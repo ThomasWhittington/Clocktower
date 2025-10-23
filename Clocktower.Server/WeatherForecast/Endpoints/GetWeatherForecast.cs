@@ -1,6 +1,6 @@
-﻿
-namespace Clocktower.Server.WeatherForecast.Endpoints;
+﻿namespace Clocktower.Server.WeatherForecast.Endpoints;
 
+[UsedImplicitly]
 public class GetWeatherForecast:IEndpoint
 {
     

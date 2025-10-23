@@ -1,6 +1,19 @@
-@ServerAddress = http://localhost:5120
+@ServerAddress = http://localhost:5120/api
 
-GET {{ServerAddress}}/weatherforecast/
-Accept: application/json
+POST {{ServerAddress}}/players/
+Content-Type: application/json
 
-###
+{
+  "name": "Tamzin"
+}
+
+### GetRoles no filter
+GET {{ServerAddress}}/roles/
+
+### GetRoles edition filter
+GET {{ServerAddress}}/roles/?
+    edition=0
+
+### GetRoles roleType filter
+GET {{ServerAddress}}/roles/?
+    roleType=3

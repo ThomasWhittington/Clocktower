@@ -1,5 +1,11 @@
+global using Microsoft.AspNetCore.Http.HttpResults;
 global using Clocktower.Server.Common.Api;
 global using FluentValidation;
+global using JetBrains.Annotations;
+global using Clocktower.Server.Data.Types.Enum;
+global using Clocktower.Server.Data.Types;
+global using Clocktower.Server.Data.Types.Role;
+global using Clocktower.Server.Data.Filters;
 using Clocktower.Server;
 using Serilog;
 

@@ -1,4 +1,6 @@
 ﻿using Clocktower.Server.Common.Api.Filters;
+using Clocktower.Server.Players.Endpoints;
+using Clocktower.Server.Roles.Endpoints;
 using Clocktower.Server.WeatherForecast.Endpoints;
 
 namespace Clocktower.Server;
@@ -11,6 +13,8 @@ public static class Endpoints
             .AddEndpointFilter<RequestLoggingFilter>();
         
         endpoints.MapWeatherForecastEndpoints();
+        endpoints.MapPlayersEndpoints();
+        endpoints.MapRolesEndpoints();
     }
 
     private static void MapWeatherForecastEndpoints(this IEndpointRouteBuilder app)
@@ -20,6 +24,25 @@ public static class Endpoints
             
         endpoints.MapPublicGroup()
             .MapEndpoint<GetWeatherForecast>();
+    }
+    
+    private static void MapPlayersEndpoints(this IEndpointRouteBuilder app)
+    {
+        var endpoints = app.MapGroup("/players")
+            .WithTags("Players");
+            
+        endpoints.MapPublicGroup()
+            .MapEndpoint<AddPlayer>();
+    }
+    
+    private static void MapRolesEndpoints(this IEndpointRouteBuilder app)
+    {
+        var endpoints = app.MapGroup("/roles")
+            .WithTags("Roles");
+            
+        endpoints.MapPublicGroup()
+            .MapEndpoint<GetRoles>()
+            ;
     }
     
     private static RouteGroupBuilder MapPublicGroup(this IEndpointRouteBuilder app, string? prefix = null)

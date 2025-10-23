@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http.Json;
+using Serilog;
 
 namespace Clocktower.Server;
 
@@ -8,7 +10,14 @@ public static class ConfigureServices
     {
         builder.AddSerilog();
         builder.AddSwagger();
+        builder.ConfigureJson();
         builder.Services.AddValidatorsFromAssembly(typeof(ConfigureServices).Assembly);
+    }
+
+    private static void ConfigureJson(this WebApplicationBuilder builder)
+    {
+        builder.Services.ConfigureHttpJsonOptions(options => { options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
+        builder.Services.Configure<JsonOptions>(options => { options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
     }
 
     private static void AddSwagger(this WebApplicationBuilder builder)
@@ -18,6 +27,11 @@ public static class ConfigureServices
         {
             options.CustomSchemaIds(type => type.FullName?.Replace('+', '.'));
             options.InferSecuritySchemes();
+        });
+        
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SchemaFilter<EnumSchemaFilter>();
         });
     }
 
