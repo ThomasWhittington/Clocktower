@@ -6,6 +6,8 @@ global using Clocktower.Server.Data.Types.Enum;
 global using Clocktower.Server.Data.Types;
 global using Clocktower.Server.Data.Types.Role;
 global using Clocktower.Server.Data.Filters;
+global using Clocktower.Server.Game.Services;
+global using Clocktower.Server.Common.Api.Extensions;
 using Clocktower.Server;
 using Serilog;
 

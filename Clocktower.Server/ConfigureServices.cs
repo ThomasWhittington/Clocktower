@@ -11,6 +11,7 @@ public static class ConfigureServices
         builder.AddSerilog();
         builder.AddSwagger();
         builder.ConfigureJson();
+        builder.Services.AddSingleton<GameStateService>();
         builder.Services.AddValidatorsFromAssembly(typeof(ConfigureServices).Assembly);
     }
 
@@ -28,11 +29,8 @@ public static class ConfigureServices
             options.CustomSchemaIds(type => type.FullName?.Replace('+', '.'));
             options.InferSecuritySchemes();
         });
-        
-        builder.Services.AddSwaggerGen(c =>
-        {
-            c.SchemaFilter<EnumSchemaFilter>();
-        });
+
+        builder.Services.AddSwaggerGen(c => { c.SchemaFilter<EnumSchemaFilter>(); });
     }
 
     private static void AddSerilog(this WebApplicationBuilder builder)
