@@ -1,0 +1,68 @@
+[
+  {
+    "GameId": "test1",
+    "Players": [
+      {
+        "Id": 0,
+        "Name": "Tamzin"
+      },
+      {
+        "Id": 1,
+        "Name": "Joe"
+      },
+      {
+        "Id": 2,
+        "Name": "Mark"
+      },
+      {
+        "Id": 3,
+        "Name": "Jas"
+      },
+      {
+        "Id": 4,
+        "Name": "Krystal"
+      }
+    ],
+    "MaxPlayers": 0,
+    "IsFull": false
+  },
+  {
+    "GameId": "test2",
+    "Players": [
+      {
+        "Id": 0,
+        "Name": "Bob"
+      },
+      {
+        "Id": 1,
+        "Name": "Steve"
+      },
+      {
+        "Id": 2,
+        "Name": "Ben"
+      },
+      {
+        "Id": 3,
+        "Name": "Claire"
+      },
+      {
+        "Id": 4,
+        "Name": "Jane"
+      },
+      {
+        "Id": 5,
+        "Name": "Jenny"
+      },
+      {
+        "Id": 6,
+        "Name": "Keith"
+      },
+      {
+        "Id": 7,
+        "Name": "Richard"
+      }
+    ],
+    "MaxPlayers": 0,
+    "IsFull": false
+  }
+]
