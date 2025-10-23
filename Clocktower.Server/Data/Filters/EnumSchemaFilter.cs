@@ -16,6 +16,7 @@ public class EnumSchemaFilter : ISchemaFilter
             {
                 schema.Enum.Add(new OpenApiString(enumName));
             }
+
             schema.Type = "string";
             schema.Format = null;
         }

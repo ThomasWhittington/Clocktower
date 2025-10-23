@@ -1,8 +1,5 @@
-﻿using Clocktower.Server.Common.Api.Filters;
-using Clocktower.Server.Game.Endpoints;
-using Clocktower.Server.Players.Endpoints;
-using Clocktower.Server.Roles.Endpoints;
-using Clocktower.Server.WeatherForecast.Endpoints;
+﻿using System.Reflection;
+using Clocktower.Server.Common.Api.Filters;
 
 namespace Clocktower.Server;
 
@@ -13,28 +10,8 @@ public static class Endpoints
         var endpoints = app.MapGroup("api")
             .AddEndpointFilter<RequestLoggingFilter>();
 
-        endpoints.MapWeatherForecastEndpoints();
-        endpoints.MapPlayersEndpoints();
         endpoints.MapRolesEndpoints();
         endpoints.MapGamesEndpoints();
-    }
-
-    private static void MapWeatherForecastEndpoints(this IEndpointRouteBuilder app)
-    {
-        var endpoints = app.MapGroup("/weatherforecast")
-            .WithTags("WeatherForecast");
-
-        endpoints.MapPublicGroup()
-            .MapEndpoint<GetWeatherForecast>();
-    }
-
-    private static void MapPlayersEndpoints(this IEndpointRouteBuilder app)
-    {
-        var endpoints = app.MapGroup("/players")
-            .WithTags("Players");
-
-        endpoints.MapPublicGroup()
-            .MapEndpoint<AddPlayer>();
     }
 
     private static void MapRolesEndpoints(this IEndpointRouteBuilder app)
@@ -43,8 +20,7 @@ public static class Endpoints
             .WithTags("Roles");
 
         endpoints.MapPublicGroup()
-            .MapEndpoint<GetRoles>()
-            ;
+            .MapEndpointsFromNamespace("Clocktower.Server.Roles.Endpoints");
     }
 
     private static void MapGamesEndpoints(this IEndpointRouteBuilder app)
@@ -53,10 +29,7 @@ public static class Endpoints
             .WithTags("Games");
 
         endpoints.MapPublicGroup()
-            .MapEndpoint<GetGames>()
-            .MapEndpoint<GetGame>()
-            .MapEndpoint<StartGame>()
-            ;
+            .MapEndpointsFromNamespace("Clocktower.Server.Game.Endpoints");
     }
 
     private static RouteGroupBuilder MapPublicGroup(this IEndpointRouteBuilder app, string? prefix = null)
@@ -65,9 +38,30 @@ public static class Endpoints
             .AllowAnonymous();
     }
 
-    private static IEndpointRouteBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app) where TEndpoint : IEndpoint
+    public static IEndpointRouteBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app) where TEndpoint : IEndpoint
     {
         TEndpoint.Map(app);
         return app;
+    }
+
+    public static IEndpointRouteBuilder MapEndpointsFromNamespace(this IEndpointRouteBuilder builder, string namespaceName)
+    {
+        var endpointTypes = Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(t => t.Namespace == namespaceName &&
+                        t is { IsClass: true, IsAbstract: false } &&
+                        typeof(IEndpoint).IsAssignableFrom(t));
+
+        var mapEndpointMethod = typeof(Endpoints)
+            .GetMethods()
+            .First(m => m is { Name: nameof(MapEndpoint), IsGenericMethodDefinition: true });
+
+        foreach (var endpointType in endpointTypes)
+        {
+            var genericMethod = mapEndpointMethod.MakeGenericMethod(endpointType);
+            genericMethod.Invoke(null, [builder]);
+        }
+
+        return builder;
     }
 }

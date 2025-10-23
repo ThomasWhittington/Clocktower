@@ -45,5 +45,31 @@ public class GameStateService
             : (false, null, $"Game ID '{gameId}' already exists");
     }
 
-    public void UpdateGame(string gameId, GameState gameState) => _games[gameId] = gameState;
+    public (bool success, Player? newPlayer, string message, AddPlayerError error) AddPlayerToGame(string gameId, string playerName)
+    {
+        var gameResult = GetGame(gameId);
+        if (!gameResult.success || gameResult.gameState == null)
+            return (false, null, gameResult.message, AddPlayerError.GameNotFound);
+
+        if (gameResult.gameState.IsFull)
+            return (false, null, $"Game is full - cannot add more players", AddPlayerError.GameFull);
+
+        if (gameResult.gameState.Players.Any(p => p.Name == playerName))
+            return (false, null, $"Player '{playerName}' already exists in this game", AddPlayerError.PlayerAlreadyExists);
+
+        var currentPlayerCount = gameResult.gameState.Players.Count;
+        var newPlayer = new Player { Name = playerName, Id = currentPlayerCount };
+
+        gameResult.gameState.Players.Add(newPlayer);
+
+        return (true, newPlayer, "Player added successfully", AddPlayerError.NoError);
+    }
+}
+
+public enum AddPlayerError
+{
+    NoError,
+    GameNotFound,
+    PlayerAlreadyExists,
+    GameFull
 }

@@ -1,9 +1,9 @@
-﻿using System.Security.Claims;
-using Clocktower.Server.Common.Api.Filters;
+﻿using Clocktower.Server.Common.Api.Filters;
 
 namespace Clocktower.Server.Common.Api.Extensions;
 
-public static class RouteHandlerBuilderValidationExtensions{
+public static class RouteHandlerBuilderValidationExtensions
+{
     /// <summary>
     /// Adds a request validation filter to the route handler.
     /// </summary>

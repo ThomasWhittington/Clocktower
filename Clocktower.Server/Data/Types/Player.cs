@@ -1,9 +1,7 @@
-﻿
-namespace Clocktower.Server.Data.Types;
+﻿namespace Clocktower.Server.Data.Types;
 
 public class Player
 {
+    public int Id { get; set; }
     public string Name { get; set; }
-    public Role.Role Role { get; set; }
-    public PlayerAlignment Alignment { get; set; } 
 }
