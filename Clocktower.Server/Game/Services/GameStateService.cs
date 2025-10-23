@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Text.Json;
 using Clocktower.Server.Data;
 
 namespace Clocktower.Server.Game.Services;
@@ -10,6 +11,24 @@ public class GameStateService
     public GameState[] GetGames()
     {
         return _games.Values.ToArray();
+    }
+
+    public (bool success, string message) LoadDummyData()
+    {
+        var json = File.ReadAllText("dummyState.json");
+        var games = JsonSerializer.Deserialize<GameState[]>(json);
+        if (games == null)
+        {
+            return (false, "Failed to deserialize json");
+        }
+
+        _games.Clear();
+        foreach (var gameState in games)
+        {
+            _games.TryAdd(gameState.GameId, gameState);
+        }
+
+        return (true, "Loaded dummy data");
     }
 
     public (bool success, GameState? gameState, string message) GetGame(string gameId)
