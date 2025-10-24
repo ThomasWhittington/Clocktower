@@ -4,7 +4,7 @@ import GameManager
 
 function App() {
     return (
-            <GameManager/>
+        <GameManager/>
     )
 }
 
