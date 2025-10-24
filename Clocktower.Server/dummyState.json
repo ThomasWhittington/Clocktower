@@ -1,6 +1,7 @@
 [
   {
-    "GameId": "test1",
+    "Id": "test1",
+    "MaxPlayers": 0,
     "Players": [
       {
         "Id": 0,
@@ -22,12 +23,11 @@
         "Id": 4,
         "Name": "Krystal"
       }
-    ],
-    "MaxPlayers": 0,
-    "IsFull": false
+    ]
   },
   {
-    "GameId": "test2",
+    "Id": "test2",
+    "MaxPlayers": 8,
     "Players": [
       {
         "Id": 0,
@@ -61,8 +61,6 @@
         "Id": 7,
         "Name": "Richard"
       }
-    ],
-    "MaxPlayers": 0,
-    "IsFull": false
+    ]
   }
 ]

@@ -25,7 +25,7 @@ public class GameStateService
         _games.Clear();
         foreach (var gameState in games)
         {
-            _games.TryAdd(gameState.GameId, gameState);
+            _games.TryAdd(gameState.Id, gameState);
         }
 
         return (true, "Loaded dummy data");
@@ -54,7 +54,7 @@ public class GameStateService
     {
         var newGameState = new GameState
         {
-            GameId = gameId
+            Id = gameId
         };
 
         bool addSuccessful = _games.TryAdd(gameId, newGameState);

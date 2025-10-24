@@ -2,7 +2,7 @@
 
 public class GameState
 {
-    public string GameId { get; set; }
+    public string Id { get; set; }
     public List<Player> Players { get; set; } = [];
     public int MaxPlayers { get; set; } = 0;
 
