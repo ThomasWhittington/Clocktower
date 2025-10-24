@@ -10,25 +10,45 @@ import styles
 import GameList
     from "./components";
 
+import {
+    gamesService
+} from "../../../services";
+
 function GameManager() {
     const [isLoading, setIsLoading] = useState(false);
     const [games, setGames] = useState([]);
+    const [game, setGame] = useState([]);
+    const [hasError, setHasError] = useState(false);
+    const [error, setError] = useState('');
+
+    const clearError = () => {
+        setHasError(false);
+        setError('');
+    };
+
+    const handleError = (err: any) => {
+        const errorMessage = err.response?.data?.message ||
+            err.response?.data ||
+            err.message ||
+            'An unexpected error occurred';
+        setError(errorMessage);
+        setHasError(true);
+    };
+
     const loadDummyData = async () => {
+        clearError();
         setIsLoading(true);
-        fetch('/api/games/load', {
-            method: 'POST'
-        })
-            .then((res) => res.json())
-            .catch((err) => console.error('API error:', err))
+        gamesService.loadDummyData()
+            .catch((err) => handleError(err))
             .finally(() => setIsLoading(false));
     };
 
     const getGames = async () => {
+        clearError();
         setIsLoading(true);
-        fetch('/api/games')
-            .then((res) => res.json())
+        gamesService.getGames()
             .then((data) => setGames(data))
-            .catch((err) => console.error('API error:', err))
+            .catch((err) => handleError(err))
             .finally(() => setIsLoading(false));
     }
 
@@ -39,14 +59,15 @@ function GameManager() {
                 const name = prompt("Player name");
                 if (name?.trim()) {
                     //TODO add player to current game id
+                    clearError();
+                    setIsLoading(true);
+                    gamesService.getGame(name).then(data => setGame(data))
+                        .catch((err) => handleError(err))
+                        .finally(() => setIsLoading(false));
                 }
             }
         };
-
-        // Add event listener
         globalThis.addEventListener('keydown', handleKeyPress);
-
-        // Cleanup
         return () => {
             globalThis.removeEventListener('keydown', handleKeyPress);
         };
@@ -60,6 +81,23 @@ function GameManager() {
                     <Spinner/>
                 ) : (
                     <>
+                        {hasError && (
+                            <div
+                                className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                                <div
+                                    className="flex justify-between items-center">
+                                    <span>{error}</span>
+                                    <button
+                                        onClick={clearError}
+                                        className="ml-2 !bg-white  !border-red-400 text-red-500 hover:text-red-700 font-bold"
+                                        aria-label="Dismiss error"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                         <button
                             onClick={loadDummyData}
                             className={styles.button}>
@@ -78,6 +116,10 @@ function GameManager() {
 
                         <GameList
                             games={games}/>
+                        <br/>
+
+                        <pre>{JSON.stringify(game, null, 2)}</pre>
+
                     </>)
             }
         </div>
