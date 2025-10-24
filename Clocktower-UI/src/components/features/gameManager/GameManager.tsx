@@ -14,10 +14,10 @@ import {
     gamesService
 } from "../../../services";
 
-function GameManager() {
+function GameManager({className}: { className?: string }) {
     const [isLoading, setIsLoading] = useState(false);
     const [games, setGames] = useState([]);
-    const [game, setGame] = useState([]);
+    const [game, setGame] = useState(null);
     const [hasError, setHasError] = useState(false);
     const [error, setError] = useState('');
 
@@ -44,6 +44,7 @@ function GameManager() {
     };
 
     const getGames = async () => {
+       setGames([]);
         clearError();
         setIsLoading(true);
         gamesService.getGames()
@@ -59,6 +60,7 @@ function GameManager() {
                 const name = prompt("Player name");
                 if (name?.trim()) {
                     //TODO add player to current game id
+                   setGame(null);
                     clearError();
                     setIsLoading(true);
                     gamesService.getGame(name).then(data => setGame(data))
@@ -74,7 +76,7 @@ function GameManager() {
     }, []);
 
     return (
-        <div>
+        <div className={className}>
             <h2 className="text-3xl font-bold mb-6 text-gray-200">Game Manager</h2>
             {
                 isLoading ? (
