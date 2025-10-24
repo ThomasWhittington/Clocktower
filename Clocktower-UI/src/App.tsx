@@ -3,7 +3,8 @@ import { GameManager } from './components/features';
 
 function App() {
     return (
-        <GameManager/>
+        <GameManager
+            className="min-h-screen w-full"/>
     )
 }
 
