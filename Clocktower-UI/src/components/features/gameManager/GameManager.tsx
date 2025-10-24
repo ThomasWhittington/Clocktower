@@ -18,6 +18,7 @@ function GameManager() {
     const [isLoading, setIsLoading] = useState(false);
     const [games, setGames] = useState([]);
     const [game, setGame] = useState([]);
+    const [gameId, setGameId] = useState('');
     const [hasError, setHasError] = useState(false);
     const [error, setError] = useState('');
 
@@ -52,21 +53,37 @@ function GameManager() {
             .finally(() => setIsLoading(false));
     }
 
-    useEffect(() => {
-        const handleKeyPress = (event: KeyboardEvent) => {
-            if (event.key === 'a' || event.key === 'A') {
-                console.log('A key pressed!');
-                const name = prompt("Player name");
-                if (name?.trim()) {
-                    //TODO add player to current game id
-                    clearError();
-                    setIsLoading(true);
-                    gamesService.getGame(name).then(data => setGame(data))
-                        .catch((err) => handleError(err))
-                        .finally(() => setIsLoading(false));
-                }
+    const getGame = async (gameId: string) => {
+        clearError();
+        setIsLoading(true);
+        gamesService.getGame(gameId).then(data => setGame(data))
+            .catch((err) => handleError(err))
+            .finally(() => setIsLoading(false));
+    }
+
+    const startGame = async () => {
+        clearError();
+        setIsLoading(true);
+        gamesService.startGame(gameId).then(data => {
+            setGame(data);
+            getGames();
+        })
+            .catch((err) => handleError(err))
+            .finally(() => setIsLoading(false));
+    }
+
+    const handleKeyPress = async (event: KeyboardEvent) => {
+        if (event.key === 'a' || event.key === 'A') {
+            console.log('A key pressed!');
+            const name = prompt("Player name");
+            if (name?.trim()) {
+                //TODO add player to current game id
+                await getGame(name)
             }
-        };
+        }
+    };
+
+    useEffect(() => {
         globalThis.addEventListener('keydown', handleKeyPress);
         return () => {
             globalThis.removeEventListener('keydown', handleKeyPress);
@@ -111,14 +128,21 @@ function GameManager() {
                         </button>
                         <br/>
                         <input
-                            type="text"
-                            className={styles.input}/>
+                            value={gameId}
+                            onChange={e => setGameId(e.target.value)}
+                        />
+                        <button
+                            onClick={startGame}
+                            className={styles.button}>
+                            Start game
+                        </button>
 
                         <GameList
                             games={games}/>
                         <br/>
 
                         <pre>{JSON.stringify(game, null, 2)}</pre>
+
 
                     </>)
             }

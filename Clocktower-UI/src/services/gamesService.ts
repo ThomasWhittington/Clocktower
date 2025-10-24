@@ -18,8 +18,20 @@ async function loadDummyData() {
     return result.data;
 }
 
+async function startGame(id: string) {
+    const result = await axios.post(`${endpoint}/${id}/start`);
+    if (result.status === 201) {
+        return result.data;
+    } else {
+        console.error(result)
+    }
+
+    return result.data;
+}
+
 export const gamesService = {
     getGame,
     getGames,
-    loadDummyData
+    loadDummyData,
+    startGame
 }
