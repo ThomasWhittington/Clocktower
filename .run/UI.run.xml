@@ -1,5 +1,8 @@
 ﻿<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Launch UI" type="js.build_tools.npm">
+    <configuration
+            default="false"
+            name="UI"
+            type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/Clocktower-UI/package.json" />
     <command value="run" />
     <scripts>

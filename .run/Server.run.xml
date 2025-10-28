@@ -2,7 +2,7 @@
         name="ProjectRunConfigurationManager">
     <configuration
             default="false"
-            name="Clocktower.Server: http"
+            name="Server"
             type="LaunchSettings"
             factoryName=".NET Launch Settings Profile">
         <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH"
