@@ -8,6 +8,9 @@ public class DiscordService(DiscordBotService bot)
 {
     private const string TownSquareName = "⛲ Town Square";
     private const string ConsultationName = "📖 Storyteller's Consultation";
+    private const string DayCategoryName = "🌞 Day BOTC";
+    private const string NightCategoryName = "🌙 Night BOTC ✨";
+    private const string CottageName = "🛌 Cottage";
 
     private readonly string[] _dayRoomNames =
     [
@@ -22,31 +25,15 @@ public class DiscordService(DiscordBotService bot)
         "💀 Haunted Cemetery"
     ];
 
-    public async Task<(bool success, string message)> CreateChannel(ulong guildId, string name)
-    {
-        try
-        {
-            var guild = await bot.Client.GetGuildAsync(guildId);
-            if (guild == null) return (false, "Guild not found");
-            var result = await guild.CreateVoiceChannelAsync(name);
-            if (result == null) return (false, "Channel failed to be created");
-            return (true, "Channel created");
-        }
-        catch (Exception ex)
-        {
-            return (false, ex.Message);
-        }
-    }
-
     public async Task<(bool success, string message)> DeleteTown(ulong guildId)
     {
         try
         {
             var guild = await bot.Client.GetGuildAsync(guildId);
             var categoryChannels = (await guild.GetChannelsAsync()).Where(o => o.IsCategory).ToList();
-            var dayCategory = categoryChannels.FirstOrDefault(o => o.Name.Contains("Day"));
+            var dayCategory = categoryChannels.FirstOrDefault(o => o.Name == DayCategoryName);
             if (dayCategory != null) await DeleteCategory(dayCategory);
-            var nightCategory = categoryChannels.FirstOrDefault(o => o.Name.Contains("Night"));
+            var nightCategory = categoryChannels.FirstOrDefault(o => o.Name == NightCategoryName);
             if (nightCategory != null) await DeleteCategory(nightCategory);
             return (true, "Town deleted");
         }
@@ -81,7 +68,7 @@ public class DiscordService(DiscordBotService bot)
             {
                 new DiscordOverwriteBuilder(guild.EveryoneRole).Allow(Permissions.AccessChannels)
             };
-            var category = await guild.CreateChannelCategoryAsync("🌞 Day BOTC", overwrites: overwrites);
+            var category = await guild.CreateChannelCategoryAsync(DayCategoryName, overwrites: overwrites);
 
             await CreateVoiceChannel(guild, category, TownSquareName);
             foreach (var dayRoomName in _dayRoomNames)
@@ -99,7 +86,7 @@ public class DiscordService(DiscordBotService bot)
         }
     }
 
-    private async Task<bool> CreateNightVoiceChannels(DiscordGuild guild)
+    private static async Task<bool> CreateNightVoiceChannels(DiscordGuild guild)
     {
         try
         {
@@ -111,12 +98,12 @@ public class DiscordService(DiscordBotService bot)
                 new DiscordOverwriteBuilder(guild.EveryoneRole).Deny(Permissions.AccessChannels),
                 new DiscordOverwriteBuilder(storytellerRole).Allow(Permissions.AccessChannels)
             };
-            var category = await guild.CreateChannelCategoryAsync("🌙 Night BOTC ✨", overwrites: overwrites);
+            var category = await guild.CreateChannelCategoryAsync(NightCategoryName, overwrites: overwrites);
 
 
             for (int i = 0; i < 15; i++)
             {
-                var result = await CreateVoiceChannel(guild, category, "🛌 Cottage");
+                var result = await CreateVoiceChannel(guild, category, CottageName);
                 if (!result) return result;
             }
 
@@ -140,7 +127,7 @@ public class DiscordService(DiscordBotService bot)
         await categoryChannel.DeleteAsync();
     }
 
-    private async Task<bool> CreateVoiceChannel(DiscordGuild guild, DiscordChannel category, string channelName)
+    private static async Task<bool> CreateVoiceChannel(DiscordGuild guild, DiscordChannel category, string channelName)
     {
         var result = await guild.CreateVoiceChannelAsync(channelName, parent: category);
         return result != null;
