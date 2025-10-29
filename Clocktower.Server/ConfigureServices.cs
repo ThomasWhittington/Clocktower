@@ -1,4 +1,6 @@
 ﻿using System.Text.Json.Serialization;
+using Clocktower.Server.Common;
+using Clocktower.Server.Discord.Services;
 using Microsoft.AspNetCore.Http.Json;
 using Serilog;
 
@@ -8,9 +10,15 @@ public static class ConfigureServices
 {
     public static void AddServices(this WebApplicationBuilder builder)
     {
+        var config = new ConfigurationBuilder().AddUserSecrets<Secrets>().Build();
+        var secrets = config.GetSection(nameof(Secrets)).Get<Secrets>()!;
+
         builder.AddSerilog();
         builder.AddSwagger();
         builder.ConfigureJson();
+        builder.Services.AddSingleton(secrets);
+        builder.Services.AddSingleton<DiscordBotService>();
+        builder.Services.AddSingleton<DiscordService>();
         builder.Services.AddSingleton<GameStateService>();
         builder.Services.AddValidatorsFromAssembly(typeof(ConfigureServices).Assembly);
     }
