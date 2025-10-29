@@ -12,6 +12,7 @@ public class DiscordService(DiscordBotService bot)
     private const string NightCategoryName = "🌙 Night BOTC ✨";
     private const string CottageName = "🛌 Cottage";
     private const string StoryTellerRoleName = "StoryTeller";
+    private const int CottageCount = 15;
 
     private readonly string[] _dayRoomNames =
     [
@@ -25,6 +26,55 @@ public class DiscordService(DiscordBotService bot)
         "🕍 Sacred Temple",
         "💀 Haunted Cemetery"
     ];
+
+    public async Task<(bool success, string message)> RebuildTown(ulong guildId)
+    {
+        try
+        {
+            var delete = await DeleteTown(guildId);
+            if (!delete.success) return delete;
+            var create = await CreateTown(guildId);
+            return create;
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
+
+    public async Task<(bool success, bool exists, string message)> TownExists(ulong guildId)
+    {
+        try
+        {
+            var guild = await bot.Client.GetGuildAsync(guildId);
+
+            var role = guild.Roles.FirstOrDefault(o => o.Value.Name == StoryTellerRoleName).Value;
+            if (role == null) return (true, false, $"{StoryTellerRoleName} role does not exist. Recommend rebuild");
+
+            var categoryChannels = (await guild.GetChannelsAsync()).Where(o => o.IsCategory).ToList();
+            var dayCategory = categoryChannels.FirstOrDefault(o => o.Name == DayCategoryName);
+            if (dayCategory == null) return (true, false, "Missing day category, Recommend rebuild");
+
+            if (_dayRoomNames.Select(dayRoomName => dayCategory.Children.Any(o => o.Name == dayRoomName)).Any(channelExists => !channelExists))
+            {
+                return (true, false, "Missing day channels. Recommend rebuild");
+            }
+
+            var nightCategory = categoryChannels.FirstOrDefault(o => o.Name == NightCategoryName);
+            if (nightCategory == null) return (true, false, "Missing night category, Recommend rebuild");
+
+            if (nightCategory.Children.Count < 15)
+            {
+                return (true, false, "Not enough cottages, Recommend rebuild");
+            }
+
+            return (true, true, "Town exists");
+        }
+        catch (Exception ex)
+        {
+            return (false, false, ex.Message);
+        }
+    }
 
     public async Task<(bool success, string message)> DeleteTown(ulong guildId)
     {
@@ -46,7 +96,7 @@ public class DiscordService(DiscordBotService bot)
         }
     }
 
-    public async Task<(bool success, string message )> CreateTown(ulong guildId)
+    public async Task<(bool success, string message)> CreateTown(ulong guildId)
     {
         try
         {
@@ -170,7 +220,7 @@ public class DiscordService(DiscordBotService bot)
             var category = await guild.CreateChannelCategoryAsync(NightCategoryName, overwrites: overwrites);
 
 
-            for (int i = 0; i < 15; i++)
+            for (int i = 0; i < CottageCount; i++)
             {
                 var result = await CreateVoiceChannel(guild, category, CottageName);
                 if (!result) return result;
