@@ -11,6 +11,7 @@ public class DiscordService(DiscordBotService bot)
     private const string DayCategoryName = "🌞 Day BOTC";
     private const string NightCategoryName = "🌙 Night BOTC ✨";
     private const string CottageName = "🛌 Cottage";
+    private const string StoryTellerRoleName = "StoryTeller";
 
     private readonly string[] _dayRoomNames =
     [
@@ -35,6 +36,8 @@ public class DiscordService(DiscordBotService bot)
             if (dayCategory != null) await DeleteCategory(dayCategory);
             var nightCategory = categoryChannels.FirstOrDefault(o => o.Name == NightCategoryName);
             if (nightCategory != null) await DeleteCategory(nightCategory);
+            await DeleteRoles(guild);
+
             return (true, "Town deleted");
         }
         catch (Exception ex)
@@ -48,6 +51,8 @@ public class DiscordService(DiscordBotService bot)
         try
         {
             var guild = await bot.Client.GetGuildAsync(guildId);
+            var roleCreated = await CreateRoles(guild);
+            if (!roleCreated) return (false, "Failed to generate roles");
             var dayCreated = await CreateDayVoiceChannels(guild);
             if (!dayCreated) return (false, "Failed to generate day channels");
             var nightCreated = await CreateNightVoiceChannels(guild);
@@ -57,6 +62,43 @@ public class DiscordService(DiscordBotService bot)
         catch (Exception ex)
         {
             return (false, ex.Message);
+        }
+    }
+
+    private static async Task<bool> CreateRoles(DiscordGuild guild)
+    {
+        try
+        {
+            if (guild.Roles.Any(o => o.Value.Name != StoryTellerRoleName))
+            {
+                var role = await guild.CreateRoleAsync(StoryTellerRoleName, color: DiscordColor.Goldenrod);
+                if (role == null) return false;
+            }
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
+    private static async Task<bool> DeleteRoles(DiscordGuild guild)
+    {
+        try
+        {
+            var role = guild.Roles.FirstOrDefault(o => o.Value.Name == StoryTellerRoleName).Value;
+            if (role != null)
+            {
+                await role.DeleteAsync();
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw;
+            return false;
         }
     }
 
@@ -90,7 +132,7 @@ public class DiscordService(DiscordBotService bot)
     {
         try
         {
-            var storytellerRole = guild.Roles.FirstOrDefault(r => r.Value.Name == "StoryTeller").Value;
+            var storytellerRole = guild.Roles.FirstOrDefault(r => r.Value.Name == StoryTellerRoleName).Value;
             if (storytellerRole == null) return false;
 
             var overwrites = new List<DiscordOverwriteBuilder>
