@@ -65,6 +65,33 @@ public class DiscordService(DiscordBotService bot)
         }
     }
 
+    public async Task<(bool success, string message)> ToggleStoryTeller(ulong guildId, ulong userId)
+    {
+        try
+        {
+            var guild = await bot.Client.GetGuildAsync(guildId);
+            var role = guild.Roles.FirstOrDefault(o => o.Value.Name == StoryTellerRoleName).Value;
+            if (role == null) return (false, $"{StoryTellerRoleName} role does not exist");
+            var user = await guild.GetMemberAsync(userId);
+            if (user == null) return (false, "User not found");
+
+            if (user.Roles.Contains(role))
+            {
+                await user.RevokeRoleAsync(role);
+                return (true, $"User {user.DisplayName} is no longer a {StoryTellerRoleName}");
+            }
+            else
+            {
+                await user.GrantRoleAsync(role);
+                return (true, $"User {user.DisplayName} is now a {StoryTellerRoleName}");
+            }
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
+
     private static async Task<bool> CreateRoles(DiscordGuild guild)
     {
         try
