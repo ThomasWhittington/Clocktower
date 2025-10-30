@@ -51,8 +51,7 @@ public class DiscordService(DiscordBotService bot)
             var role = guild.Roles.FirstOrDefault(o => o.Value.Name == StoryTellerRoleName).Value;
             if (role == null) return (true, false, $"{StoryTellerRoleName} role does not exist. Recommend rebuild");
 
-            var categoryChannels = (await guild.GetChannelsAsync()).Where(o => o.IsCategory).ToList();
-            var dayCategory = categoryChannels.FirstOrDefault(o => o.Name == DayCategoryName);
+            var dayCategory = await guild.GetCategory(name: DayCategoryName);
             if (dayCategory == null) return (true, false, "Missing day category, Recommend rebuild");
 
             if (_dayRoomNames.Select(dayRoomName => dayCategory.Children.Any(o => o.Name == dayRoomName)).Any(channelExists => !channelExists))
@@ -60,10 +59,10 @@ public class DiscordService(DiscordBotService bot)
                 return (true, false, "Missing day channels. Recommend rebuild");
             }
 
-            var nightCategory = categoryChannels.FirstOrDefault(o => o.Name == NightCategoryName);
+            var nightCategory = await guild.GetCategory(name: NightCategoryName);
             if (nightCategory == null) return (true, false, "Missing night category, Recommend rebuild");
 
-            if (nightCategory.Children.Count < 15)
+            if (nightCategory.Children.Count < CottageCount)
             {
                 return (true, false, "Not enough cottages, Recommend rebuild");
             }
@@ -81,11 +80,10 @@ public class DiscordService(DiscordBotService bot)
         try
         {
             var guild = await bot.Client.GetGuildAsync(guildId);
-            var categoryChannels = (await guild.GetChannelsAsync()).Where(o => o.IsCategory).ToList();
-            var dayCategory = categoryChannels.FirstOrDefault(o => o.Name == DayCategoryName);
-            if (dayCategory != null) await DeleteCategory(dayCategory);
-            var nightCategory = categoryChannels.FirstOrDefault(o => o.Name == NightCategoryName);
-            if (nightCategory != null) await DeleteCategory(nightCategory);
+            var dayCategory = await guild.GetCategory(name: DayCategoryName);
+            if (dayCategory != null) await dayCategory.DeleteCategoryAsync();
+            var nightCategory = await guild.GetCategory(name: NightCategoryName);
+            if (nightCategory != null) await nightCategory.DeleteCategoryAsync();
             await DeleteRoles(guild);
 
             return (true, "Town deleted");
@@ -142,68 +140,28 @@ public class DiscordService(DiscordBotService bot)
         }
     }
 
-    private static async Task<bool> CreateRoles(DiscordGuild guild)
+
+    public async Task<(bool success, TownOccupants? townOccupants, string message)> GetTownOccupancy(ulong guildId)
     {
         try
         {
-            if (guild.Roles.Any(o => o.Value.Name != StoryTellerRoleName))
-            {
-                var role = await guild.CreateRoleAsync(StoryTellerRoleName, color: DiscordColor.Goldenrod);
-                if (role == null) return false;
-            }
+            var guild = await bot.Client.GetGuildAsync(guildId);
 
-            return true;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
+            var channelCategories = new List<MiniCategory>();
+            var dayCategory = await guild.GetMiniCategory(DayCategoryName);
+            if (dayCategory != null) channelCategories.Add(dayCategory);
+            var nightCategory = await guild.GetMiniCategory(NightCategoryName);
+            if (nightCategory != null) channelCategories.Add(nightCategory);
 
-    private static async Task<bool> DeleteRoles(DiscordGuild guild)
-    {
-        try
-        {
-            var role = guild.Roles.FirstOrDefault(o => o.Value.Name == StoryTellerRoleName).Value;
-            if (role != null)
-            {
-                await role.DeleteAsync();
-            }
-
-            return true;
+            var townOccupants = new TownOccupants(channelCategories);
+            return (true, townOccupants, $"Town occupancy {townOccupants.UserCount}");
         }
         catch (Exception ex)
         {
-            throw;
-            return false;
+            return (false, null, ex.Message);
         }
     }
 
-    private async Task<bool> CreateDayVoiceChannels(DiscordGuild guild)
-    {
-        try
-        {
-            var overwrites = new List<DiscordOverwriteBuilder>
-            {
-                new DiscordOverwriteBuilder(guild.EveryoneRole).Allow(Permissions.AccessChannels)
-            };
-            var category = await guild.CreateChannelCategoryAsync(DayCategoryName, overwrites: overwrites);
-
-            await CreateVoiceChannel(guild, category, TownSquareName);
-            foreach (var dayRoomName in _dayRoomNames)
-            {
-                var success = await CreateVoiceChannel(guild, category, dayRoomName);
-                if (!success) return success;
-            }
-
-            await CreateVoiceChannel(guild, category, ConsultationName);
-            return true;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
 
     private static async Task<bool> CreateNightVoiceChannels(DiscordGuild guild)
     {
@@ -222,7 +180,7 @@ public class DiscordService(DiscordBotService bot)
 
             for (int i = 0; i < CottageCount; i++)
             {
-                var result = await CreateVoiceChannel(guild, category, CottageName);
+                var result = await guild.CreateVoiceChannel(category, CottageName);
                 if (!result) return result;
             }
 
@@ -234,21 +192,74 @@ public class DiscordService(DiscordBotService bot)
         }
     }
 
-    private static async Task DeleteCategory(DiscordChannel categoryChannel)
+
+    private static async Task<bool> CreateRoles(DiscordGuild guild)
     {
-        if (categoryChannel is null) return;
-
-        foreach (var channel in categoryChannel.Children)
+        try
         {
-            await channel.DeleteAsync();
-        }
+            if (guild.Roles.Any(o => o.Value.Name != StoryTellerRoleName))
+            {
+                var role = await guild.CreateRoleAsync(StoryTellerRoleName, color: DiscordColor.Goldenrod);
+                if (role == null) return false;
+            }
 
-        await categoryChannel.DeleteAsync();
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
-    private static async Task<bool> CreateVoiceChannel(DiscordGuild guild, DiscordChannel category, string channelName)
+    private static async Task DeleteRoles(DiscordGuild guild)
     {
-        var result = await guild.CreateVoiceChannelAsync(channelName, parent: category);
-        return result != null;
+        var role = guild.Roles.FirstOrDefault(o => o.Value.Name == StoryTellerRoleName).Value;
+        if (role != null)
+        {
+            await role.DeleteAsync();
+        }
+    }
+
+    private async Task<bool> CreateDayVoiceChannels(DiscordGuild guild)
+    {
+        try
+        {
+            var overwrites = new List<DiscordOverwriteBuilder>
+            {
+                new DiscordOverwriteBuilder(guild.EveryoneRole).Allow(Permissions.AccessChannels)
+            };
+            var category = await guild.CreateChannelCategoryAsync(DayCategoryName, overwrites: overwrites);
+
+            await guild.CreateVoiceChannel(category, TownSquareName);
+            foreach (var dayRoomName in _dayRoomNames)
+            {
+                var success = await guild.CreateVoiceChannel(category, dayRoomName);
+                if (!success) return success;
+            }
+
+            await guild.CreateVoiceChannel(category, ConsultationName);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 }
+
+[UsedImplicitly]
+public record MiniChannel(ulong Id, string Name);
+
+[UsedImplicitly]
+public record MiniCategory(ulong Id, string Name, IEnumerable<ChannelOccupants> Channels);
+
+[UsedImplicitly]
+public record MiniUser(ulong Id, string Name);
+
+public record TownOccupants(IEnumerable<MiniCategory> ChannelCategories)
+{
+    public int UserCount => ChannelCategories.Sum(category => category.Channels.Sum(channel => channel.Occupants.Count()));
+}
+
+[UsedImplicitly]
+public record ChannelOccupants(MiniChannel Channel, IEnumerable<MiniUser> Occupants);
