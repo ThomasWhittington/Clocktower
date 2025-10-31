@@ -10,8 +10,8 @@ import {
     StatusIcon
 } from "../../../ui";
 import type {
-    ClocktowerServerDiscordEndpointsCheckGuildResponse,
-    ClocktowerServerDiscordEndpointsGetTownStatusResponse
+    CheckGuildApiResponse,
+    GetTownStatusApiResponse
 } from "../../../../openApi";
 
 function DiscordAdminPanel({guildIdChange}: {
@@ -21,9 +21,10 @@ function DiscordAdminPanel({guildIdChange}: {
     const [inputValue, setInputValue] = useState<string>('');
     const [guildId, setGuildId] = useState<bigint>(0n);
     const [error, setError] = useState<string>("");
+    const [message, setMessage] = useState<string>("");
     const [buttonEnabled, setButtonEnabled] = useState<boolean>(false);
-    const [guildData, setGuildData] = useState<ClocktowerServerDiscordEndpointsCheckGuildResponse>();
-    const [townStatus, setTownStatus] = useState<ClocktowerServerDiscordEndpointsGetTownStatusResponse>();
+    const [guildData, setGuildData] = useState<CheckGuildApiResponse>();
+    const [townStatus, setTownStatus] = useState<GetTownStatusApiResponse>();
 
     useEffect(() => {
         inputChanged("1318686543363178666");
@@ -64,7 +65,6 @@ function DiscordAdminPanel({guildIdChange}: {
 
     const handleGetStatus = async () => {
         setIsLoading(true);
-
         await discordService.getTownStatus(guildId)
             .then((data) => setTownStatus(data))
             .catch((err) => setError(err.message))
@@ -73,7 +73,11 @@ function DiscordAdminPanel({guildIdChange}: {
 
 
     const handleRebuildTown = async () => {
-
+        setIsLoading(true);
+        await discordService.rebuildTown(guildId)
+            .then((data) => setMessage(data))
+            .catch((err) => setError(err.message))
+            .finally(() => setIsLoading(false));
     }
 
 
@@ -105,7 +109,9 @@ function DiscordAdminPanel({guildIdChange}: {
                 <Spinner/>}
             {error &&
                 <p className="text-red-500 text-sm">{error}</p>}
-            {guildData?.valid &&
+            {message &&
+                <p className="text-purple-700 text-sm">{message}</p>}
+            {(guildData?.valid && guildId > 0) &&
                 <div>
                     {townStatus &&
                         <StatusIcon

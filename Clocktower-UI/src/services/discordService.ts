@@ -1,10 +1,13 @@
 ﻿import {
     checkGuildApi,
-    type ClocktowerServerDiscordEndpointsGetTownStatusResponse,
-    getTownStatusApi
+    type CheckGuildApiResponse,
+    getTownStatusApi,
+    type GetTownStatusApiResponse,
+    rebuildTownApi,
+    type RebuildTownApiResponse
 } from '../openApi';
 
-async function checkGuild(id: bigint) {
+async function checkGuild(id: bigint): Promise<CheckGuildApiResponse> {
     const {
         data,
         error
@@ -26,7 +29,7 @@ async function checkGuild(id: bigint) {
     };
 }
 
-async function getTownStatus(id: bigint): Promise<ClocktowerServerDiscordEndpointsGetTownStatusResponse> {
+async function getTownStatus(id: bigint): Promise<GetTownStatusApiResponse> {
     const {
         data,
         error
@@ -46,8 +49,21 @@ async function getTownStatus(id: bigint): Promise<ClocktowerServerDiscordEndpoin
     };
 }
 
+async function rebuildTown(id: bigint): Promise<RebuildTownApiResponse> {
+    const {
+        data,
+        error
+    } = await rebuildTownApi({path: {guildId: id}});
+    if (error) {
+        console.error('Failed to rebuild town:', error);
+        throw new Error(error.toString());
+    }
+
+    return data ?? '';
+}
 
 export const discordService = {
     checkGuild,
-    getTownStatus
+    getTownStatus,
+    rebuildTown
 }
