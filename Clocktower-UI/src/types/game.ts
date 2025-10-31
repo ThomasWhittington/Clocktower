@@ -1,10 +1,10 @@
-﻿import type {
-    components
-} from "../openApi/clocktowerServer";
-import {
+﻿import {
     mapToPlayer,
     type Player
 } from "./player.ts";
+import type {
+    ClocktowerServerDataGameState
+} from "../openApi";
 
 export type GameState = {
     id: string;
@@ -13,10 +13,7 @@ export type GameState = {
     isFull: boolean;
 }
 
-
-type OpenApiGame = components["schemas"]["Clocktower.Server.Data.GameState"];
-
-export function mapToGameState(apiGame: OpenApiGame): GameState {
+export function mapToGameState(apiGame: ClocktowerServerDataGameState): GameState {
     const players = (apiGame.players ?? [])
         .map(player => mapToPlayer(player));
 

@@ -1,25 +1,17 @@
 ﻿import {
-    createPathBasedClient
-} from "openapi-fetch";
-import type {
-    paths
-} from "../openApi/clocktowerServer";
+    checkGuildApi
+} from '../openApi';
 
-const client = createPathBasedClient<paths>();
-
-async function checkGuild(id: bigint): Promise<{
-    valid?: boolean
-    name?: string | null
-    message?: string | null
-}> {
+async function checkGuild(id: bigint) {
     const {
         data,
         error
-    } = await client["/api/discord/{guildId}"].GET({
-        params: {
-            path: {"guildId": id}
+    } = await checkGuildApi({
+        path: {
+            guildId: id,
         }
     });
+
     if (error) {
         console.error('Failed to check guildId:', error);
         throw new Error(error.toString());
@@ -32,6 +24,7 @@ async function checkGuild(id: bigint): Promise<{
     };
 }
 
+
 export const discordService = {
-    checkGuild
+    checkGuild,
 }

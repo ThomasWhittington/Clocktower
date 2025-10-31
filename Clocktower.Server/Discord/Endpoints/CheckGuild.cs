@@ -8,20 +8,21 @@ public class CheckGuild : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/{guildId}", Handle)
+        .SetOpenApiOperationId<CheckGuild>()
         .WithSummary("Checks access to guild")
         .WithDescription("Checks if bot has access to the guild")
         .WithRequestValidation<GuildIdRequest>();
 
-    private static async Task<Results<Ok<CheckGuildResponse>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, DiscordService discordService)
+    private static async Task<Results<Ok<Response>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, DiscordService discordService)
     {
         var (success, valid, name, message) = await discordService.CheckGuildId(request.GuildId);
         if (success)
         {
-            return TypedResults.Ok(new CheckGuildResponse(valid, name, message));
+            return TypedResults.Ok(new Response(valid, name, message));
         }
 
         return TypedResults.BadRequest(message);
     }
 
-    public record CheckGuildResponse(bool Valid, string Name, string Message);
+    public record Response(bool Valid, string Name, string Message);
 }

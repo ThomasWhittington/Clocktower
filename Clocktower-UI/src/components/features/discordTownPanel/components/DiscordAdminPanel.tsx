@@ -23,14 +23,11 @@ function DiscordAdminPanel({guildIdChange}: {
     }>();
 
     const inputChanged = async (e: any) => {
-        console.log(e.target.value)
         setButtonEnabled(false);
 
         setError("");
         const numericValue = BigInt(e.target.value);
-        console.log(numericValue)
         if (numericValue > 41943040000) {
-            console.log('set')
             setButtonEnabled(true);
         }
         setInputValue(numericValue)
@@ -38,10 +35,10 @@ function DiscordAdminPanel({guildIdChange}: {
 
     const checkGuildId = async (id: bigint): Promise<boolean> => {
         setError('');
+        setGuildData({});
         setIsLoading(true);
         let valid = false;
 
-        console.log(id)
         discordService.checkGuild(id)
             .then((data) => setGuildData(data))
             .catch((err) => setError(err.message))
@@ -56,6 +53,15 @@ function DiscordAdminPanel({guildIdChange}: {
             setGuildId(inputValue);
         }
     };
+
+    const handleGetStatus = async () => {
+
+    }
+
+
+    const handleRebuildTown = async () => {
+
+    }
 
 
     return (
@@ -85,8 +91,22 @@ function DiscordAdminPanel({guildIdChange}: {
                 <Spinner/>}
             {error &&
                 <p className="text-red-500 text-sm">{error}</p>}
-            {guildData &&
-                <h2 className="text-2xl">{guildData.name}</h2>}
+            {guildData?.valid &&
+                <div>
+                    <h2 className="text-2xl">{guildData.name}</h2>
+                    <button
+                        className="rounded-2xl"
+                        onClick={handleGetStatus}>
+                        Get Status
+                    </button>
+
+                    <button
+                        className="rounded-2xl"
+                        onClick={handleRebuildTown}>
+                        Rebuild Town
+                    </button>
+                </div>
+            }
         </div>
 
     )
