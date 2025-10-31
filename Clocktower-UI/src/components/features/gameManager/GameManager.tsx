@@ -13,11 +13,14 @@ import GameList
 import {
     gamesService
 } from "../../../services";
+import type {
+    GameState
+} from "../../../types/game.ts";
 
 function GameManager() {
     const [isLoading, setIsLoading] = useState(false);
-    const [games, setGames] = useState([]);
-    const [game, setGame] = useState([]);
+    const [games, setGames] = useState<GameState[]>([]);
+    const [game, setGame] = useState<GameState>();
     const [gameId, setGameId] = useState('');
     const [hasError, setHasError] = useState(false);
     const [error, setError] = useState('');

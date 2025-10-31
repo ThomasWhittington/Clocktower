@@ -1,16 +1,12 @@
 ﻿import React
     from 'react';
+import type {
+    GameState
+} from "../../../../types/game.ts";
 
-interface Game {
-    id: string;
-    name: string;
-    players: string[];
-    maxPlayers: number;
-    isFull: boolean;
-}
 
 interface GameListProps {
-    games: Game[];
+    games: GameState[];
 }
 
 const GameList: React.FC<GameListProps> = ({games}) => {
