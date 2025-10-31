@@ -1,10 +1,12 @@
-﻿using DSharpPlus;
+﻿using Clocktower.Server.Socket;
+using DSharpPlus;
 using DSharpPlus.Entities;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Discord.Services;
 
 [UsedImplicitly]
-public class DiscordService(DiscordBotService bot)
+public class DiscordService(DiscordBotService bot, IHubContext<StateHub> hubContext)
 {
     private const string TownSquareName = "⛲ Town Square";
     private const string ConsultationName = "📖 Storyteller's Consultation";
@@ -27,6 +29,31 @@ public class DiscordService(DiscordBotService bot)
         "💀 Haunted Cemetery"
     ];
 
+    private TownOccupants? _townOccupants;
+
+    public void Initialize()
+    {
+        bot.Client.VoiceStateUpdated += async (_, args) =>
+        {
+            if (args.Before?.Channel?.Id != args.After?.Channel?.Id)
+            {
+                await MoveUser(args.User, args.Before, args.After);
+            }
+        };
+    }
+
+    private async Task MoveUser(DiscordUser user, DiscordVoiceState? before, DiscordVoiceState? after)
+    {
+        ulong guildId;
+        if (before != null) guildId = before.Guild.Id;
+        else if (after != null) guildId = after.Guild.Id;
+        else return;
+        if (_townOccupants == null) await GetTownOccupancy(guildId);
+
+        _townOccupants!.MoveUser(user, after);
+        await hubContext.Clients.All.SendAsync("UserMovedChannel", _townOccupants);
+    }
+
     public async Task<(bool success, bool valid, string guildName, string message)> CheckGuildId(ulong guildId)
     {
         try
@@ -39,7 +66,7 @@ public class DiscordService(DiscordBotService bot)
 
             return (false, false, string.Empty, "Bot does not have access to guild");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return (false, false, string.Empty, $"Bot does not have access to guild: {guildId}");
         }
@@ -165,6 +192,7 @@ public class DiscordService(DiscordBotService bot)
     {
         try
         {
+            if (_townOccupants != null) return (true, _townOccupants, "Got from cache");
             var guild = await bot.Client.GetGuildAsync(guildId);
 
             var channelCategories = new List<MiniCategory>();
@@ -174,6 +202,7 @@ public class DiscordService(DiscordBotService bot)
             if (nightCategory != null) channelCategories.Add(nightCategory);
 
             var townOccupants = new TownOccupants(channelCategories);
+            _townOccupants = townOccupants;
             return (true, townOccupants, $"Town occupancy {townOccupants.UserCount}");
         }
         catch (Exception ex)
@@ -276,9 +305,33 @@ public record MiniCategory(ulong Id, string Name, IEnumerable<ChannelOccupants> 
 [UsedImplicitly]
 public record MiniUser(ulong Id, string Name);
 
-public record TownOccupants(IEnumerable<MiniCategory> ChannelCategories)
+public class TownOccupants(List<MiniCategory> channelCategories)
 {
     public int UserCount => ChannelCategories.Sum(category => category.Channels.Sum(channel => channel.Occupants.Count()));
+    public List<MiniCategory> ChannelCategories { get; private set; } = channelCategories;
+
+    public void MoveUser(DiscordUser user, DiscordVoiceState? newChannel)
+    {
+        var miniUser = new MiniUser(user.Id, user.Username);
+
+        ChannelCategories = ChannelCategories.Select(category =>
+            category with
+            {
+                Channels = category.Channels.Select(channel =>
+                {
+                    var occupantsList = channel.Occupants
+                        .Where(o => o.Id != user.Id)
+                        .ToList();
+
+                    if (newChannel?.Channel?.Id == channel.Channel.Id)
+                    {
+                        occupantsList.Add(miniUser);
+                    }
+
+                    return channel with { Occupants = occupantsList };
+                }).ToList()
+            }).ToList();
+    }
 }
 
 [UsedImplicitly]

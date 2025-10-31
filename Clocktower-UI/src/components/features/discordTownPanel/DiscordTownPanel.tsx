@@ -15,6 +15,9 @@ import {
 import {
     Spinner
 } from "../../ui";
+import {
+    useStateHub
+} from "./hooks/useStateHub.ts";
 
 function DiscordTownPanel() {
     const [isLoading, setIsLoading] = useState(false);
@@ -22,9 +25,8 @@ function DiscordTownPanel() {
     const [guildId, setGuildId] = useState<bigint>();
     const [townOccupancy, setTownOccupancy] = useState<TownOccupants>();
 
-    useEffect(() => {
-        getTownOccupancy().catch(console.error);
-    }, [guildId]);
+
+    const discordMoveState = useStateHub();
 
     const getTownOccupancy = async () => {
         if (guildId === undefined) return;
@@ -34,6 +36,19 @@ function DiscordTownPanel() {
             .catch((err) => setError(err.message))
             .finally(() => setIsLoading(false));
     }
+
+    useEffect(() => {
+        getTownOccupancy().catch(console.error);
+    }, [guildId,]);
+
+    useEffect(() => {
+        if (discordMoveState && discordMoveState) {
+            setTownOccupancy(discordMoveState);
+        } else if (discordMoveState) {
+            console.log('signalR empty');
+        }
+    }, [discordMoveState]);
+
     return (
         <div
             className="bg-[#121214] h-full">
@@ -45,9 +60,10 @@ function DiscordTownPanel() {
             {error &&
                 <p className="text-red-500 text-sm">{error}</p>}
             {townOccupancy &&
-                <DiscordTown
-                    townOccupancy={townOccupancy}/>
-            }
+                <>
+                    <DiscordTown
+                        townOccupancy={townOccupancy}/>
+                </>}
         </div>
     );
 }

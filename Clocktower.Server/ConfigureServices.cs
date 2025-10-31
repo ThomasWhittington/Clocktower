@@ -19,11 +19,13 @@ public static class ConfigureServices
             options.AddPolicy("AllowReactApp",
                 policy => policy.WithOrigins("http://localhost:5173")
                     .AllowAnyHeader()
-                    .AllowAnyMethod());
+                    .AllowAnyMethod()
+                    .AllowCredentials());
         });
 
         builder.AddSerilog();
         builder.AddSwagger();
+        builder.AddSignalR();
         builder.ConfigureJson();
         builder.Services.AddSingleton(secrets);
         builder.Services.AddSingleton<DiscordBotService>();
@@ -48,6 +50,11 @@ public static class ConfigureServices
         });
 
         builder.Services.AddSwaggerGen(c => { c.SchemaFilter<EnumSchemaFilter>(); });
+    }
+
+    private static void AddSignalR(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSignalR();
     }
 
     private static void AddSerilog(this WebApplicationBuilder builder)
