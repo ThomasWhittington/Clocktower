@@ -23,20 +23,6 @@
             <ExecutableRowSnapshot>
                 <option name="condition">
                     <ConditionSnapshot>
-                        <option name="type"
-                                value="immediately"/>
-                    </ConditionSnapshot>
-                </option>
-                <option name="executable">
-                    <ExecutableSnapshot>
-                        <option name="id"
-                                value="runConfig:.NET Project.Bot"/>
-                    </ExecutableSnapshot>
-                </option>
-            </ExecutableRowSnapshot>
-            <ExecutableRowSnapshot>
-                <option name="condition">
-                    <ConditionSnapshot>
                         <attributes>
                             <entry key="port"
                                    value="5120"/>

@@ -27,10 +27,30 @@ public class DiscordService(DiscordBotService bot)
         "💀 Haunted Cemetery"
     ];
 
+    public async Task<(bool success, bool valid, string guildName, string message)> CheckGuildId(ulong guildId)
+    {
+        try
+        {
+            var guild = await bot.Client.GetGuildAsync(guildId);
+            if (guild != null)
+            {
+                return (true, true, guild.Name, "Bot has access to guild");
+            }
+
+            return (false, false, string.Empty, "Bot does not have access to guild");
+        }
+        catch (Exception ex)
+        {
+            return (false, false, string.Empty, $"Bot does not have access to guild: {guildId}");
+        }
+    }
+
     public async Task<(bool success, string message)> RebuildTown(ulong guildId)
     {
         try
         {
+            var guildValid = await CheckGuildId(guildId);
+            if (guildValid is not { success: true, valid: true }) return (false, guildValid.message);
             var delete = await DeleteTown(guildId);
             if (!delete.success) return delete;
             var create = await CreateTown(guildId);

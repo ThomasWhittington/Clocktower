@@ -4,10 +4,10 @@ using Clocktower.Server.Discord.Services;
 namespace Clocktower.Server.Discord.Endpoints;
 
 [UsedImplicitly]
-public class TownExists : IEndpoint
+public class TownStatus : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapGet("/{guildId}", Handle)
+        .MapGet("/{guildId}/status", Handle)
         .WithSummary("Get status of town")
         .WithDescription("Gets if the town exists in a valid state")
         .WithRequestValidation<GuildIdRequest>();

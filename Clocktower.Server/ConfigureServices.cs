@@ -13,6 +13,15 @@ public static class ConfigureServices
         var config = new ConfigurationBuilder().AddUserSecrets<Secrets>().Build();
         var secrets = config.GetSection(nameof(Secrets)).Get<Secrets>()!;
 
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowReactApp",
+                policy => policy.WithOrigins("http://localhost:5173")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod());
+        });
+
         builder.AddSerilog();
         builder.AddSwagger();
         builder.ConfigureJson();
