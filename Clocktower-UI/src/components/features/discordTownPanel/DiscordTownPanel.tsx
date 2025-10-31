@@ -16,8 +16,8 @@ import {
     Spinner
 } from "../../ui";
 import {
-    useStateHub
-} from "./hooks/useStateHub.ts";
+    useDiscordHub
+} from "./hooks/useDiscordHub.ts";
 
 function DiscordTownPanel() {
     const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +26,7 @@ function DiscordTownPanel() {
     const [townOccupancy, setTownOccupancy] = useState<TownOccupants>();
 
 
-    const discordMoveState = useStateHub();
+    const discordMoveState = useDiscordHub();
 
     const getTownOccupancy = async () => {
         if (guildId === undefined) return;
@@ -42,12 +42,10 @@ function DiscordTownPanel() {
     }, [guildId,]);
 
     useEffect(() => {
-        if (discordMoveState && discordMoveState) {
-            setTownOccupancy(discordMoveState);
-        } else if (discordMoveState) {
-            console.log('signalR empty');
+        if (discordMoveState.townOccupancy) {
+            setTownOccupancy(discordMoveState.townOccupancy);
         }
-    }, [discordMoveState]);
+    }, [discordMoveState.townOccupancy]);
 
     return (
         <div

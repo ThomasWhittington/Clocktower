@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace Clocktower.Server.Discord.Services;
 
 [UsedImplicitly]
-public class DiscordService(DiscordBotService bot, IHubContext<StateHub> hubContext)
+public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hubContext)
 {
     private const string TownSquareName = "⛲ Town Square";
     private const string ConsultationName = "📖 Storyteller's Consultation";
@@ -29,7 +29,7 @@ public class DiscordService(DiscordBotService bot, IHubContext<StateHub> hubCont
         "💀 Haunted Cemetery"
     ];
 
-    private TownOccupants? _townOccupants;
+    private TownOccupants? _townOccupants; //TODO convert to a dictionary with the guild id to support multiple servers
 
     public void Initialize()
     {
@@ -51,7 +51,7 @@ public class DiscordService(DiscordBotService bot, IHubContext<StateHub> hubCont
         if (_townOccupants == null) await GetTownOccupancy(guildId);
 
         _townOccupants!.MoveUser(user, after);
-        await hubContext.Clients.All.SendAsync("UserMovedChannel", _townOccupants);
+        await hubContext.Clients.All.TownOccupancyUpdated(_townOccupants);
     }
 
     public async Task<(bool success, bool valid, string guildName, string message)> CheckGuildId(ulong guildId)

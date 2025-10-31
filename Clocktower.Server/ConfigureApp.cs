@@ -13,6 +13,6 @@ public static class ConfigureApp
         app.UseSwaggerUI();
         app.UseHttpsRedirection();
         app.MapEndpoints();
-        app.MapHub<StateHub>("/statehub");
+        app.MapHub<DiscordNotificationHub>("/discordHub");
     }
 }
