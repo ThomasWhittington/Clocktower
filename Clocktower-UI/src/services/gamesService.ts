@@ -1,7 +1,7 @@
 ﻿import {
     type GameState,
     mapToGameState,
-} from "../types/game.ts";
+} from "../types";
 import {
     getGameApi,
     getGamesApi,

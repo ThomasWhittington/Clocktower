@@ -15,7 +15,7 @@ import {
 } from "../../../services";
 import type {
     GameState
-} from "../../../types/game.ts";
+} from "../../../types";
 
 function GameManager() {
     const [isLoading, setIsLoading] = useState(false);

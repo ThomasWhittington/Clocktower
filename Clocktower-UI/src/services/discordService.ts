@@ -1,11 +1,17 @@
 ﻿import {
     checkGuildApi,
     type CheckGuildApiResponse,
+    getTownOccupancyApi,
     getTownStatusApi,
     type GetTownStatusApiResponse,
     rebuildTownApi,
     type RebuildTownApiResponse
 } from '../openApi';
+import {
+    mapToTownOccupants,
+    type TownOccupants
+} from "../types";
+
 
 async function checkGuild(id: bigint): Promise<CheckGuildApiResponse> {
     const {
@@ -62,8 +68,29 @@ async function rebuildTown(id: bigint): Promise<RebuildTownApiResponse> {
     return data ?? '';
 }
 
+async function getTownOccupancy(id: bigint): Promise<TownOccupants> {
+    const {
+        data,
+        error
+    } = await getTownOccupancyApi({path: {guildId: id}});
+    if (error) {
+        console.error('Failed to rebuild town:', error);
+        throw new Error(error.toString());
+    }
+
+
+    if (data) {
+        return mapToTownOccupants(data);
+    }
+    return {
+        userCount: 0,
+        channelCategories: []
+    };
+}
+
 export const discordService = {
     checkGuild,
     getTownStatus,
-    rebuildTown
+    rebuildTown,
+    getTownOccupancy
 }
