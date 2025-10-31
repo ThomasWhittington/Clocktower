@@ -1,52 +1,87 @@
-﻿import axios, {
-    HttpStatusCode
-} from "axios";
+﻿import {
+    type GameState,
+    mapToGameState,
+} from "../types";
+import {
+    getGameApi,
+    getGamesApi,
+    loadDummyGamesApi,
+    startGameApi
+} from "../openApi";
 
-const endpoint = '/api/games';
 
-async function getGame(id: string) {
-    try {
-        const result = await axios.get(`${endpoint}/${id}`);
-        return result.data;
-    } catch (error) {
+async function getGame(id: string): Promise<GameState> {
+
+    const {
+        data,
+        error
+    } = await getGameApi({path: {"gameId": id}});
+
+    if (error) {
         console.error('Failed to get game:', error);
-        throw error;
+        throw new Error('Failed to get game');
     }
+
+    if (data) {
+        return mapToGameState(data);
+    }
+    return {
+        id: id,
+        players: [],
+        maxPlayers: 0,
+        isFull: false
+    };
 }
 
-async function getGames() {
-    try {
-        const result = await axios.get(endpoint);
-        return result.data || [];
-    } catch (error) {
-        console.error('Failed to get games:', error);
-        return [];
+async function getGames(): Promise<GameState[]> {
+
+    const {
+        data,
+        error
+    } = await getGamesApi();
+
+    if (error) {
+        console.error('Failed to fetch games:', error);
+        throw new Error('Failed to fetch games');
     }
+
+    return data?.map(mapToGameState) ?? [];
 }
 
-async function loadDummyData() {
-    try {
-        const result = await axios.post(`${endpoint}/load`);
-        return result.data;
-    } catch (error) {
+async function loadDummyData(): Promise<string | undefined> {
+    const {
+        data,
+        error
+    } = await loadDummyGamesApi();
+
+    if (error) {
         console.error('Failed to load dummy data:', error);
-        throw error;
+        throw new Error('Failed to load dummy data');
     }
+
+    return data;
 }
 
-async function startGame(id: string) {
-    try {
-        const result = await axios.post(`${endpoint}/${id}/start`);
-        if (result.status === HttpStatusCode.Created) {
-            return result.data;
-        } else {
-            console.error('Unexpected status:', result.status);
-            return result.data;
-        }
-    } catch (error) {
+async function startGame(id: string): Promise<GameState> {
+
+    const {
+        data,
+        error
+    } = await startGameApi({path: {"gameId": id}});
+    if (error) {
         console.error('Failed to start game:', error);
-        throw error;
+        throw new Error('Failed to start game');
     }
+
+    if (data) {
+        return mapToGameState(data);
+    }
+    return {
+        id: id,
+        players: [],
+        maxPlayers: 0,
+        isFull: false
+    };
 }
 
 export const gamesService = {

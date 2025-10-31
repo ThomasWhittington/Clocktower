@@ -1,10 +1,30 @@
 import './App.css'
-import { GameManager } from './components/features';
+import {
+    Panel,
+    PanelGroup,
+    PanelResizeHandle
+} from "react-resizable-panels";
+import {
+    DiscordTownPanel,
+    GameManager
+} from "./components/features";
 
 function App() {
     return (
-        <GameManager
-            className="min-h-screen w-full"/>
+        <PanelGroup
+            autoSaveId="example"
+            direction="horizontal">
+            <Panel
+                defaultSize={25}>
+                <DiscordTownPanel/>
+            </Panel>
+            <PanelResizeHandle
+                className="w-2 bg-gray-400 hover:bg-gray-600 cursor-col-resize"/>
+            <Panel
+                className="flex justify-center align-center">
+                <GameManager/>
+            </Panel>
+        </PanelGroup>
     )
 }
 

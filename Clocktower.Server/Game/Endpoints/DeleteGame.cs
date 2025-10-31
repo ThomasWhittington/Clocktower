@@ -5,6 +5,7 @@ public class DeleteGame : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapDelete("/{gameId}/delete", Handle)
+        .SetOpenApiOperationId<DeleteGame>()
         .WithSummary("Deletes a game by id");
 
 

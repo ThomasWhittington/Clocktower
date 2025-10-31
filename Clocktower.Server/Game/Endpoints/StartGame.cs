@@ -7,6 +7,7 @@ public class StartGame : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{gameId}/start", Handle)
+        .SetOpenApiOperationId<StartGame>()
         .WithSummary("Starts new game state for id")
         .WithRequestValidation<Request>();
 

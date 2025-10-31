@@ -1,0 +1,96 @@
+﻿import {
+    checkGuildApi,
+    type CheckGuildApiResponse,
+    getTownOccupancyApi,
+    getTownStatusApi,
+    type GetTownStatusApiResponse,
+    rebuildTownApi,
+    type RebuildTownApiResponse
+} from '../openApi';
+import {
+    mapToTownOccupants,
+    type TownOccupants
+} from "../types";
+
+
+async function checkGuild(id: bigint): Promise<CheckGuildApiResponse> {
+    const {
+        data,
+        error
+    } = await checkGuildApi({
+        path: {
+            guildId: id,
+        }
+    });
+
+    if (error) {
+        console.error('Failed to check guildId:', error);
+        throw new Error(error.toString());
+    }
+
+    return data ?? {
+        valid: false,
+        name: '',
+        message: ''
+    };
+}
+
+async function getTownStatus(id: bigint): Promise<GetTownStatusApiResponse> {
+    const {
+        data,
+        error
+    } = await getTownStatusApi({
+        path: {
+            guildId: id,
+        }
+    });
+
+    if (error) {
+        console.error('Failed to get town status:', error);
+        throw new Error(error.toString());
+    }
+    return data ?? {
+        exists: false,
+        message: "Failed to get town status"
+    };
+}
+
+async function rebuildTown(id: bigint): Promise<RebuildTownApiResponse> {
+    const {
+        data,
+        error
+    } = await rebuildTownApi({path: {guildId: id}});
+    if (error) {
+        console.error('Failed to rebuild town:', error);
+        throw new Error(error.toString());
+    }
+
+    return data ?? '';
+}
+
+async function getTownOccupancy(id: bigint): Promise<TownOccupants> {
+    const {
+        data,
+        error
+    } = await getTownOccupancyApi({path: {guildId: id}});
+    if (error) {
+        console.error('Failed to rebuild town:', error);
+        throw new Error(error.toString());
+    }
+
+
+    if (data) {
+        return mapToTownOccupants(data);
+    }
+    return {
+        userCount: 0,
+        channelCategories: []
+    };
+}
+
+export const discordService = {
+    checkGuild,
+    getTownStatus,
+    rebuildTown,
+    getTownOccupancy
+}

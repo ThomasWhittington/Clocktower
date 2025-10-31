@@ -12,6 +12,7 @@ public static class Endpoints
 
         endpoints.MapRolesEndpoints();
         endpoints.MapGamesEndpoints();
+        endpoints.MapDiscordEndpoints();
     }
 
     private static void MapRolesEndpoints(this IEndpointRouteBuilder app)
@@ -30,6 +31,15 @@ public static class Endpoints
 
         endpoints.MapPublicGroup()
             .MapEndpointsFromNamespace("Clocktower.Server.Game.Endpoints");
+    }
+
+    private static void MapDiscordEndpoints(this IEndpointRouteBuilder app)
+    {
+        var endpoints = app.MapGroup("/discord")
+            .WithTags("Discord");
+
+        endpoints.MapPublicGroup()
+            .MapEndpointsFromNamespace("Clocktower.Server.Discord.Endpoints");
     }
 
     private static RouteGroupBuilder MapPublicGroup(this IEndpointRouteBuilder app, string? prefix = null)
