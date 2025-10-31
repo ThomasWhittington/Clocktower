@@ -9,47 +9,47 @@ import {
     client
 } from './client.gen';
 import type {
+    AddPlayerToGameApiData,
+    AddPlayerToGameApiErrors,
+    AddPlayerToGameApiResponses,
     CheckGuildApiData,
     CheckGuildApiErrors,
     CheckGuildApiResponses,
-    DeleteApiDiscordByGuildIdData,
-    DeleteApiDiscordByGuildIdErrors,
-    DeleteApiDiscordByGuildIdResponses,
-    DeleteApiGamesByGameIdDeleteData,
-    DeleteApiGamesByGameIdDeleteErrors,
-    DeleteApiGamesByGameIdDeleteResponses,
-    GetApiDiscordByGuildIdOccupancyData,
-    GetApiDiscordByGuildIdOccupancyErrors,
-    GetApiDiscordByGuildIdOccupancyResponses,
-    GetApiDiscordByGuildIdStatusData,
-    GetApiDiscordByGuildIdStatusErrors,
-    GetApiDiscordByGuildIdStatusResponses,
-    GetApiGamesByGameIdData,
-    GetApiGamesByGameIdErrors,
-    GetApiGamesByGameIdResponses,
-    GetApiGamesData,
-    GetApiGamesErrors,
-    GetApiGamesResponses,
-    GetApiRolesData,
-    GetApiRolesResponses,
-    PostApiDiscordByGuildIdByUserIdData,
-    PostApiDiscordByGuildIdByUserIdErrors,
-    PostApiDiscordByGuildIdByUserIdResponses,
-    PostApiDiscordByGuildIdData,
-    PostApiDiscordByGuildIdErrors,
-    PostApiDiscordByGuildIdRebuildData,
-    PostApiDiscordByGuildIdRebuildErrors,
-    PostApiDiscordByGuildIdRebuildResponses,
-    PostApiDiscordByGuildIdResponses,
-    PostApiGamesByGameIdPlayersData,
-    PostApiGamesByGameIdPlayersErrors,
-    PostApiGamesByGameIdPlayersResponses,
-    PostApiGamesByGameIdStartData,
-    PostApiGamesByGameIdStartErrors,
-    PostApiGamesByGameIdStartResponses,
-    PostApiGamesLoadData,
-    PostApiGamesLoadErrors,
-    PostApiGamesLoadResponses
+    CreateTownApiData,
+    CreateTownApiErrors,
+    CreateTownApiResponses,
+    DeleteGameApiData,
+    DeleteGameApiErrors,
+    DeleteGameApiResponses,
+    DeleteTownApiData,
+    DeleteTownApiErrors,
+    DeleteTownApiResponses,
+    GetGameApiData,
+    GetGameApiErrors,
+    GetGameApiResponses,
+    GetGamesApiData,
+    GetGamesApiErrors,
+    GetGamesApiResponses,
+    GetRolesApiData,
+    GetRolesApiResponses,
+    GetTownOccupancyApiData,
+    GetTownOccupancyApiErrors,
+    GetTownOccupancyApiResponses,
+    GetTownStatusApiData,
+    GetTownStatusApiErrors,
+    GetTownStatusApiResponses,
+    LoadDummyGamesApiData,
+    LoadDummyGamesApiErrors,
+    LoadDummyGamesApiResponses,
+    RebuildTownApiData,
+    RebuildTownApiErrors,
+    RebuildTownApiResponses,
+    StartGameApiData,
+    StartGameApiErrors,
+    StartGameApiResponses,
+    ToggleStoryTellerApiData,
+    ToggleStoryTellerApiErrors,
+    ToggleStoryTellerApiResponses
 } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> =
@@ -73,8 +73,8 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  *
  * Removes all roles, channels and categories associated with clocktower
  */
-export const deleteApiDiscordByGuildId = <ThrowOnError extends boolean = false>(options: Options<DeleteApiDiscordByGuildIdData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteApiDiscordByGuildIdResponses, DeleteApiDiscordByGuildIdErrors, ThrowOnError>({
+export const deleteTownApi = <ThrowOnError extends boolean = false>(options: Options<DeleteTownApiData, ThrowOnError>) => {
+    return (options.client ?? client).delete<DeleteTownApiResponses, DeleteTownApiErrors, ThrowOnError>({
         url: '/api/discord/{guildId}',
         ...options
     });
@@ -97,8 +97,8 @@ export const checkGuildApi = <ThrowOnError extends boolean = false>(options: Opt
  *
  * Creates the roles, categories and channels required for clocktower
  */
-export const postApiDiscordByGuildId = <ThrowOnError extends boolean = false>(options: Options<PostApiDiscordByGuildIdData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiDiscordByGuildIdResponses, PostApiDiscordByGuildIdErrors, ThrowOnError>({
+export const createTownApi = <ThrowOnError extends boolean = false>(options: Options<CreateTownApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateTownApiResponses, CreateTownApiErrors, ThrowOnError>({
         url: '/api/discord/{guildId}',
         ...options
     });
@@ -109,9 +109,21 @@ export const postApiDiscordByGuildId = <ThrowOnError extends boolean = false>(op
  *
  * Gets user presense in the town
  */
-export const getApiDiscordByGuildIdOccupancy = <ThrowOnError extends boolean = false>(options: Options<GetApiDiscordByGuildIdOccupancyData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiDiscordByGuildIdOccupancyResponses, GetApiDiscordByGuildIdOccupancyErrors, ThrowOnError>({
+export const getTownOccupancyApi = <ThrowOnError extends boolean = false>(options: Options<GetTownOccupancyApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetTownOccupancyApiResponses, GetTownOccupancyApiErrors, ThrowOnError>({
         url: '/api/discord/{guildId}/occupancy',
+        ...options
+    });
+};
+
+/**
+ * Get status of town
+ *
+ * Gets if the town exists in a valid state
+ */
+export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: Options<GetTownStatusApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetTownStatusApiResponses, GetTownStatusApiErrors, ThrowOnError>({
+        url: '/api/discord/{guildId}/status',
         ...options
     });
 };
@@ -121,8 +133,8 @@ export const getApiDiscordByGuildIdOccupancy = <ThrowOnError extends boolean = f
  *
  * Rebuilds the town including roles, categories and channels
  */
-export const postApiDiscordByGuildIdRebuild = <ThrowOnError extends boolean = false>(options: Options<PostApiDiscordByGuildIdRebuildData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiDiscordByGuildIdRebuildResponses, PostApiDiscordByGuildIdRebuildErrors, ThrowOnError>({
+export const rebuildTownApi = <ThrowOnError extends boolean = false>(options: Options<RebuildTownApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<RebuildTownApiResponses, RebuildTownApiErrors, ThrowOnError>({
         url: '/api/discord/{guildId}/rebuild',
         ...options
     });
@@ -133,21 +145,9 @@ export const postApiDiscordByGuildIdRebuild = <ThrowOnError extends boolean = fa
  *
  * Adds or removes the storyteller role from the specified user
  */
-export const postApiDiscordByGuildIdByUserId = <ThrowOnError extends boolean = false>(options: Options<PostApiDiscordByGuildIdByUserIdData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiDiscordByGuildIdByUserIdResponses, PostApiDiscordByGuildIdByUserIdErrors, ThrowOnError>({
+export const toggleStoryTellerApi = <ThrowOnError extends boolean = false>(options: Options<ToggleStoryTellerApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<ToggleStoryTellerApiResponses, ToggleStoryTellerApiErrors, ThrowOnError>({
         url: '/api/discord/{guildId}/{userId}',
-        ...options
-    });
-};
-
-/**
- * Get status of town
- *
- * Gets if the town exists in a valid state
- */
-export const getApiDiscordByGuildIdStatus = <ThrowOnError extends boolean = false>(options: Options<GetApiDiscordByGuildIdStatusData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiDiscordByGuildIdStatusResponses, GetApiDiscordByGuildIdStatusErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}/status',
         ...options
     });
 };
@@ -155,8 +155,8 @@ export const getApiDiscordByGuildIdStatus = <ThrowOnError extends boolean = fals
 /**
  * Add player to game
  */
-export const postApiGamesByGameIdPlayers = <ThrowOnError extends boolean = false>(options: Options<PostApiGamesByGameIdPlayersData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiGamesByGameIdPlayersResponses, PostApiGamesByGameIdPlayersErrors, ThrowOnError>({
+export const addPlayerToGameApi = <ThrowOnError extends boolean = false>(options: Options<AddPlayerToGameApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<AddPlayerToGameApiResponses, AddPlayerToGameApiErrors, ThrowOnError>({
         url: '/api/games/{gameId}/players',
         ...options
     });
@@ -165,8 +165,8 @@ export const postApiGamesByGameIdPlayers = <ThrowOnError extends boolean = false
 /**
  * Deletes a game by id
  */
-export const deleteApiGamesByGameIdDelete = <ThrowOnError extends boolean = false>(options: Options<DeleteApiGamesByGameIdDeleteData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteApiGamesByGameIdDeleteResponses, DeleteApiGamesByGameIdDeleteErrors, ThrowOnError>({
+export const deleteGameApi = <ThrowOnError extends boolean = false>(options: Options<DeleteGameApiData, ThrowOnError>) => {
+    return (options.client ?? client).delete<DeleteGameApiResponses, DeleteGameApiErrors, ThrowOnError>({
         url: '/api/games/{gameId}/delete',
         ...options
     });
@@ -175,8 +175,8 @@ export const deleteApiGamesByGameIdDelete = <ThrowOnError extends boolean = fals
 /**
  * Get the game state by id
  */
-export const getApiGamesByGameId = <ThrowOnError extends boolean = false>(options: Options<GetApiGamesByGameIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiGamesByGameIdResponses, GetApiGamesByGameIdErrors, ThrowOnError>({
+export const getGameApi = <ThrowOnError extends boolean = false>(options: Options<GetGameApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetGameApiResponses, GetGameApiErrors, ThrowOnError>({
         url: '/api/games/{gameId}',
         ...options
     });
@@ -185,8 +185,8 @@ export const getApiGamesByGameId = <ThrowOnError extends boolean = false>(option
 /**
  * Gets all games
  */
-export const getApiGames = <ThrowOnError extends boolean = false>(options?: Options<GetApiGamesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiGamesResponses, GetApiGamesErrors, ThrowOnError>({
+export const getGamesApi = <ThrowOnError extends boolean = false>(options?: Options<GetGamesApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetGamesApiResponses, GetGamesApiErrors, ThrowOnError>({
         url: '/api/games',
         ...options
     });
@@ -195,8 +195,8 @@ export const getApiGames = <ThrowOnError extends boolean = false>(options?: Opti
 /**
  * Loads dummy data from saved json file
  */
-export const postApiGamesLoad = <ThrowOnError extends boolean = false>(options?: Options<PostApiGamesLoadData, ThrowOnError>) => {
-    return (options?.client ?? client).post<PostApiGamesLoadResponses, PostApiGamesLoadErrors, ThrowOnError>({
+export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?: Options<LoadDummyGamesApiData, ThrowOnError>) => {
+    return (options?.client ?? client).post<LoadDummyGamesApiResponses, LoadDummyGamesApiErrors, ThrowOnError>({
         url: '/api/games/load',
         ...options
     });
@@ -205,8 +205,8 @@ export const postApiGamesLoad = <ThrowOnError extends boolean = false>(options?:
 /**
  * Starts new game state for id
  */
-export const postApiGamesByGameIdStart = <ThrowOnError extends boolean = false>(options: Options<PostApiGamesByGameIdStartData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiGamesByGameIdStartResponses, PostApiGamesByGameIdStartErrors, ThrowOnError>({
+export const startGameApi = <ThrowOnError extends boolean = false>(options: Options<StartGameApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<StartGameApiResponses, StartGameApiErrors, ThrowOnError>({
         url: '/api/games/{gameId}/start',
         ...options
     });
@@ -217,8 +217,8 @@ export const postApiGamesByGameIdStart = <ThrowOnError extends boolean = false>(
  *
  * Filter roles by edition and/or role type
  */
-export const getApiRoles = <ThrowOnError extends boolean = false>(options?: Options<GetApiRolesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiRolesResponses, unknown, ThrowOnError>({
+export const getRolesApi = <ThrowOnError extends boolean = false>(options?: Options<GetRolesApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetRolesApiResponses, unknown, ThrowOnError>({
         url: '/api/roles',
         ...options
     });

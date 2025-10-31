@@ -5,14 +5,9 @@ public class GetRoles : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/", Handle)
+        .SetOpenApiOperationId<GetRoles>()
         .WithSummary("Return all roles")
         .WithDescription("Filter roles by edition and/or role type");
-
-    [UsedImplicitly]
-    public record Response(IEnumerable<Role> Roles);
-
-    [UsedImplicitly]
-    public record Request(RoleType? RoleType = null, Edition? Edition = null);
 
 
     public static Response Handle([AsParameters] Request request)
@@ -30,4 +25,10 @@ public class GetRoles : IEndpoint
 
         return new Response(roles);
     }
+
+    [UsedImplicitly]
+    public record Response(IEnumerable<Role> Roles);
+
+    [UsedImplicitly]
+    public record Request(RoleType? RoleType = null, Edition? Edition = null);
 }

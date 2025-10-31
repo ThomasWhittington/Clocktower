@@ -42,7 +42,7 @@ export type ClocktowerServerDiscordEndpointsCheckGuildResponse = {
     message?: string | null;
 };
 
-export type ClocktowerServerDiscordEndpointsTownStatusTownExistsResponse = {
+export type ClocktowerServerDiscordEndpointsGetTownStatusTownExistsResponse = {
     exists?: boolean;
     message?: string | null;
 };
@@ -101,7 +101,7 @@ export type ClocktowerServerDiscordServicesTownOccupantsWritable = {
     channelCategories?: Array<ClocktowerServerDiscordServicesMiniCategory> | null;
 };
 
-export type DeleteApiDiscordByGuildIdData = {
+export type DeleteTownApiData = {
     body?: never;
     path: {
         guildId: bigint;
@@ -110,7 +110,7 @@ export type DeleteApiDiscordByGuildIdData = {
     url: '/api/discord/{guildId}';
 };
 
-export type DeleteApiDiscordByGuildIdErrors = {
+export type DeleteTownApiErrors = {
     /**
      * Bad Request
      */
@@ -121,16 +121,16 @@ export type DeleteApiDiscordByGuildIdErrors = {
     404: string;
 };
 
-export type DeleteApiDiscordByGuildIdError = DeleteApiDiscordByGuildIdErrors[keyof DeleteApiDiscordByGuildIdErrors];
+export type DeleteTownApiError = DeleteTownApiErrors[keyof DeleteTownApiErrors];
 
-export type DeleteApiDiscordByGuildIdResponses = {
+export type DeleteTownApiResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type DeleteApiDiscordByGuildIdResponse = DeleteApiDiscordByGuildIdResponses[keyof DeleteApiDiscordByGuildIdResponses];
+export type DeleteTownApiResponse = DeleteTownApiResponses[keyof DeleteTownApiResponses];
 
 export type CheckGuildApiData = {
     body?: never;
@@ -163,7 +163,7 @@ export type CheckGuildApiResponses = {
 
 export type CheckGuildApiResponse = CheckGuildApiResponses[keyof CheckGuildApiResponses];
 
-export type PostApiDiscordByGuildIdData = {
+export type CreateTownApiData = {
     body?: never;
     path: {
         guildId: bigint;
@@ -172,7 +172,7 @@ export type PostApiDiscordByGuildIdData = {
     url: '/api/discord/{guildId}';
 };
 
-export type PostApiDiscordByGuildIdErrors = {
+export type CreateTownApiErrors = {
     /**
      * Bad Request
      */
@@ -183,18 +183,18 @@ export type PostApiDiscordByGuildIdErrors = {
     404: string;
 };
 
-export type PostApiDiscordByGuildIdError = PostApiDiscordByGuildIdErrors[keyof PostApiDiscordByGuildIdErrors];
+export type CreateTownApiError = CreateTownApiErrors[keyof CreateTownApiErrors];
 
-export type PostApiDiscordByGuildIdResponses = {
+export type CreateTownApiResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type PostApiDiscordByGuildIdResponse = PostApiDiscordByGuildIdResponses[keyof PostApiDiscordByGuildIdResponses];
+export type CreateTownApiResponse = CreateTownApiResponses[keyof CreateTownApiResponses];
 
-export type GetApiDiscordByGuildIdOccupancyData = {
+export type GetTownOccupancyApiData = {
     body?: never;
     path: {
         guildId: bigint;
@@ -203,7 +203,7 @@ export type GetApiDiscordByGuildIdOccupancyData = {
     url: '/api/discord/{guildId}/occupancy';
 };
 
-export type GetApiDiscordByGuildIdOccupancyErrors = {
+export type GetTownOccupancyApiErrors = {
     /**
      * Bad Request
      */
@@ -214,18 +214,49 @@ export type GetApiDiscordByGuildIdOccupancyErrors = {
     404: string;
 };
 
-export type GetApiDiscordByGuildIdOccupancyError = GetApiDiscordByGuildIdOccupancyErrors[keyof GetApiDiscordByGuildIdOccupancyErrors];
+export type GetTownOccupancyApiError = GetTownOccupancyApiErrors[keyof GetTownOccupancyApiErrors];
 
-export type GetApiDiscordByGuildIdOccupancyResponses = {
+export type GetTownOccupancyApiResponses = {
     /**
      * OK
      */
     200: ClocktowerServerDiscordServicesTownOccupants;
 };
 
-export type GetApiDiscordByGuildIdOccupancyResponse = GetApiDiscordByGuildIdOccupancyResponses[keyof GetApiDiscordByGuildIdOccupancyResponses];
+export type GetTownOccupancyApiResponse = GetTownOccupancyApiResponses[keyof GetTownOccupancyApiResponses];
 
-export type PostApiDiscordByGuildIdRebuildData = {
+export type GetTownStatusApiData = {
+    body?: never;
+    path: {
+        guildId: bigint;
+    };
+    query?: never;
+    url: '/api/discord/{guildId}/status';
+};
+
+export type GetTownStatusApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: string;
+};
+
+export type GetTownStatusApiError = GetTownStatusApiErrors[keyof GetTownStatusApiErrors];
+
+export type GetTownStatusApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerDiscordEndpointsGetTownStatusTownExistsResponse;
+};
+
+export type GetTownStatusApiResponse = GetTownStatusApiResponses[keyof GetTownStatusApiResponses];
+
+export type RebuildTownApiData = {
     body?: never;
     path: {
         guildId: bigint;
@@ -234,7 +265,7 @@ export type PostApiDiscordByGuildIdRebuildData = {
     url: '/api/discord/{guildId}/rebuild';
 };
 
-export type PostApiDiscordByGuildIdRebuildErrors = {
+export type RebuildTownApiErrors = {
     /**
      * Bad Request
      */
@@ -245,18 +276,18 @@ export type PostApiDiscordByGuildIdRebuildErrors = {
     404: string;
 };
 
-export type PostApiDiscordByGuildIdRebuildError = PostApiDiscordByGuildIdRebuildErrors[keyof PostApiDiscordByGuildIdRebuildErrors];
+export type RebuildTownApiError = RebuildTownApiErrors[keyof RebuildTownApiErrors];
 
-export type PostApiDiscordByGuildIdRebuildResponses = {
+export type RebuildTownApiResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type PostApiDiscordByGuildIdRebuildResponse = PostApiDiscordByGuildIdRebuildResponses[keyof PostApiDiscordByGuildIdRebuildResponses];
+export type RebuildTownApiResponse = RebuildTownApiResponses[keyof RebuildTownApiResponses];
 
-export type PostApiDiscordByGuildIdByUserIdData = {
+export type ToggleStoryTellerApiData = {
     body?: never;
     path: {
         guildId: bigint;
@@ -266,7 +297,7 @@ export type PostApiDiscordByGuildIdByUserIdData = {
     url: '/api/discord/{guildId}/{userId}';
 };
 
-export type PostApiDiscordByGuildIdByUserIdErrors = {
+export type ToggleStoryTellerApiErrors = {
     /**
      * Bad Request
      */
@@ -277,49 +308,18 @@ export type PostApiDiscordByGuildIdByUserIdErrors = {
     404: string;
 };
 
-export type PostApiDiscordByGuildIdByUserIdError = PostApiDiscordByGuildIdByUserIdErrors[keyof PostApiDiscordByGuildIdByUserIdErrors];
+export type ToggleStoryTellerApiError = ToggleStoryTellerApiErrors[keyof ToggleStoryTellerApiErrors];
 
-export type PostApiDiscordByGuildIdByUserIdResponses = {
+export type ToggleStoryTellerApiResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type PostApiDiscordByGuildIdByUserIdResponse = PostApiDiscordByGuildIdByUserIdResponses[keyof PostApiDiscordByGuildIdByUserIdResponses];
+export type ToggleStoryTellerApiResponse = ToggleStoryTellerApiResponses[keyof ToggleStoryTellerApiResponses];
 
-export type GetApiDiscordByGuildIdStatusData = {
-    body?: never;
-    path: {
-        guildId: bigint;
-    };
-    query?: never;
-    url: '/api/discord/{guildId}/status';
-};
-
-export type GetApiDiscordByGuildIdStatusErrors = {
-    /**
-     * Bad Request
-     */
-    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
-    /**
-     * Not Found
-     */
-    404: string;
-};
-
-export type GetApiDiscordByGuildIdStatusError = GetApiDiscordByGuildIdStatusErrors[keyof GetApiDiscordByGuildIdStatusErrors];
-
-export type GetApiDiscordByGuildIdStatusResponses = {
-    /**
-     * OK
-     */
-    200: ClocktowerServerDiscordEndpointsTownStatusTownExistsResponse;
-};
-
-export type GetApiDiscordByGuildIdStatusResponse = GetApiDiscordByGuildIdStatusResponses[keyof GetApiDiscordByGuildIdStatusResponses];
-
-export type PostApiGamesByGameIdPlayersData = {
+export type AddPlayerToGameApiData = {
     body?: never;
     path: {
         gameId: string;
@@ -330,7 +330,7 @@ export type PostApiGamesByGameIdPlayersData = {
     url: '/api/games/{gameId}/players';
 };
 
-export type PostApiGamesByGameIdPlayersErrors = {
+export type AddPlayerToGameApiErrors = {
     /**
      * Bad Request
      */
@@ -345,18 +345,18 @@ export type PostApiGamesByGameIdPlayersErrors = {
     409: string;
 };
 
-export type PostApiGamesByGameIdPlayersError = PostApiGamesByGameIdPlayersErrors[keyof PostApiGamesByGameIdPlayersErrors];
+export type AddPlayerToGameApiError = AddPlayerToGameApiErrors[keyof AddPlayerToGameApiErrors];
 
-export type PostApiGamesByGameIdPlayersResponses = {
+export type AddPlayerToGameApiResponses = {
     /**
      * Created
      */
     201: ClocktowerServerDataTypesPlayer;
 };
 
-export type PostApiGamesByGameIdPlayersResponse = PostApiGamesByGameIdPlayersResponses[keyof PostApiGamesByGameIdPlayersResponses];
+export type AddPlayerToGameApiResponse = AddPlayerToGameApiResponses[keyof AddPlayerToGameApiResponses];
 
-export type DeleteApiGamesByGameIdDeleteData = {
+export type DeleteGameApiData = {
     body?: never;
     path: {
         gameId: string;
@@ -365,23 +365,23 @@ export type DeleteApiGamesByGameIdDeleteData = {
     url: '/api/games/{gameId}/delete';
 };
 
-export type DeleteApiGamesByGameIdDeleteErrors = {
+export type DeleteGameApiErrors = {
     /**
      * Not Found
      */
     404: string;
 };
 
-export type DeleteApiGamesByGameIdDeleteError = DeleteApiGamesByGameIdDeleteErrors[keyof DeleteApiGamesByGameIdDeleteErrors];
+export type DeleteGameApiError = DeleteGameApiErrors[keyof DeleteGameApiErrors];
 
-export type DeleteApiGamesByGameIdDeleteResponses = {
+export type DeleteGameApiResponses = {
     /**
      * OK
      */
     200: unknown;
 };
 
-export type GetApiGamesByGameIdData = {
+export type GetGameApiData = {
     body?: never;
     path: {
         gameId: string;
@@ -390,75 +390,75 @@ export type GetApiGamesByGameIdData = {
     url: '/api/games/{gameId}';
 };
 
-export type GetApiGamesByGameIdErrors = {
+export type GetGameApiErrors = {
     /**
      * Not Found
      */
     404: string;
 };
 
-export type GetApiGamesByGameIdError = GetApiGamesByGameIdErrors[keyof GetApiGamesByGameIdErrors];
+export type GetGameApiError = GetGameApiErrors[keyof GetGameApiErrors];
 
-export type GetApiGamesByGameIdResponses = {
+export type GetGameApiResponses = {
     /**
      * OK
      */
     200: ClocktowerServerDataGameState;
 };
 
-export type GetApiGamesByGameIdResponse = GetApiGamesByGameIdResponses[keyof GetApiGamesByGameIdResponses];
+export type GetGameApiResponse = GetGameApiResponses[keyof GetGameApiResponses];
 
-export type GetApiGamesData = {
+export type GetGamesApiData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/games';
 };
 
-export type GetApiGamesErrors = {
+export type GetGamesApiErrors = {
     /**
      * Not Found
      */
     404: string;
 };
 
-export type GetApiGamesError = GetApiGamesErrors[keyof GetApiGamesErrors];
+export type GetGamesApiError = GetGamesApiErrors[keyof GetGamesApiErrors];
 
-export type GetApiGamesResponses = {
+export type GetGamesApiResponses = {
     /**
      * OK
      */
     200: Array<ClocktowerServerDataGameState>;
 };
 
-export type GetApiGamesResponse = GetApiGamesResponses[keyof GetApiGamesResponses];
+export type GetGamesApiResponse = GetGamesApiResponses[keyof GetGamesApiResponses];
 
-export type PostApiGamesLoadData = {
+export type LoadDummyGamesApiData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/games/load';
 };
 
-export type PostApiGamesLoadErrors = {
+export type LoadDummyGamesApiErrors = {
     /**
      * Bad Request
      */
     400: string;
 };
 
-export type PostApiGamesLoadError = PostApiGamesLoadErrors[keyof PostApiGamesLoadErrors];
+export type LoadDummyGamesApiError = LoadDummyGamesApiErrors[keyof LoadDummyGamesApiErrors];
 
-export type PostApiGamesLoadResponses = {
+export type LoadDummyGamesApiResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type PostApiGamesLoadResponse = PostApiGamesLoadResponses[keyof PostApiGamesLoadResponses];
+export type LoadDummyGamesApiResponse = LoadDummyGamesApiResponses[keyof LoadDummyGamesApiResponses];
 
-export type PostApiGamesByGameIdStartData = {
+export type StartGameApiData = {
     body?: never;
     path: {
         gameId: string;
@@ -467,25 +467,25 @@ export type PostApiGamesByGameIdStartData = {
     url: '/api/games/{gameId}/start';
 };
 
-export type PostApiGamesByGameIdStartErrors = {
+export type StartGameApiErrors = {
     /**
      * Bad Request
      */
     400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
 };
 
-export type PostApiGamesByGameIdStartError = PostApiGamesByGameIdStartErrors[keyof PostApiGamesByGameIdStartErrors];
+export type StartGameApiError = StartGameApiErrors[keyof StartGameApiErrors];
 
-export type PostApiGamesByGameIdStartResponses = {
+export type StartGameApiResponses = {
     /**
      * Created
      */
     201: ClocktowerServerDataGameState;
 };
 
-export type PostApiGamesByGameIdStartResponse = PostApiGamesByGameIdStartResponses[keyof PostApiGamesByGameIdStartResponses];
+export type StartGameApiResponse = StartGameApiResponses[keyof StartGameApiResponses];
 
-export type GetApiRolesData = {
+export type GetRolesApiData = {
     body?: never;
     path?: never;
     query?: {
@@ -495,11 +495,11 @@ export type GetApiRolesData = {
     url: '/api/roles';
 };
 
-export type GetApiRolesResponses = {
+export type GetRolesApiResponses = {
     /**
      * OK
      */
     200: ClocktowerServerRolesEndpointsGetRolesResponse;
 };
 
-export type GetApiRolesResponse = GetApiRolesResponses[keyof GetApiRolesResponses];
+export type GetRolesApiResponse = GetRolesApiResponses[keyof GetRolesApiResponses];

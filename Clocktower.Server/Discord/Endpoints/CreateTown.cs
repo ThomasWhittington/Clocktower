@@ -8,6 +8,7 @@ public class CreateTown : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{guildId}", Handle)
+        .SetOpenApiOperationId<CreateTown>()
         .WithSummary("Creates the town in the provided server")
         .WithDescription("Creates the roles, categories and channels required for clocktower")
         .WithRequestValidation<GuildIdRequest>();

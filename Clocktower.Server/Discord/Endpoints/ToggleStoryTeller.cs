@@ -7,6 +7,7 @@ public class ToggleStoryTeller : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{guildId}/{userId}", Handle)
+        .SetOpenApiOperationId<ToggleStoryTeller>()
         .WithSummary("Toggles the storyteller role for a user")
         .WithDescription("Adds or removes the storyteller role from the specified user")
         .WithRequestValidation<GuildAndUserRequest>();

@@ -5,6 +5,7 @@ public class AddPlayerToGame : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{gameId}/players", Handle)
+        .SetOpenApiOperationId<AddPlayerToGame>()
         .WithSummary("Add player to game")
         .WithRequestValidation<Request>();
 

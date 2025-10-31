@@ -8,6 +8,7 @@ public class RebuildTown : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{guildId}/rebuild", Handle)
+        .SetOpenApiOperationId<RebuildTown>()
         .WithSummary("Rebuild town")
         .WithDescription("Rebuilds the town including roles, categories and channels")
         .WithRequestValidation<GuildIdRequest>();

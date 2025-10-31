@@ -8,6 +8,7 @@ public class GetTownOccupancy : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/{guildId}/occupancy", Handle)
+        .SetOpenApiOperationId<GetTownOccupancy>()
         .WithSummary("Get occupancy of town")
         .WithDescription("Gets user presense in the town")
         .WithRequestValidation<GuildIdRequest>();
