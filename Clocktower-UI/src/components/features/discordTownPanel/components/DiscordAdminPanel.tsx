@@ -1,4 +1,5 @@
 ﻿import {
+    useEffect,
     useState
 } from "react";
 import {
@@ -12,7 +13,7 @@ function DiscordAdminPanel({guildIdChange}: {
     guildIdChange: (value: bigint) => void
 }) {
     const [isLoading, setIsLoading] = useState(false);
-    const [inputValue, setInputValue] = useState<bigint>(0n);
+    const [inputValue, setInputValue] = useState<string>('');
     const [_, setGuildId] = useState<bigint>(0n);
     const [error, setError] = useState<string>("");
     const [buttonEnabled, setButtonEnabled] = useState<boolean>(false);
@@ -22,15 +23,20 @@ function DiscordAdminPanel({guildIdChange}: {
         message?: string | null
     }>();
 
-    const inputChanged = async (e: any) => {
+    useEffect(() => {
+        inputChanged("1318686543363178666");
+    }, []);
+
+
+    const inputChanged = (value: string) => {
         setButtonEnabled(false);
 
         setError("");
-        const numericValue = BigInt(e.target.value);
+        const numericValue = BigInt(value);
         if (numericValue > 41943040000) {
             setButtonEnabled(true);
         }
-        setInputValue(numericValue)
+        setInputValue(value)
     }
 
     const checkGuildId = async (id: bigint): Promise<boolean> => {
@@ -48,9 +54,10 @@ function DiscordAdminPanel({guildIdChange}: {
 
 
     const handleSetGuildId = async () => {
-        if (await checkGuildId(inputValue)) {
-            guildIdChange(inputValue);
-            setGuildId(inputValue);
+        const numericValue = BigInt(inputValue);
+        if (await checkGuildId(numericValue)) {
+            guildIdChange(numericValue);
+            setGuildId(numericValue);
         }
     };
 
@@ -77,7 +84,8 @@ function DiscordAdminPanel({guildIdChange}: {
                     id="serverId"
                     type="number"
                     className="bg-[#222327] w-2/3 h-10 flex-3 rounded-2xl"
-                    onChange={inputChanged}
+                    value={inputValue}
+                    onChange={(e) => inputChanged(e.target.value)}
                 />
                 <button
                     className="bg-blue-500 text-white px-4 py-2 rounded-2xl hover:bg-blue-600"
