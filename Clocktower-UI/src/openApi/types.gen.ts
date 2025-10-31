@@ -42,7 +42,7 @@ export type ClocktowerServerDiscordEndpointsCheckGuildResponse = {
     message?: string | null;
 };
 
-export type ClocktowerServerDiscordEndpointsGetTownStatusTownExistsResponse = {
+export type ClocktowerServerDiscordEndpointsGetTownStatusResponse = {
     exists?: boolean;
     message?: string | null;
 };
@@ -251,7 +251,7 @@ export type GetTownStatusApiResponses = {
     /**
      * OK
      */
-    200: ClocktowerServerDiscordEndpointsGetTownStatusTownExistsResponse;
+    200: ClocktowerServerDiscordEndpointsGetTownStatusResponse;
 };
 
 export type GetTownStatusApiResponse = GetTownStatusApiResponses[keyof GetTownStatusApiResponses];

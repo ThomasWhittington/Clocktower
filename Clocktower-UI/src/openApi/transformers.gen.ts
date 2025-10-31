@@ -69,7 +69,7 @@ export const getTownOccupancyApiResponseTransformer = async (data: any): Promise
 };
 
 export const getTownStatusApiResponseTransformer = async (data: any): Promise<GetTownStatusApiResponse> => {
-    data = clocktowerServerDiscordEndpointsGetTownStatusTownExistsResponseSchemaResponseTransformer(data);
+    data = clocktowerServerDiscordEndpointsGetTownStatusResponseSchemaResponseTransformer(data);
     return data;
 };
 

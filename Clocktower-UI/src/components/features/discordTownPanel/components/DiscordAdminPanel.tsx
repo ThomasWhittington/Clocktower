@@ -6,22 +6,24 @@ import {
     discordService
 } from "../../../../services";
 import {
-    Spinner
+    Spinner,
+    StatusIcon
 } from "../../../ui";
+import type {
+    ClocktowerServerDiscordEndpointsCheckGuildResponse,
+    ClocktowerServerDiscordEndpointsGetTownStatusResponse
+} from "../../../../openApi";
 
 function DiscordAdminPanel({guildIdChange}: {
     guildIdChange: (value: bigint) => void
 }) {
     const [isLoading, setIsLoading] = useState(false);
     const [inputValue, setInputValue] = useState<string>('');
-    const [_, setGuildId] = useState<bigint>(0n);
+    const [guildId, setGuildId] = useState<bigint>(0n);
     const [error, setError] = useState<string>("");
     const [buttonEnabled, setButtonEnabled] = useState<boolean>(false);
-    const [guildData, setGuildData] = useState<{
-        valid?: boolean,
-        name?: string | null,
-        message?: string | null
-    }>();
+    const [guildData, setGuildData] = useState<ClocktowerServerDiscordEndpointsCheckGuildResponse>();
+    const [townStatus, setTownStatus] = useState<ClocktowerServerDiscordEndpointsGetTownStatusResponse>();
 
     useEffect(() => {
         inputChanged("1318686543363178666");
@@ -43,13 +45,12 @@ function DiscordAdminPanel({guildIdChange}: {
         setError('');
         setGuildData({});
         setIsLoading(true);
-        let valid = false;
 
-        discordService.checkGuild(id)
+        await discordService.checkGuild(id)
             .then((data) => setGuildData(data))
             .catch((err) => setError(err.message))
             .finally(() => setIsLoading(false));
-        return valid;
+        return guildData?.valid ?? false;
     };
 
 
@@ -62,7 +63,12 @@ function DiscordAdminPanel({guildIdChange}: {
     };
 
     const handleGetStatus = async () => {
+        setIsLoading(true);
 
+        await discordService.getTownStatus(guildId)
+            .then((data) => setTownStatus(data))
+            .catch((err) => setError(err.message))
+            .finally(() => setIsLoading(false));
     }
 
 
@@ -101,6 +107,10 @@ function DiscordAdminPanel({guildIdChange}: {
                 <p className="text-red-500 text-sm">{error}</p>}
             {guildData?.valid &&
                 <div>
+                    {townStatus &&
+                        <StatusIcon
+                            status={townStatus.exists ?? false}/>
+                    }
                     <h2 className="text-2xl">{guildData.name}</h2>
                     <button
                         className="rounded-2xl"
