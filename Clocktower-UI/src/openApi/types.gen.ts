@@ -11,18 +11,9 @@ export type ClocktowerServerDataGameState = {
     readonly isFull?: boolean;
 };
 
-export type ClocktowerServerDataTypesEnumEdition =
-    'TroubleBrewing'
-    | 'SectsAndViolets'
-    | 'BadMoonRising'
-    | 'Experimental';
+export type ClocktowerServerDataTypesEnumEdition = 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
 
-export type ClocktowerServerDataTypesEnumRoleType =
-    'Townsfolk'
-    | 'Outsider'
-    | 'Minion'
-    | 'Demon'
-    | 'Traveller';
+export type ClocktowerServerDataTypesEnumRoleType = 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
 
 export type ClocktowerServerDataTypesPlayer = {
     id?: number;

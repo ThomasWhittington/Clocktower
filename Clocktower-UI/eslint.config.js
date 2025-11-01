@@ -28,7 +28,6 @@ export default defineConfig([
         parserOptions: {
             project: './tsconfig.json',
         },
-        ignorePatterns: ['src/openApi/**/*'],
         globals: globals.browser,
     },
   },
