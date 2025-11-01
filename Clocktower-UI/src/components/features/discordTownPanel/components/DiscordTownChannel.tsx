@@ -45,7 +45,8 @@ function DiscordTownChannel({channel}: {
 
     return (
         <div>
-            <a onClick={moveUserHere}>{channel.channel.name} {channel.channel.id}</a>
+            <a onClick={moveUserHere}
+               className="cursor-pointer">{channel.channel.name}</a>
             {channel.occupants.map(user =>
                 <DiscordTownUser
                     key={user.id}
