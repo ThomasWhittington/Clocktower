@@ -39,6 +39,7 @@ public static class ConfigureServices
         builder.Services.ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.SerializerOptions.Converters.Add(new ULongToStringConverter());
         });
         builder.Services.Configure<JsonOptions>(options => { options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
     }
@@ -57,7 +58,11 @@ public static class ConfigureServices
 
     private static void AddSignalR(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSignalR();
+        builder.Services.AddSignalR()
+            .AddJsonProtocol(options =>
+            {
+                options.PayloadSerializerOptions.Converters.Add(new ULongToStringConverter());
+            });
     }
 
     private static void AddSerilog(this WebApplicationBuilder builder)

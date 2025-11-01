@@ -13,6 +13,26 @@ type DiscordHubState = {
     townOccupancy?: TownOccupants;
 };
 
+//TODO move to utils
+const convertStringIdsToBigints = (obj: any): any => {
+    if (obj === null || typeof obj !== 'object') {
+        if (typeof obj === 'string' && /^\d{15,}$/.test(obj)) {
+            return BigInt(obj);
+        }
+        return obj;
+    }
+
+    if (Array.isArray(obj)) {
+        return obj.map(convertStringIdsToBigints);
+    }
+
+    const converted: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+        converted[key] = convertStringIdsToBigints(value);
+    }
+    return converted;
+};
+
 export const useDiscordHub = (): DiscordHubState => {
     const [state, setState] = useState<DiscordHubState>({});
 
@@ -24,9 +44,10 @@ export const useDiscordHub = (): DiscordHubState => {
         console.log(connection)
 
         connection.on('TownOccupancyUpdated', (occupants: TownOccupants) => {
+            const convertedOccupants = convertStringIdsToBigints(occupants) as TownOccupants;
             setState(prev => ({
                 ...prev,
-                townOccupancy: occupants,
+                townOccupancy: convertedOccupants,
                 lastUpdate: 'TownOccupancyUpdated'
             }));
         });
