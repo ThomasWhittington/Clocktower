@@ -2,6 +2,7 @@
 using Clocktower.Server.Socket;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using DSharpPlus.Exceptions;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Discord.Services;
@@ -75,8 +76,15 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
             if (member == null)
                 return (false, "User not found in guild");
 
+            if (member.VoiceState == null)
+                return (false, "User is not connected to voice");
+
             await member.ModifyAsync(x => x.VoiceChannel = channel);
             return (true, $"User {member.DisplayName} moved to {channel.Name}");
+        }
+        catch (BadRequestException badRequestException)
+        {
+            return (false, badRequestException.JsonMessage);
         }
         catch (Exception ex)
         {

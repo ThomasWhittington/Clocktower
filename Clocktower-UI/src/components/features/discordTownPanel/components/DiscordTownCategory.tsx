@@ -10,7 +10,7 @@ function DiscordTownCategory({category}: {
 }) {
     return (
         <>
-            <p className="bg-pink-950">{category.name}</p>
+            <p className="bg-pink-950">{category.name} {category.id}</p>
             {category.channels.map(channel =>
                 <DiscordTownChannel
                     key={channel.channel.id}

@@ -7,7 +7,7 @@ function DiscordTownUser({user}: {
 }) {
     return (
         <>
-            <p className="text-purple-700">{user.name}</p>
+            <p className="text-purple-700">{user.name} {user.id}</p>
         </>
     );
 }

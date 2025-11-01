@@ -4,6 +4,7 @@
     getTownOccupancyApi,
     getTownStatusApi,
     type GetTownStatusApiResponse,
+    moveUserToChannelApi,
     rebuildTownApi,
     type RebuildTownApiResponse
 } from '../openApi';
@@ -69,6 +70,8 @@ async function rebuildTown(id: bigint): Promise<RebuildTownApiResponse> {
 }
 
 async function getTownOccupancy(id: bigint): Promise<TownOccupants> {
+
+
     const {
         data,
         error
@@ -88,9 +91,30 @@ async function getTownOccupancy(id: bigint): Promise<TownOccupants> {
     };
 }
 
+async function moveUserToChannel(guildId: bigint, userId: bigint, channelId: bigint): Promise<string> {
+    const {
+        data,
+        error
+    } = await moveUserToChannelApi({
+        path: {
+            guildId: guildId,
+            userId: userId,
+            channelId: channelId
+        }
+    });
+    if (error) {
+        console.error('Failed to move user to channel:', error);
+        throw new Error(error.toString());
+    }
+
+
+    return data ?? 'Failed to move user to channel';
+}
+
 export const discordService = {
     checkGuild,
     getTownStatus,
     rebuildTown,
-    getTownOccupancy
+    getTownOccupancy,
+    moveUserToChannel
 }
