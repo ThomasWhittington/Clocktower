@@ -41,6 +41,9 @@ import type {
     LoadDummyGamesApiData,
     LoadDummyGamesApiErrors,
     LoadDummyGamesApiResponses,
+    MoveUserToChannelApiData,
+    MoveUserToChannelApiErrors,
+    MoveUserToChannelApiResponses,
     RebuildTownApiData,
     RebuildTownApiErrors,
     RebuildTownApiResponses,
@@ -124,6 +127,18 @@ export const getTownOccupancyApi = <ThrowOnError extends boolean = false>(option
 export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: Options<GetTownStatusApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetTownStatusApiResponses, GetTownStatusApiErrors, ThrowOnError>({
         url: '/api/discord/{guildId}/status',
+        ...options
+    });
+};
+
+/**
+ * Moves the user to the specified channel
+ *
+ * Moves the user to the specified channel
+ */
+export const moveUserToChannelApi = <ThrowOnError extends boolean = false>(options: Options<MoveUserToChannelApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<MoveUserToChannelApiResponses, MoveUserToChannelApiErrors, ThrowOnError>({
+        url: '/api/discord/{guildId}/{userId}/{channelId}',
         ...options
     });
 };

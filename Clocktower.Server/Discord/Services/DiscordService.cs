@@ -1,4 +1,5 @@
-﻿using Clocktower.Server.Socket;
+﻿using System.Collections.Concurrent;
+using Clocktower.Server.Socket;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using Microsoft.AspNetCore.SignalR;
@@ -29,7 +30,7 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
         "💀 Haunted Cemetery"
     ];
 
-    private TownOccupants? _townOccupants; //TODO convert to a dictionary with the guild id to support multiple servers
+    private readonly ConcurrentDictionary<ulong, TownOccupants> _townOccupants = new();
 
     public void Initialize()
     {
@@ -37,21 +38,50 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
         {
             if (args.Before?.Channel?.Id != args.After?.Channel?.Id)
             {
-                await MoveUser(args.User, args.Before, args.After);
+                await HandleUserMoved(args.User, args.Before, args.After);
             }
         };
     }
 
-    private async Task MoveUser(DiscordUser user, DiscordVoiceState? before, DiscordVoiceState? after)
+    private async Task HandleUserMoved(DiscordUser user, DiscordVoiceState? before, DiscordVoiceState? after)
     {
         ulong guildId;
         if (before != null) guildId = before.Guild.Id;
         else if (after != null) guildId = after.Guild.Id;
         else return;
-        if (_townOccupants == null) await GetTownOccupancy(guildId);
 
-        _townOccupants!.MoveUser(user, after);
-        await hubContext.Clients.All.TownOccupancyUpdated(_townOccupants);
+        if (_townOccupants[guildId] == null) await GetTownOccupancy(guildId);
+        var thisTownOccupancy = _townOccupants[guildId];
+        thisTownOccupancy!.MoveUser(user, after);
+        await hubContext.Clients.All.TownOccupancyUpdated(thisTownOccupancy);
+    }
+
+    public async Task<(bool success, string message)> MoveUser(ulong guildId, ulong userId, ulong channelId)
+    {
+        try
+        {
+            var guild = await bot.Client.GetGuildAsync(guildId);
+            if (guild == null)
+                return (false, "Guild not found");
+
+            var channel = guild.GetChannel(channelId);
+            if (channel == null)
+                return (false, "Channel not found in guild");
+
+            if (channel.Type != ChannelType.Voice)
+                return (false, "Channel is not a voice channel");
+
+            var member = await guild.GetMemberAsync(userId);
+            if (member == null)
+                return (false, "User not found in guild");
+
+            await member.ModifyAsync(x => x.VoiceChannel = channel);
+            return (true, $"User {member.DisplayName} moved to {channel.Name}");
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
     }
 
     public async Task<(bool success, bool valid, string guildName, string message)> CheckGuildId(ulong guildId)
@@ -192,7 +222,8 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
     {
         try
         {
-            if (_townOccupants != null) return (true, _townOccupants, "Got from cache");
+            var gotInCache = _townOccupants.TryGetValue(guildId, out TownOccupants? thisTownOccupancy);
+            if (gotInCache && thisTownOccupancy != null) return (true, thisTownOccupancy, "Got from cache");
             var guild = await bot.Client.GetGuildAsync(guildId);
 
             var channelCategories = new List<MiniCategory>();
@@ -202,7 +233,8 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
             if (nightCategory != null) channelCategories.Add(nightCategory);
 
             var townOccupants = new TownOccupants(channelCategories);
-            _townOccupants = townOccupants;
+
+            _townOccupants.TryAdd(guildId, townOccupants);
             return (true, townOccupants, $"Town occupancy {townOccupants.UserCount}");
         }
         catch (Exception ex)

@@ -1,0 +1,4 @@
+﻿root = true
+
+[openApi]
+disable_formatter = true
