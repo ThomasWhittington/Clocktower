@@ -13,21 +13,29 @@ import type {
     CheckGuildApiResponse,
     GetTownStatusApiResponse
 } from "../../../../openApi";
+import {
+    useAppStore
+} from "../../../../store.ts";
+import {
+    ValidationUtils
+} from "../../../../utils/validation.ts";
 
-function DiscordAdminPanel({guildIdChange}: {
-    guildIdChange: (value: bigint) => void
-}) {
+function DiscordAdminPanel() {
     const [isLoading, setIsLoading] = useState(false);
     const [inputValue, setInputValue] = useState<string>('');
-    const [guildId, setGuildId] = useState<bigint>(0n);
+    const guildId = useAppStore((state) => state.guildId);
+    const setGuildId = useAppStore((state) => state.setGuildId);
+    const setCurrentUserId = useAppStore((state) => state.setCurrentUserId);
     const [error, setError] = useState<string>("");
     const [message, setMessage] = useState<string>("");
     const [buttonEnabled, setButtonEnabled] = useState<boolean>(false);
     const [guildData, setGuildData] = useState<CheckGuildApiResponse>();
     const [townStatus, setTownStatus] = useState<GetTownStatusApiResponse>();
 
+
     useEffect(() => {
         inputChanged("1318686543363178666");
+        setCurrentUserId(285398267854848000n);
     }, []);
 
 
@@ -36,7 +44,7 @@ function DiscordAdminPanel({guildIdChange}: {
 
         setError("");
         const numericValue = BigInt(value);
-        if (numericValue > 41943040000) {
+        if (ValidationUtils.isValidDiscordId(numericValue)) {
             setButtonEnabled(true);
         }
         setInputValue(value)
@@ -58,12 +66,16 @@ function DiscordAdminPanel({guildIdChange}: {
     const handleSetGuildId = async () => {
         const numericValue = BigInt(inputValue);
         if (await checkGuildId(numericValue)) {
-            guildIdChange(numericValue);
+            //guildIdChange(numericValue);
             setGuildId(numericValue);
         }
     };
 
     const handleGetStatus = async () => {
+        if (!ValidationUtils.isValidDiscordId(guildId)) {
+            console.error('guildId was not valid');
+            return;
+        }
         setIsLoading(true);
         await discordService.getTownStatus(guildId)
             .then((data) => setTownStatus(data))
@@ -73,6 +85,11 @@ function DiscordAdminPanel({guildIdChange}: {
 
 
     const handleRebuildTown = async () => {
+        if (!ValidationUtils.isValidDiscordId(guildId)) {
+            console.error('guildId was not valid');
+            return;
+        }
+
         setIsLoading(true);
         await discordService.rebuildTown(guildId)
             .then((data) => setMessage(data))

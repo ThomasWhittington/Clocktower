@@ -11,18 +11,9 @@ export type ClocktowerServerDataGameState = {
     readonly isFull?: boolean;
 };
 
-export type ClocktowerServerDataTypesEnumEdition =
-    'TroubleBrewing'
-    | 'SectsAndViolets'
-    | 'BadMoonRising'
-    | 'Experimental';
+export type ClocktowerServerDataTypesEnumEdition = 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
 
-export type ClocktowerServerDataTypesEnumRoleType =
-    'Townsfolk'
-    | 'Outsider'
-    | 'Minion'
-    | 'Demon'
-    | 'Traveller';
+export type ClocktowerServerDataTypesEnumRoleType = 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
 
 export type ClocktowerServerDataTypesPlayer = {
     id?: number;
@@ -69,8 +60,8 @@ export type ClocktowerServerDiscordServicesMiniUser = {
 };
 
 export type ClocktowerServerDiscordServicesTownOccupants = {
-    channelCategories?: Array<ClocktowerServerDiscordServicesMiniCategory> | null;
     readonly userCount?: number;
+    channelCategories?: Array<ClocktowerServerDiscordServicesMiniCategory> | null;
 };
 
 export type ClocktowerServerRolesEndpointsGetRolesResponse = {
@@ -255,6 +246,35 @@ export type GetTownStatusApiResponses = {
 };
 
 export type GetTownStatusApiResponse = GetTownStatusApiResponses[keyof GetTownStatusApiResponses];
+
+export type MoveUserToChannelApiData = {
+    body?: never;
+    path: {
+        guildId: bigint;
+        userId: bigint;
+        channelId: bigint;
+    };
+    query?: never;
+    url: '/api/discord/{guildId}/{userId}/{channelId}';
+};
+
+export type MoveUserToChannelApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+};
+
+export type MoveUserToChannelApiError = MoveUserToChannelApiErrors[keyof MoveUserToChannelApiErrors];
+
+export type MoveUserToChannelApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type MoveUserToChannelApiResponse = MoveUserToChannelApiResponses[keyof MoveUserToChannelApiResponses];
 
 export type RebuildTownApiData = {
     body?: never;

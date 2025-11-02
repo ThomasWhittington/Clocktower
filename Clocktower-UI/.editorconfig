@@ -1,0 +1,4 @@
+﻿root = true
+
+[src/openApi/**]
+generated = true

@@ -41,6 +41,9 @@ import type {
     LoadDummyGamesApiData,
     LoadDummyGamesApiErrors,
     LoadDummyGamesApiResponses,
+    MoveUserToChannelApiData,
+    MoveUserToChannelApiErrors,
+    MoveUserToChannelApiResponses,
     RebuildTownApiData,
     RebuildTownApiErrors,
     RebuildTownApiResponses,
@@ -52,9 +55,7 @@ import type {
     ToggleStoryTellerApiResponses
 } from './types.gen';
 
-export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> =
-    Options2<TData, ThrowOnError>
-    & {
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
      * You can provide a client instance returned by `createClient()` instead of
      * individual options. This might be also useful if you want to implement a
@@ -124,6 +125,18 @@ export const getTownOccupancyApi = <ThrowOnError extends boolean = false>(option
 export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: Options<GetTownStatusApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetTownStatusApiResponses, GetTownStatusApiErrors, ThrowOnError>({
         url: '/api/discord/{guildId}/status',
+        ...options
+    });
+};
+
+/**
+ * Moves the user to the specified channel
+ *
+ * Moves the user to the specified channel
+ */
+export const moveUserToChannelApi = <ThrowOnError extends boolean = false>(options: Options<MoveUserToChannelApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<MoveUserToChannelApiResponses, MoveUserToChannelApiErrors, ThrowOnError>({
+        url: '/api/discord/{guildId}/{userId}/{channelId}',
         ...options
     });
 };

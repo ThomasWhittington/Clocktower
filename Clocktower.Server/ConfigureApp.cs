@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Clocktower.Server.Socket;
+using Serilog;
 
 namespace Clocktower.Server;
 
@@ -12,5 +13,6 @@ public static class ConfigureApp
         app.UseSwaggerUI();
         app.UseHttpsRedirection();
         app.MapEndpoints();
+        app.MapHub<DiscordNotificationHub>("/discordHub");
     }
 }

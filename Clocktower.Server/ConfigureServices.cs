@@ -19,11 +19,13 @@ public static class ConfigureServices
             options.AddPolicy("AllowReactApp",
                 policy => policy.WithOrigins("http://localhost:5173")
                     .AllowAnyHeader()
-                    .AllowAnyMethod());
+                    .AllowAnyMethod()
+                    .AllowCredentials());
         });
 
         builder.AddSerilog();
         builder.AddSwagger();
+        builder.AddSignalR();
         builder.ConfigureJson();
         builder.Services.AddSingleton(secrets);
         builder.Services.AddSingleton<DiscordBotService>();
@@ -34,7 +36,11 @@ public static class ConfigureServices
 
     private static void ConfigureJson(this WebApplicationBuilder builder)
     {
-        builder.Services.ConfigureHttpJsonOptions(options => { options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
+        builder.Services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.SerializerOptions.Converters.Add(new ULongToStringConverter());
+        });
         builder.Services.Configure<JsonOptions>(options => { options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
     }
 
@@ -48,6 +54,15 @@ public static class ConfigureServices
         });
 
         builder.Services.AddSwaggerGen(c => { c.SchemaFilter<EnumSchemaFilter>(); });
+    }
+
+    private static void AddSignalR(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSignalR()
+            .AddJsonProtocol(options =>
+            {
+                options.PayloadSerializerOptions.Converters.Add(new ULongToStringConverter());
+            });
     }
 
     private static void AddSerilog(this WebApplicationBuilder builder)
