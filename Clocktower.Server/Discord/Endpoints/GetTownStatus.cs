@@ -15,7 +15,9 @@ public class GetTownStatus : IEndpoint
 
     private static async Task<Results<Ok<Response>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, DiscordService discordService)
     {
-        var (success, exists, message) = await discordService.TownExists(request.GuildId);
+        var guildId = ulong.Parse(request.GuildId);
+
+        var (success, exists, message) = await discordService.TownExists(guildId);
         if (success)
         {
             return TypedResults.Ok(new Response(exists, message));

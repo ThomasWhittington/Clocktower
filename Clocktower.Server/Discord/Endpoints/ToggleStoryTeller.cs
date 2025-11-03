@@ -16,7 +16,10 @@ public class ToggleStoryTeller : IEndpoint
         [AsParameters] GuildAndUserRequest request,
         DiscordService discordService)
     {
-        var (success, message) = await discordService.ToggleStoryTeller(request.GuildId, request.UserId);
+        var guildId = ulong.Parse(request.GuildId);
+        var userId = ulong.Parse(request.UserId);
+       
+        var (success, message) = await discordService.ToggleStoryTeller(guildId, userId);
         if (success)
         {
             return TypedResults.Ok(message);
@@ -26,7 +29,7 @@ public class ToggleStoryTeller : IEndpoint
     }
 
     [UsedImplicitly]
-    public record GuildAndUserRequest(ulong GuildId, ulong UserId);
+    public record GuildAndUserRequest(string GuildId, string UserId);
 
     [UsedImplicitly]
     public class GuildAndUserRequestValidator : AbstractValidator<GuildAndUserRequest>
@@ -36,19 +39,14 @@ public class ToggleStoryTeller : IEndpoint
             RuleFor(x => x.GuildId)
                 .NotEmpty()
                 .WithMessage("GuildId cannot be empty")
-                .Must(BeValidDiscordSnowflake)
+                .Must(Common.Validation.BeValidDiscordSnowflake)
                 .WithMessage("GuildId must be a valid Discord snowflake");
 
             RuleFor(x => x.UserId)
                 .NotEmpty()
                 .WithMessage("UserId cannot be empty")
-                .Must(BeValidDiscordSnowflake)
+                .Must(Common.Validation.BeValidDiscordSnowflake)
                 .WithMessage("UserId must be a valid Discord snowflake");
-        }
-
-        private static bool BeValidDiscordSnowflake(ulong id)
-        {
-            return id > 41943040000L;
         }
     }
 }

@@ -3,19 +3,19 @@
 } from "../openApi";
 
 export type MiniChannel = {
-    id: bigint;
+    id: string;
     name: string;
 };
 
 export function mapToMiniChannel(apiMiniUser: ClocktowerServerDiscordServicesMiniChannel | undefined): MiniChannel {
     if (!apiMiniUser) {
         return {
-            id: 0n,
+            id: '',
             name: "Unknown channel"
         };
     }
     return {
-        id: apiMiniUser.id ?? 0n,
+        id: apiMiniUser.id ?? '',
         name: apiMiniUser.name ?? "Unknown channel"
     };
 }

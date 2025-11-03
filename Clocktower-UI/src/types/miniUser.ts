@@ -3,13 +3,13 @@
 } from "../openApi";
 
 export type MiniUser = {
-    id: bigint;
+    id: string;
     name: string;
 };
 
 export function mapToMiniUser(apiMiniUser: ClocktowerServerDiscordServicesMiniUser): MiniUser {
     return {
-        id: apiMiniUser.id ?? 0n,
+        id: apiMiniUser.id ?? '',
         name: apiMiniUser.name ?? "Unknown user"
     };
 }

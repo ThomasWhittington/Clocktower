@@ -15,7 +15,9 @@ public class CheckGuild : IEndpoint
 
     private static async Task<Results<Ok<Response>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, DiscordService discordService)
     {
-        var (success, valid, name, message) = await discordService.CheckGuildId(request.GuildId);
+        var guildId = ulong.Parse(request.GuildId);
+        
+        var (success, valid, name, message) = await discordService.CheckGuildId(guildId);
         if (success)
         {
             return TypedResults.Ok(new Response(valid, name, message));

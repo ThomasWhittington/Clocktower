@@ -3,14 +3,19 @@
 import type {
     AddPlayerToGameApiResponse,
     CheckGuildApiResponse,
+    GetAuthDataApiResponse,
     GetGameApiResponse,
     GetGamesApiResponse,
     GetRolesApiResponse,
     GetTownOccupancyApiResponse,
     GetTownStatusApiResponse,
-    HandleDiscordCallbackApiResponse,
     StartGameApiResponse
 } from './types.gen';
+
+export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetAuthDataApiResponse> => {
+    data = clocktowerServerDiscordEndpointsAuthResponseSchemaResponseTransformer(data);
+    return data;
+};
 
 export const checkGuildApiResponseTransformer = async (data: any): Promise<CheckGuildApiResponse> => {
     data = clocktowerServerDiscordEndpointsCheckGuildResponseSchemaResponseTransformer(data);
@@ -27,9 +32,6 @@ const clocktowerServerDiscordServicesTownOccupantsSchemaResponseTransformer = (d
 };
 
 const clocktowerServerDiscordServicesMiniCategorySchemaResponseTransformer = (data: any) => {
-    if (data.id) {
-        data.id = BigInt(data.id.toString());
-    }
     if (data.channels) {
         data.channels = data.channels.map((item: any) => {
             return clocktowerServerDiscordServicesChannelOccupantsSchemaResponseTransformer(item);
@@ -50,20 +52,6 @@ const clocktowerServerDiscordServicesChannelOccupantsSchemaResponseTransformer =
     return data;
 };
 
-const clocktowerServerDiscordServicesMiniChannelSchemaResponseTransformer = (data: any) => {
-    if (data.id) {
-        data.id = BigInt(data.id.toString());
-    }
-    return data;
-};
-
-const clocktowerServerDiscordServicesMiniUserSchemaResponseTransformer = (data: any) => {
-    if (data.id) {
-        data.id = BigInt(data.id.toString());
-    }
-    return data;
-};
-
 export const getTownOccupancyApiResponseTransformer = async (data: any): Promise<GetTownOccupancyApiResponse> => {
     data = clocktowerServerDiscordServicesTownOccupantsSchemaResponseTransformer(data);
     return data;
@@ -71,18 +59,6 @@ export const getTownOccupancyApiResponseTransformer = async (data: any): Promise
 
 export const getTownStatusApiResponseTransformer = async (data: any): Promise<GetTownStatusApiResponse> => {
     data = clocktowerServerDiscordEndpointsGetTownStatusResponseSchemaResponseTransformer(data);
-    return data;
-};
-
-const clocktowerServerDiscordEndpointsLoginResponseSchemaResponseTransformer = (data: any) => {
-    if (data.id) {
-        data.id = BigInt(data.id.toString());
-    }
-    return data;
-};
-
-export const handleDiscordCallbackApiResponseTransformer = async (data: any): Promise<HandleDiscordCallbackApiResponse> => {
-    data = clocktowerServerDiscordEndpointsLoginResponseSchemaResponseTransformer(data);
     return data;
 };
 

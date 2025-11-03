@@ -7,10 +7,6 @@ import * as signalR
 import type {
     TownOccupants
 } from "../../../../types";
-import {
-    ConverterUtils
-} from "../../../../utils";
-
 
 type DiscordHubState = {
     townOccupancy?: TownOccupants;
@@ -26,10 +22,9 @@ export const useDiscordHub = (): DiscordHubState => {
             .build();
 
         connection.on('TownOccupancyUpdated', (occupants: TownOccupants) => {
-            const convertedOccupants = ConverterUtils.convertStringIdsToBigints(occupants) as TownOccupants;
             setState(prev => ({
                 ...prev,
-                townOccupancy: convertedOccupants,
+                townOccupancy: occupants,
                 lastUpdate: 'TownOccupancyUpdated'
             }));
         });

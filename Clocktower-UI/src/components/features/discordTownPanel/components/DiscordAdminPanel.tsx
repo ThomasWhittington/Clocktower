@@ -35,22 +35,20 @@ function DiscordAdminPanel() {
 
     useEffect(() => {
         inputChanged("1318686543363178666");
-        setCurrentUserId(285398267854848000n);
+        setCurrentUserId("285398267854848000n");
     }, []);
 
 
     const inputChanged = (value: string) => {
         setButtonEnabled(false);
-
         setError("");
-        const numericValue = BigInt(value);
-        if (ValidationUtils.isValidDiscordId(numericValue)) {
+        if (ValidationUtils.isValidDiscordId(value)) {
             setButtonEnabled(true);
         }
         setInputValue(value)
     }
 
-    const checkGuildId = async (id: bigint): Promise<boolean> => {
+    const checkGuildId = async (id: string): Promise<boolean> => {
         setError('');
         setGuildData({});
         setIsLoading(true);
@@ -64,10 +62,8 @@ function DiscordAdminPanel() {
 
 
     const handleSetGuildId = async () => {
-        const numericValue = BigInt(inputValue);
-        if (await checkGuildId(numericValue)) {
-            //guildIdChange(numericValue);
-            setGuildId(numericValue);
+        if (await checkGuildId(inputValue)) {
+            setGuildId(inputValue);
         }
     };
 
@@ -128,7 +124,7 @@ function DiscordAdminPanel() {
                 <p className="text-red-500 text-sm">{error}</p>}
             {message &&
                 <p className="text-purple-700 text-sm">{message}</p>}
-            {(guildData?.valid && guildId > 0) &&
+            {(guildData?.valid && guildId != '') &&
                 <div>
                     {townStatus &&
                         <StatusIcon

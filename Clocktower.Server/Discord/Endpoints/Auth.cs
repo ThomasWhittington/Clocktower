@@ -27,7 +27,7 @@ public class Auth : IEndpoint
     }
 
 
-    public record Response(ulong Id, string Name);
+    public record Response(string Id, string Name);
 
     private static Results<RedirectHttpResult, BadRequest<string>> InitiateAuth(DiscordAuthService discordAuthService)
     {
@@ -41,11 +41,12 @@ public class Auth : IEndpoint
         [FromServices] DiscordAuthService discordAuthService,
         [FromServices] IMemoryCache cache)
     {
+        //TODO move cache logic into service, return only the key
         var (success, authResult, message) = await discordAuthService.HandleCallback(error, code);
 
         if (success && authResult is { User: not null })
         {
-            var response = new Response(ulong.Parse(authResult.User.Id), authResult.User.Username);
+            var response = new Response(authResult.User.Id, authResult.User.Username);
             var tempKey = Guid.NewGuid().ToString();
             cache.Set($"auth_data_{tempKey}", response, TimeSpan.FromMinutes(5));
 

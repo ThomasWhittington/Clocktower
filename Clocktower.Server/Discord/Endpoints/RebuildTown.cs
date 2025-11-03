@@ -15,7 +15,9 @@ public class RebuildTown : IEndpoint
 
     private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, DiscordService discordService)
     {
-        var (success, message) = await discordService.RebuildTown(request.GuildId);
+        var guildId = ulong.Parse(request.GuildId);
+
+        var (success, message) = await discordService.RebuildTown(guildId);
         if (success)
         {
             return TypedResults.Ok(message);

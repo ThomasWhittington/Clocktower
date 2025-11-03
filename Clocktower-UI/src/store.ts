@@ -3,10 +3,10 @@
 } from 'zustand';
 
 interface AppState {
-    guildId: bigint,
-    currentUserId?: bigint,
-    setGuildId: (value: bigint) => void;
-    setCurrentUserId: (value: bigint) => void;
+    guildId: string,
+    currentUserId: string,
+    setGuildId: (value: string) => void;
+    setCurrentUserId: (value: string) => void;
     isMuted: boolean;
     toggleMute: () => void;
 
@@ -14,8 +14,8 @@ interface AppState {
 
 export const useAppStore = create<AppState>(
     (set) => ({
-        guildId: 0n,
-        currentUserId: undefined,
+        guildId: '',
+        currentUserId: '',
         isMuted: false,
         setGuildId: (id) => set(() => ({guildId: id})),
         setCurrentUserId: (id) => set(() => ({currentUserId: id})),

@@ -337,13 +337,13 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
 }
 
 [UsedImplicitly]
-public record MiniChannel(ulong Id, string Name);
+public record MiniChannel(string Id, string Name);
 
 [UsedImplicitly]
-public record MiniCategory(ulong Id, string Name, IEnumerable<ChannelOccupants> Channels);
+public record MiniCategory(string Id, string Name, IEnumerable<ChannelOccupants> Channels);
 
 [UsedImplicitly]
-public record MiniUser(ulong Id, string Name);
+public record MiniUser(string Id, string Name);
 
 public class TownOccupants(List<MiniCategory> channelCategories)
 {
@@ -352,7 +352,7 @@ public class TownOccupants(List<MiniCategory> channelCategories)
 
     public void MoveUser(DiscordUser user, DiscordVoiceState? newChannel)
     {
-        var miniUser = new MiniUser(user.Id, user.Username);
+        var miniUser = new MiniUser(user.Id.ToString(), user.Username);
 
         ChannelCategories = ChannelCategories.Select(category =>
             category with
@@ -360,10 +360,10 @@ public class TownOccupants(List<MiniCategory> channelCategories)
                 Channels = category.Channels.Select(channel =>
                 {
                     var occupantsList = channel.Occupants
-                        .Where(o => o.Id != user.Id)
+                        .Where(o => o.Id != user.Id.ToString())
                         .ToList();
 
-                    if (newChannel?.Channel?.Id == channel.Channel.Id)
+                    if (newChannel?.Channel?.Id.ToString() == channel.Channel.Id)
                     {
                         occupantsList.Add(miniUser);
                     }

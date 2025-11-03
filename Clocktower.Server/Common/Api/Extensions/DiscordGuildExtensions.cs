@@ -50,7 +50,7 @@ public static class DiscordGuildExtensions
         var channelOccupancy = await GetChannelOccupancy(guild, categoryChannel);
 
 
-        var miniCategory = new MiniCategory(categoryChannel.Id, categoryChannel.Name, channelOccupancy);
+        var miniCategory = new MiniCategory(categoryChannel.Id.ToString(), categoryChannel.Name, channelOccupancy);
         return miniCategory;
     }
 
@@ -59,9 +59,9 @@ public static class DiscordGuildExtensions
         var channels = await guild.GetChannels(parent: categoryChannel);
 
         return (from discordChannel in channels
-            let miniChannel = new MiniChannel(discordChannel.Id, discordChannel.Name)
+            let miniChannel = new MiniChannel(discordChannel.Id.ToString(), discordChannel.Name)
             let occupants = discordChannel.Users.Select(discordChannelUser =>
-                new MiniUser(discordChannelUser.Id, discordChannelUser.DisplayName)
+                new MiniUser(discordChannelUser.Id.ToString(), discordChannelUser.DisplayName)
             ).ToList()
             select new ChannelOccupants(miniChannel, occupants)).ToList();
     }

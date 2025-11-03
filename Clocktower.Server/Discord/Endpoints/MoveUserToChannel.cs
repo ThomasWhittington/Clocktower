@@ -14,7 +14,11 @@ public class MoveUserToChannel : IEndpoint
 
     private static async Task<Results<Ok<string>, BadRequest<string>>> Handle([AsParameters] Request request, DiscordService discordService)
     {
-        var (success, message) = await discordService.MoveUser(request.GuildId, request.UserId, request.ChannelId);
+        var guildId = ulong.Parse(request.GuildId);
+        var userId = ulong.Parse(request.UserId);
+        var channelId = ulong.Parse(request.ChannelId);
+
+        var (success, message) = await discordService.MoveUser(guildId, userId, channelId);
         if (success)
         {
             return TypedResults.Ok(message);
@@ -25,7 +29,7 @@ public class MoveUserToChannel : IEndpoint
 
 
     [UsedImplicitly]
-    public record Request(ulong GuildId, ulong UserId, ulong ChannelId);
+    public record Request(string GuildId, string UserId, string ChannelId);
 
     [UsedImplicitly]
     public class RequestValidator : AbstractValidator<Request>
@@ -35,25 +39,20 @@ public class MoveUserToChannel : IEndpoint
             RuleFor(x => x.GuildId)
                 .NotEmpty()
                 .WithMessage("GuildId cannot be empty")
-                .Must(BeValidDiscordSnowflake)
+                .Must(Common.Validation.BeValidDiscordSnowflake)
                 .WithMessage("GuildId must be a valid Discord snowflake");
 
             RuleFor(x => x.UserId)
                 .NotEmpty()
                 .WithMessage("UserId cannot be empty")
-                .Must(BeValidDiscordSnowflake)
+                .Must(Common.Validation.BeValidDiscordSnowflake)
                 .WithMessage("UserId must be a valid Discord snowflake");
 
             RuleFor(x => x.ChannelId)
                 .NotEmpty()
                 .WithMessage("ChannelId cannot be empty")
-                .Must(BeValidDiscordSnowflake)
+                .Must(Common.Validation.BeValidDiscordSnowflake)
                 .WithMessage("ChannelId must be a valid Discord snowflake");
-        }
-
-        private static bool BeValidDiscordSnowflake(ulong id)
-        {
-            return id > 41943040000L;
         }
     }
 }
