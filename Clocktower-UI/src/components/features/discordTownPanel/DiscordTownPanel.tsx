@@ -10,7 +10,8 @@ import type {
 } from "../../../types";
 import {
     DiscordAdminPanel,
-    DiscordTown
+    DiscordTown,
+    DiscordUserStatus
 } from "./components";
 import {
     Spinner
@@ -58,7 +59,8 @@ function DiscordTownPanel() {
 
     return (
         <div
-            className="bg-[#121214] h-full">
+            id="discord-town-panel"
+            className="bg-[#121214] h-full flex flex-col justify-between">
             <DiscordAdminPanel/>
 
             {isLoading &&
@@ -70,6 +72,8 @@ function DiscordTownPanel() {
                     <DiscordTown
                         townOccupancy={townOccupancy}/>
                 </>}
+
+            <DiscordUserStatus/>
         </div>
     );
 }

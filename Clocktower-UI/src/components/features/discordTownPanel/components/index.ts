@@ -18,3 +18,7 @@ export {
     default as DiscordTownUser
 }
     from './DiscordTownUser.tsx';
+export {
+    default as DiscordUserStatus
+}
+    from './DiscordUserStatus.tsx';

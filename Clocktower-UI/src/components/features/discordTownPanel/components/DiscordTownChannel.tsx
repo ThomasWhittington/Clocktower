@@ -12,7 +12,7 @@ import {
 } from "../../../../store.ts";
 import {
     ValidationUtils
-} from "../../../../utils/validation.ts";
+} from "../../../../utils";
 
 function DiscordTownChannel({channel}: {
     channel: ChannelOccupants
@@ -21,6 +21,7 @@ function DiscordTownChannel({channel}: {
     const guildId = useAppStore((state) => state.guildId);
     const currentUserId = useAppStore((state) => state.currentUserId);
 
+    const channelId = `discord-channel-${channel.channel.id}`;
     const moveUserHere = async () => {
         if (!(ValidationUtils.isValidDiscordId(guildId) &&
             ValidationUtils.isValidDiscordId(channel.channel.id) &&
@@ -44,7 +45,7 @@ function DiscordTownChannel({channel}: {
     }
 
     return (
-        <div>
+        <div id={channelId}>
             <a onClick={moveUserHere}
                className="cursor-pointer">{channel.channel.name}</a>
             {channel.occupants.map(user =>
