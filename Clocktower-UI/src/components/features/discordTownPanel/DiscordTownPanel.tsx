@@ -26,6 +26,9 @@ import {
     ValidationUtils
 } from "../../../utils";
 
+
+//TODO add journey of adding bot to server
+//TODO add check if user is in the voice to enable/disable the channel moving actions
 function DiscordTownPanel() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string>("");

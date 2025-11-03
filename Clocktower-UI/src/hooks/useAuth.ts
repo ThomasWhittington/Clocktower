@@ -7,7 +7,7 @@ import {
 } from '../types/auth';
 import {
     authService
-} from '../services/auth';
+} from '../services';
 
 export const useAuth = (): AuthState & {
     login: () => void;
