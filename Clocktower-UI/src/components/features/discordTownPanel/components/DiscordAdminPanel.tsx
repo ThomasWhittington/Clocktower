@@ -35,7 +35,7 @@ function DiscordAdminPanel() {
 
     useEffect(() => {
         inputChanged("1318686543363178666");
-        setCurrentUserId("285398267854848000n");
+        setCurrentUserId("285398267854848000");
     }, []);
 
 
