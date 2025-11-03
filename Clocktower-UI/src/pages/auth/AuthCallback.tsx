@@ -1,6 +1,9 @@
 ﻿import {
     useEffect
 } from 'react';
+import {
+    discordService
+} from "../../services";
 
 const AuthCallback = () => {
     useEffect(() => {
@@ -17,15 +20,17 @@ const AuthCallback = () => {
 
             if (key) {
                 try {
-                    const response = await fetch(`http://localhost:5120/api/discord/auth/data/${key}`);
-                    if (response.ok) {
-                        const userData = await response.json();
-                        localStorage.setItem('user', JSON.stringify(userData));
+                    const {
+                        data,
+                        error
+                    } = await discordService.getAuthData(key);
 
-                        // Redirect to dashboard or wherever you want after successful auth
-                        window.location.href = '/';
+                    if (error) {
+                        console.error('Failed to get auth data:', error);
+                        window.location.href = '/login?error=auth_data_failed';
                     } else {
-                        throw new Error('Failed to retrieve auth data');
+                        localStorage.setItem('user', JSON.stringify(data));
+                        window.location.href = '/';
                     }
                 } catch (error) {
                     console.error('Failed to get auth data:', error);

@@ -1,6 +1,7 @@
 ﻿import {
     checkGuildApi,
     type CheckGuildApiResponse,
+    getAuthDataApi,
     getTownOccupancyApi,
     getTownStatusApi,
     type GetTownStatusApiResponse,
@@ -119,10 +120,19 @@ async function moveUserToChannel(guildId: string, userId: string, channelId: str
     return data ?? 'Failed to move user to channel';
 }
 
+async function getAuthData(key: string) {
+    return await getAuthDataApi({
+        path: {
+            key: key
+        }
+    });
+}
+
 export const discordService = {
     checkGuild,
     getTownStatus,
     rebuildTown,
     getTownOccupancy,
-    moveUserToChannel
+    moveUserToChannel,
+    getAuthData
 }
