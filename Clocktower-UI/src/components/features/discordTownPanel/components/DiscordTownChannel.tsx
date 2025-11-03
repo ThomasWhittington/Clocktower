@@ -19,18 +19,19 @@ function DiscordTownChannel({channel}: {
 }) {
 
     const guildId = useAppStore((state) => state.guildId);
-    const currentUserId = useAppStore((state) => state.currentUserId);
+    const currentUser = useAppStore((state) => state.currentUser);
 
     const channelId = `discord-channel-${channel.channel.id}`;
     const moveUserHere = async () => {
         if (!(ValidationUtils.isValidDiscordId(guildId) &&
             ValidationUtils.isValidDiscordId(channel.channel.id) &&
-            ValidationUtils.isValidDiscordId(currentUserId))
+            currentUser != undefined &&
+            ValidationUtils.isValidDiscordId(currentUser.id))
         ) {
             console.error('Ids were not valid');
             console.log(guildId);
             console.log(channel.channel.id);
-            console.log(currentUserId);
+            console.log(currentUser!.id);
 
             return;
         }
@@ -38,14 +39,15 @@ function DiscordTownChannel({channel}: {
         console.log('guild: ' + guildId);
         console.log('channel: ' + channel.channel.id);
 
-        await discordService.moveUserToChannel(guildId, currentUserId, channel.channel.id)
+        await discordService.moveUserToChannel(guildId, currentUser.id, channel.channel.id)
             .then((data) => console.log(data))
             .catch((err) => console.error(err));
 
     }
 
     return (
-        <div id={channelId}>
+        <div
+            id={channelId}>
             <a onClick={moveUserHere}
                className="cursor-pointer">{channel.channel.name}</a>
             {channel.occupants.map(user =>

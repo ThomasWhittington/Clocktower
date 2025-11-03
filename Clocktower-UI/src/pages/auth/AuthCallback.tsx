@@ -4,8 +4,13 @@
 import {
     discordService
 } from "../../services";
+import {
+    useAppStore
+} from "../../store.ts";
 
 const AuthCallback = () => {
+    const setCurrentUser = useAppStore((state) => state.setCurrentUser);
+
     useEffect(() => {
         const handleAuthCallback = async () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -29,7 +34,10 @@ const AuthCallback = () => {
                         console.error('Failed to get auth data:', error);
                         window.location.href = '/login?error=auth_data_failed';
                     } else {
-                        localStorage.setItem('user', JSON.stringify(data));
+                        setCurrentUser({
+                            id: data?.id??'',
+                            name: data?.name??''
+                        });
                         window.location.href = '/';
                     }
                 } catch (error) {

@@ -25,7 +25,6 @@ function DiscordAdminPanel() {
     const [inputValue, setInputValue] = useState<string>('');
     const guildId = useAppStore((state) => state.guildId);
     const setGuildId = useAppStore((state) => state.setGuildId);
-    const setCurrentUserId = useAppStore((state) => state.setCurrentUserId);
     const [error, setError] = useState<string>("");
     const [message, setMessage] = useState<string>("");
     const [buttonEnabled, setButtonEnabled] = useState<boolean>(false);
@@ -35,7 +34,6 @@ function DiscordAdminPanel() {
 
     useEffect(() => {
         inputChanged("1318686543363178666");
-        setCurrentUserId("285398267854848000");
     }, []);
 
 

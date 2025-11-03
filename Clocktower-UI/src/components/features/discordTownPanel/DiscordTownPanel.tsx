@@ -68,10 +68,10 @@ function DiscordTownPanel() {
             {error &&
                 <p className="text-red-500 text-sm">{error}</p>}
             {townOccupancy &&
-                <>
-                    <DiscordTown
+                <div className="mb-auto">
+                    <DiscordTown 
                         townOccupancy={townOccupancy}/>
-                </>}
+                </div>}
 
             <DiscordUserStatus/>
         </div>
