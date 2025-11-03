@@ -23,7 +23,7 @@ import {
 } from "../../../store.ts";
 import {
     ValidationUtils
-} from "../../../utils/validation.ts";
+} from "../../../utils";
 
 function DiscordTownPanel() {
     const [isLoading, setIsLoading] = useState(false);

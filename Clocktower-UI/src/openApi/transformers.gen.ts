@@ -8,6 +8,7 @@ import type {
     GetRolesApiResponse,
     GetTownOccupancyApiResponse,
     GetTownStatusApiResponse,
+    HandleDiscordCallbackApiResponse,
     StartGameApiResponse
 } from './types.gen';
 
@@ -70,6 +71,18 @@ export const getTownOccupancyApiResponseTransformer = async (data: any): Promise
 
 export const getTownStatusApiResponseTransformer = async (data: any): Promise<GetTownStatusApiResponse> => {
     data = clocktowerServerDiscordEndpointsGetTownStatusResponseSchemaResponseTransformer(data);
+    return data;
+};
+
+const clocktowerServerDiscordEndpointsLoginResponseSchemaResponseTransformer = (data: any) => {
+    if (data.id) {
+        data.id = BigInt(data.id.toString());
+    }
+    return data;
+};
+
+export const handleDiscordCallbackApiResponseTransformer = async (data: any): Promise<HandleDiscordCallbackApiResponse> => {
+    data = clocktowerServerDiscordEndpointsLoginResponseSchemaResponseTransformer(data);
     return data;
 };
 

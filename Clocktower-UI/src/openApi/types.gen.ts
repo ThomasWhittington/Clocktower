@@ -38,6 +38,13 @@ export type ClocktowerServerDiscordEndpointsGetTownStatusResponse = {
     message?: string | null;
 };
 
+export type ClocktowerServerDiscordEndpointsLoginResponse = {
+    id?: bigint;
+    name?: string | null;
+    email?: string | null;
+    avatar?: string | null;
+};
+
 export type ClocktowerServerDiscordServicesChannelOccupants = {
     channel?: ClocktowerServerDiscordServicesMiniChannel;
     occupants?: Array<ClocktowerServerDiscordServicesMiniUser> | null;
@@ -246,6 +253,50 @@ export type GetTownStatusApiResponses = {
 };
 
 export type GetTownStatusApiResponse = GetTownStatusApiResponses[keyof GetTownStatusApiResponses];
+
+export type InitiateDiscordAuthApiData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/discord/auth';
+};
+
+export type InitiateDiscordAuthApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: string;
+};
+
+export type InitiateDiscordAuthApiError = InitiateDiscordAuthApiErrors[keyof InitiateDiscordAuthApiErrors];
+
+export type HandleDiscordCallbackApiData = {
+    body?: never;
+    path?: never;
+    query?: {
+        code?: string;
+        error?: string;
+    };
+    url: '/api/discord/auth/callback';
+};
+
+export type HandleDiscordCallbackApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: string;
+};
+
+export type HandleDiscordCallbackApiError = HandleDiscordCallbackApiErrors[keyof HandleDiscordCallbackApiErrors];
+
+export type HandleDiscordCallbackApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerDiscordEndpointsLoginResponse;
+};
+
+export type HandleDiscordCallbackApiResponse = HandleDiscordCallbackApiResponses[keyof HandleDiscordCallbackApiResponses];
 
 export type MoveUserToChannelApiData = {
     body?: never;

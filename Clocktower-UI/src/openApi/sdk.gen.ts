@@ -38,6 +38,11 @@ import type {
     GetTownStatusApiData,
     GetTownStatusApiErrors,
     GetTownStatusApiResponses,
+    HandleDiscordCallbackApiData,
+    HandleDiscordCallbackApiErrors,
+    HandleDiscordCallbackApiResponses,
+    InitiateDiscordAuthApiData,
+    InitiateDiscordAuthApiErrors,
     LoadDummyGamesApiData,
     LoadDummyGamesApiErrors,
     LoadDummyGamesApiResponses,
@@ -125,6 +130,30 @@ export const getTownOccupancyApi = <ThrowOnError extends boolean = false>(option
 export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: Options<GetTownStatusApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetTownStatusApiResponses, GetTownStatusApiErrors, ThrowOnError>({
         url: '/api/discord/{guildId}/status',
+        ...options
+    });
+};
+
+/**
+ * Initiate Discord OAuth
+ *
+ * Redirects user to Discord for OAuth authentication
+ */
+export const initiateDiscordAuthApi = <ThrowOnError extends boolean = false>(options?: Options<InitiateDiscordAuthApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<unknown, InitiateDiscordAuthApiErrors, ThrowOnError>({
+        url: '/api/discord/auth',
+        ...options
+    });
+};
+
+/**
+ * Handle Discord OAuth callback
+ *
+ * Handles the callback from Discord OAuth
+ */
+export const handleDiscordCallbackApi = <ThrowOnError extends boolean = false>(options?: Options<HandleDiscordCallbackApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<HandleDiscordCallbackApiResponses, HandleDiscordCallbackApiErrors, ThrowOnError>({
+        url: '/api/discord/auth/callback',
         ...options
     });
 };

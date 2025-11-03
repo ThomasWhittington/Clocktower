@@ -24,7 +24,6 @@ export const useDiscordHub = (): DiscordHubState => {
             .withUrl('http://localhost:5120/discordHub')
             .withAutomaticReconnect()
             .build();
-        console.log(connection)
 
         connection.on('TownOccupancyUpdated', (occupants: TownOccupants) => {
             const convertedOccupants = ConverterUtils.convertStringIdsToBigints(occupants) as TownOccupants;

@@ -18,7 +18,7 @@ import {
 } from "../../../../store.ts";
 import {
     ValidationUtils
-} from "../../../../utils/validation.ts";
+} from "../../../../utils";
 
 function DiscordAdminPanel() {
     const [isLoading, setIsLoading] = useState(false);
