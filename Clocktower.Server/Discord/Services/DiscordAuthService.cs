@@ -1,11 +1,18 @@
 ﻿using System.Diagnostics;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using Clocktower.Server.Common;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Clocktower.Server.Discord.Services;
 
-public class DiscordAuthService(Secrets secrets)
+public class DiscordAuthService(Secrets secrets, IMemoryCache cache)
 {
+    private readonly JsonSerializerOptions _deserializationOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+    };
+
     public (bool success, string url, string message) GetAuthorizationUrl()
     {
         const string scopes = "identify guilds";
@@ -24,42 +31,46 @@ public class DiscordAuthService(Secrets secrets)
         return (true, authorizationUrl, "Authorization Url generated");
     }
 
-    public async Task<(bool success, AuthResult? authResult, string message)> HandleCallback(string? error, string? code)
+    public async Task<string> HandleCallback(string? error, string? code)
     {
-        if (!string.IsNullOrEmpty(error)) return (false, null, $"Discord OAuth error: {error}");
-        if (string.IsNullOrEmpty(code)) return (false, null, "Authorization code not received");
+        const string frontendUrl = "http://localhost:5173/auth/callback?key=";
+        const string errorUrl = "http://localhost:5173/login?error=";
+
+        if (!string.IsNullOrEmpty(error)) return errorUrl + Uri.EscapeDataString($"Discord OAuth error: {error}");
+        if (string.IsNullOrEmpty(code)) return errorUrl + Uri.EscapeDataString("Authorization code not received");
 
         try
         {
             using var httpClient = new HttpClient();
 
             var tokenResponse = await ExchangeCodeForToken(code, httpClient);
-            if (tokenResponse == null)
-            {
-                return (false, null, "Failed to exchange code for token");
-            }
+            if (tokenResponse == null) return errorUrl + Uri.EscapeDataString("Failed to exchange code for token");
 
             var userInfo = await GetDiscordUserInfo(tokenResponse.AccessToken, httpClient);
-            if (userInfo == null)
-            {
-                return (false, null, "Failed to get user information");
-            }
+            if (userInfo == null) return errorUrl + Uri.EscapeDataString("Failed to get user information");
 
-            // Here you would typically:
-            // 1. Create or update user in your database
-            // 2. Generate JWT token for your application
-            // 3. Set authentication cookies
+            var response = new MiniUser(userInfo.Id, userInfo.Username);
+            var tempKey = Guid.NewGuid().ToString();
+            cache.Set($"auth_data_{tempKey}", response, TimeSpan.FromMinutes(5));
 
-            var result = new AuthResult(true, userInfo, tokenResponse.AccessToken, tokenResponse.RefreshToken);
-
-            return (true, result, string.Empty);
+            return frontendUrl + tempKey;
         }
         catch (Exception ex)
         {
-            return (false, null, $"Authentication failed: {ex.Message}");
+            return errorUrl + Uri.EscapeDataString($"Authentication failed: {ex.Message}");
         }
     }
 
+    public MiniUser? GetAuthData(string key)
+    {
+        if (cache.TryGetValue($"auth_data_{key}", out var userData) && userData is MiniUser response)
+        {
+            cache.Remove($"auth_data_{key}");
+            return response;
+        }
+
+        return null;
+    }
 
     private async Task<TokenResponse?> ExchangeCodeForToken(string code, HttpClient httpClient)
     {
@@ -86,22 +97,16 @@ public class DiscordAuthService(Secrets secrets)
         });
     }
 
-    private static async Task<DiscordUser?> GetDiscordUserInfo(string accessToken, HttpClient httpClient)
+    private async Task<DiscordUser?> GetDiscordUserInfo(string accessToken, HttpClient httpClient)
     {
-        httpClient.DefaultRequestHeaders.Authorization = new("Bearer", accessToken);
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
         var response = await httpClient.GetAsync("https://discord.com/api/users/@me");
 
-        if (!response.IsSuccessStatusCode)
-        {
-            return null;
-        }
+        if (!response.IsSuccessStatusCode) return null;
 
         var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<DiscordUser>(json, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
-        });
+        return JsonSerializer.Deserialize<DiscordUser>(json, _deserializationOptions);
     }
 
     public record TokenResponse(

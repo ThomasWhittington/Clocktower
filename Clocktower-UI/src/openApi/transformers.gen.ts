@@ -13,7 +13,7 @@ import type {
 } from './types.gen';
 
 export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetAuthDataApiResponse> => {
-    data = clocktowerServerDiscordEndpointsAuthResponseSchemaResponseTransformer(data);
+    data = clocktowerServerDiscordServicesMiniUserSchemaResponseTransformer(data);
     return data;
 };
 

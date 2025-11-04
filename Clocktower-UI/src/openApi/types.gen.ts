@@ -27,11 +27,6 @@ export type ClocktowerServerDataTypesRoleRole = {
     edition?: ClocktowerServerDataTypesEnumEdition;
 };
 
-export type ClocktowerServerDiscordEndpointsAuthResponse = {
-    id?: string | null;
-    name?: string | null;
-};
-
 export type ClocktowerServerDiscordEndpointsCheckGuildResponse = {
     valid?: boolean;
     name?: string | null;
@@ -159,7 +154,7 @@ export type GetAuthDataApiResponses = {
     /**
      * OK
      */
-    200: ClocktowerServerDiscordEndpointsAuthResponse;
+    200: ClocktowerServerDiscordServicesMiniUser;
 };
 
 export type GetAuthDataApiResponse = GetAuthDataApiResponses[keyof GetAuthDataApiResponses];
