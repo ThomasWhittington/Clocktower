@@ -55,6 +55,7 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
         var thisTownOccupancy = _townOccupants[guildId];
         thisTownOccupancy!.MoveUser(user, after);
         await hubContext.Clients.All.TownOccupancyUpdated(thisTownOccupancy);
+        await hubContext.Clients.All.UserVoiceStateChanged(user.Id.ToString(), after?.Channel != null);
     }
 
     public async Task<(bool success, string message)> MoveUser(ulong guildId, ulong userId, ulong channelId)
