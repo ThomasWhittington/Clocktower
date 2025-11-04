@@ -17,14 +17,14 @@ import {
     Spinner
 } from "../../ui";
 import {
-    useDiscordHub
-} from "./hooks/useDiscordHub.ts";
-import {
     useAppStore
 } from "../../../store.ts";
 import {
     ValidationUtils
 } from "../../../utils";
+import {
+    useDiscordHub
+} from "./hooks/useDiscordHub.ts";
 
 
 //TODO add journey of adding bot to server
@@ -71,8 +71,9 @@ function DiscordTownPanel() {
             {error &&
                 <p className="text-red-500 text-sm">{error}</p>}
             {townOccupancy &&
-                <div className="mb-auto">
-                    <DiscordTown 
+                <div
+                    className="mb-auto">
+                    <DiscordTown
                         townOccupancy={townOccupancy}/>
                 </div>}
 

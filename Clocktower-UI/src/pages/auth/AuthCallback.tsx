@@ -18,7 +18,6 @@ const AuthCallback = () => {
             const error = urlParams.get('error');
 
             if (error) {
-                console.error('Auth failed:', decodeURIComponent(error));
                 window.location.href = '/login?error=' + encodeURIComponent(error);
                 return;
             }

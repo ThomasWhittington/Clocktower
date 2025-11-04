@@ -13,6 +13,9 @@ import {
 import {
     ValidationUtils
 } from "../../../../utils";
+import {
+    useUserVoiceStatus
+} from "../hooks/useUserVoiceStatus.ts";
 
 function DiscordTownChannel({channel}: {
     channel: ChannelOccupants
@@ -20,8 +23,10 @@ function DiscordTownChannel({channel}: {
 
     const guildId = useAppStore((state) => state.guildId);
     const currentUser = useAppStore((state) => state.currentUser);
-
+    const {isInVoiceChannel} = useUserVoiceStatus();
+    
     const channelId = `discord-channel-${channel.channel.id}`;
+    
     const moveUserHere = async () => {
         if (!(ValidationUtils.isValidDiscordId(guildId) &&
             ValidationUtils.isValidDiscordId(channel.channel.id) &&
@@ -35,10 +40,7 @@ function DiscordTownChannel({channel}: {
 
             return;
         }
-
-        console.log('guild: ' + guildId);
-        console.log('channel: ' + channel.channel.id);
-
+        
         await discordService.moveUserToChannel(guildId, currentUser.id, channel.channel.id)
             .then((data) => console.log(data))
             .catch((err) => console.error(err));
@@ -48,8 +50,8 @@ function DiscordTownChannel({channel}: {
     return (
         <div
             id={channelId}>
-            <a onClick={moveUserHere}
-               className="cursor-pointer">{channel.channel.name}</a>
+            <a onClick={isInVoiceChannel ? moveUserHere : undefined}
+               className={isInVoiceChannel ? "cursor-pointer" : "cursor-not-allowed opacity-50"}>{channel.channel.name}</a>
             {channel.occupants.map(user =>
                 <DiscordTownUser
                     key={user.id}
