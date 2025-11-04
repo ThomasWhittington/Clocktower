@@ -1,21 +1,22 @@
 ﻿import type {
     ChannelOccupants,
-} from "../../../../types";
+} from "@/types";
 import {
     DiscordTownUser
 } from "./index.ts";
 import {
     discordService
-} from "../../../../services";
+} from "@/services";
 import {
     useAppStore
-} from "../../../../store.ts";
+} from "@/store";
 import {
     ValidationUtils
-} from "../../../../utils";
+} from "@/utils";
 import {
     useUserVoiceStatus
-} from "../hooks/useUserVoiceStatus.ts";
+} from "@/components/features/discordTownPanel/hooks";
+
 
 function DiscordTownChannel({channel}: {
     channel: ChannelOccupants

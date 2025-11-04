@@ -1,9 +1,9 @@
 ﻿import {
     useAppStore
-} from "../../../../store.ts";
+} from "@/store";
 import {
     authService
-} from "../../../../services/";
+} from "@/services";
 
 function DiscordUserStatus() {
     const currentUser = useAppStore((state) => state.currentUser);

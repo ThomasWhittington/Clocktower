@@ -4,7 +4,7 @@
 } from "react";
 import {
     Spinner
-} from '../../ui';
+} from '@/components/ui';
 import styles
     from "./GameManager.module.css";
 import GameList
@@ -12,10 +12,10 @@ import GameList
 
 import {
     gamesService
-} from "../../../services";
+} from "@/services";
 import type {
     GameState
-} from "../../../types";
+} from "@/types";
 
 function GameManager() {
     const [isLoading, setIsLoading] = useState(false);

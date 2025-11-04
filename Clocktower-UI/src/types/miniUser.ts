@@ -1,6 +1,6 @@
 ﻿import type {
     ClocktowerServerDiscordServicesMiniUser
-} from "../openApi";
+} from "@/openApi";
 
 export type MiniUser = {
     id: string;

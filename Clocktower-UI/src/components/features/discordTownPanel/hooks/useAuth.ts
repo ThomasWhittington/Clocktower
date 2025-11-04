@@ -4,10 +4,10 @@
 } from 'react';
 import {
     type AuthState
-} from '../types/auth';
+} from '@/types/auth';
 import {
     authService
-} from '../services';
+} from '@/services';
 
 export const useAuth = (): AuthState & {
     login: () => void;

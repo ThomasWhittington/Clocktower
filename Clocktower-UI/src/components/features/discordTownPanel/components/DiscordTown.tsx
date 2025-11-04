@@ -1,6 +1,6 @@
 ﻿import type {
     TownOccupants
-} from "../../../../types";
+} from "@/types";
 import {
     DiscordTownCategory
 } from "./index.ts";

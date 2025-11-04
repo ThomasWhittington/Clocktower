@@ -1,6 +1,6 @@
 ﻿import type {
     ClocktowerServerDiscordServicesChannelOccupants
-} from "../openApi";
+} from "@/openApi";
 import {
     mapToMiniChannel,
     type MiniChannel

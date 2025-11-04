@@ -3,10 +3,10 @@
 } from 'react';
 import {
     discordService
-} from "../../services";
+} from "@/services";
 import {
     useAppStore
-} from "../../store.ts";
+} from "@/store";
 
 const AuthCallback = () => {
     const setCurrentUser = useAppStore((state) => state.setCurrentUser);

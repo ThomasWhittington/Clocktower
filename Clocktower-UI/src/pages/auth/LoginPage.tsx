@@ -1,5 +1,5 @@
 ﻿import DiscordLoginButton
-    from "../../components/auth/DiscordLoginButton.tsx";
+    from "@/components/auth/DiscordLoginButton";
 
 const LoginPage = () => {
     const urlParams = new URLSearchParams(window.location.search);

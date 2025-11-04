@@ -1,6 +1,6 @@
 ﻿import {
     type User
-} from '../types/auth';
+} from '@/types/auth';
 
 export const authService = {
     getUser(): User | null {

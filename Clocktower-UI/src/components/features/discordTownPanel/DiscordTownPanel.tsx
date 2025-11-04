@@ -1,64 +1,23 @@
 ﻿import {
-    useEffect,
-    useState
-} from "react";
-import {
-    discordService
-} from "../../../services";
-import type {
-    TownOccupants
-} from "../../../types";
-import {
     DiscordAdminPanel,
     DiscordTown,
     DiscordUserStatus
 } from "./components";
 import {
     Spinner
-} from "../../ui";
+} from "@/components/ui";
 import {
-    useAppStore
-} from "../../../store.ts";
-import {
-    ValidationUtils
-} from "../../../utils";
-import {
-    useDiscordHub
-} from "./hooks/useDiscordHub.ts";
+    useTownOccupancy
+} from "./hooks";
 
 
 //TODO add journey of adding bot to server
-//TODO add check if user is in the voice to enable/disable the channel moving actions
 function DiscordTownPanel() {
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string>("");
-    const guildId = useAppStore((state) => state.guildId);
-    const [townOccupancy, setTownOccupancy] = useState<TownOccupants>();
-
-
-    const discordMoveState = useDiscordHub();
-
-    const getTownOccupancy = async () => {
-        if (!ValidationUtils.isValidDiscordId(guildId)) {
-            console.error('guildId was not valid');
-            return;
-        }
-        setIsLoading(true);
-        await discordService.getTownOccupancy(guildId)
-            .then((data) => setTownOccupancy(data))
-            .catch((err) => setError(err.message))
-            .finally(() => setIsLoading(false));
-    }
-
-    useEffect(() => {
-        getTownOccupancy().catch(console.error);
-    }, [guildId]);
-
-    useEffect(() => {
-        if (discordMoveState.townOccupancy) {
-            setTownOccupancy(discordMoveState.townOccupancy);
-        }
-    }, [discordMoveState.townOccupancy]);
+    const {
+        townOccupancy,
+        isLoading,
+        error
+    } = useTownOccupancy();
 
     return (
         <div

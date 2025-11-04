@@ -1,6 +1,7 @@
 ﻿import {
     useAuth
-} from '../../hooks/useAuth';
+} from "@/components/features/discordTownPanel/hooks/useAuth.ts";
+
 
 const DiscordLoginButton = () => {
     const { login } = useAuth();

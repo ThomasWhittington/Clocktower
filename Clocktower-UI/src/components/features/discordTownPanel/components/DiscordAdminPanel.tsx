@@ -4,21 +4,21 @@
 } from "react";
 import {
     discordService
-} from "../../../../services";
+} from "@/services";
 import {
     Spinner,
     StatusIcon
-} from "../../../ui";
+} from "@/components/ui";
 import type {
     CheckGuildApiResponse,
     GetTownStatusApiResponse
-} from "../../../../openApi";
+} from "@/openApi";
 import {
     useAppStore
-} from "../../../../store.ts";
+} from "@/store";
 import {
     ValidationUtils
-} from "../../../../utils";
+} from "@/utils";
 
 function DiscordAdminPanel() {
     const [isLoading, setIsLoading] = useState(false);

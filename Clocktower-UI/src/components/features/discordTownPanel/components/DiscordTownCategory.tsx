@@ -1,6 +1,6 @@
 ﻿import type {
     MiniCategory
-} from "../../../../types";
+} from "@/types";
 import {
     DiscordTownChannel
 } from "./index.ts";

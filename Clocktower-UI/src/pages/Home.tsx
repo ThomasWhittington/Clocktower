@@ -9,13 +9,13 @@ import {
 } from "../components/features";
 import {
     useDiscordHub
-} from "../components/features/discordTownPanel/hooks/useDiscordHub.ts";
+} from "@/components/features/discordTownPanel/hooks";
 import {
     HubConnectionState
 } from "@microsoft/signalr";
 import {
     Spinner
-} from "../components/ui";
+} from "@/components/ui";
 
 function Home() {
     const {

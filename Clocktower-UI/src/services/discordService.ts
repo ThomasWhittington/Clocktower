@@ -8,11 +8,11 @@
     moveUserToChannelApi,
     rebuildTownApi,
     type RebuildTownApiResponse
-} from '../openApi';
+} from '@/openApi';
 import {
     mapToTownOccupants,
     type TownOccupants
-} from "../types";
+} from "@/types";
 
 
 async function checkGuild(id: string): Promise<CheckGuildApiResponse> {
