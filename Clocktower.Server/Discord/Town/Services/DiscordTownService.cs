@@ -1,11 +1,12 @@
 ﻿using System.Collections.Concurrent;
+using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Socket;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Clocktower.Server.Discord.Services;
+namespace Clocktower.Server.Discord.Town.Services;
 
 [UsedImplicitly]
 public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hubContext)
@@ -55,6 +56,7 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
         var thisTownOccupancy = _townOccupants[guildId];
         thisTownOccupancy!.MoveUser(user, after);
         await hubContext.Clients.All.TownOccupancyUpdated(thisTownOccupancy);
+        await hubContext.Clients.All.UserVoiceStateChanged(user.Id.ToString(), after?.Channel != null);
     }
 
     public async Task<(bool success, string message)> MoveUser(ulong guildId, ulong userId, ulong channelId)
@@ -116,9 +118,16 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
         {
             var guildValid = await CheckGuildId(guildId);
             if (guildValid is not { success: true, valid: true }) return (false, guildValid.message);
+            await hubContext.Clients.All.TownOccupancyUpdated(new TownOccupants([]));
             var delete = await DeleteTown(guildId);
             if (!delete.success) return delete;
             var create = await CreateTown(guildId);
+            if (create.success)
+            {
+                _townOccupants.Clear();
+                await GetTownOccupancy(guildId);
+            }
+
             return create;
         }
         catch (Exception ex)
@@ -243,6 +252,7 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
             var townOccupants = new TownOccupants(channelCategories);
 
             _townOccupants.TryAdd(guildId, townOccupants);
+            await hubContext.Clients.All.TownOccupancyUpdated(_townOccupants[guildId]);
             return (true, townOccupants, $"Town occupancy {townOccupants.UserCount}");
         }
         catch (Exception ex)
@@ -337,13 +347,13 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
 }
 
 [UsedImplicitly]
-public record MiniChannel(ulong Id, string Name);
+public record MiniChannel(string Id, string Name);
 
 [UsedImplicitly]
-public record MiniCategory(ulong Id, string Name, IEnumerable<ChannelOccupants> Channels);
+public record MiniCategory(string Id, string Name, IEnumerable<ChannelOccupants> Channels);
 
 [UsedImplicitly]
-public record MiniUser(ulong Id, string Name);
+public record MiniUser(string Id, string Name);
 
 public class TownOccupants(List<MiniCategory> channelCategories)
 {
@@ -352,7 +362,7 @@ public class TownOccupants(List<MiniCategory> channelCategories)
 
     public void MoveUser(DiscordUser user, DiscordVoiceState? newChannel)
     {
-        var miniUser = new MiniUser(user.Id, user.Username);
+        var miniUser = new MiniUser(user.Id.ToString(), user.Username);
 
         ChannelCategories = ChannelCategories.Select(category =>
             category with
@@ -360,10 +370,10 @@ public class TownOccupants(List<MiniCategory> channelCategories)
                 Channels = category.Channels.Select(channel =>
                 {
                     var occupantsList = channel.Occupants
-                        .Where(o => o.Id != user.Id)
+                        .Where(o => o.Id != user.Id.ToString())
                         .ToList();
 
-                    if (newChannel?.Channel?.Id == channel.Channel.Id)
+                    if (newChannel?.Channel?.Id.ToString() == channel.Channel.Id)
                     {
                         occupantsList.Add(miniUser);
                     }

@@ -1,26 +1,27 @@
 ﻿import {
     checkGuildApi,
     type CheckGuildApiResponse,
+    getAuthDataApi,
     getTownOccupancyApi,
     getTownStatusApi,
     type GetTownStatusApiResponse,
     moveUserToChannelApi,
     rebuildTownApi,
     type RebuildTownApiResponse
-} from '../openApi';
+} from '@/generated';
 import {
     mapToTownOccupants,
     type TownOccupants
-} from "../types";
+} from "@/types";
 
 
-async function checkGuild(id: bigint): Promise<CheckGuildApiResponse> {
+async function checkGuild(id: string): Promise<CheckGuildApiResponse> {
     const {
         data,
         error
     } = await checkGuildApi({
         path: {
-            guildId: id,
+            guildId: id.toString()
         }
     });
 
@@ -36,7 +37,7 @@ async function checkGuild(id: bigint): Promise<CheckGuildApiResponse> {
     };
 }
 
-async function getTownStatus(id: bigint): Promise<GetTownStatusApiResponse> {
+async function getTownStatus(id: string): Promise<GetTownStatusApiResponse> {
     const {
         data,
         error
@@ -56,11 +57,16 @@ async function getTownStatus(id: bigint): Promise<GetTownStatusApiResponse> {
     };
 }
 
-async function rebuildTown(id: bigint): Promise<RebuildTownApiResponse> {
+async function rebuildTown(id: string): Promise<RebuildTownApiResponse> {
     const {
         data,
         error
-    } = await rebuildTownApi({path: {guildId: id}});
+    } = await rebuildTownApi({
+        path: {
+            guildId: id
+        }
+    });
+
     if (error) {
         console.error('Failed to rebuild town:', error);
         throw new Error(error.toString());
@@ -69,13 +75,16 @@ async function rebuildTown(id: bigint): Promise<RebuildTownApiResponse> {
     return data ?? '';
 }
 
-async function getTownOccupancy(id: bigint): Promise<TownOccupants> {
-
-
+async function getTownOccupancy(id: string): Promise<TownOccupants> {
     const {
         data,
         error
-    } = await getTownOccupancyApi({path: {guildId: id}});
+    } = await getTownOccupancyApi({
+        path: {
+            guildId: id
+        }
+    });
+
     if (error) {
         console.error('Failed to rebuild town:', error);
         throw new Error(error.toString());
@@ -91,7 +100,7 @@ async function getTownOccupancy(id: bigint): Promise<TownOccupants> {
     };
 }
 
-async function moveUserToChannel(guildId: bigint, userId: bigint, channelId: bigint): Promise<string> {
+async function moveUserToChannel(guildId: string, userId: string, channelId: string): Promise<string> {
     const {
         data,
         error
@@ -111,10 +120,19 @@ async function moveUserToChannel(guildId: bigint, userId: bigint, channelId: big
     return data ?? 'Failed to move user to channel';
 }
 
+async function getAuthData(key: string) {
+    return await getAuthDataApi({
+        path: {
+            key: key
+        }
+    });
+}
+
 export const discordService = {
     checkGuild,
     getTownStatus,
     rebuildTown,
     getTownOccupancy,
-    moveUserToChannel
+    moveUserToChannel,
+    getAuthData
 }

@@ -4,7 +4,7 @@
 } from "react";
 import {
     Spinner
-} from '../../ui';
+} from '@/components/ui';
 import styles
     from "./GameManager.module.css";
 import GameList
@@ -12,10 +12,10 @@ import GameList
 
 import {
     gamesService
-} from "../../../services";
+} from "@/services";
 import type {
     GameState
-} from "../../../types";
+} from "@/types";
 
 function GameManager() {
     const [isLoading, setIsLoading] = useState(false);
@@ -80,17 +80,18 @@ function GameManager() {
             console.log('A key pressed!');
             const name = prompt("Player name");
             if (name?.trim()) {
-                //TODO add player to current game id
                 await getGame(name)
             }
         }
     };
 
     useEffect(() => {
+        /*
         globalThis.addEventListener('keydown', handleKeyPress);
         return () => {
             globalThis.removeEventListener('keydown', handleKeyPress);
         };
+        */
     }, []);
 
     return (

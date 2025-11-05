@@ -1,7 +1,7 @@
-﻿using Clocktower.Server.Discord.Endpoints.Validation;
-using Clocktower.Server.Discord.Services;
+﻿using Clocktower.Server.Discord.Town.Endpoints.Validation;
+using Clocktower.Server.Discord.Town.Services;
 
-namespace Clocktower.Server.Discord.Endpoints;
+namespace Clocktower.Server.Discord.Town.Endpoints;
 
 [UsedImplicitly]
 public class GetTownOccupancy : IEndpoint
@@ -15,7 +15,9 @@ public class GetTownOccupancy : IEndpoint
 
     private static async Task<Results<Ok<TownOccupants>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, DiscordService discordService)
     {
-        var (success, townOccupants, message) = await discordService.GetTownOccupancy(request.GuildId);
+        var guildId = ulong.Parse(request.GuildId);
+
+        var (success, townOccupants, message) = await discordService.GetTownOccupancy(guildId);
         if (success)
         {
             return TypedResults.Ok(townOccupants);

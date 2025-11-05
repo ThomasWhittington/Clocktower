@@ -1,31 +1,46 @@
 import './App.css'
 import {
-    Panel,
-    PanelGroup,
-    PanelResizeHandle
-} from "react-resizable-panels";
+    BrowserRouter as Router,
+    Route,
+    Routes
+} from 'react-router-dom';
 import {
-    DiscordTownPanel,
-    GameManager
-} from "./components/features";
+    AuthCallback,
+    BotCallback,
+    Game,
+    Home,
+    LoginPage
+} from "./pages";
 
 function App() {
-    return (
-        <PanelGroup
-            autoSaveId="example"
-            direction="horizontal">
-            <Panel
-                defaultSize={25}>
-                <DiscordTownPanel/>
-            </Panel>
-            <PanelResizeHandle
-                className="w-2 bg-gray-400 hover:bg-gray-600 cursor-col-resize"/>
-            <Panel
-                className="flex justify-center align-center">
-                <GameManager/>
-            </Panel>
-        </PanelGroup>
-    )
+    return (         
+            <Router>
+                <Routes>
+                    <Route
+                        path="/login"
+                        element={
+                            <LoginPage/>}/>
+                    <Route
+                        path="/auth/callback"
+                        element={
+                            <AuthCallback/>}
+                    />
+                    <Route
+                        path="/auth/bot-callback"
+                        element={
+                            <BotCallback/>}
+                    />
+                    <Route
+                        path="/"
+                        element={
+                            <Home/>}/>
+                    <Route
+                        path="/game"
+                        element={
+                            <Game/>}/>
+                </Routes>
+            </Router>
+    );
 }
 
 export default App

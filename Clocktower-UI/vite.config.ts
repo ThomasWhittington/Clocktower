@@ -5,6 +5,8 @@ import react
     from '@vitejs/plugin-react'
 import tailwindcss
     from "@tailwindcss/vite";
+import path
+    from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -15,6 +17,7 @@ export default defineConfig({
                 plugins: [['babel-plugin-react-compiler']],
             },
         }),
+
     ],
     server: {
         proxy: {
@@ -23,6 +26,16 @@ export default defineConfig({
                 changeOrigin: true,
                 secure: false
             }
+        }
+    },
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, './src'),
+            '@/components': path.resolve(__dirname, './src/components'),
+            '@/types': path.resolve(__dirname, './src/types'),
+            '@/services': path.resolve(__dirname, './src/services'),
+            '@/utils': path.resolve(__dirname, './src/utils'),
+            '@/store': path.resolve(__dirname, './src/store'),
         }
     }
 })

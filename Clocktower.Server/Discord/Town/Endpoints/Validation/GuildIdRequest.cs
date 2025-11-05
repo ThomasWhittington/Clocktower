@@ -1,7 +1,7 @@
-﻿namespace Clocktower.Server.Discord.Endpoints.Validation;
+﻿namespace Clocktower.Server.Discord.Town.Endpoints.Validation;
 
 [UsedImplicitly]
-public record GuildIdRequest(ulong GuildId);
+public record GuildIdRequest(string GuildId);
 
 [UsedImplicitly]
 public class GuildIdRequestValidator : AbstractValidator<GuildIdRequest>
@@ -11,12 +11,7 @@ public class GuildIdRequestValidator : AbstractValidator<GuildIdRequest>
         RuleFor(x => x.GuildId)
             .NotEmpty()
             .WithMessage("GuildId cannot be empty")
-            .Must(BeValidDiscordSnowflake)
+            .Must(Common.Validation.BeValidDiscordSnowflake)
             .WithMessage("GuildId must be a valid Discord snowflake");
-    }
-
-    private static bool BeValidDiscordSnowflake(ulong id)
-    {
-        return id > 41943040000L;
     }
 }

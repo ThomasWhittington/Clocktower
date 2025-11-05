@@ -13,6 +13,8 @@ public static class Endpoints
         endpoints.MapRolesEndpoints();
         endpoints.MapGamesEndpoints();
         endpoints.MapDiscordEndpoints();
+        endpoints.MapDiscordAuthEndpoints();
+        endpoints.MapDiscordTownEndpoints();
     }
 
     private static void MapRolesEndpoints(this IEndpointRouteBuilder app)
@@ -40,6 +42,24 @@ public static class Endpoints
 
         endpoints.MapPublicGroup()
             .MapEndpointsFromNamespace("Clocktower.Server.Discord.Endpoints");
+    }
+    
+    private static void MapDiscordAuthEndpoints(this IEndpointRouteBuilder app)
+    {
+        var endpoints = app.MapGroup("/discord/auth")
+            .WithTags("Discord Auth");
+
+        endpoints.MapPublicGroup()
+            .MapEndpointsFromNamespace("Clocktower.Server.Discord.Auth.Endpoints");
+    }
+    
+    private static void MapDiscordTownEndpoints(this IEndpointRouteBuilder app)
+    {
+        var endpoints = app.MapGroup("/discord/town")
+            .WithTags("Discord Town");
+
+        endpoints.MapPublicGroup()
+            .MapEndpointsFromNamespace("Clocktower.Server.Discord.Town.Endpoints");
     }
 
     private static RouteGroupBuilder MapPublicGroup(this IEndpointRouteBuilder app, string? prefix = null)

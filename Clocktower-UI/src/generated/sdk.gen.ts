@@ -9,9 +9,16 @@ import {
     client
 } from './client.gen';
 import type {
+    AddBotApiData,
+    AddBotApiErrors,
     AddPlayerToGameApiData,
     AddPlayerToGameApiErrors,
     AddPlayerToGameApiResponses,
+    BotCallbackApiData,
+    BotCallbackApiErrors,
+    CallbackApiData,
+    CallbackApiErrors,
+    CallbackApiResponses,
     CheckGuildApiData,
     CheckGuildApiErrors,
     CheckGuildApiResponses,
@@ -24,6 +31,9 @@ import type {
     DeleteTownApiData,
     DeleteTownApiErrors,
     DeleteTownApiResponses,
+    GetAuthDataApiData,
+    GetAuthDataApiErrors,
+    GetAuthDataApiResponses,
     GetGameApiData,
     GetGameApiErrors,
     GetGameApiResponses,
@@ -41,6 +51,8 @@ import type {
     LoadDummyGamesApiData,
     LoadDummyGamesApiErrors,
     LoadDummyGamesApiResponses,
+    LoginApiData,
+    LoginApiErrors,
     MoveUserToChannelApiData,
     MoveUserToChannelApiErrors,
     MoveUserToChannelApiResponses,
@@ -70,18 +82,6 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * Deletes the town in the provided server
- *
- * Removes all roles, channels and categories associated with clocktower
- */
-export const deleteTownApi = <ThrowOnError extends boolean = false>(options: Options<DeleteTownApiData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteTownApiResponses, DeleteTownApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}',
-        ...options
-    });
-};
-
-/**
  * Checks access to guild
  *
  * Checks if bot has access to the guild
@@ -94,13 +94,85 @@ export const checkGuildApi = <ThrowOnError extends boolean = false>(options: Opt
 };
 
 /**
+ * Add bot to server
+ *
+ * Allows user to add bot to their server
+ */
+export const addBotApi = <ThrowOnError extends boolean = false>(options?: Options<AddBotApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<unknown, AddBotApiErrors, ThrowOnError>({
+        url: '/api/discord/auth/addBot',
+        ...options
+    });
+};
+
+/**
+ * Handle Discord OAuth callback
+ *
+ * Handles the callback from Discord OAuth
+ */
+export const botCallbackApi = <ThrowOnError extends boolean = false>(options?: Options<BotCallbackApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<unknown, BotCallbackApiErrors, ThrowOnError>({
+        url: '/api/discord/auth/bot-callback',
+        ...options
+    });
+};
+
+/**
+ * Handle Discord OAuth callback
+ *
+ * Handles the callback from Discord OAuth
+ */
+export const callbackApi = <ThrowOnError extends boolean = false>(options?: Options<CallbackApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<CallbackApiResponses, CallbackApiErrors, ThrowOnError>({
+        url: '/api/discord/auth/callback',
+        ...options
+    });
+};
+
+/**
+ * Get temporary auth data
+ *
+ * Retrieves temporary authentication data by key
+ */
+export const getAuthDataApi = <ThrowOnError extends boolean = false>(options: Options<GetAuthDataApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetAuthDataApiResponses, GetAuthDataApiErrors, ThrowOnError>({
+        url: '/api/discord/auth/data/{key}',
+        ...options
+    });
+};
+
+/**
+ * Initiate Discord OAuth
+ *
+ * Redirects user to Discord for OAuth authentication
+ */
+export const loginApi = <ThrowOnError extends boolean = false>(options?: Options<LoginApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<unknown, LoginApiErrors, ThrowOnError>({
+        url: '/api/discord/auth',
+        ...options
+    });
+};
+
+/**
+ * Deletes the town in the provided server
+ *
+ * Removes all roles, channels and categories associated with clocktower
+ */
+export const deleteTownApi = <ThrowOnError extends boolean = false>(options: Options<DeleteTownApiData, ThrowOnError>) => {
+    return (options.client ?? client).delete<DeleteTownApiResponses, DeleteTownApiErrors, ThrowOnError>({
+        url: '/api/discord/town/{guildId}',
+        ...options
+    });
+};
+
+/**
  * Creates the town in the provided server
  *
  * Creates the roles, categories and channels required for clocktower
  */
 export const createTownApi = <ThrowOnError extends boolean = false>(options: Options<CreateTownApiData, ThrowOnError>) => {
     return (options.client ?? client).post<CreateTownApiResponses, CreateTownApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}',
+        url: '/api/discord/town/{guildId}',
         ...options
     });
 };
@@ -112,7 +184,7 @@ export const createTownApi = <ThrowOnError extends boolean = false>(options: Opt
  */
 export const getTownOccupancyApi = <ThrowOnError extends boolean = false>(options: Options<GetTownOccupancyApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetTownOccupancyApiResponses, GetTownOccupancyApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}/occupancy',
+        url: '/api/discord/town/{guildId}/occupancy',
         ...options
     });
 };
@@ -124,7 +196,7 @@ export const getTownOccupancyApi = <ThrowOnError extends boolean = false>(option
  */
 export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: Options<GetTownStatusApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetTownStatusApiResponses, GetTownStatusApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}/status',
+        url: '/api/discord/town/{guildId}/status',
         ...options
     });
 };
@@ -136,7 +208,7 @@ export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: 
  */
 export const moveUserToChannelApi = <ThrowOnError extends boolean = false>(options: Options<MoveUserToChannelApiData, ThrowOnError>) => {
     return (options.client ?? client).post<MoveUserToChannelApiResponses, MoveUserToChannelApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}/{userId}/{channelId}',
+        url: '/api/discord/town/{guildId}/{userId}/{channelId}',
         ...options
     });
 };
@@ -148,7 +220,7 @@ export const moveUserToChannelApi = <ThrowOnError extends boolean = false>(optio
  */
 export const rebuildTownApi = <ThrowOnError extends boolean = false>(options: Options<RebuildTownApiData, ThrowOnError>) => {
     return (options.client ?? client).post<RebuildTownApiResponses, RebuildTownApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}/rebuild',
+        url: '/api/discord/town/{guildId}/rebuild',
         ...options
     });
 };
@@ -160,7 +232,7 @@ export const rebuildTownApi = <ThrowOnError extends boolean = false>(options: Op
  */
 export const toggleStoryTellerApi = <ThrowOnError extends boolean = false>(options: Options<ToggleStoryTellerApiData, ThrowOnError>) => {
     return (options.client ?? client).post<ToggleStoryTellerApiResponses, ToggleStoryTellerApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}/{userId}',
+        url: '/api/discord/town/{guildId}/{userId}',
         ...options
     });
 };

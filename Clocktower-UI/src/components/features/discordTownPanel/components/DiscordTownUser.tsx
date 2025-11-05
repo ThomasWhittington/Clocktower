@@ -1,6 +1,6 @@
 ﻿import type {
     MiniUser
-} from "../../../../types";
+} from "@/types";
 
 function DiscordTownUser({user}: {
     user: MiniUser

@@ -10,6 +10,7 @@ global using Clocktower.Server.Game.Services;
 global using Clocktower.Server.Common.Api.Extensions;
 using Clocktower.Server;
 using Clocktower.Server.Discord.Services;
+using Clocktower.Server.Discord.Town.Services;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()

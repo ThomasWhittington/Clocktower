@@ -1,7 +1,10 @@
 ﻿using System.Text.Json.Serialization;
 using Clocktower.Server.Common;
+using Clocktower.Server.Discord.Auth.Services;
 using Clocktower.Server.Discord.Services;
+using Clocktower.Server.Discord.Town.Services;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
 namespace Clocktower.Server;
@@ -28,6 +31,8 @@ public static class ConfigureServices
         builder.AddSignalR();
         builder.ConfigureJson();
         builder.Services.AddSingleton(secrets);
+        builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
+        builder.Services.AddSingleton<DiscordAuthService>();
         builder.Services.AddSingleton<DiscordBotService>();
         builder.Services.AddSingleton<DiscordService>();
         builder.Services.AddSingleton<GameStateService>();
@@ -59,10 +64,7 @@ public static class ConfigureServices
     private static void AddSignalR(this WebApplicationBuilder builder)
     {
         builder.Services.AddSignalR()
-            .AddJsonProtocol(options =>
-            {
-                options.PayloadSerializerOptions.Converters.Add(new ULongToStringConverter());
-            });
+            .AddJsonProtocol(options => { options.PayloadSerializerOptions.Converters.Add(new ULongToStringConverter()); });
     }
 
     private static void AddSerilog(this WebApplicationBuilder builder)

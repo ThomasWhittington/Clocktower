@@ -1,14 +1,13 @@
 ﻿import {
     type GameState,
     mapToGameState,
-} from "../types";
+} from "@/types";
 import {
     getGameApi,
     getGamesApi,
     loadDummyGamesApi,
     startGameApi
-} from "../openApi";
-
+} from "@/generated";
 
 async function getGame(id: string): Promise<GameState> {
 
