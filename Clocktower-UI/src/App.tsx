@@ -7,6 +7,7 @@ import {
 import {
     AuthCallback,
     BotCallback,
+    Game,
     Home,
     LoginPage
 } from "./pages";
@@ -33,6 +34,10 @@ function App() {
                         path="/"
                         element={
                             <Home/>}/>
+                    <Route
+                        path="/game"
+                        element={
+                            <Game/>}/>
                 </Routes>
             </Router>
     );

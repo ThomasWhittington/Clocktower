@@ -6,12 +6,18 @@ import type {
 } from "./types/auth.ts";
 
 interface AppState {
+    loggedIn: boolean,
     guildId: string,
     currentUser?: User,
     setGuildId: (value: string) => void;
     setCurrentUser: (value: User) => void;
     clearSession: () => void;
     reset: () => void;
+}
+
+const getLoggedIn = (): boolean => {
+    var currentUser = getStoredUser();
+    return currentUser != undefined;
 }
 
 const getStoredGuildId = (): string => {
@@ -44,6 +50,7 @@ export const useAppStore = create<AppState>(
     (set) => ({
         guildId: getStoredGuildId(),
         currentUser: getStoredUser(),
+        loggedIn: getLoggedIn(),
         setGuildId: (id) => {
             setStoredGuildId(id);
             set(() => ({guildId: id}));
