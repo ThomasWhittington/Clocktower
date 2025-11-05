@@ -5,7 +5,7 @@ import {
 
 export default defineConfig({
     input: 'http://localhost:5120/swagger/v1/swagger.json', // or URL to your API spec
-    output: 'src/openApi',
+    output: 'src/generated',
     plugins: [
         '@hey-api/typescript',
         '@hey-api/transformers',

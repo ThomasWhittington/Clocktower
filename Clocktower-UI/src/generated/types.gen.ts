@@ -108,6 +108,26 @@ export type AddBotApiErrors = {
 
 export type AddBotApiError = AddBotApiErrors[keyof AddBotApiErrors];
 
+export type BotCallbackApiData = {
+    body?: never;
+    path?: never;
+    query?: {
+        code?: string;
+        error?: string;
+        guild_id?: string;
+    };
+    url: '/api/discord-auth/bot-callback';
+};
+
+export type BotCallbackApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: string;
+};
+
+export type BotCallbackApiError = BotCallbackApiErrors[keyof BotCallbackApiErrors];
+
 export type CallbackApiData = {
     body?: never;
     path?: never;

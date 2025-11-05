@@ -8,7 +8,7 @@
     moveUserToChannelApi,
     rebuildTownApi,
     type RebuildTownApiResponse
-} from '@/openApi';
+} from '@/generated';
 import {
     mapToTownOccupants,
     type TownOccupants

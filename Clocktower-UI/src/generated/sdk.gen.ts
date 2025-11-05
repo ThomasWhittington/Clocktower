@@ -14,6 +14,8 @@ import type {
     AddPlayerToGameApiData,
     AddPlayerToGameApiErrors,
     AddPlayerToGameApiResponses,
+    BotCallbackApiData,
+    BotCallbackApiErrors,
     CallbackApiData,
     CallbackApiErrors,
     CallbackApiResponses,
@@ -87,6 +89,18 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 export const addBotApi = <ThrowOnError extends boolean = false>(options?: Options<AddBotApiData, ThrowOnError>) => {
     return (options?.client ?? client).get<unknown, AddBotApiErrors, ThrowOnError>({
         url: '/api/discord-auth/addBot',
+        ...options
+    });
+};
+
+/**
+ * Handle Discord OAuth callback
+ *
+ * Handles the callback from Discord OAuth
+ */
+export const botCallbackApi = <ThrowOnError extends boolean = false>(options?: Options<BotCallbackApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<unknown, BotCallbackApiErrors, ThrowOnError>({
+        url: '/api/discord-auth/bot-callback',
         ...options
     });
 };

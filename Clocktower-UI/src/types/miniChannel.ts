@@ -1,13 +1,13 @@
 ﻿import type {
-    ClocktowerServerDiscordServicesMiniChannel
-} from "@/openApi";
+    ClocktowerServerDiscordTownServicesMiniChannel
+} from "@/generated";
 
 export type MiniChannel = {
     id: string;
     name: string;
 };
 
-export function mapToMiniChannel(apiMiniUser: ClocktowerServerDiscordServicesMiniChannel | undefined): MiniChannel {
+export function mapToMiniChannel(apiMiniUser: ClocktowerServerDiscordTownServicesMiniChannel | undefined): MiniChannel {
     if (!apiMiniUser) {
         return {
             id: '',

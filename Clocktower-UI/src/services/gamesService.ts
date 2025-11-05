@@ -7,7 +7,7 @@ import {
     getGamesApi,
     loadDummyGamesApi,
     startGameApi
-} from "@/openApi";
+} from "@/generated";
 
 async function getGame(id: string): Promise<GameState> {
 

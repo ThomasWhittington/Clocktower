@@ -1,13 +1,13 @@
 ﻿import type {
-    ClocktowerServerDiscordServicesMiniUser
-} from "@/openApi";
+    ClocktowerServerDiscordTownServicesMiniUser
+} from "@/generated";
 
 export type MiniUser = {
     id: string;
     name: string;
 };
 
-export function mapToMiniUser(apiMiniUser: ClocktowerServerDiscordServicesMiniUser): MiniUser {
+export function mapToMiniUser(apiMiniUser: ClocktowerServerDiscordTownServicesMiniUser): MiniUser {
     return {
         id: apiMiniUser.id ?? '',
         name: apiMiniUser.name ?? "Unknown user"
