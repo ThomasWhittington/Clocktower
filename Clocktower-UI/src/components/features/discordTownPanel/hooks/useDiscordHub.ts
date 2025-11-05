@@ -5,6 +5,9 @@
 } from 'react';
 import * as signalR
     from '@microsoft/signalr';
+import {
+    HubConnectionState
+} from '@microsoft/signalr';
 import type {
     TownOccupants
 } from '@/types';
@@ -30,6 +33,14 @@ const notifyListeners = () => {
 
 const setState = (updates: Partial<DiscordHubState>) => {
     globalState = {...globalState, ...updates};
+    notifyListeners();
+};
+
+const resetDiscordHubState = () => {
+    globalState = {
+        userVoiceStates: {},
+        connectionState: HubConnectionState.Disconnected
+    };
     notifyListeners();
 };
 
@@ -105,3 +116,4 @@ export const useDiscordHub = () => {
 export const updateDiscordHubState = (updates: Partial<DiscordHubState>) => {
     setState(updates);
 };
+export const resetDiscordHub = resetDiscordHubState;

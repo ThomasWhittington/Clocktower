@@ -6,4 +6,5 @@ public class Secrets
     public string DiscordClientId { get; set; }
     public string DiscordClientSecret { get; set; }
     public string DiscordRedirectUri { get; set; }
+    public string DiscordBotRedirectUri { get; set; }
 }

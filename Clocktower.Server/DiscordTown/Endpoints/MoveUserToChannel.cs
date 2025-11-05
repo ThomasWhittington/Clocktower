@@ -1,6 +1,6 @@
-﻿using Clocktower.Server.Discord.Services;
+﻿using Clocktower.Server.DiscordTown.Services;
 
-namespace Clocktower.Server.Discord.Endpoints;
+namespace Clocktower.Server.DiscordTown.Endpoints;
 
 [UsedImplicitly]
 public class MoveUserToChannel : IEndpoint

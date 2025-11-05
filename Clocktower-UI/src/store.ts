@@ -10,12 +10,16 @@ interface AppState {
     currentUser?: User,
     setGuildId: (value: string) => void;
     setCurrentUser: (value: User) => void;
-    isMuted: boolean;
-    toggleMute: () => void;
-
+    clearSession: () => void;
+    reset: () => void;
 }
+
 const getStoredGuildId = (): string => {
     return localStorage.getItem('guildId') || '';
+};
+
+const setStoredGuildId = (id: string) => {
+    localStorage.setItem('guildId', id);
 };
 
 const getStoredUser = (): User | undefined => {
@@ -23,26 +27,38 @@ const getStoredUser = (): User | undefined => {
     return stored ? JSON.parse(stored) : undefined;
 };
 
-const getStoredMuteState = (): boolean => {
-    return localStorage.getItem('isMuted') === 'true';
+const setStoredUser = (user: User) => {
+    localStorage.setItem('currentUser', JSON.stringify(user));
 };
+
+const clearStoredSession = () => {
+    localStorage.clear();
+};
+
+const getInitialState = () => ({
+    guildId: '',
+    currentUser: undefined,
+});
 
 export const useAppStore = create<AppState>(
     (set) => ({
         guildId: getStoredGuildId(),
         currentUser: getStoredUser(),
-        isMuted: getStoredMuteState(),
         setGuildId: (id) => {
-            localStorage.setItem('guildId', id);
+            setStoredGuildId(id);
             set(() => ({guildId: id}));
         },
         setCurrentUser: (user) => {
-            localStorage.setItem('currentUser', JSON.stringify(user));
+            setStoredUser(user);
             set(() => ({currentUser: user}));
         },
-        toggleMute: () => set((state) => {
-            const newMuteState = !state.isMuted;
-            localStorage.setItem('isMuted', newMuteState.toString());
-            return {isMuted: newMuteState};
-        }),
-    }));
+        clearSession: () => {
+            clearStoredSession();
+            set(() => getInitialState());
+        },
+        reset: () => {
+            clearStoredSession();
+            set(() => getInitialState());
+        },
+    })
+);

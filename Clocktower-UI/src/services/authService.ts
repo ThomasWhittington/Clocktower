@@ -13,6 +13,6 @@ export const authService = {
     },
 
     initiateDiscordLogin(): void {
-        window.location.href = 'http://localhost:5120/api/discord/auth';
+        window.location.href = 'http://localhost:5120/api/discord-auth';
     }
 };

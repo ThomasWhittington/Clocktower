@@ -5,7 +5,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Clocktower.Server.Discord.Services;
+namespace Clocktower.Server.DiscordTown.Services;
 
 [UsedImplicitly]
 public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hubContext)
@@ -117,9 +117,16 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
         {
             var guildValid = await CheckGuildId(guildId);
             if (guildValid is not { success: true, valid: true }) return (false, guildValid.message);
+            await hubContext.Clients.All.TownOccupancyUpdated(new TownOccupants([]));
             var delete = await DeleteTown(guildId);
             if (!delete.success) return delete;
             var create = await CreateTown(guildId);
+            if (create.success)
+            {
+                _townOccupants.Clear();
+                await GetTownOccupancy(guildId);
+            }
+
             return create;
         }
         catch (Exception ex)
@@ -244,6 +251,7 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
             var townOccupants = new TownOccupants(channelCategories);
 
             _townOccupants.TryAdd(guildId, townOccupants);
+            await hubContext.Clients.All.TownOccupancyUpdated(_townOccupants[guildId]);
             return (true, townOccupants, $"Town occupancy {townOccupants.UserCount}");
         }
         catch (Exception ex)

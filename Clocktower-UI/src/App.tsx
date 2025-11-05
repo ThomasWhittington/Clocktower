@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom';
 import {
     AuthCallback,
+    BotCallback,
     Home,
     LoginPage
 } from "./pages";
@@ -22,6 +23,11 @@ function App() {
                         path="/auth/callback"
                         element={
                             <AuthCallback/>}
+                    />
+                    <Route
+                        path="/auth/bot-callback"
+                        element={
+                            <BotCallback/>}
                     />
                     <Route
                         path="/"

@@ -13,52 +13,52 @@ import type {
 } from './types.gen';
 
 export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetAuthDataApiResponse> => {
-    data = clocktowerServerDiscordServicesMiniUserSchemaResponseTransformer(data);
+    data = clocktowerServerDiscordTownServicesMiniUserSchemaResponseTransformer(data);
     return data;
 };
 
 export const checkGuildApiResponseTransformer = async (data: any): Promise<CheckGuildApiResponse> => {
-    data = clocktowerServerDiscordEndpointsCheckGuildResponseSchemaResponseTransformer(data);
+    data = clocktowerServerDiscordTownEndpointsCheckGuildResponseSchemaResponseTransformer(data);
     return data;
 };
 
-const clocktowerServerDiscordServicesTownOccupantsSchemaResponseTransformer = (data: any) => {
+const clocktowerServerDiscordTownServicesTownOccupantsSchemaResponseTransformer = (data: any) => {
     if (data.channelCategories) {
         data.channelCategories = data.channelCategories.map((item: any) => {
-            return clocktowerServerDiscordServicesMiniCategorySchemaResponseTransformer(item);
+            return clocktowerServerDiscordTownServicesMiniCategorySchemaResponseTransformer(item);
         });
     }
     return data;
 };
 
-const clocktowerServerDiscordServicesMiniCategorySchemaResponseTransformer = (data: any) => {
+const clocktowerServerDiscordTownServicesMiniCategorySchemaResponseTransformer = (data: any) => {
     if (data.channels) {
         data.channels = data.channels.map((item: any) => {
-            return clocktowerServerDiscordServicesChannelOccupantsSchemaResponseTransformer(item);
+            return clocktowerServerDiscordTownServicesChannelOccupantsSchemaResponseTransformer(item);
         });
     }
     return data;
 };
 
-const clocktowerServerDiscordServicesChannelOccupantsSchemaResponseTransformer = (data: any) => {
+const clocktowerServerDiscordTownServicesChannelOccupantsSchemaResponseTransformer = (data: any) => {
     if (data.channel) {
-        data.channel = clocktowerServerDiscordServicesMiniChannelSchemaResponseTransformer(data.channel);
+        data.channel = clocktowerServerDiscordTownServicesMiniChannelSchemaResponseTransformer(data.channel);
     }
     if (data.occupants) {
         data.occupants = data.occupants.map((item: any) => {
-            return clocktowerServerDiscordServicesMiniUserSchemaResponseTransformer(item);
+            return clocktowerServerDiscordTownServicesMiniUserSchemaResponseTransformer(item);
         });
     }
     return data;
 };
 
 export const getTownOccupancyApiResponseTransformer = async (data: any): Promise<GetTownOccupancyApiResponse> => {
-    data = clocktowerServerDiscordServicesTownOccupantsSchemaResponseTransformer(data);
+    data = clocktowerServerDiscordTownServicesTownOccupantsSchemaResponseTransformer(data);
     return data;
 };
 
 export const getTownStatusApiResponseTransformer = async (data: any): Promise<GetTownStatusApiResponse> => {
-    data = clocktowerServerDiscordEndpointsGetTownStatusResponseSchemaResponseTransformer(data);
+    data = clocktowerServerDiscordTownEndpointsGetTownStatusResponseSchemaResponseTransformer(data);
     return data;
 };
 

@@ -5,14 +5,21 @@ import {
     authService
 } from "@/services";
 
+import {
+    useAddBot
+} from '@/components/features/discordTownPanel/hooks';
+import {
+    resetAllApplicationState
+} from "@/utils";
+
 function DiscordUserStatus() {
     const currentUser = useAppStore((state) => state.currentUser);
-    const setCurrentUser = useAppStore((state) => state.setCurrentUser);
+    const {addBot} = useAddBot();
 
     const handleLogout = () => {
-        setCurrentUser(null!);
+        resetAllApplicationState();
+        window.location.href = '/';
     };
-
     return (
         <>
             {currentUser ? (
@@ -20,7 +27,13 @@ function DiscordUserStatus() {
                     className="flex items-center space-x-2">
                     <p className="text-purple-700">Logged in as {currentUser.name}</p>
                     <button
-                        onClick={handleLogout}
+                        onClick={addBot}
+                        className="bg-red-500 text-white px-4 py-2 rounded-2xl hover:bg-red-600"
+                    >
+                        Add Bot To Server
+                    </button>
+                    <button
+                        onClick={() => handleLogout()}
                         className="bg-red-500 text-white px-4 py-2 rounded-2xl hover:bg-red-600"
                     >
                         Logout

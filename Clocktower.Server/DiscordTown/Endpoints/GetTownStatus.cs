@@ -1,7 +1,7 @@
-﻿using Clocktower.Server.Discord.Endpoints.Validation;
-using Clocktower.Server.Discord.Services;
+﻿using Clocktower.Server.DiscordTown.Endpoints.Validation;
+using Clocktower.Server.DiscordTown.Services;
 
-namespace Clocktower.Server.Discord.Endpoints;
+namespace Clocktower.Server.DiscordTown.Endpoints;
 
 [UsedImplicitly]
 public class GetTownStatus : IEndpoint

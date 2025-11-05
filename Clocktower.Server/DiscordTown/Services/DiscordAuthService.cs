@@ -4,7 +4,7 @@ using System.Text.Json;
 using Clocktower.Server.Common;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Clocktower.Server.Discord.Services;
+namespace Clocktower.Server.DiscordTown.Services;
 
 public class DiscordAuthService(Secrets secrets, IMemoryCache cache)
 {
@@ -59,6 +59,35 @@ public class DiscordAuthService(Secrets secrets, IMemoryCache cache)
         {
             return errorUrl + Uri.EscapeDataString($"Authentication failed: {ex.Message}");
         }
+    }
+
+    public string HandleBotCallback(string? error, string? code, string? guildId)
+    {
+        const string frontendUrl = "http://localhost:5173/auth/bot-callback?guild_id=";
+        const string errorUrl = "http://localhost:5173/login?error=";
+
+        if (!string.IsNullOrEmpty(error)) return errorUrl + Uri.EscapeDataString($"Discord OAuth error: {error}");
+        if (string.IsNullOrEmpty(code)) return errorUrl + Uri.EscapeDataString("Authorization code not received");
+        if (string.IsNullOrEmpty(guildId)) return errorUrl + Uri.EscapeDataString("No guildId received");
+
+        return frontendUrl + Uri.EscapeDataString(guildId);
+    }
+
+    public (bool success, string url, string message) GetAddBotUrl()
+    {
+        if (string.IsNullOrEmpty(secrets.DiscordClientId)) return (false, string.Empty, "Discord OAuth not properly configured");
+
+        var permissionsInt = 8;
+
+        var authorizationUrl = $"https://discord.com/oauth2/authorize" +
+                               $"?client_id={secrets.DiscordClientId}" +
+                               $"&permissions={permissionsInt}" +
+                               $"&integration_type=0" +
+                               $"&scope=bot" +
+                               $"&response_type=code" +
+                               $"&redirect_uri={Uri.EscapeDataString(secrets.DiscordBotRedirectUri)}";
+
+        return (true, authorizationUrl, "Bot addition Url generated");
     }
 
     public MiniUser? GetAuthData(string key)

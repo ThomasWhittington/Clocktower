@@ -1,5 +1,6 @@
 ﻿import {
     useEffect,
+    useRef,
     useState
 } from 'react';
 import {
@@ -18,46 +19,111 @@ import type {
     TownOccupants
 } from '@/types';
 
+type TownOccupancyState = {
+    townOccupancy?: TownOccupants;
+    isLoading: boolean;
+    error: string;
+    guildId?: string;
+};
+
+let globalTownState: TownOccupancyState = {
+    isLoading: false,
+    error: ""
+};
+const globalTownListeners = new Set<(state: TownOccupancyState) => void>();
+let isInitializing = false;
+
+const notifyTownListeners = () => {
+    globalTownListeners.forEach(listener => listener({...globalTownState}));
+};
+
+const setTownState = (updates: Partial<TownOccupancyState>) => {
+    globalTownState = {...globalTownState, ...updates};
+    notifyTownListeners();
+};
+
+const initializeTownOccupancy = async (guildId: string) => {
+    if (isInitializing || globalTownState.guildId === guildId) return;
+
+    isInitializing = true;
+
+    if (!ValidationUtils.isValidDiscordId(guildId)) {
+        console.error('guildId was not valid');
+        setTownState({
+            error: 'Invalid guild ID',
+            isLoading: false
+        });
+        isInitializing = false;
+        return;
+    }
+
+    setTownState({
+        isLoading: true,
+        error: "",
+        guildId
+    });
+
+    try {
+        const data = await discordService.getTownOccupancy(guildId);
+        setTownState({
+            townOccupancy: data,
+            isLoading: false
+        });
+    } catch (err: any) {
+        setTownState({
+            error: err.message,
+            isLoading: false
+        });
+    } finally {
+        isInitializing = false;
+    }
+};
+
+const resetTownOccupancyState = () => {
+    globalTownState = {
+        isLoading: false,
+        error: "",
+        guildId: undefined,
+        townOccupancy: undefined
+    };
+    notifyTownListeners();
+};
+
 export const useTownOccupancy = () => {
-    const [townOccupancy, setTownOccupancy] = useState<TownOccupants>();
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string>("");
+    const [state, setState] = useState<TownOccupancyState>(globalTownState);
+    const listenerRef = useRef<(state: TownOccupancyState) => void>(null);
 
     const guildId = useAppStore((state) => state.guildId);
     const {townOccupancy: realtimeTownOccupancy} = useDiscordHub();
 
     useEffect(() => {
-        const getTownOccupancy = async () => {
-            if (!ValidationUtils.isValidDiscordId(guildId)) {
-                console.error('guildId was not valid');
-                return;
-            }
+        const listener = (newState: TownOccupancyState) => setState(newState);
+        listenerRef.current = listener;
+        globalTownListeners.add(listener);
 
-            setIsLoading(true);
-            setError("");
+        if (guildId && guildId !== globalTownState.guildId) {
+            initializeTownOccupancy(guildId).then(_ => {
+            });
+        }
 
-            try {
-                const data = await discordService.getTownOccupancy(guildId);
-                setTownOccupancy(data);
-            } catch (err: any) {
-                setError(err.message);
-            } finally {
-                setIsLoading(false);
+        return () => {
+            if (listenerRef.current) {
+                globalTownListeners.delete(listenerRef.current);
             }
         };
-
-        getTownOccupancy();
     }, [guildId]);
 
     useEffect(() => {
         if (realtimeTownOccupancy) {
-            setTownOccupancy(realtimeTownOccupancy);
+            setTownState({townOccupancy: realtimeTownOccupancy});
         }
     }, [realtimeTownOccupancy]);
 
     return {
-        townOccupancy,
-        isLoading,
-        error
+        townOccupancy: state.townOccupancy,
+        isLoading: state.isLoading,
+        error: state.error
     };
 };
+
+export const resetTownOccupancy = resetTownOccupancyState;

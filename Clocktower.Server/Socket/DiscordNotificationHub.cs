@@ -1,4 +1,4 @@
-﻿using Clocktower.Server.Discord.Services;
+﻿using Clocktower.Server.DiscordTown.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Socket;

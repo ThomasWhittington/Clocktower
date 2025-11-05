@@ -1,7 +1,7 @@
 ﻿using Clocktower.Server.Common;
 using DSharpPlus;
 
-namespace Clocktower.Server.Discord.Services;
+namespace Clocktower.Server.DiscordTown.Services;
 
 public class DiscordBotService(Secrets secrets)
 {

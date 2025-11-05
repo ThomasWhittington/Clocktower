@@ -9,9 +9,14 @@ import {
     client
 } from './client.gen';
 import type {
+    AddBotApiData,
+    AddBotApiErrors,
     AddPlayerToGameApiData,
     AddPlayerToGameApiErrors,
     AddPlayerToGameApiResponses,
+    CallbackApiData,
+    CallbackApiErrors,
+    CallbackApiResponses,
     CheckGuildApiData,
     CheckGuildApiErrors,
     CheckGuildApiResponses,
@@ -41,14 +46,11 @@ import type {
     GetTownStatusApiData,
     GetTownStatusApiErrors,
     GetTownStatusApiResponses,
-    HandleDiscordCallbackApiData,
-    HandleDiscordCallbackApiErrors,
-    HandleDiscordCallbackApiResponses,
-    InitiateDiscordAuthApiData,
-    InitiateDiscordAuthApiErrors,
     LoadDummyGamesApiData,
     LoadDummyGamesApiErrors,
     LoadDummyGamesApiResponses,
+    LoginApiData,
+    LoginApiErrors,
     MoveUserToChannelApiData,
     MoveUserToChannelApiErrors,
     MoveUserToChannelApiResponses,
@@ -78,13 +80,13 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * Initiate Discord OAuth
+ * Add bot to server
  *
- * Redirects user to Discord for OAuth authentication
+ * Allows user to add bot to their server
  */
-export const initiateDiscordAuthApi = <ThrowOnError extends boolean = false>(options?: Options<InitiateDiscordAuthApiData, ThrowOnError>) => {
-    return (options?.client ?? client).get<unknown, InitiateDiscordAuthApiErrors, ThrowOnError>({
-        url: '/api/discord/auth',
+export const addBotApi = <ThrowOnError extends boolean = false>(options?: Options<AddBotApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<unknown, AddBotApiErrors, ThrowOnError>({
+        url: '/api/discord-auth/addBot',
         ...options
     });
 };
@@ -94,9 +96,9 @@ export const initiateDiscordAuthApi = <ThrowOnError extends boolean = false>(opt
  *
  * Handles the callback from Discord OAuth
  */
-export const handleDiscordCallbackApi = <ThrowOnError extends boolean = false>(options?: Options<HandleDiscordCallbackApiData, ThrowOnError>) => {
-    return (options?.client ?? client).get<HandleDiscordCallbackApiResponses, HandleDiscordCallbackApiErrors, ThrowOnError>({
-        url: '/api/discord/auth/callback',
+export const callbackApi = <ThrowOnError extends boolean = false>(options?: Options<CallbackApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<CallbackApiResponses, CallbackApiErrors, ThrowOnError>({
+        url: '/api/discord-auth/callback',
         ...options
     });
 };
@@ -108,7 +110,19 @@ export const handleDiscordCallbackApi = <ThrowOnError extends boolean = false>(o
  */
 export const getAuthDataApi = <ThrowOnError extends boolean = false>(options: Options<GetAuthDataApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetAuthDataApiResponses, GetAuthDataApiErrors, ThrowOnError>({
-        url: '/api/discord/auth/data/{key}',
+        url: '/api/discord-auth/data/{key}',
+        ...options
+    });
+};
+
+/**
+ * Initiate Discord OAuth
+ *
+ * Redirects user to Discord for OAuth authentication
+ */
+export const loginApi = <ThrowOnError extends boolean = false>(options?: Options<LoginApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<unknown, LoginApiErrors, ThrowOnError>({
+        url: '/api/discord-auth',
         ...options
     });
 };
@@ -120,7 +134,7 @@ export const getAuthDataApi = <ThrowOnError extends boolean = false>(options: Op
  */
 export const deleteTownApi = <ThrowOnError extends boolean = false>(options: Options<DeleteTownApiData, ThrowOnError>) => {
     return (options.client ?? client).delete<DeleteTownApiResponses, DeleteTownApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}',
+        url: '/api/discord-town/{guildId}',
         ...options
     });
 };
@@ -132,7 +146,7 @@ export const deleteTownApi = <ThrowOnError extends boolean = false>(options: Opt
  */
 export const checkGuildApi = <ThrowOnError extends boolean = false>(options: Options<CheckGuildApiData, ThrowOnError>) => {
     return (options.client ?? client).get<CheckGuildApiResponses, CheckGuildApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}',
+        url: '/api/discord-town/{guildId}',
         ...options
     });
 };
@@ -144,7 +158,7 @@ export const checkGuildApi = <ThrowOnError extends boolean = false>(options: Opt
  */
 export const createTownApi = <ThrowOnError extends boolean = false>(options: Options<CreateTownApiData, ThrowOnError>) => {
     return (options.client ?? client).post<CreateTownApiResponses, CreateTownApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}',
+        url: '/api/discord-town/{guildId}',
         ...options
     });
 };
@@ -156,7 +170,7 @@ export const createTownApi = <ThrowOnError extends boolean = false>(options: Opt
  */
 export const getTownOccupancyApi = <ThrowOnError extends boolean = false>(options: Options<GetTownOccupancyApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetTownOccupancyApiResponses, GetTownOccupancyApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}/occupancy',
+        url: '/api/discord-town/{guildId}/occupancy',
         ...options
     });
 };
@@ -168,7 +182,7 @@ export const getTownOccupancyApi = <ThrowOnError extends boolean = false>(option
  */
 export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: Options<GetTownStatusApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetTownStatusApiResponses, GetTownStatusApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}/status',
+        url: '/api/discord-town/{guildId}/status',
         ...options
     });
 };
@@ -180,7 +194,7 @@ export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: 
  */
 export const moveUserToChannelApi = <ThrowOnError extends boolean = false>(options: Options<MoveUserToChannelApiData, ThrowOnError>) => {
     return (options.client ?? client).post<MoveUserToChannelApiResponses, MoveUserToChannelApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}/{userId}/{channelId}',
+        url: '/api/discord-town/{guildId}/{userId}/{channelId}',
         ...options
     });
 };
@@ -192,7 +206,7 @@ export const moveUserToChannelApi = <ThrowOnError extends boolean = false>(optio
  */
 export const rebuildTownApi = <ThrowOnError extends boolean = false>(options: Options<RebuildTownApiData, ThrowOnError>) => {
     return (options.client ?? client).post<RebuildTownApiResponses, RebuildTownApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}/rebuild',
+        url: '/api/discord-town/{guildId}/rebuild',
         ...options
     });
 };
@@ -204,7 +218,7 @@ export const rebuildTownApi = <ThrowOnError extends boolean = false>(options: Op
  */
 export const toggleStoryTellerApi = <ThrowOnError extends boolean = false>(options: Options<ToggleStoryTellerApiData, ThrowOnError>) => {
     return (options.client ?? client).post<ToggleStoryTellerApiResponses, ToggleStoryTellerApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}/{userId}',
+        url: '/api/discord-town/{guildId}/{userId}',
         ...options
     });
 };
