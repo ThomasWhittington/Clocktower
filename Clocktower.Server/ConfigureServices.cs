@@ -1,6 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 using Clocktower.Server.Common;
-using Clocktower.Server.DiscordTown.Services;
+using Clocktower.Server.Discord.Auth.Services;
+using Clocktower.Server.Discord.Services;
+using Clocktower.Server.Discord.Town.Services;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;

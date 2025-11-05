@@ -1,6 +1,6 @@
-﻿using Clocktower.Server.DiscordTown.Services;
+﻿using Clocktower.Server.Discord.Town.Services;
 
-namespace Clocktower.Server.DiscordTown.Endpoints;
+namespace Clocktower.Server.Discord.Town.Endpoints;
 
 [UsedImplicitly]
 public class ToggleStoryTeller : IEndpoint

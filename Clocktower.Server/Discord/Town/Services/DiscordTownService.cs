@@ -1,11 +1,12 @@
 ﻿using System.Collections.Concurrent;
+using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Socket;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Clocktower.Server.DiscordTown.Services;
+namespace Clocktower.Server.Discord.Town.Services;
 
 [UsedImplicitly]
 public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hubContext)

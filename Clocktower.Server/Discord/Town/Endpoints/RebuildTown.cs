@@ -1,7 +1,7 @@
-﻿using Clocktower.Server.DiscordTown.Endpoints.Validation;
-using Clocktower.Server.DiscordTown.Services;
+﻿using Clocktower.Server.Discord.Town.Endpoints.Validation;
+using Clocktower.Server.Discord.Town.Services;
 
-namespace Clocktower.Server.DiscordTown.Endpoints;
+namespace Clocktower.Server.Discord.Town.Endpoints;
 
 [UsedImplicitly]
 public class RebuildTown : IEndpoint

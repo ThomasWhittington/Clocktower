@@ -1,7 +1,7 @@
-﻿using Clocktower.Server.DiscordTown.Services;
+﻿using Clocktower.Server.Discord.Auth.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Clocktower.Server.DiscordAuth.Endpoints;
+namespace Clocktower.Server.Discord.Auth.Endpoints;
 
 [UsedImplicitly]
 public class BotCallback : IEndpoint

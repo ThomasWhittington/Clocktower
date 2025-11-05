@@ -2,9 +2,10 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Clocktower.Server.Common;
+using Clocktower.Server.Discord.Town.Services;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Clocktower.Server.DiscordTown.Services;
+namespace Clocktower.Server.Discord.Auth.Services;
 
 public class DiscordAuthService(Secrets secrets, IMemoryCache cache)
 {

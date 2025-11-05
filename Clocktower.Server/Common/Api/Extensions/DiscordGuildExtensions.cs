@@ -1,4 +1,4 @@
-﻿using Clocktower.Server.DiscordTown.Services;
+﻿using Clocktower.Server.Discord.Town.Services;
 using DSharpPlus.Entities;
 
 namespace Clocktower.Server.Common.Api.Extensions;

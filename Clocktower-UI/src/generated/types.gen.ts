@@ -27,7 +27,7 @@ export type ClocktowerServerDataTypesRoleRole = {
     edition?: ClocktowerServerDataTypesEnumEdition;
 };
 
-export type ClocktowerServerDiscordTownEndpointsCheckGuildResponse = {
+export type ClocktowerServerDiscordEndpointsCheckGuildResponse = {
     valid?: boolean;
     name?: string | null;
     message?: string | null;
@@ -92,11 +92,42 @@ export type ClocktowerServerDiscordTownServicesTownOccupantsWritable = {
     channelCategories?: Array<ClocktowerServerDiscordTownServicesMiniCategory> | null;
 };
 
+export type CheckGuildApiData = {
+    body?: never;
+    path: {
+        guildId: string;
+    };
+    query?: never;
+    url: '/api/discord/{guildId}';
+};
+
+export type CheckGuildApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: string;
+};
+
+export type CheckGuildApiError = CheckGuildApiErrors[keyof CheckGuildApiErrors];
+
+export type CheckGuildApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerDiscordEndpointsCheckGuildResponse;
+};
+
+export type CheckGuildApiResponse = CheckGuildApiResponses[keyof CheckGuildApiResponses];
+
 export type AddBotApiData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/discord-auth/addBot';
+    url: '/api/discord/auth/addBot';
 };
 
 export type AddBotApiErrors = {
@@ -116,7 +147,7 @@ export type BotCallbackApiData = {
         error?: string;
         guild_id?: string;
     };
-    url: '/api/discord-auth/bot-callback';
+    url: '/api/discord/auth/bot-callback';
 };
 
 export type BotCallbackApiErrors = {
@@ -135,7 +166,7 @@ export type CallbackApiData = {
         code?: string;
         error?: string;
     };
-    url: '/api/discord-auth/callback';
+    url: '/api/discord/auth/callback';
 };
 
 export type CallbackApiErrors = {
@@ -160,7 +191,7 @@ export type GetAuthDataApiData = {
         key: string;
     };
     query?: never;
-    url: '/api/discord-auth/data/{key}';
+    url: '/api/discord/auth/data/{key}';
 };
 
 export type GetAuthDataApiErrors = {
@@ -183,7 +214,7 @@ export type LoginApiData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/discord-auth';
+    url: '/api/discord/auth';
 };
 
 export type LoginApiErrors = {
@@ -201,7 +232,7 @@ export type DeleteTownApiData = {
         guildId: string;
     };
     query?: never;
-    url: '/api/discord-town/{guildId}';
+    url: '/api/discord/town/{guildId}';
 };
 
 export type DeleteTownApiErrors = {
@@ -226,44 +257,13 @@ export type DeleteTownApiResponses = {
 
 export type DeleteTownApiResponse = DeleteTownApiResponses[keyof DeleteTownApiResponses];
 
-export type CheckGuildApiData = {
-    body?: never;
-    path: {
-        guildId: string;
-    };
-    query?: never;
-    url: '/api/discord-town/{guildId}';
-};
-
-export type CheckGuildApiErrors = {
-    /**
-     * Bad Request
-     */
-    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
-    /**
-     * Not Found
-     */
-    404: string;
-};
-
-export type CheckGuildApiError = CheckGuildApiErrors[keyof CheckGuildApiErrors];
-
-export type CheckGuildApiResponses = {
-    /**
-     * OK
-     */
-    200: ClocktowerServerDiscordTownEndpointsCheckGuildResponse;
-};
-
-export type CheckGuildApiResponse = CheckGuildApiResponses[keyof CheckGuildApiResponses];
-
 export type CreateTownApiData = {
     body?: never;
     path: {
         guildId: string;
     };
     query?: never;
-    url: '/api/discord-town/{guildId}';
+    url: '/api/discord/town/{guildId}';
 };
 
 export type CreateTownApiErrors = {
@@ -294,7 +294,7 @@ export type GetTownOccupancyApiData = {
         guildId: string;
     };
     query?: never;
-    url: '/api/discord-town/{guildId}/occupancy';
+    url: '/api/discord/town/{guildId}/occupancy';
 };
 
 export type GetTownOccupancyApiErrors = {
@@ -325,7 +325,7 @@ export type GetTownStatusApiData = {
         guildId: string;
     };
     query?: never;
-    url: '/api/discord-town/{guildId}/status';
+    url: '/api/discord/town/{guildId}/status';
 };
 
 export type GetTownStatusApiErrors = {
@@ -358,7 +358,7 @@ export type MoveUserToChannelApiData = {
         channelId: string;
     };
     query?: never;
-    url: '/api/discord-town/{guildId}/{userId}/{channelId}';
+    url: '/api/discord/town/{guildId}/{userId}/{channelId}';
 };
 
 export type MoveUserToChannelApiErrors = {
@@ -385,7 +385,7 @@ export type RebuildTownApiData = {
         guildId: string;
     };
     query?: never;
-    url: '/api/discord-town/{guildId}/rebuild';
+    url: '/api/discord/town/{guildId}/rebuild';
 };
 
 export type RebuildTownApiErrors = {
@@ -417,7 +417,7 @@ export type ToggleStoryTellerApiData = {
         userId: string;
     };
     query?: never;
-    url: '/api/discord-town/{guildId}/{userId}';
+    url: '/api/discord/town/{guildId}/{userId}';
 };
 
 export type ToggleStoryTellerApiErrors = {

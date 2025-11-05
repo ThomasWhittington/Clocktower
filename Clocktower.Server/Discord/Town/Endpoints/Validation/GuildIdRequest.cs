@@ -1,4 +1,4 @@
-﻿namespace Clocktower.Server.DiscordTown.Endpoints.Validation;
+﻿namespace Clocktower.Server.Discord.Town.Endpoints.Validation;
 
 [UsedImplicitly]
 public record GuildIdRequest(string GuildId);

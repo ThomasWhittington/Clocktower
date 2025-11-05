@@ -12,13 +12,13 @@ import type {
     StartGameApiResponse
 } from './types.gen';
 
-export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetAuthDataApiResponse> => {
-    data = clocktowerServerDiscordTownServicesMiniUserSchemaResponseTransformer(data);
+export const checkGuildApiResponseTransformer = async (data: any): Promise<CheckGuildApiResponse> => {
+    data = clocktowerServerDiscordEndpointsCheckGuildResponseSchemaResponseTransformer(data);
     return data;
 };
 
-export const checkGuildApiResponseTransformer = async (data: any): Promise<CheckGuildApiResponse> => {
-    data = clocktowerServerDiscordTownEndpointsCheckGuildResponseSchemaResponseTransformer(data);
+export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetAuthDataApiResponse> => {
+    data = clocktowerServerDiscordTownServicesMiniUserSchemaResponseTransformer(data);
     return data;
 };
 
