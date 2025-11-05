@@ -80,17 +80,18 @@ function GameManager() {
             console.log('A key pressed!');
             const name = prompt("Player name");
             if (name?.trim()) {
-                //TODO add player to current game id
                 await getGame(name)
             }
         }
     };
 
     useEffect(() => {
+        /*
         globalThis.addEventListener('keydown', handleKeyPress);
         return () => {
             globalThis.removeEventListener('keydown', handleKeyPress);
         };
+        */
     }, []);
 
     return (
