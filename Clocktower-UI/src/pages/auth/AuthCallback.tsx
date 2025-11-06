@@ -34,8 +34,9 @@ const AuthCallback = () => {
                         window.location.href = '/login?error=auth_data_failed';
                     } else {
                         setCurrentUser({
-                            id: data?.id??'',
-                            name: data?.name??''
+                            id: data?.id ?? '',
+                            name: data?.name ?? '',
+                            avatarUrl: data?.avatarUrl ?? ''
                         });
                         window.location.href = '/';
                     }

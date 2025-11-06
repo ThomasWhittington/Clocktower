@@ -16,7 +16,7 @@ interface AppState {
 }
 
 const getLoggedIn = (): boolean => {
-    var currentUser = getStoredUser();
+    const currentUser = getStoredUser();
     return currentUser != undefined;
 }
 

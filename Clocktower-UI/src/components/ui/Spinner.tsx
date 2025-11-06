@@ -1,4 +1,4 @@
-﻿const Spinner = () => (
+﻿export const Spinner = () => (
     <svg
         aria-hidden="true"
         className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-indigo-600"
@@ -13,4 +13,3 @@
     </svg>
 )
 
-export default Spinner

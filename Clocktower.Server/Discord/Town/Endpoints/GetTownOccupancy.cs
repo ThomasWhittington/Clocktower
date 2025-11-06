@@ -13,11 +13,11 @@ public class GetTownOccupancy : IEndpoint
         .WithDescription("Gets user presense in the town")
         .WithRequestValidation<GuildIdRequest>();
 
-    private static async Task<Results<Ok<TownOccupants>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, DiscordService discordService)
+    private static async Task<Results<Ok<TownOccupants>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, DiscordTownService discordTownService)
     {
         var guildId = ulong.Parse(request.GuildId);
 
-        var (success, townOccupants, message) = await discordService.GetTownOccupancy(guildId);
+        var (success, townOccupants, message) = await discordTownService.GetTownOccupancy(guildId);
         if (success)
         {
             return TypedResults.Ok(townOccupants);

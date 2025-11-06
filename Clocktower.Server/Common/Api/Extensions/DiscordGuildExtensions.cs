@@ -61,7 +61,7 @@ public static class DiscordGuildExtensions
         return (from discordChannel in channels
             let miniChannel = new MiniChannel(discordChannel.Id.ToString(), discordChannel.Name)
             let occupants = discordChannel.Users.Select(discordChannelUser =>
-                new MiniUser(discordChannelUser.Id.ToString(), discordChannelUser.DisplayName)
+                new MiniUser(discordChannelUser.Id.ToString(), discordChannelUser.DisplayName, discordChannelUser.AvatarUrl)
             ).ToList()
             select new ChannelOccupants(miniChannel, occupants)).ToList();
     }

@@ -1,5 +1,16 @@
-﻿export { default as Spinner } from './spinner';
-export {
-    default as StatusIcon
+﻿export {
+    Spinner
 }
-    from './statusIcon';
+    from './Spinner';
+export {
+    StatusIcon
+}
+    from './StatusIcon';
+export {
+    GuildsList
+}
+    from './GuildsList';
+export {
+    DiscordUserStatus
+}
+    from './DiscordUserStatus.tsx';

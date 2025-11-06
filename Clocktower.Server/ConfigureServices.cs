@@ -34,6 +34,7 @@ public static class ConfigureServices
         builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
         builder.Services.AddSingleton<DiscordAuthService>();
         builder.Services.AddSingleton<DiscordBotService>();
+        builder.Services.AddSingleton<DiscordTownService>();
         builder.Services.AddSingleton<DiscordService>();
         builder.Services.AddSingleton<GameStateService>();
         builder.Services.AddValidatorsFromAssembly(typeof(ConfigureServices).Assembly);

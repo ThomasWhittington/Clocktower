@@ -1,7 +1,6 @@
 ﻿import {
     DiscordAdminPanel,
-    DiscordTown,
-    DiscordUserStatus
+    DiscordTown
 } from "./components";
 import {
     Spinner
@@ -10,8 +9,6 @@ import {
     useTownOccupancy
 } from "./hooks";
 
-
-//TODO add journey of adding bot to server
 function DiscordTownPanel() {
     const {
         townOccupancy,
@@ -34,9 +31,8 @@ function DiscordTownPanel() {
                     className="mb-auto">
                     <DiscordTown
                         townOccupancy={townOccupancy}/>
-                </div>}
-
-            <DiscordUserStatus/>
+                </div>
+            }
         </div>
     );
 }

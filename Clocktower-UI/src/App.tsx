@@ -11,9 +11,17 @@ import {
     Home,
     LoginPage
 } from "./pages";
+import {
+    useAppStore
+} from "@/store";
+import {
+    DiscordUserStatus
+} from "@/components/ui";
 
 function App() {
-    return (         
+    const loggedIn = useAppStore((state) => state.loggedIn);
+    return (
+        <>
             <Router>
                 <Routes>
                     <Route
@@ -40,6 +48,13 @@ function App() {
                             <Game/>}/>
                 </Routes>
             </Router>
+            {loggedIn &&
+                <div
+                    className="fixed top-4 right-4">
+                    <DiscordUserStatus/>
+                </div>
+            }
+        </>
     );
 }
 

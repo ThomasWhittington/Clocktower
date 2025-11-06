@@ -2,6 +2,7 @@
     checkGuildApi,
     type CheckGuildApiResponse,
     getAuthDataApi,
+    getGuildsWithUserApi,
     getTownOccupancyApi,
     getTownStatusApi,
     type GetTownStatusApiResponse,
@@ -10,7 +11,9 @@
     type RebuildTownApiResponse
 } from '@/generated';
 import {
+    mapToMiniGuild,
     mapToTownOccupants,
+    type MiniGuild,
     type TownOccupants
 } from "@/types";
 
@@ -128,8 +131,30 @@ async function getAuthData(key: string) {
     });
 }
 
+async function getGuildsWithUser(userId: string): Promise<MiniGuild[]> {
+    const {
+        data,
+        error
+    } = await getGuildsWithUserApi({
+        path: {
+            userId: userId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to get guilds:', error);
+        throw new Error(error.toString());
+    }
+
+    if (data) {
+        return data.miniGuilds?.map(mapToMiniGuild) ?? [];
+    }
+    return [];
+}
+
 export const discordService = {
     checkGuild,
+    getGuildsWithUser,
     getTownStatus,
     rebuildTown,
     getTownOccupancy,

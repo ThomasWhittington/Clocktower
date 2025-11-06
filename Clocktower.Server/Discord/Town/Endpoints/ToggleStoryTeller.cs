@@ -14,12 +14,12 @@ public class ToggleStoryTeller : IEndpoint
 
     private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle(
         [AsParameters] GuildAndUserRequest request,
-        DiscordService discordService)
+        DiscordTownService discordTownService)
     {
         var guildId = ulong.Parse(request.GuildId);
         var userId = ulong.Parse(request.UserId);
        
-        var (success, message) = await discordService.ToggleStoryTeller(guildId, userId);
+        var (success, message) = await discordTownService.ToggleStoryTeller(guildId, userId);
         if (success)
         {
             return TypedResults.Ok(message);

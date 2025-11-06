@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace Clocktower.Server.Discord.Town.Services;
 
 [UsedImplicitly]
-public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hubContext)
+public class DiscordTownService(DiscordBotService bot, IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hubContext)
 {
     private const string TownSquareName = "⛲ Town Square";
     private const string ConsultationName = "📖 Storyteller's Consultation";
@@ -93,31 +93,11 @@ public class DiscordService(DiscordBotService bot, IHubContext<DiscordNotificati
             return (false, ex.Message);
         }
     }
-
-    public async Task<(bool success, bool valid, string guildName, string message)> CheckGuildId(ulong guildId)
-    {
-        try
-        {
-            var guild = await bot.Client.GetGuildAsync(guildId);
-            if (guild != null)
-            {
-                return (true, true, guild.Name, "Bot has access to guild");
-            }
-
-            return (false, false, string.Empty, "Bot does not have access to guild");
-        }
-        catch (Exception)
-        {
-            return (false, false, string.Empty, $"Bot does not have access to guild: {guildId}");
-        }
-    }
-
+    
     public async Task<(bool success, string message)> RebuildTown(ulong guildId)
     {
         try
         {
-            var guildValid = await CheckGuildId(guildId);
-            if (guildValid is not { success: true, valid: true }) return (false, guildValid.message);
             await hubContext.Clients.All.TownOccupancyUpdated(new TownOccupants([]));
             var delete = await DeleteTown(guildId);
             if (!delete.success) return delete;
@@ -353,7 +333,7 @@ public record MiniChannel(string Id, string Name);
 public record MiniCategory(string Id, string Name, IEnumerable<ChannelOccupants> Channels);
 
 [UsedImplicitly]
-public record MiniUser(string Id, string Name);
+public record MiniUser(string Id, string Name, string? AvatarUrl);
 
 public class TownOccupants(List<MiniCategory> channelCategories)
 {
@@ -362,7 +342,7 @@ public class TownOccupants(List<MiniCategory> channelCategories)
 
     public void MoveUser(DiscordUser user, DiscordVoiceState? newChannel)
     {
-        var miniUser = new MiniUser(user.Id.ToString(), user.Username);
+        var miniUser = new MiniUser(user.Id.ToString(), user.Username, user.AvatarUrl);
 
         ChannelCategories = ChannelCategories.Select(category =>
             category with

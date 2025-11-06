@@ -5,22 +5,50 @@ import {
     authService
 } from "@/services";
 
+import {
+    useAddBot,
+    useGuildsWithUser
+} from "@/pages/hooks";
+import type {
+    MiniGuild
+} from "@/types";
+import {
+    GuildsList
+} from "@/components/ui";
+
 function Home() {
     const loggedIn = useAppStore((state) => state.loggedIn);
-    
+    const {
+        guilds,
+        loading,
+        error
+    } = useGuildsWithUser(loggedIn);
+
+    const setGuildId = useAppStore((state) => state.setGuildId);
+    const {addBot} = useAddBot();
+
+    const handleGuildClick = (guild: MiniGuild) => {
+        setGuildId(guild.id);
+        window.location.href = '/game';
+    };
+
     return (
         <>
             {loggedIn ?
                 (
                     <>
                         <h1>Play on Discord</h1>
-
-                        <h2>You are playing in these games</h2>
-
-                        <h2>Games in your servers</h2>
-
+                        <GuildsList
+                            guilds={guilds}
+                            loading={loading}
+                            error={error}
+                            onGuildClick={handleGuildClick}
+                        />
                         <button
-                            onClick={() => window.location.href = "/game"}>Go to game
+                            onClick={addBot}
+                            className="btn-outline"
+                        >
+                            Add Bot To Server
                         </button>
                     </>
                 ) : (

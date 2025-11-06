@@ -40,6 +40,9 @@ import type {
     GetGamesApiData,
     GetGamesApiErrors,
     GetGamesApiResponses,
+    GetGuildsWithUserApiData,
+    GetGuildsWithUserApiErrors,
+    GetGuildsWithUserApiResponses,
     GetRolesApiData,
     GetRolesApiResponses,
     GetTownOccupancyApiData,
@@ -67,7 +70,9 @@ import type {
     ToggleStoryTellerApiResponses
 } from './types.gen';
 
-export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> =
+    Options2<TData, ThrowOnError>
+    & {
     /**
      * You can provide a client instance returned by `createClient()` instead of
      * individual options. This might be also useful if you want to implement a
@@ -88,7 +93,19 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  */
 export const checkGuildApi = <ThrowOnError extends boolean = false>(options: Options<CheckGuildApiData, ThrowOnError>) => {
     return (options.client ?? client).get<CheckGuildApiResponses, CheckGuildApiErrors, ThrowOnError>({
-        url: '/api/discord/{guildId}',
+        url: '/api/discord/{guildId}/check',
+        ...options
+    });
+};
+
+/**
+ * Gets guilds that contain user
+ *
+ * Gets all guilds the bot is in that the player is also an administrator
+ */
+export const getGuildsWithUserApi = <ThrowOnError extends boolean = false>(options: Options<GetGuildsWithUserApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetGuildsWithUserApiResponses, GetGuildsWithUserApiErrors, ThrowOnError>({
+        url: '/api/discord/{userId}/guilds',
         ...options
     });
 };

@@ -26,7 +26,7 @@ try
     app.Configure();
 
     await app.Services.GetRequiredService<DiscordBotService>().InitializeAsync();
-    app.Services.GetRequiredService<DiscordService>().Initialize();
+    app.Services.GetRequiredService<DiscordTownService>().Initialize();
     await app.RunAsync();
 }
 catch (Exception ex)

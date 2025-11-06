@@ -6,6 +6,7 @@ import type {
     GetAuthDataApiResponse,
     GetGameApiResponse,
     GetGamesApiResponse,
+    GetGuildsWithUserApiResponse,
     GetRolesApiResponse,
     GetTownOccupancyApiResponse,
     GetTownStatusApiResponse,
@@ -14,6 +15,20 @@ import type {
 
 export const checkGuildApiResponseTransformer = async (data: any): Promise<CheckGuildApiResponse> => {
     data = clocktowerServerDiscordEndpointsCheckGuildResponseSchemaResponseTransformer(data);
+    return data;
+};
+
+const clocktowerServerDiscordEndpointsGetGuildsWithUserResponseSchemaResponseTransformer = (data: any) => {
+    if (data.miniGuilds) {
+        data.miniGuilds = data.miniGuilds.map((item: any) => {
+            return clocktowerServerDiscordServicesDiscordServiceMiniGuildSchemaResponseTransformer(item);
+        });
+    }
+    return data;
+};
+
+export const getGuildsWithUserApiResponseTransformer = async (data: any): Promise<GetGuildsWithUserApiResponse> => {
+    data = clocktowerServerDiscordEndpointsGetGuildsWithUserResponseSchemaResponseTransformer(data);
     return data;
 };
 

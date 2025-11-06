@@ -50,7 +50,11 @@ public class DiscordAuthService(Secrets secrets, IMemoryCache cache)
             var userInfo = await GetDiscordUserInfo(tokenResponse.AccessToken, httpClient);
             if (userInfo == null) return errorUrl + Uri.EscapeDataString("Failed to get user information");
 
-            var response = new MiniUser(userInfo.Id, userInfo.Username);
+            var avatarUrl = userInfo.Avatar != null 
+                ? $"https://cdn.discordapp.com/avatars/{userInfo.Id}/{userInfo.Avatar}.png" 
+                : "https://cdn.discordapp.com/embed/avatars/0.png";
+
+            var response = new MiniUser(userInfo.Id, userInfo.Username, avatarUrl);
             var tempKey = Guid.NewGuid().ToString();
             cache.Set($"auth_data_{tempKey}", response, TimeSpan.FromMinutes(5));
 

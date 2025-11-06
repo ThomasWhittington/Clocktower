@@ -18,3 +18,6 @@ export *
 
 export *
     from './player.ts'
+
+export *
+    from './miniGuild.ts'

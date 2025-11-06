@@ -1,12 +1,10 @@
 ﻿import {
-    useEffect,
     useState
 } from "react";
 import {
     Spinner
 } from '@/components/ui';
-import styles
-    from "./GameManager.module.css";
+
 import GameList
     from "./components";
 
@@ -56,7 +54,7 @@ function GameManager() {
             .finally(() => setIsLoading(false));
     }
 
-    const getGame = async (gameId: string) => {
+    const getGame = async () => {
         clearError();
         setIsLoading(true);
         gamesService.getGame(gameId).then(data => setGame(data))
@@ -74,25 +72,6 @@ function GameManager() {
             .catch((err) => handleError(err))
             .finally(() => setIsLoading(false));
     }
-
-    const handleKeyPress = async (event: KeyboardEvent) => {
-        if (event.key === 'a' || event.key === 'A') {
-            console.log('A key pressed!');
-            const name = prompt("Player name");
-            if (name?.trim()) {
-                await getGame(name)
-            }
-        }
-    };
-
-    useEffect(() => {
-        /*
-        globalThis.addEventListener('keydown', handleKeyPress);
-        return () => {
-            globalThis.removeEventListener('keydown', handleKeyPress);
-        };
-        */
-    }, []);
 
     return (
         <div>
@@ -121,13 +100,13 @@ function GameManager() {
 
                         <button
                             onClick={loadDummyData}
-                            className={styles.button}>
+                            className="btn-primary">
                             Load Dummy Data
                         </button>
                         <br/>
                         <button
                             onClick={getGames}
-                            className={styles.button}>
+                            className="btn-primary">
                             Get games
                         </button>
                         <br/>
@@ -137,10 +116,14 @@ function GameManager() {
                         />
                         <button
                             onClick={startGame}
-                            className={styles.button}>
+                            className="btn-primary">
                             Start game
                         </button>
-
+                        <button
+                            onClick={getGame}
+                            className="btn-primary">
+                            Get game
+                        </button>
                         <GameList
                             games={games}/>
                         <br/>

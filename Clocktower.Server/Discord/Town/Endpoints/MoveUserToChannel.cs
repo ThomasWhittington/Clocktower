@@ -12,13 +12,13 @@ public class MoveUserToChannel : IEndpoint
         .WithDescription("Moves the user to the specified channel")
         .WithRequestValidation<Request>();
 
-    private static async Task<Results<Ok<string>, BadRequest<string>>> Handle([AsParameters] Request request, DiscordService discordService)
+    private static async Task<Results<Ok<string>, BadRequest<string>>> Handle([AsParameters] Request request, DiscordTownService discordTownService)
     {
         var guildId = ulong.Parse(request.GuildId);
         var userId = ulong.Parse(request.UserId);
         var channelId = ulong.Parse(request.ChannelId);
 
-        var (success, message) = await discordService.MoveUser(guildId, userId, channelId);
+        var (success, message) = await discordTownService.MoveUser(guildId, userId, channelId);
         if (success)
         {
             return TypedResults.Ok(message);

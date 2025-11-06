@@ -1,9 +1,7 @@
-﻿const Spinner = ({status}: {
+﻿export const StatusIcon = ({status}: {
     status: boolean
 }) => (
     <span>
       {status ? '✔️' : '❌'}
     </span>
 )
-
-export default Spinner

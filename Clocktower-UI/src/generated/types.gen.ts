@@ -11,9 +11,18 @@ export type ClocktowerServerDataGameState = {
     readonly isFull?: boolean;
 };
 
-export type ClocktowerServerDataTypesEnumEdition = 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
+export type ClocktowerServerDataTypesEnumEdition =
+    'TroubleBrewing'
+    | 'SectsAndViolets'
+    | 'BadMoonRising'
+    | 'Experimental';
 
-export type ClocktowerServerDataTypesEnumRoleType = 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
+export type ClocktowerServerDataTypesEnumRoleType =
+    'Townsfolk'
+    | 'Outsider'
+    | 'Minion'
+    | 'Demon'
+    | 'Traveller';
 
 export type ClocktowerServerDataTypesPlayer = {
     id?: number;
@@ -31,6 +40,15 @@ export type ClocktowerServerDiscordEndpointsCheckGuildResponse = {
     valid?: boolean;
     name?: string | null;
     message?: string | null;
+};
+
+export type ClocktowerServerDiscordEndpointsGetGuildsWithUserResponse = {
+    miniGuilds?: Array<ClocktowerServerDiscordServicesDiscordServiceMiniGuild> | null;
+};
+
+export type ClocktowerServerDiscordServicesDiscordServiceMiniGuild = {
+    id?: string | null;
+    name?: string | null;
 };
 
 export type ClocktowerServerDiscordTownEndpointsGetTownStatusResponse = {
@@ -57,6 +75,7 @@ export type ClocktowerServerDiscordTownServicesMiniChannel = {
 export type ClocktowerServerDiscordTownServicesMiniUser = {
     id?: string | null;
     name?: string | null;
+    avatarUrl?: string | null;
 };
 
 export type ClocktowerServerDiscordTownServicesTownOccupants = {
@@ -98,7 +117,7 @@ export type CheckGuildApiData = {
         guildId: string;
     };
     query?: never;
-    url: '/api/discord/{guildId}';
+    url: '/api/discord/{guildId}/check';
 };
 
 export type CheckGuildApiErrors = {
@@ -106,10 +125,6 @@ export type CheckGuildApiErrors = {
      * Bad Request
      */
     400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
-    /**
-     * Not Found
-     */
-    404: string;
 };
 
 export type CheckGuildApiError = CheckGuildApiErrors[keyof CheckGuildApiErrors];
@@ -122,6 +137,33 @@ export type CheckGuildApiResponses = {
 };
 
 export type CheckGuildApiResponse = CheckGuildApiResponses[keyof CheckGuildApiResponses];
+
+export type GetGuildsWithUserApiData = {
+    body?: never;
+    path: {
+        userId: string;
+    };
+    query?: never;
+    url: '/api/discord/{userId}/guilds';
+};
+
+export type GetGuildsWithUserApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+};
+
+export type GetGuildsWithUserApiError = GetGuildsWithUserApiErrors[keyof GetGuildsWithUserApiErrors];
+
+export type GetGuildsWithUserApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerDiscordEndpointsGetGuildsWithUserResponse;
+};
+
+export type GetGuildsWithUserApiResponse = GetGuildsWithUserApiResponses[keyof GetGuildsWithUserApiResponses];
 
 export type AddBotApiData = {
     body?: never;
