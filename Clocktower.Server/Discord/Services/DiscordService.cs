@@ -34,19 +34,24 @@ public class DiscordService(DiscordBotService bot)
             foreach (var discordGuild in guilds)
             {
                 var member = await discordGuild.Value.GetMemberAsync(userId);
-                if(member==null) continue;
+                if (member == null) continue;
                 if (member.Permissions.HasPermission(Permissions.Administrator))
                 {
                     miniGuilds.Add(new MiniGuild(discordGuild.Key.ToString(), discordGuild.Value.Name));
                 }
             }
-            
+
             return (true, miniGuilds, $"Recieved {miniGuilds.Count} guilds where user has admin");
         }
         catch (Exception)
         {
             return (false, [], "Failed to gather guilds with user");
         }
+    }
+
+    public async Task<(bool success, string message)> SendMessage(ulong userId, string requestMessage)
+    {
+        throw new NotImplementedException();
     }
 
     public record MiniGuild(string Id, string Name);
