@@ -13,7 +13,7 @@ public class DeleteTown : IEndpoint
         .WithDescription("Removes all roles, channels and categories associated with clocktower")
         .WithRequestValidation<GuildIdRequest>();
 
-    private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, DiscordTownService discordTownService)
+    private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, IDiscordTownService discordTownService)
     {
         var guildId = ulong.Parse(request.GuildId);
 

@@ -2,15 +2,15 @@ global using Microsoft.AspNetCore.Http.HttpResults;
 global using Clocktower.Server.Common.Api;
 global using FluentValidation;
 global using JetBrains.Annotations;
+global using Clocktower.Server.Data;
 global using Clocktower.Server.Data.Types.Enum;
 global using Clocktower.Server.Data.Types;
 global using Clocktower.Server.Data.Types.Role;
 global using Clocktower.Server.Data.Filters;
 global using Clocktower.Server.Game.Services;
 global using Clocktower.Server.Common.Api.Extensions;
+global using Clocktower.Server.Common;
 using Clocktower.Server;
-using Clocktower.Server.Discord.Services;
-using Clocktower.Server.Discord.Town.Services;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -25,8 +25,8 @@ try
     var app = builder.Build();
     app.Configure();
 
-    await app.Services.GetRequiredService<DiscordBotService>().InitializeAsync();
-    app.Services.GetRequiredService<DiscordTownService>().Initialize();
+    //  await app.Services.GetRequiredService<DiscordBotService>().InitializeAsync();
+    //  app.Services.GetRequiredService<DiscordTownService>().Initialize();
     await app.RunAsync();
 }
 catch (Exception ex)

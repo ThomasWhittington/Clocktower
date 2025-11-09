@@ -1,13 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using Clocktower.Server.Common;
-using Clocktower.Server.Discord.Town.Services;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Clocktower.Server.Discord.Auth.Services;
 
-public class DiscordAuthService(Secrets secrets, IMemoryCache cache)
+public class DiscordAuthService(Secrets secrets, IMemoryCache cache) : IDiscordAuthService
 {
     private readonly JsonSerializerOptions _deserializationOptions = new()
     {
@@ -50,8 +48,8 @@ public class DiscordAuthService(Secrets secrets, IMemoryCache cache)
             var userInfo = await GetDiscordUserInfo(tokenResponse.AccessToken, httpClient);
             if (userInfo == null) return errorUrl + Uri.EscapeDataString("Failed to get user information");
 
-            var avatarUrl = userInfo.Avatar != null 
-                ? $"https://cdn.discordapp.com/avatars/{userInfo.Id}/{userInfo.Avatar}.png" 
+            var avatarUrl = userInfo.Avatar != null
+                ? $"https://cdn.discordapp.com/avatars/{userInfo.Id}/{userInfo.Avatar}.png"
                 : "https://cdn.discordapp.com/embed/avatars/0.png";
 
             var response = new MiniUser(userInfo.Id, userInfo.Username, avatarUrl);
@@ -143,7 +141,7 @@ public class DiscordAuthService(Secrets secrets, IMemoryCache cache)
         return JsonSerializer.Deserialize<DiscordUser>(json, _deserializationOptions);
     }
 
-    public record TokenResponse(
+    private sealed record TokenResponse(
         string AccessToken,
         string TokenType,
         int ExpiresIn,
@@ -151,20 +149,12 @@ public class DiscordAuthService(Secrets secrets, IMemoryCache cache)
         string Scope
     );
 
-    public record DiscordUser(
+    private sealed record DiscordUser(
         string Id,
         string Username,
         string? Email,
         string? Avatar,
         bool? Verified,
         string Discriminator
-    );
-
-    public record AuthResult(
-        bool Success,
-        DiscordUser? User,
-        string? AccessToken,
-        string? RefreshToken,
-        string? Error = null
     );
 }

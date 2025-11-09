@@ -17,7 +17,7 @@ public class Callback : IEndpoint
     private static async Task<Results<RedirectHttpResult, BadRequest<string>>> Handle(
         [FromQuery] string? code,
         [FromQuery] string? error,
-        [FromServices] DiscordAuthService discordAuthService)
+        [FromServices] IDiscordAuthService discordAuthService)
     {
         var redirectUrl = await discordAuthService.HandleCallback(error, code);
         return TypedResults.Redirect(redirectUrl);

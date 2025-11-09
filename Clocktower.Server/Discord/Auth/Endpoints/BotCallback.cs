@@ -18,7 +18,7 @@ public class BotCallback : IEndpoint
         [FromQuery] string? code,
         [FromQuery] string? error,
         [FromQuery(Name = "guild_id")] string? guildId,
-        [FromServices] DiscordAuthService discordAuthService)
+        [FromServices] IDiscordAuthService discordAuthService)
     {
         var redirectUrl = discordAuthService.HandleBotCallback(error, code, guildId);
         return TypedResults.Redirect(redirectUrl);

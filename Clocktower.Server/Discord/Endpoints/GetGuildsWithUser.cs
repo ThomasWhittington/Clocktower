@@ -1,5 +1,4 @@
-﻿using Clocktower.Server.Common;
-using Clocktower.Server.Discord.Services;
+﻿using Clocktower.Server.Discord.Services;
 
 namespace Clocktower.Server.Discord.Endpoints;
 
@@ -13,11 +12,11 @@ public class GetGuildsWithUser : IEndpoint
         .WithDescription("Gets all guilds the bot is in that the player is also an administrator")
         .WithRequestValidation<Request>();
 
-    private static async Task<Results<Ok<Response>, BadRequest<string>>> Handle([AsParameters] Request request, DiscordService discordService)
+    private static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] Request request, IDiscordService discordService)
     {
         var userId = ulong.Parse(request.UserId);
 
-        var (success, guilds, message) = await discordService.GetGuildsWithUser(userId);
+        var (success, guilds, message) = discordService.GetGuildsWithUser(userId);
         if (success)
         {
             return TypedResults.Ok(new Response(guilds));
@@ -27,7 +26,7 @@ public class GetGuildsWithUser : IEndpoint
     }
 
     [UsedImplicitly]
-    public record Response(List<DiscordService.MiniGuild> MiniGuilds);
+    public record Response(List<MiniGuild> MiniGuilds);
 
     [UsedImplicitly]
     public record Request(string UserId);

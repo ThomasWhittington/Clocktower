@@ -13,7 +13,7 @@ public class RebuildTown : IEndpoint
         .WithDescription("Rebuilds the town including roles, categories and channels")
         .WithRequestValidation<GuildIdRequest>();
 
-    private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, DiscordTownService discordTownService)
+    private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, IDiscordTownService discordTownService)
     {
         var guildId = ulong.Parse(request.GuildId);
 

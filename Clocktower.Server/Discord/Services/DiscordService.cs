@@ -1,16 +1,13 @@
-﻿using DSharpPlus;
+﻿namespace Clocktower.Server.Discord.Services;
 
-namespace Clocktower.Server.Discord.Services;
-
-[UsedImplicitly]
-public class DiscordService(DiscordBotService bot)
+public class DiscordService(NewDiscordBotService bot) : IDiscordService
 {
-    public async Task<(bool success, bool valid, string guildName, string message)> CheckGuildId(ulong guildId)
+    public (bool success, bool valid, string guildName, string message) CheckGuildId(ulong guildId)
     {
         try
         {
-            var guild = await bot.Client.GetGuildAsync(guildId);
-            if (guild != null)
+            var guild = bot.Client.GetGuild(guildId);
+            if (guild is not null)
             {
                 return (true, true, guild.Name, "Bot has access to guild");
             }
@@ -23,7 +20,7 @@ public class DiscordService(DiscordBotService bot)
         }
     }
 
-    public async Task<(bool success, List<MiniGuild> guilds, string message)> GetGuildsWithUser(ulong userId)
+    public (bool success, List<MiniGuild> guilds, string message) GetGuildsWithUser(ulong userId)
     {
         try
         {
@@ -33,15 +30,15 @@ public class DiscordService(DiscordBotService bot)
 
             foreach (var discordGuild in guilds)
             {
-                var member = await discordGuild.Value.GetMemberAsync(userId);
+                var member = discordGuild.Users.FirstOrDefault(o => o.Id == userId);
                 if (member == null) continue;
-                if (member.Permissions.HasPermission(Permissions.Administrator))
+                if (member.GuildPermissions.Administrator)
                 {
-                    miniGuilds.Add(new MiniGuild(discordGuild.Key.ToString(), discordGuild.Value.Name));
+                    miniGuilds.Add(new MiniGuild(discordGuild.Id.ToString(), discordGuild.Name));
                 }
             }
 
-            return (true, miniGuilds, $"Recieved {miniGuilds.Count} guilds where user has admin");
+            return (true, miniGuilds, $"Received {miniGuilds.Count} guilds where user has admin");
         }
         catch (Exception)
         {
@@ -49,10 +46,8 @@ public class DiscordService(DiscordBotService bot)
         }
     }
 
-    public async Task<(bool success, string message)> SendMessage(ulong userId, string requestMessage)
+    public async Task<(bool success, string message)> SendMessage(ulong userId, string message)
     {
         throw new NotImplementedException();
     }
-
-    public record MiniGuild(string Id, string Name);
 }

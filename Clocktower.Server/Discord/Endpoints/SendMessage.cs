@@ -1,5 +1,4 @@
-﻿using Clocktower.Server.Common;
-using Clocktower.Server.Discord.Services;
+﻿using Clocktower.Server.Discord.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Clocktower.Server.Discord.Endpoints;
@@ -15,7 +14,7 @@ public class SendMessage : IEndpoint
         .WithRequestValidation<Request>();
 
 
-    private static async Task<Results<Ok, BadRequest<string>>> Handle([FromBody] Request request, DiscordService discordService)
+    private static async Task<Results<Ok, BadRequest<string>>> Handle([FromBody] Request request, IDiscordService discordService)
     {
         var userId = ulong.Parse(request.UserId);
 

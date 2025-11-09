@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using Clocktower.Server.Common;
 using Clocktower.Server.Discord.Auth.Services;
 using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Discord.Town.Services;
@@ -32,10 +31,11 @@ public static class ConfigureServices
         builder.ConfigureJson();
         builder.Services.AddSingleton(secrets);
         builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
-        builder.Services.AddSingleton<DiscordAuthService>();
-        builder.Services.AddSingleton<DiscordBotService>();
-        builder.Services.AddSingleton<DiscordTownService>();
-        builder.Services.AddSingleton<DiscordService>();
+        builder.Services.AddSingleton<IDiscordAuthService, DiscordAuthService>();
+        builder.Services.AddSingleton<NewDiscordBotService>();
+        builder.Services.AddHostedService(provider => provider.GetRequiredService<NewDiscordBotService>());
+        builder.Services.AddSingleton<IDiscordService, DiscordService>();
+        builder.Services.AddSingleton<IDiscordTownService, DiscordTownService>();
         builder.Services.AddSingleton<GameStateService>();
         builder.Services.AddValidatorsFromAssembly(typeof(ConfigureServices).Assembly);
     }

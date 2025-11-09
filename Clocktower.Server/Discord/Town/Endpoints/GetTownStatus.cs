@@ -13,11 +13,11 @@ public class GetTownStatus : IEndpoint
         .WithDescription("Gets if the town exists in a valid state")
         .WithRequestValidation<GuildIdRequest>();
 
-    private static async Task<Results<Ok<Response>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, DiscordTownService discordTownService)
+    private static Results<Ok<Response>, NotFound<string>, BadRequest<string>> Handle([AsParameters] GuildIdRequest request, IDiscordTownService discordTownService)
     {
         var guildId = ulong.Parse(request.GuildId);
 
-        var (success, exists, message) = await discordTownService.TownExists(guildId);
+        var (success, exists, message) = discordTownService.TownExists(guildId);
         if (success)
         {
             return TypedResults.Ok(new Response(exists, message));

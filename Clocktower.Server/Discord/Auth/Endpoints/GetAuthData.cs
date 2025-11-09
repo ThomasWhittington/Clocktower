@@ -1,5 +1,4 @@
 ﻿using Clocktower.Server.Discord.Auth.Services;
-using Clocktower.Server.Discord.Town.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Clocktower.Server.Discord.Auth.Endpoints;
@@ -16,7 +15,7 @@ public class GetAuthData : IEndpoint
     }
     private static Results<Ok<MiniUser>, NotFound> Handle(
         string key,
-        [FromServices] DiscordAuthService discordAuthService)
+        [FromServices] IDiscordAuthService discordAuthService)
     {
         var miniUser = discordAuthService.GetAuthData(key);
         return miniUser != null ? TypedResults.Ok(miniUser) : TypedResults.NotFound();
