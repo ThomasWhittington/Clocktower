@@ -21,7 +21,7 @@ public class TownOccupants(List<MiniCategory> channelCategories)
     public int UserCount => ChannelCategories.Sum(category => category.Channels.Sum(channel => channel.Occupants.Count()));
     public List<MiniCategory> ChannelCategories { get; private set; } = channelCategories;
 
-    public void MoveUser(SocketUser user, DiscordVoiceState? newChannel)
+    public void MoveUser(SocketUser user, SocketVoiceState? newChannel)
     {
         var miniUser = new MiniUser(user.Id.ToString(), user.Username, user.GetAvatarUrl());
 
@@ -34,7 +34,7 @@ public class TownOccupants(List<MiniCategory> channelCategories)
                         .Where(o => o.Id != user.Id.ToString())
                         .ToList();
 
-                    if (newChannel?.Channel?.Id.ToString() == channel.Channel.Id)
+                    if (newChannel?.VoiceChannel?.Id.ToString() == channel.Channel.Id)
                     {
                         occupantsList.Add(miniUser);
                     }

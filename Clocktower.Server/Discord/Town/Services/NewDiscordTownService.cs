@@ -3,12 +3,11 @@ using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Socket;
 using Discord;
 using Discord.WebSocket;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Discord.Town.Services;
 
 [UsedImplicitly]
-public class DiscordTownService(DiscordBotService bot, IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hubContext) : IDiscordTownService
+public class DiscordTownService(DiscordBotService bot, INotificationService notificationService) : IDiscordTownService
 {
     private const string TownSquareName = "⛲ Town Square";
     private const string ConsultationName = "📖 Storyteller's Consultation";
@@ -34,33 +33,6 @@ public class DiscordTownService(DiscordBotService bot, IHubContext<DiscordNotifi
     ];
 
     private readonly ConcurrentDictionary<ulong, TownOccupants> _townOccupants = new();
-
-    /*
-public void Initialize()
-{
-     bot.Client.VoiceStateUpdated += async (_, args) =>
-     {
-         if (args.Before?.Channel?.Id != args.After?.Channel?.Id)
-         {
-             await HandleUserMoved(args.User, args.Before, args.After);
-         }
-     };
-}
-
-private async Task HandleUserMoved(DiscordUser user, DiscordVoiceState? before, DiscordVoiceState? after)
-{
-    ulong guildId;
-    if (before != null) guildId = before.Guild.Id;
-    else if (after != null) guildId = after.Guild.Id;
-    else return;
-
-    var (success, thisTownOccupancy, _) = await GetTownOccupancy(guildId);
-    if (!success) return;
-    thisTownOccupancy!.MoveUser(user, after);
-    await hubContext.Clients.All.TownOccupancyUpdated(thisTownOccupancy);
-    await hubContext.Clients.All.UserVoiceStateChanged(user.Id.ToString(), after?.Channel != null);
-}
-*/
 
     public async Task<(bool success, string message)> MoveUser(ulong guildId, ulong userId, ulong channelId)
     {
@@ -94,7 +66,7 @@ private async Task HandleUserMoved(DiscordUser user, DiscordVoiceState? before, 
     {
         try
         {
-            await hubContext.Clients.All.TownOccupancyUpdated(new TownOccupants([]));
+            await notificationService.BroadcastTownOccupancyUpdate(new TownOccupants([]));
             var delete = await DeleteTown(guildId);
             if (!delete.success) return delete;
             var create = await CreateTown(guildId);
@@ -227,7 +199,7 @@ private async Task HandleUserMoved(DiscordUser user, DiscordVoiceState? before, 
             var townOccupants = new TownOccupants(channelCategories);
 
             _townOccupants.TryAdd(guildId, townOccupants);
-            await hubContext.Clients.All.TownOccupancyUpdated(_townOccupants[guildId]);
+            await notificationService.BroadcastTownOccupancyUpdate(_townOccupants[guildId]);
             return (true, townOccupants, $"Town occupancy {townOccupants.UserCount}");
         }
         catch (Exception ex)

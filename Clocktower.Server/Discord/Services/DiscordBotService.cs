@@ -1,36 +1,44 @@
-﻿using Discord;
+﻿using Clocktower.Server.Discord.Town.Services;
+using Clocktower.Server.Socket;
+using Discord;
 using Discord.WebSocket;
 
 namespace Clocktower.Server.Discord.Services;
 
-public class DiscordBotService(Secrets secrets, IServiceProvider serviceProvider) : BackgroundService
+public class DiscordBotService(Secrets secrets, IServiceProvider serviceProvider, INotificationService notificationService) : BackgroundService
 {
-    private readonly DiscordSocketClient _client = new(new DiscordSocketConfig
+    public DiscordSocketClient Client { get; } = new(new DiscordSocketConfig
     {
         GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.All
     });
 
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-
-    public DiscordSocketClient Client => _client;
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _client.Log += LogAsync;
-        _client.Ready += ReadyAsync;
+        Client.Log += LogAsync;
+        Client.Ready += ReadyAsync;
 
-        _client.UserVoiceStateUpdated += ClientOnUserVoiceStateUpdated;
+        Client.UserVoiceStateUpdated += ClientOnUserVoiceStateUpdated;
 
         string token = secrets.DiscordBotToken;
-        await _client.LoginAsync(TokenType.Bot, token);
-        await _client.StartAsync();
+        await Client.LoginAsync(TokenType.Bot, token);
+        await Client.StartAsync();
 
         await Task.Delay(Timeout.Infinite, stoppingToken);
     }
 
-    private Task ClientOnUserVoiceStateUpdated(SocketUser arg1, SocketVoiceState arg2, SocketVoiceState arg3)
+    private async Task ClientOnUserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after)
     {
-        throw new NotImplementedException();
+        var guildId = after.VoiceChannel?.Guild?.Id ?? before.VoiceChannel?.Guild?.Id;
+        if (guildId.HasValue && before.VoiceChannel?.Id != after.VoiceChannel?.Id)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var townService = scope.ServiceProvider.GetRequiredService<IDiscordTownService>();
+            var (success, thisTownOccupancy, _) = await townService.GetTownOccupancy(guildId.Value);
+            if (!success) return;
+            thisTownOccupancy!.MoveUser(user, after);
+            await notificationService.BroadcastTownOccupancyUpdate(thisTownOccupancy);
+            await notificationService.BroadcastUserVoiceStateChanged(user.Id.ToString(), after.VoiceChannel != null);
+        }
     }
 
 
@@ -42,7 +50,7 @@ public class DiscordBotService(Secrets secrets, IServiceProvider serviceProvider
 
     private Task ReadyAsync()
     {
-        Console.WriteLine($"{_client.CurrentUser} is connected!");
+        Console.WriteLine($"{Client.CurrentUser} is connected!");
         return Task.CompletedTask;
     }
 }

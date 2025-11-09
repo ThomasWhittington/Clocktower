@@ -2,6 +2,7 @@
 using Clocktower.Server.Discord.Auth.Services;
 using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Discord.Town.Services;
+using Clocktower.Server.Socket;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
@@ -30,6 +31,7 @@ public static class ConfigureServices
         builder.AddSignalR();
         builder.ConfigureJson();
         builder.Services.AddSingleton(secrets);
+        builder.Services.AddSingleton<INotificationService, NotificationService>();
         builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
         builder.Services.AddSingleton<IDiscordAuthService, DiscordAuthService>();
         builder.Services.AddSingleton<DiscordBotService>();

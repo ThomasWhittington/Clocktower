@@ -17,7 +17,8 @@ public static class DiscordGuildExtensions
 
     public static IEnumerable<ChannelOccupants> GetChannelOccupancy(this SocketGuild guild, SocketCategoryChannel categoryChannel)
     {
-        var channels = guild.VoiceChannels.Where(o => o.CategoryId == categoryChannel.Id);
+        var channels = guild.VoiceChannels.Where(o => o.CategoryId == categoryChannel.Id)
+            .OrderBy(o => o.Position);
 
         return (from discordChannel in channels
             let miniChannel = new MiniChannel(discordChannel.Id.ToString(), discordChannel.Name)
