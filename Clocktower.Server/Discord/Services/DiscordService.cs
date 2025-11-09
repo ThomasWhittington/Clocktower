@@ -48,6 +48,17 @@ public class DiscordService(DiscordBotService bot) : IDiscordService
 
     public async Task<(bool success, string message)> SendMessage(ulong userId, string message)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var user = await bot.Client.GetUserAsync(userId);
+            if (user is null) return (false, $"Couldn't find user: {userId}");
+            var dmChannel = await user.CreateDMChannelAsync();
+            await dmChannel.SendMessageAsync(message);
+            return (true, "Sent message to user");
+        }
+        catch (Exception)
+        {
+            return (false, "Failed to send message to user");
+        }
     }
 }
