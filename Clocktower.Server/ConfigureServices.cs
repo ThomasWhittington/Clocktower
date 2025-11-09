@@ -32,8 +32,8 @@ public static class ConfigureServices
         builder.Services.AddSingleton(secrets);
         builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
         builder.Services.AddSingleton<IDiscordAuthService, DiscordAuthService>();
-        builder.Services.AddSingleton<NewDiscordBotService>();
-        builder.Services.AddHostedService(provider => provider.GetRequiredService<NewDiscordBotService>());
+        builder.Services.AddSingleton<DiscordBotService>();
+        builder.Services.AddHostedService(provider => provider.GetRequiredService<DiscordBotService>());
         builder.Services.AddSingleton<IDiscordService, DiscordService>();
         builder.Services.AddSingleton<IDiscordTownService, DiscordTownService>();
         builder.Services.AddSingleton<GameStateService>();

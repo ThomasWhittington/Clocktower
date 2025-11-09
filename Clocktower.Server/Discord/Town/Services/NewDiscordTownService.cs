@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace Clocktower.Server.Discord.Town.Services;
 
 [UsedImplicitly]
-public class DiscordTownService(NewDiscordBotService bot, IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hubContext) : IDiscordTownService
+public class DiscordTownService(DiscordBotService bot, IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hubContext) : IDiscordTownService
 {
     private const string TownSquareName = "⛲ Town Square";
     private const string ConsultationName = "📖 Storyteller's Consultation";
