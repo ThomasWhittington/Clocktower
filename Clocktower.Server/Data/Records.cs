@@ -1,12 +1,11 @@
-﻿
-using DSharpPlus.Entities;
+﻿using Discord.WebSocket;
 
 namespace Clocktower.Server.Data;
 
 public record MiniGuild(string Id, string Name);
+
 [UsedImplicitly]
 public record ChannelOccupants(MiniChannel Channel, IEnumerable<MiniUser> Occupants);
-
 
 [UsedImplicitly]
 public record MiniChannel(string Id, string Name);
@@ -22,9 +21,9 @@ public class TownOccupants(List<MiniCategory> channelCategories)
     public int UserCount => ChannelCategories.Sum(category => category.Channels.Sum(channel => channel.Occupants.Count()));
     public List<MiniCategory> ChannelCategories { get; private set; } = channelCategories;
 
-    public void MoveUser(DiscordUser user, DiscordVoiceState? newChannel)
+    public void MoveUser(SocketUser user, DiscordVoiceState? newChannel)
     {
-        var miniUser = new MiniUser(user.Id.ToString(), user.Username, user.AvatarUrl);
+        var miniUser = new MiniUser(user.Id.ToString(), user.Username, user.GetAvatarUrl());
 
         ChannelCategories = ChannelCategories.Select(category =>
             category with
