@@ -1,0 +1,40 @@
+﻿name: Deploy to Hetzner
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build -f Clocktower.Server\Dockerfile -t clocktower-server .
+
+      - name: Save Docker image to tar
+        run: docker save clocktower-server -o clocktower-server.tar
+
+      - name: Copy image to server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "clocktower-server.tar"
+          target: "/root"
+
+      - name: Load and run container on server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker load -i /root/clocktower-server.tar
+            docker stop clocktower-server || true
+            docker rm clocktower-server || true
+            docker run -d --name clocktower-server -p 80:80 clocktower-server
