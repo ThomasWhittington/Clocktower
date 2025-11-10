@@ -7,6 +7,9 @@ import {
 import {
     discordService
 } from "@/services";
+import {
+    resetAllApplicationState
+} from "@/utils";
 
 const Join = () => {
     const setCurrentUser = useAppStore((state) => state.setCurrentUser);
@@ -14,6 +17,7 @@ const Join = () => {
 
     useEffect(() => {
         const handleJoin = async () => {
+            resetAllApplicationState();
             const urlParams = new URLSearchParams(window.location.search);
             const key = urlParams.get('key');
             const error = urlParams.get('error');
