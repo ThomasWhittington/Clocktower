@@ -4,11 +4,43 @@ export type ClientOptions = {
     baseUrl: 'http://localhost:5120' | (string & {});
 };
 
+export type ClocktowerServerDataChannelOccupants = {
+    channel?: ClocktowerServerDataMiniChannel;
+    occupants?: Array<ClocktowerServerDataMiniUser> | null;
+};
+
 export type ClocktowerServerDataGameState = {
     id?: string | null;
     players?: Array<ClocktowerServerDataTypesPlayer> | null;
     maxPlayers?: number;
     readonly isFull?: boolean;
+};
+
+export type ClocktowerServerDataMiniCategory = {
+    id?: string | null;
+    name?: string | null;
+    channels?: Array<ClocktowerServerDataChannelOccupants> | null;
+};
+
+export type ClocktowerServerDataMiniChannel = {
+    id?: string | null;
+    name?: string | null;
+};
+
+export type ClocktowerServerDataMiniGuild = {
+    id?: string | null;
+    name?: string | null;
+};
+
+export type ClocktowerServerDataMiniUser = {
+    id?: string | null;
+    name?: string | null;
+    avatarUrl?: string | null;
+};
+
+export type ClocktowerServerDataTownOccupants = {
+    readonly userCount?: number;
+    channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
 };
 
 export type ClocktowerServerDataTypesEnumEdition =
@@ -43,44 +75,17 @@ export type ClocktowerServerDiscordEndpointsCheckGuildResponse = {
 };
 
 export type ClocktowerServerDiscordEndpointsGetGuildsWithUserResponse = {
-    miniGuilds?: Array<ClocktowerServerDiscordServicesDiscordServiceMiniGuild> | null;
+    miniGuilds?: Array<ClocktowerServerDataMiniGuild> | null;
 };
 
-export type ClocktowerServerDiscordServicesDiscordServiceMiniGuild = {
-    id?: string | null;
-    name?: string | null;
+export type ClocktowerServerDiscordEndpointsSendMessageRequest = {
+    userId?: string | null;
+    message?: string | null;
 };
 
 export type ClocktowerServerDiscordTownEndpointsGetTownStatusResponse = {
     exists?: boolean;
     message?: string | null;
-};
-
-export type ClocktowerServerDiscordTownServicesChannelOccupants = {
-    channel?: ClocktowerServerDiscordTownServicesMiniChannel;
-    occupants?: Array<ClocktowerServerDiscordTownServicesMiniUser> | null;
-};
-
-export type ClocktowerServerDiscordTownServicesMiniCategory = {
-    id?: string | null;
-    name?: string | null;
-    channels?: Array<ClocktowerServerDiscordTownServicesChannelOccupants> | null;
-};
-
-export type ClocktowerServerDiscordTownServicesMiniChannel = {
-    id?: string | null;
-    name?: string | null;
-};
-
-export type ClocktowerServerDiscordTownServicesMiniUser = {
-    id?: string | null;
-    name?: string | null;
-    avatarUrl?: string | null;
-};
-
-export type ClocktowerServerDiscordTownServicesTownOccupants = {
-    readonly userCount?: number;
-    channelCategories?: Array<ClocktowerServerDiscordTownServicesMiniCategory> | null;
 };
 
 export type ClocktowerServerRolesEndpointsGetRolesResponse = {
@@ -107,8 +112,8 @@ export type ClocktowerServerDataGameStateWritable = {
     maxPlayers?: number;
 };
 
-export type ClocktowerServerDiscordTownServicesTownOccupantsWritable = {
-    channelCategories?: Array<ClocktowerServerDiscordTownServicesMiniCategory> | null;
+export type ClocktowerServerDataTownOccupantsWritable = {
+    channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
 };
 
 export type CheckGuildApiData = {
@@ -164,6 +169,29 @@ export type GetGuildsWithUserApiResponses = {
 };
 
 export type GetGuildsWithUserApiResponse = GetGuildsWithUserApiResponses[keyof GetGuildsWithUserApiResponses];
+
+export type SendMessageApiData = {
+    body: ClocktowerServerDiscordEndpointsSendMessageRequest;
+    path?: never;
+    query?: never;
+    url: '/api/discord/message';
+};
+
+export type SendMessageApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+};
+
+export type SendMessageApiError = SendMessageApiErrors[keyof SendMessageApiErrors];
+
+export type SendMessageApiResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type AddBotApiData = {
     body?: never;
@@ -247,7 +275,7 @@ export type GetAuthDataApiResponses = {
     /**
      * OK
      */
-    200: ClocktowerServerDiscordTownServicesMiniUser;
+    200: ClocktowerServerDataMiniUser;
 };
 
 export type GetAuthDataApiResponse = GetAuthDataApiResponses[keyof GetAuthDataApiResponses];
@@ -356,7 +384,7 @@ export type GetTownOccupancyApiResponses = {
     /**
      * OK
      */
-    200: ClocktowerServerDiscordTownServicesTownOccupants;
+    200: ClocktowerServerDataTownOccupants;
 };
 
 export type GetTownOccupancyApiResponse = GetTownOccupancyApiResponses[keyof GetTownOccupancyApiResponses];
@@ -391,6 +419,34 @@ export type GetTownStatusApiResponses = {
 };
 
 export type GetTownStatusApiResponse = GetTownStatusApiResponses[keyof GetTownStatusApiResponses];
+
+export type InviteUserApiData = {
+    body?: never;
+    path: {
+        guildId: string;
+        userId: string;
+    };
+    query?: never;
+    url: '/api/discord/town/{guildId}/invite/{userId}';
+};
+
+export type InviteUserApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+};
+
+export type InviteUserApiError = InviteUserApiErrors[keyof InviteUserApiErrors];
+
+export type InviteUserApiResponses = {
+    /**
+     * OK
+     */
+    200: boolean;
+};
+
+export type InviteUserApiResponse = InviteUserApiResponses[keyof InviteUserApiResponses];
 
 export type MoveUserToChannelApiData = {
     body?: never;
@@ -467,10 +523,6 @@ export type ToggleStoryTellerApiErrors = {
      * Bad Request
      */
     400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
-    /**
-     * Not Found
-     */
-    404: string;
 };
 
 export type ToggleStoryTellerApiError = ToggleStoryTellerApiErrors[keyof ToggleStoryTellerApiErrors];

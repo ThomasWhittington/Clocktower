@@ -6,6 +6,7 @@
     getTownOccupancyApi,
     getTownStatusApi,
     type GetTownStatusApiResponse,
+    inviteUserApi,
     moveUserToChannelApi,
     rebuildTownApi,
     type RebuildTownApiResponse
@@ -152,6 +153,25 @@ async function getGuildsWithUser(userId: string): Promise<MiniGuild[]> {
     return [];
 }
 
+async function inviteUser(guildId: string, userId: string): Promise<boolean> {
+    const {
+        data,
+        error
+    } = await inviteUserApi({
+        path: {
+            guildId: guildId,
+            userId: userId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to get guilds:', error);
+        throw new Error(error.toString());
+    }
+
+    return data ?? false;
+}
+
 export const discordService = {
     checkGuild,
     getGuildsWithUser,
@@ -159,5 +179,6 @@ export const discordService = {
     rebuildTown,
     getTownOccupancy,
     moveUserToChannel,
-    getAuthData
+    getAuthData,
+    inviteUser
 }

@@ -21,7 +21,7 @@ export const checkGuildApiResponseTransformer = async (data: any): Promise<Check
 const clocktowerServerDiscordEndpointsGetGuildsWithUserResponseSchemaResponseTransformer = (data: any) => {
     if (data.miniGuilds) {
         data.miniGuilds = data.miniGuilds.map((item: any) => {
-            return clocktowerServerDiscordServicesDiscordServiceMiniGuildSchemaResponseTransformer(item);
+            return clocktowerServerDataMiniGuildSchemaResponseTransformer(item);
         });
     }
     return data;
@@ -33,42 +33,42 @@ export const getGuildsWithUserApiResponseTransformer = async (data: any): Promis
 };
 
 export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetAuthDataApiResponse> => {
-    data = clocktowerServerDiscordTownServicesMiniUserSchemaResponseTransformer(data);
+    data = clocktowerServerDataMiniUserSchemaResponseTransformer(data);
     return data;
 };
 
-const clocktowerServerDiscordTownServicesTownOccupantsSchemaResponseTransformer = (data: any) => {
+const clocktowerServerDataTownOccupantsSchemaResponseTransformer = (data: any) => {
     if (data.channelCategories) {
         data.channelCategories = data.channelCategories.map((item: any) => {
-            return clocktowerServerDiscordTownServicesMiniCategorySchemaResponseTransformer(item);
+            return clocktowerServerDataMiniCategorySchemaResponseTransformer(item);
         });
     }
     return data;
 };
 
-const clocktowerServerDiscordTownServicesMiniCategorySchemaResponseTransformer = (data: any) => {
+const clocktowerServerDataMiniCategorySchemaResponseTransformer = (data: any) => {
     if (data.channels) {
         data.channels = data.channels.map((item: any) => {
-            return clocktowerServerDiscordTownServicesChannelOccupantsSchemaResponseTransformer(item);
+            return clocktowerServerDataChannelOccupantsSchemaResponseTransformer(item);
         });
     }
     return data;
 };
 
-const clocktowerServerDiscordTownServicesChannelOccupantsSchemaResponseTransformer = (data: any) => {
+const clocktowerServerDataChannelOccupantsSchemaResponseTransformer = (data: any) => {
     if (data.channel) {
-        data.channel = clocktowerServerDiscordTownServicesMiniChannelSchemaResponseTransformer(data.channel);
+        data.channel = clocktowerServerDataMiniChannelSchemaResponseTransformer(data.channel);
     }
     if (data.occupants) {
         data.occupants = data.occupants.map((item: any) => {
-            return clocktowerServerDiscordTownServicesMiniUserSchemaResponseTransformer(item);
+            return clocktowerServerDataMiniUserSchemaResponseTransformer(item);
         });
     }
     return data;
 };
 
 export const getTownOccupancyApiResponseTransformer = async (data: any): Promise<GetTownOccupancyApiResponse> => {
-    data = clocktowerServerDiscordTownServicesTownOccupantsSchemaResponseTransformer(data);
+    data = clocktowerServerDataTownOccupantsSchemaResponseTransformer(data);
     return data;
 };
 

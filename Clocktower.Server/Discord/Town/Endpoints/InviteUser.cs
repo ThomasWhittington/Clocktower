@@ -3,26 +3,26 @@
 namespace Clocktower.Server.Discord.Town.Endpoints;
 
 [UsedImplicitly]
-public class ToggleStoryTeller : IEndpoint
+public class InviteUser : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{guildId}/{userId}", Handle)
-        .SetOpenApiOperationId<ToggleStoryTeller>()
-        .WithSummary("Toggles the storyteller role for a user")
-        .WithDescription("Adds or removes the storyteller role from the specified user")
+        .MapPost("/{guildId}/invite/{userId}", Handle)
+        .SetOpenApiOperationId<InviteUser>()
+        .WithSummary("Invites user to the specified guild")
+        .WithDescription("Invites user to the specified guild")
         .WithRequestValidation<GuildAndUserRequest>();
 
-    private static async Task<Results<Ok<string>, BadRequest<string>>> Handle(
+    private static async Task<Results<Ok<bool>, BadRequest<string>>> Handle(
         [AsParameters] GuildAndUserRequest request,
         IDiscordTownService discordTownService)
     {
         var guildId = ulong.Parse(request.GuildId);
         var userId = ulong.Parse(request.UserId);
 
-        var (success, message) = await discordTownService.ToggleStoryTeller(guildId, userId);
+        var (success, message) = await discordTownService.InviteUser(guildId, userId);
         if (success)
         {
-            return TypedResults.Ok(message);
+            return TypedResults.Ok(success);
         }
 
         return TypedResults.BadRequest(message);

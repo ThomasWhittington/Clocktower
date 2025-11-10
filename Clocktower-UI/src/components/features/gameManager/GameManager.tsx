@@ -9,20 +9,24 @@ import GameList
     from "./components";
 
 import {
+    discordService,
     gamesService
 } from "@/services";
 import type {
     GameState
 } from "@/types";
+import {
+    useAppStore
+} from "@/store";
 
 function GameManager() {
     const [isLoading, setIsLoading] = useState(false);
     const [games, setGames] = useState<GameState[]>([]);
     const [game, setGame] = useState<GameState>();
-    const [gameId, setGameId] = useState('');
+    const [id, setId] = useState('');
     const [hasError, setHasError] = useState(false);
     const [error, setError] = useState('');
-
+    const guildId = useAppStore((state) => state.guildId);
     const clearError = () => {
         setHasError(false);
         setError('');
@@ -57,7 +61,7 @@ function GameManager() {
     const getGame = async () => {
         clearError();
         setIsLoading(true);
-        gamesService.getGame(gameId).then(data => setGame(data))
+        gamesService.getGame(id).then(data => setGame(data))
             .catch((err) => handleError(err))
             .finally(() => setIsLoading(false));
     }
@@ -65,9 +69,19 @@ function GameManager() {
     const startGame = async () => {
         clearError();
         setIsLoading(true);
-        gamesService.startGame(gameId).then(data => {
+        gamesService.startGame(id).then(data => {
             setGame(data);
             getGames();
+        })
+            .catch((err) => handleError(err))
+            .finally(() => setIsLoading(false));
+    }
+
+    const inviteUser = async () => {
+        clearError();
+        setIsLoading(true);
+        await discordService.inviteUser(guildId, id).then(data => {
+            console.log(data)
         })
             .catch((err) => handleError(err))
             .finally(() => setIsLoading(false));
@@ -111,8 +125,8 @@ function GameManager() {
                         </button>
                         <br/>
                         <input
-                            value={gameId}
-                            onChange={e => setGameId(e.target.value)}
+                            value={id}
+                            onChange={e => setId(e.target.value)}
                         />
                         <button
                             onClick={startGame}
@@ -123,6 +137,11 @@ function GameManager() {
                             onClick={getGame}
                             className="btn-primary">
                             Get game
+                        </button>
+                        <button
+                            onClick={inviteUser}
+                            className="btn-primary">
+                            Invite User
                         </button>
                         <GameList
                             games={games}/>

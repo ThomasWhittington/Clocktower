@@ -51,6 +51,9 @@ import type {
     GetTownStatusApiData,
     GetTownStatusApiErrors,
     GetTownStatusApiResponses,
+    InviteUserApiData,
+    InviteUserApiErrors,
+    InviteUserApiResponses,
     LoadDummyGamesApiData,
     LoadDummyGamesApiErrors,
     LoadDummyGamesApiResponses,
@@ -62,6 +65,9 @@ import type {
     RebuildTownApiData,
     RebuildTownApiErrors,
     RebuildTownApiResponses,
+    SendMessageApiData,
+    SendMessageApiErrors,
+    SendMessageApiResponses,
     StartGameApiData,
     StartGameApiErrors,
     StartGameApiResponses,
@@ -107,6 +113,22 @@ export const getGuildsWithUserApi = <ThrowOnError extends boolean = false>(optio
     return (options.client ?? client).get<GetGuildsWithUserApiResponses, GetGuildsWithUserApiErrors, ThrowOnError>({
         url: '/api/discord/{userId}/guilds',
         ...options
+    });
+};
+
+/**
+ * Sends message to the user
+ *
+ * Sends message to the user
+ */
+export const sendMessageApi = <ThrowOnError extends boolean = false>(options: Options<SendMessageApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SendMessageApiResponses, SendMessageApiErrors, ThrowOnError>({
+        url: '/api/discord/message',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
     });
 };
 
@@ -214,6 +236,18 @@ export const getTownOccupancyApi = <ThrowOnError extends boolean = false>(option
 export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: Options<GetTownStatusApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetTownStatusApiResponses, GetTownStatusApiErrors, ThrowOnError>({
         url: '/api/discord/town/{guildId}/status',
+        ...options
+    });
+};
+
+/**
+ * Invites user to the specified guild
+ *
+ * Invites user to the specified guild
+ */
+export const inviteUserApi = <ThrowOnError extends boolean = false>(options: Options<InviteUserApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<InviteUserApiResponses, InviteUserApiErrors, ThrowOnError>({
+        url: '/api/discord/town/{guildId}/invite/{userId}',
         ...options
     });
 };

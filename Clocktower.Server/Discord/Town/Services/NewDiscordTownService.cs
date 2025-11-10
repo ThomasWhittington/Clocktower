@@ -181,7 +181,6 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
         }
     }
 
-
     public async Task<(bool success, TownOccupants? townOccupants, string message)> GetTownOccupancy(ulong guildId)
     {
         try
@@ -299,6 +298,24 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
         catch (Exception)
         {
             return false;
+        }
+    }
+
+    public async Task<(bool success, string message)> InviteUser(ulong guildId, ulong userId)
+    {
+        try
+        {
+            var url = "http://localhost:5173/join/dummy";
+
+            var user = await bot.Client.GetUserAsync(userId);
+            if (user is null) return (false, $"Couldn't find user: {userId}");
+            var dmChannel = await user.CreateDMChannelAsync();
+            await dmChannel.SendMessageAsync($"[Join here]({url})");
+            return (true, "Sent message to user");
+        }
+        catch (Exception)
+        {
+            return (false, "Failed to send message to user");
         }
     }
 }
