@@ -13,7 +13,7 @@ public static class ConfigureServices
 {
     public static void AddServices(this WebApplicationBuilder builder)
     {
-        var config = new ConfigurationBuilder().AddUserSecrets<Secrets>().Build();
+        var config = new ConfigurationBuilder().AddUserSecrets<Secrets>().AddEnvironmentVariables().Build();
         var secrets = config.GetSection(nameof(Secrets)).Get<Secrets>()!;
 
 
