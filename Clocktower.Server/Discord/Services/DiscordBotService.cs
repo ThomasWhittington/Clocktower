@@ -18,7 +18,7 @@ public class DiscordBotService : BackgroundService
         _notificationService = notificationService;
         _secrets = secretsOptions.Value;
 
-        if (_secrets is null)
+        if (string.IsNullOrEmpty(_secrets.DiscordBotRedirectUri))
         {
             throw new ArgumentNullException("Secrets are not set");
         }
