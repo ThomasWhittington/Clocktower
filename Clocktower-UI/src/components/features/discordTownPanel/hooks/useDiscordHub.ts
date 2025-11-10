@@ -48,7 +48,7 @@ const createConnection = async () => {
     if (globalConnection) return;
 
     globalConnection = new signalR.HubConnectionBuilder()
-        .withUrl('http://localhost:5120/discordHub')
+        .withUrl(import.meta.env.VITE_CLOCKTOWER_SERVER_URI + '/discordHub')
         .withAutomaticReconnect()
         .configureLogging(signalR.LogLevel.Information)
         .build();

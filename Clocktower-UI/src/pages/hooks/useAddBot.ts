@@ -2,7 +2,7 @@
     addBot: () => void
 } => {
     const addBot = () => {
-        window.location.href = 'http://localhost:5120/api/discord/auth/addBot';
+        window.location.href = import.meta.env.VITE_CLOCKTOWER_SERVER_URI + '/api/discord/auth/addBot';
     };
     return {
         addBot

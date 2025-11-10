@@ -22,7 +22,7 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: process.env.CLOCKTOWER_SERVER_URI,
+                target: process.env.VITE_CLOCKTOWER_SERVER_URI,
                 changeOrigin: true,
                 secure: false
             }
