@@ -3,11 +3,12 @@ using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Socket;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Clocktower.Server.Discord.Town.Services;
 
 [UsedImplicitly]
-public class DiscordTownService(DiscordBotService bot, INotificationService notificationService) : IDiscordTownService
+public class DiscordTownService(DiscordBotService bot, INotificationService notificationService, IMemoryCache cache) : IDiscordTownService
 {
     private const string TownSquareName = "⛲ Town Square";
     private const string ConsultationName = "📖 Storyteller's Consultation";
@@ -207,6 +208,17 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
         }
     }
 
+    public JoinData? GetJoinData(string key)
+    {
+        if (cache.TryGetValue($"join_data_{key}", out var joinData) && joinData is JoinData response)
+        {
+            cache.Remove($"join_data_{key}");
+            return response;
+        }
+
+        return null;
+    }
+
 
     private static async Task<bool> CreateNightVoiceChannels(SocketGuild guild)
     {
@@ -305,10 +317,17 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
     {
         try
         {
-            var url = "http://localhost:5173/join/dummy";
-
+            var guild = bot.Client.GetGuild(guildId);
+            if (guild is null) return (false, "Guild not found");
             var user = await bot.Client.GetUserAsync(userId);
             if (user is null) return (false, $"Couldn't find user: {userId}");
+
+
+            var response = new JoinData(guildId.ToString(), new MiniUser(user.Id.ToString(), user.Username, user.GetAvatarUrl()));
+            var tempKey = Guid.NewGuid().ToString();
+            cache.Set($"join_data_{tempKey}", response, TimeSpan.FromMinutes(5));
+            var url = $"http://localhost:5173/join?key={tempKey}";
+
             var dmChannel = await user.CreateDMChannelAsync();
             await dmChannel.SendMessageAsync($"[Join here]({url})");
             return (true, "Sent message to user");

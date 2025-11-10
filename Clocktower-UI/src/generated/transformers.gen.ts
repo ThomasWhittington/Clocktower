@@ -7,6 +7,7 @@ import type {
     GetGameApiResponse,
     GetGamesApiResponse,
     GetGuildsWithUserApiResponse,
+    GetJoinDataApiResponse,
     GetRolesApiResponse,
     GetTownOccupancyApiResponse,
     GetTownStatusApiResponse,
@@ -34,6 +35,18 @@ export const getGuildsWithUserApiResponseTransformer = async (data: any): Promis
 
 export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetAuthDataApiResponse> => {
     data = clocktowerServerDataMiniUserSchemaResponseTransformer(data);
+    return data;
+};
+
+const clocktowerServerDataTypesJoinDataSchemaResponseTransformer = (data: any) => {
+    if (data.user) {
+        data.user = clocktowerServerDataMiniUserSchemaResponseTransformer(data.user);
+    }
+    return data;
+};
+
+export const getJoinDataApiResponseTransformer = async (data: any): Promise<GetJoinDataApiResponse> => {
+    data = clocktowerServerDataTypesJoinDataSchemaResponseTransformer(data);
     return data;
 };
 

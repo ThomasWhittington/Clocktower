@@ -43,6 +43,9 @@ import type {
     GetGuildsWithUserApiData,
     GetGuildsWithUserApiErrors,
     GetGuildsWithUserApiResponses,
+    GetJoinDataApiData,
+    GetJoinDataApiErrors,
+    GetJoinDataApiResponses,
     GetRolesApiData,
     GetRolesApiResponses,
     GetTownOccupancyApiData,
@@ -76,9 +79,7 @@ import type {
     ToggleStoryTellerApiResponses
 } from './types.gen';
 
-export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> =
-    Options2<TData, ThrowOnError>
-    & {
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
      * You can provide a client instance returned by `createClient()` instead of
      * individual options. This might be also useful if you want to implement a
@@ -188,6 +189,18 @@ export const getAuthDataApi = <ThrowOnError extends boolean = false>(options: Op
 export const loginApi = <ThrowOnError extends boolean = false>(options?: Options<LoginApiData, ThrowOnError>) => {
     return (options?.client ?? client).get<unknown, LoginApiErrors, ThrowOnError>({
         url: '/api/discord/auth',
+        ...options
+    });
+};
+
+/**
+ * Get temporary join data
+ *
+ * Retrieves temporary join data by key
+ */
+export const getJoinDataApi = <ThrowOnError extends boolean = false>(options: Options<GetJoinDataApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetJoinDataApiResponses, GetJoinDataApiErrors, ThrowOnError>({
+        url: '/api/discord/auth/join/{key}',
         ...options
     });
 };

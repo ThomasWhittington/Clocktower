@@ -43,18 +43,14 @@ export type ClocktowerServerDataTownOccupants = {
     channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
 };
 
-export type ClocktowerServerDataTypesEnumEdition =
-    'TroubleBrewing'
-    | 'SectsAndViolets'
-    | 'BadMoonRising'
-    | 'Experimental';
+export type ClocktowerServerDataTypesEnumEdition = 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
 
-export type ClocktowerServerDataTypesEnumRoleType =
-    'Townsfolk'
-    | 'Outsider'
-    | 'Minion'
-    | 'Demon'
-    | 'Traveller';
+export type ClocktowerServerDataTypesEnumRoleType = 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
+
+export type ClocktowerServerDataTypesJoinData = {
+    guildId?: string | null;
+    user?: ClocktowerServerDataMiniUser;
+};
 
 export type ClocktowerServerDataTypesPlayer = {
     id?: number;
@@ -295,6 +291,31 @@ export type LoginApiErrors = {
 };
 
 export type LoginApiError = LoginApiErrors[keyof LoginApiErrors];
+
+export type GetJoinDataApiData = {
+    body?: never;
+    path: {
+        key: string;
+    };
+    query?: never;
+    url: '/api/discord/auth/join/{key}';
+};
+
+export type GetJoinDataApiErrors = {
+    /**
+     * Not Found
+     */
+    404: unknown;
+};
+
+export type GetJoinDataApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerDataTypesJoinData;
+};
+
+export type GetJoinDataApiResponse = GetJoinDataApiResponses[keyof GetJoinDataApiResponses];
 
 export type DeleteTownApiData = {
     body?: never;

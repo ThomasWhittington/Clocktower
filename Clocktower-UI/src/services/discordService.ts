@@ -3,6 +3,7 @@
     type CheckGuildApiResponse,
     getAuthDataApi,
     getGuildsWithUserApi,
+    getJoinDataApi,
     getTownOccupancyApi,
     getTownStatusApi,
     type GetTownStatusApiResponse,
@@ -172,6 +173,14 @@ async function inviteUser(guildId: string, userId: string): Promise<boolean> {
     return data ?? false;
 }
 
+async function getJoinData(key: string) {
+    return await getJoinDataApi({
+        path: {
+            key: key
+        }
+    });
+}
+
 export const discordService = {
     checkGuild,
     getGuildsWithUser,
@@ -180,5 +189,6 @@ export const discordService = {
     getTownOccupancy,
     moveUserToChannel,
     getAuthData,
-    inviteUser
+    inviteUser,
+    getJoinData
 }

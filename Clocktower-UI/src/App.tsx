@@ -9,6 +9,7 @@ import {
     BotCallback,
     Game,
     Home,
+    Join,
     LoginPage
 } from "./pages";
 import {
@@ -46,6 +47,10 @@ function App() {
                         path="/game"
                         element={
                             <Game/>}/>
+                    <Route
+                        path="/join"
+                        element={
+                            <Join/>}/>
                 </Routes>
             </Router>
             {loggedIn &&
