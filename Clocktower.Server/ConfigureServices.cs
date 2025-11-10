@@ -19,7 +19,11 @@ public static class ConfigureServices
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowReactApp",
-                policy => policy.WithOrigins("http://localhost:5173")
+                policy => policy.WithOrigins(
+                        "http://localhost:5173",
+                        "http://37.27.37.160",
+                        "https://amarantosclocktower.web.app"
+                        )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials());
