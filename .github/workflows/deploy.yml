@@ -26,6 +26,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "clocktower-server.tar"
           target: "/root"
+          options: "-o StrictHostKeyChecking=no"
 
       - name: Load and run container on server
         uses: appleboy/ssh-action@v0.1.10
@@ -38,3 +39,5 @@ jobs:
             docker stop clocktower-server || true
             docker rm clocktower-server || true
             docker run -d --name clocktower-server -p 80:80 clocktower-server
+          options: "-o StrictHostKeyChecking=no"
+
