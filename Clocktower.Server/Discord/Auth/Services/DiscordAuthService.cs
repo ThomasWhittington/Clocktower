@@ -35,8 +35,8 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IMemoryCache c
 
     public async Task<string> HandleCallback(string? error, string? code)
     {
-        const string frontendUrl = "http://localhost:5173/auth/callback?key=";
-        const string errorUrl = "http://localhost:5173/login?error=";
+        string frontendUrl = _secrets.FeUri + "/auth/callback?key=";
+        string errorUrl = _secrets.FeUri + "/login?error=";
 
         if (!string.IsNullOrEmpty(error)) return errorUrl + Uri.EscapeDataString($"Discord OAuth error: {error}");
         if (string.IsNullOrEmpty(code)) return errorUrl + Uri.EscapeDataString("Authorization code not received");
@@ -69,8 +69,8 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IMemoryCache c
 
     public string HandleBotCallback(string? error, string? code, string? guildId)
     {
-        const string frontendUrl = "http://localhost:5173/auth/bot-callback?guild_id=";
-        const string errorUrl = "http://localhost:5173/login?error=";
+        string frontendUrl = _secrets.FeUri + "/auth/bot-callback?guild_id=";
+        string errorUrl = _secrets.FeUri + "/login?error=";
 
         if (!string.IsNullOrEmpty(error)) return errorUrl + Uri.EscapeDataString($"Discord OAuth error: {error}");
         if (string.IsNullOrEmpty(code)) return errorUrl + Uri.EscapeDataString("Authorization code not received");

@@ -4,12 +4,14 @@ using Clocktower.Server.Socket;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace Clocktower.Server.Discord.Town.Services;
 
 [UsedImplicitly]
-public class DiscordTownService(DiscordBotService bot, INotificationService notificationService, IMemoryCache cache) : IDiscordTownService
+public class DiscordTownService(DiscordBotService bot, INotificationService notificationService, IMemoryCache cache, IOptions<Secrets> secretsOptions) : IDiscordTownService
 {
+    private readonly Secrets _secrets = secretsOptions.Value;
     private const string TownSquareName = "⛲ Town Square";
     private const string ConsultationName = "📖 Storyteller's Consultation";
     private const string DayCategoryName = "🌞 Day BOTC";
@@ -326,7 +328,7 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
             var response = new JoinData(guildId.ToString(), new MiniUser(user.Id.ToString(), user.Username, user.GetAvatarUrl()));
             var tempKey = Guid.NewGuid().ToString();
             cache.Set($"join_data_{tempKey}", response, TimeSpan.FromMinutes(5));
-            var url = $"http://localhost:5173/join?key={tempKey}";
+            var url = _secrets.FeUri + $"/join?key={tempKey}";
 
             var dmChannel = await user.CreateDMChannelAsync();
             await dmChannel.SendMessageAsync($"[Join here]({url})");
