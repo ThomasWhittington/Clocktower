@@ -22,7 +22,7 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: 'http://localhost:5120',
+                target: process.env.CLOCKTOWER_SERVER_URI || 'http://localhost:5120',
                 changeOrigin: true,
                 secure: false
             }
