@@ -6,9 +6,23 @@ using Microsoft.Extensions.Options;
 
 namespace Clocktower.Server.Discord.Services;
 
-public class DiscordBotService(IOptions<Secrets> secretsOptions, IServiceProvider serviceProvider, INotificationService notificationService) : BackgroundService
+public class DiscordBotService : BackgroundService
 {
-    private readonly Secrets _secrets = secretsOptions.Value;
+    private readonly Secrets _secrets;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly INotificationService _notificationService;
+
+    public DiscordBotService(IOptions<Secrets> secretsOptions, IServiceProvider serviceProvider, INotificationService notificationService)
+    {
+        _serviceProvider = serviceProvider;
+        _notificationService = notificationService;
+        _secrets = secretsOptions.Value;
+
+        if (_secrets is null)
+        {
+            throw new ArgumentNullException("Secrets are not set");
+        }
+    }
 
     public DiscordSocketClient Client { get; } = new(new DiscordSocketConfig
     {
@@ -34,13 +48,13 @@ public class DiscordBotService(IOptions<Secrets> secretsOptions, IServiceProvide
         var guildId = after.VoiceChannel?.Guild?.Id ?? before.VoiceChannel?.Guild?.Id;
         if (guildId.HasValue && before.VoiceChannel?.Id != after.VoiceChannel?.Id)
         {
-            using var scope = serviceProvider.CreateScope();
+            using var scope = _serviceProvider.CreateScope();
             var townService = scope.ServiceProvider.GetRequiredService<IDiscordTownService>();
             var (success, thisTownOccupancy, _) = await townService.GetTownOccupancy(guildId.Value);
             if (!success) return;
             thisTownOccupancy!.MoveUser(user, after);
-            await notificationService.BroadcastTownOccupancyUpdate(thisTownOccupancy);
-            await notificationService.BroadcastUserVoiceStateChanged(user.Id.ToString(), after.VoiceChannel != null);
+            await _notificationService.BroadcastTownOccupancyUpdate(thisTownOccupancy);
+            await _notificationService.BroadcastUserVoiceStateChanged(user.Id.ToString(), after.VoiceChannel != null);
         }
     }
 
