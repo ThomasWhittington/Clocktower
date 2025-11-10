@@ -14,8 +14,7 @@ public static class ConfigureServices
     public static void AddServices(this WebApplicationBuilder builder)
     {
         var config = new ConfigurationBuilder().AddUserSecrets<Secrets>().AddEnvironmentVariables().Build();
-        var secrets = config.GetSection(nameof(Secrets)).Get<Secrets>()!;
-
+        builder.Configuration.AddConfiguration(config);
 
         builder.Services.AddCors(options =>
         {
@@ -30,7 +29,7 @@ public static class ConfigureServices
         builder.AddSwagger();
         builder.AddSignalR();
         builder.ConfigureJson();
-        builder.Services.AddSingleton(secrets);
+        builder.Services.Configure<Secrets>(builder.Configuration.GetSection(nameof(Secrets)));
         builder.Services.AddSingleton<INotificationService, NotificationService>();
         builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
         builder.Services.AddSingleton<IDiscordAuthService, DiscordAuthService>();

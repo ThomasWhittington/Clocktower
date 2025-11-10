@@ -2,11 +2,14 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace Clocktower.Server.Discord.Auth.Services;
 
-public class DiscordAuthService(Secrets secrets, IMemoryCache cache) : IDiscordAuthService
+public class DiscordAuthService(IOptions<Secrets> secretsOptions, IMemoryCache cache) : IDiscordAuthService
 {
+    private readonly Secrets _secrets = secretsOptions.Value;
+
     private readonly JsonSerializerOptions _deserializationOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
@@ -16,14 +19,14 @@ public class DiscordAuthService(Secrets secrets, IMemoryCache cache) : IDiscordA
     {
         const string scopes = "identify guilds";
 
-        if (string.IsNullOrEmpty(secrets.DiscordClientId) || string.IsNullOrEmpty(secrets.DiscordRedirectUri))
+        if (string.IsNullOrEmpty(_secrets.DiscordClientId) || string.IsNullOrEmpty(_secrets.DiscordRedirectUri))
         {
             return (false, string.Empty, "Discord OAuth not properly configured");
         }
 
         var authorizationUrl = $"https://discord.com/api/oauth2/authorize" +
-                               $"?client_id={secrets.DiscordClientId}" +
-                               $"&redirect_uri={Uri.EscapeDataString(secrets.DiscordRedirectUri)}" +
+                               $"?client_id={_secrets.DiscordClientId}" +
+                               $"&redirect_uri={Uri.EscapeDataString(_secrets.DiscordRedirectUri)}" +
                                $"&response_type=code" +
                                $"&scope={Uri.EscapeDataString(scopes)}";
 
@@ -78,17 +81,17 @@ public class DiscordAuthService(Secrets secrets, IMemoryCache cache) : IDiscordA
 
     public (bool success, string url, string message) GetAddBotUrl()
     {
-        if (string.IsNullOrEmpty(secrets.DiscordClientId)) return (false, string.Empty, "Discord OAuth not properly configured");
+        if (string.IsNullOrEmpty(_secrets.DiscordClientId)) return (false, string.Empty, "Discord OAuth not properly configured");
 
         var permissionsInt = 8;
 
         var authorizationUrl = $"https://discord.com/oauth2/authorize" +
-                               $"?client_id={secrets.DiscordClientId}" +
+                               $"?client_id={_secrets.DiscordClientId}" +
                                $"&permissions={permissionsInt}" +
                                $"&integration_type=0" +
                                $"&scope=bot" +
                                $"&response_type=code" +
-                               $"&redirect_uri={Uri.EscapeDataString(secrets.DiscordBotRedirectUri)}";
+                               $"&redirect_uri={Uri.EscapeDataString(_secrets.DiscordBotRedirectUri)}";
 
         return (true, authorizationUrl, "Bot addition Url generated");
     }
@@ -107,11 +110,11 @@ public class DiscordAuthService(Secrets secrets, IMemoryCache cache) : IDiscordA
     private async Task<TokenResponse?> ExchangeCodeForToken(string code, HttpClient httpClient)
     {
         var tokenRequest = new FormUrlEncodedContent([
-            new KeyValuePair<string, string>("client_id", secrets.DiscordClientId),
-            new KeyValuePair<string, string>("client_secret", secrets.DiscordClientSecret),
+            new KeyValuePair<string, string>("client_id", _secrets.DiscordClientId),
+            new KeyValuePair<string, string>("client_secret", _secrets.DiscordClientSecret),
             new KeyValuePair<string, string>("grant_type", "authorization_code"),
             new KeyValuePair<string, string>("code", code),
-            new KeyValuePair<string, string>("redirect_uri", secrets.DiscordRedirectUri)
+            new KeyValuePair<string, string>("redirect_uri", _secrets.DiscordRedirectUri)
         ]);
 
         var response = await httpClient.PostAsync("https://discord.com/api/oauth2/token", tokenRequest);

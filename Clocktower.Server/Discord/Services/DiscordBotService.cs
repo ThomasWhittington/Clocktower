@@ -2,11 +2,14 @@
 using Clocktower.Server.Socket;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.Options;
 
 namespace Clocktower.Server.Discord.Services;
 
-public class DiscordBotService(Secrets secrets, IServiceProvider serviceProvider, INotificationService notificationService) : BackgroundService
+public class DiscordBotService(IOptions<Secrets> secretsOptions, IServiceProvider serviceProvider, INotificationService notificationService) : BackgroundService
 {
+    private readonly Secrets _secrets = secretsOptions.Value;
+
     public DiscordSocketClient Client { get; } = new(new DiscordSocketConfig
     {
         GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.All
@@ -19,7 +22,7 @@ public class DiscordBotService(Secrets secrets, IServiceProvider serviceProvider
 
         Client.UserVoiceStateUpdated += ClientOnUserVoiceStateUpdated;
 
-        string token = secrets.DiscordBotToken;
+        string token = _secrets.DiscordBotToken;
         await Client.LoginAsync(TokenType.Bot, token);
         await Client.StartAsync();
 
