@@ -25,8 +25,7 @@ try
     var app = builder.Build();
     app.Configure();
 
-    //  await app.Services.GetRequiredService<DiscordBotService>().InitializeAsync();
-    //  app.Services.GetRequiredService<DiscordTownService>().Initialize();
+
     await app.RunAsync();
 }
 catch (Exception ex)

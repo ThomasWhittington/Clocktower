@@ -1,0 +1,13 @@
+services:
+  clocktower-server:
+    build:
+      context: ./Clocktower.Server
+      dockerfile: Dockerfile
+    container_name: clocktower.server
+    ports:
+      - "8080:80"
+    env_file:
+      - .env.prod
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+    restart: unless-stopped
