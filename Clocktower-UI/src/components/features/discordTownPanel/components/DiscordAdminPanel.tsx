@@ -52,7 +52,9 @@ function DiscordAdminPanel() {
     }
 
     return (
-
+        <></>
+    );
+    return (
         <div
             className="flex flex-col space-y-2">
             {isLoading &&
