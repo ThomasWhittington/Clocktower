@@ -11,13 +11,16 @@
     moveUserToChannelApi,
     rebuildTownApi,
     type RebuildTownApiResponse
-} from '@/generated';
+} from '@/api';
 import {
     mapToMiniGuild,
     mapToTownOccupants,
     type MiniGuild,
     type TownOccupants
 } from "@/types";
+import {
+    apiClient
+} from "@/api/api-client.ts";
 
 
 async function checkGuild(id: string): Promise<CheckGuildApiResponse> {
@@ -25,6 +28,7 @@ async function checkGuild(id: string): Promise<CheckGuildApiResponse> {
         data,
         error
     } = await checkGuildApi({
+        client: apiClient,
         path: {
             guildId: id.toString()
         }
@@ -47,6 +51,7 @@ async function getTownStatus(id: string): Promise<GetTownStatusApiResponse> {
         data,
         error
     } = await getTownStatusApi({
+        client: apiClient,
         path: {
             guildId: id,
         }
@@ -67,6 +72,7 @@ async function rebuildTown(id: string): Promise<RebuildTownApiResponse> {
         data,
         error
     } = await rebuildTownApi({
+        client: apiClient,
         path: {
             guildId: id
         }
@@ -85,6 +91,7 @@ async function getTownOccupancy(id: string): Promise<TownOccupants> {
         data,
         error
     } = await getTownOccupancyApi({
+        client: apiClient,
         path: {
             guildId: id
         }
@@ -110,6 +117,7 @@ async function moveUserToChannel(guildId: string, userId: string, channelId: str
         data,
         error
     } = await moveUserToChannelApi({
+        client: apiClient,
         path: {
             guildId: guildId,
             userId: userId,
@@ -127,6 +135,7 @@ async function moveUserToChannel(guildId: string, userId: string, channelId: str
 
 async function getAuthData(key: string) {
     return await getAuthDataApi({
+        client: apiClient,
         path: {
             key: key
         }
@@ -138,6 +147,7 @@ async function getGuildsWithUser(userId: string): Promise<MiniGuild[]> {
         data,
         error
     } = await getGuildsWithUserApi({
+        client: apiClient,
         path: {
             userId: userId
         }
@@ -159,6 +169,7 @@ async function inviteUser(guildId: string, userId: string): Promise<boolean> {
         data,
         error
     } = await inviteUserApi({
+        client: apiClient,
         path: {
             guildId: guildId,
             userId: userId

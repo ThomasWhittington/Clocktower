@@ -10,13 +10,22 @@ public static class Endpoints
         var endpoints = app.MapGroup("api")
             .AddEndpointFilter<RequestLoggingFilter>();
 
+        endpoints.MapAdminEndpoints();
         endpoints.MapRolesEndpoints();
         endpoints.MapGamesEndpoints();
         endpoints.MapDiscordEndpoints();
         endpoints.MapDiscordAuthEndpoints();
         endpoints.MapDiscordTownEndpoints();
     }
+    
+    private static void MapAdminEndpoints(this IEndpointRouteBuilder app)
+    {
+        var endpoints = app.MapGroup("/admin")
+            .WithTags("Admin");
 
+        endpoints.MapPublicGroup()
+            .MapEndpointsFromNamespace("Clocktower.Server.Admin.Endpoints");
+    }
     private static void MapRolesEndpoints(this IEndpointRouteBuilder app)
     {
         var endpoints = app.MapGroup("/roles")

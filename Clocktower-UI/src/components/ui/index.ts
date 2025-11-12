@@ -14,3 +14,7 @@ export {
     DiscordUserStatus
 }
     from './DiscordUserStatus.tsx';
+export {
+    ServerDisconnected
+}
+    from './ServerDisconnected.tsx';

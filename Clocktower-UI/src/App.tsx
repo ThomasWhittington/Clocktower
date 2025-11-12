@@ -16,48 +16,59 @@ import {
     useAppStore
 } from "@/store";
 import {
-    DiscordUserStatus
+    DiscordUserStatus,
+    ServerDisconnected
 } from "@/components/ui";
+import {
+    useServerHeartbeat
+} from "@/hooks";
 
 function App() {
     const loggedIn = useAppStore((state) => state.loggedIn);
+    const heartbeat = useServerHeartbeat();
     return (
         <>
-            <Router>
-                <Routes>
-                    <Route
-                        path="/login"
-                        element={
-                            <LoginPage/>}/>
-                    <Route
-                        path="/auth/callback"
-                        element={
-                            <AuthCallback/>}
-                    />
-                    <Route
-                        path="/auth/bot-callback"
-                        element={
-                            <BotCallback/>}
-                    />
-                    <Route
-                        path="/"
-                        element={
-                            <Home/>}/>
-                    <Route
-                        path="/game"
-                        element={
-                            <Game/>}/>
-                    <Route
-                        path="/join"
-                        element={
-                            <Join/>}/>
-                </Routes>
-            </Router>
-            {loggedIn &&
-                <div
-                    className="fixed top-4 right-4">
-                    <DiscordUserStatus/>
-                </div>
+            {heartbeat.status === 'Healthy' ? (
+                <>
+                    <Router>
+                        <Routes>
+                            <Route
+                                path="/login"
+                                element={
+                                    <LoginPage/>}/>
+                            <Route
+                                path="/auth/callback"
+                                element={
+                                    <AuthCallback/>}
+                            />
+                            <Route
+                                path="/auth/bot-callback"
+                                element={
+                                    <BotCallback/>}
+                            />
+                            <Route
+                                path="/"
+                                element={
+                                    <Home/>}/>
+                            <Route
+                                path="/game"
+                                element={
+                                    <Game/>}/>
+                            <Route
+                                path="/join"
+                                element={
+                                    <Join/>}/>
+                        </Routes>
+                    </Router>
+                    {loggedIn &&
+                        <div
+                            className="fixed top-4 right-4">
+                            <DiscordUserStatus/>
+                        </div>
+                    }
+                </>) : (
+                <ServerDisconnected {...heartbeat}/>
+            )
             }
         </>
     );
