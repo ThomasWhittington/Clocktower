@@ -186,6 +186,7 @@ async function inviteUser(guildId: string, userId: string): Promise<boolean> {
 
 async function getJoinData(key: string) {
     return await getJoinDataApi({
+        client: apiClient,
         path: {
             key: key
         }
