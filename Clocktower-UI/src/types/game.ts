@@ -4,7 +4,7 @@
 } from "./player.ts";
 import type {
     ClocktowerServerDataGameState
-} from "@/generated";
+} from "@/api";
 
 export type GameState = {
     id: string;

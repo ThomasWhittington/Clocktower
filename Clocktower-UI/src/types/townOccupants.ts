@@ -1,6 +1,7 @@
 ﻿import type {
-    ClocktowerServerDiscordTownServicesTownOccupants
-} from "@/generated";
+    ClocktowerServerDataTownOccupants
+} from "@/api";
+
 import {
     mapToMiniCategory,
     type MiniCategory
@@ -11,7 +12,7 @@ export type TownOccupants = {
     channelCategories: MiniCategory[];
 }
 
-export function mapToTownOccupants(apiTownOccupants: ClocktowerServerDiscordTownServicesTownOccupants): TownOccupants {
+export function mapToTownOccupants(apiTownOccupants: ClocktowerServerDataTownOccupants): TownOccupants {
     const channelCategories = (apiTownOccupants.channelCategories ?? [])
         .map(channelCategory => mapToMiniCategory(channelCategory));
 

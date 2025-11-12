@@ -1,13 +1,13 @@
 ﻿import type {
-    ClocktowerServerDiscordServicesDiscordServiceMiniGuild
-} from "@/generated";
+    ClocktowerServerDataMiniGuild
+} from "@/api";
 
 export type MiniGuild = {
     id: string;
     name: string;
 };
 
-export function mapToMiniGuild(apiMiniGuild:  ClocktowerServerDiscordServicesDiscordServiceMiniGuild | undefined): MiniGuild {
+export function mapToMiniGuild(apiMiniGuild:  ClocktowerServerDataMiniGuild | undefined): MiniGuild {
     if (!apiMiniGuild) {
         return {
             id: '',

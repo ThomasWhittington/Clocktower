@@ -1,6 +1,6 @@
 ﻿import type {
     ClocktowerServerDataTypesPlayer
-} from "@/generated";
+} from "@/api";
 
 export type Player = {
     id: number;
