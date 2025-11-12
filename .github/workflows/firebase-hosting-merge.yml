@@ -12,6 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: echo "VITE_CLOCKTOWER_SERVER_URI=${{ vars.CLOCKTOWER_SERVER_URI }}"
+      - run: rm -rf node_modules dist .vite
+        working-directory: ./Clocktower-UI
       - run: npm ci && npm run build -- --mode production
         working-directory: ./Clocktower-UI
         env:
