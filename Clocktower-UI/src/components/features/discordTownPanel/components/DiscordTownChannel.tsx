@@ -18,15 +18,13 @@ import {
 } from "@/components/features/discordTownPanel/hooks";
 
 
-function DiscordTownChannel({channel}: {
+function DiscordTownChannel({channel}: Readonly<{
     channel: ChannelOccupants
-}) {
+}>) {
 
     const guildId = useAppStore((state) => state.guildId);
     const currentUser = useAppStore((state) => state.currentUser);
     const {isInVoiceChannel} = useUserVoiceStatus();
-    
-    const channelId = `discord-channel-${channel.channel.id}`;
     
     const moveUserHere = async () => {
         if (!(ValidationUtils.isValidDiscordId(guildId) &&
@@ -41,7 +39,7 @@ function DiscordTownChannel({channel}: {
 
             return;
         }
-        
+
         await discordService.moveUserToChannel(guildId, currentUser.id, channel.channel.id)
             .then((data) => console.log(data))
             .catch((err) => console.error(err));
@@ -50,14 +48,17 @@ function DiscordTownChannel({channel}: {
 
     return (
         <div
-            id={channelId}>
+            id={`discord-channel-${channel.channel.id}`}
+            className={`channel-container${channel.occupants.length > 0 ? '' : '-empty'}`}>
             <a onClick={isInVoiceChannel ? moveUserHere : undefined}
-               className={isInVoiceChannel ? "cursor-pointer" : "cursor-not-allowed opacity-50"}>{channel.channel.name}</a>
-            {channel.occupants.map(user =>
+               className={`channel-button channel-button-${isInVoiceChannel ? "enabled" :
+                   "disabled"}`}>{channel.channel.name}</a>
+            <div
+                className="channel-occupants">{channel.occupants.map(user => (
                 <DiscordTownUser
                     key={user.id}
-                    user={user}/>)}
-
+                    user={user}/>
+            ))}</div>
         </div>
     );
 }

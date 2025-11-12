@@ -69,13 +69,13 @@ function DiscordAdminPanel() {
                             status={townStatus.exists ?? false}/>
                     }
                     <button
-                        className="rounded-2xl"
+                        className="btn-primary"
                         onClick={handleGetStatus}>
                         Get Status
                     </button>
 
                     <button
-                        className="rounded-2xl"
+                        className="btn-primary"
                         onClick={handleRebuildTown}>
                         Rebuild Town
                     </button>

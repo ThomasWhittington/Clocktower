@@ -4,21 +4,40 @@
 import {
     DiscordTownChannel
 } from "./index.ts";
+import {
+    useState
+} from "react";
 
-function DiscordTownCategory({category}: {
+function DiscordTownCategory({category}: Readonly<{
     category: MiniCategory
-}) {
-    const categoryId = `discord-category-${category.id}`;
+}>) {
+    const [isOpen, setIsOpen] = useState(true);
+    const toggleOpen = () => setIsOpen(prev => !prev);
+
     return (
         <div
-            id={categoryId}>
-            <p className="bg-pink-950">{category.name}</p>
-            {category.channels.map(channel =>
-                <DiscordTownChannel
-                    key={channel.channel.id}
-                    channel={channel}/>
+            className="category-container"
+            id={`discord-category-${category.id}`}
+        >
+            <button
+                onClick={toggleOpen}
+                className="unstyled-button category-header"
+            >
+                {isOpen ? '▾' : '▸'} {category.name}
+            </button>
+
+            {isOpen && (
+                <div>
+                    {category.channels.map(channel => (
+                        <DiscordTownChannel
+                            key={channel.channel.id}
+                            channel={channel}
+                        />
+                    ))}
+                </div>
             )}
         </div>
+
     );
 }
 

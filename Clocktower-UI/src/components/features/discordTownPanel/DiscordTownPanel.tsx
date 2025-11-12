@@ -19,7 +19,7 @@ function DiscordTownPanel() {
     return (
         <div
             id="discord-town-panel"
-            className="bg-[#121214] h-full flex flex-col justify-between">
+            className="bg-discord h-full flex flex-col justify-between p-4">
             <DiscordAdminPanel/>
 
             {isLoading &&
