@@ -46,7 +46,6 @@ export function useServerHeartbeat(url = '/api/health', healthyInterval = 5000, 
     }, [healthyInterval, unhealthyInterval]);
 
     const scheduleNextPing = useCallback((intervalMs: number) => {
-        console.log(intervalMs)
         if (timerRef.current) {
             clearTimeout(timerRef.current);
         }
