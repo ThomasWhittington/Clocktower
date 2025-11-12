@@ -1,0 +1,6 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Publish to IIS" type="DotNetFolderPublish" factoryName="Publish to folder">
+    <riderPublish configuration="Release" platform="Any CPU" target_folder="E:/ClocktowerServerIIS" target_framework="net9.0" uuid_high="6867822417533878490" uuid_low="-5770456065926511618" />
+    <method v="2" />
+  </configuration>
+</component>

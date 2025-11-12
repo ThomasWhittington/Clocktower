@@ -1,4 +1,5 @@
 ﻿using Clocktower.Server.Socket;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
 
 namespace Clocktower.Server;
@@ -7,11 +8,15 @@ public static class ConfigureApp
 {
     public static void Configure(this WebApplication app)
     {
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.ContentRootPath, ".well-known")),
+            RequestPath = "/.well-known"
+        });
         app.UseCors("AllowReactApp");
         app.UseSerilogRequestLogging();
         app.UseSwagger();
         app.UseSwaggerUI();
-        app.UseHttpsRedirection();
         app.MapEndpoints();
         app.MapHub<DiscordNotificationHub>("/discordHub");
     }
