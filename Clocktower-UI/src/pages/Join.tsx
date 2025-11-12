@@ -21,11 +21,13 @@ const Join = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const key = urlParams.get('key');
             const error = urlParams.get('error');
-
+            console.log(urlParams);
             if (error) {
                 window.location.href = '/error?error=' + encodeURIComponent(error);
                 return;
             }
+            console.log(`key`);
+            console.log(key);
 
             if (key) {
                 try {
@@ -33,7 +35,10 @@ const Join = () => {
                         data,
                         error
                     } = await discordService.getJoinData(key);
-
+                    console.log(`data`);
+                    console.log(data);
+                    console.log(`error`);
+                    console.log(error);
                     if (error) {
                         console.error('Failed to get join data:', error);
                         window.location.href = '/error?error=join_data_failed';
