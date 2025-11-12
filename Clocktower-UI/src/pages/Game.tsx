@@ -4,8 +4,7 @@
     PanelResizeHandle
 } from "react-resizable-panels";
 import {
-    DiscordTownPanel,
-    GameManager
+    DiscordTownPanel
 } from "../components/features";
 import {
     useDiscordHub
@@ -23,7 +22,7 @@ function Game() {
         connectionState,
         gameTime
     } = useDiscordHub();
-    
+
     return (
         <>
             {
@@ -42,7 +41,7 @@ function Game() {
                                 className="flex justify-center align-center">
                                 <BackgroundImage
                                     gameTime={gameTime}>
-                                    <GameManager/>
+                                    <></>
                                 </BackgroundImage>
                             </Panel>
                         </PanelGroup>

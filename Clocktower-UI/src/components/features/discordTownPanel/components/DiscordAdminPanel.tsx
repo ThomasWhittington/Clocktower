@@ -10,7 +10,7 @@ import {
 } from "@/components/ui";
 import type {
     GetTownStatusApiResponse
-} from "@/generated";
+} from "@/api";
 import {
     useAppStore
 } from "@/store";
