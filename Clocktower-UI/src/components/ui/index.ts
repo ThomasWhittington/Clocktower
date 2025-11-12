@@ -18,3 +18,7 @@ export {
     ServerDisconnected
 }
     from './ServerDisconnected.tsx';
+export {
+    BackgroundImage
+}
+    from './BackgroundImage.tsx';
