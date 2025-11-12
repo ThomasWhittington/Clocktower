@@ -14,16 +14,24 @@ import type {
 
 type UserVoiceStates = Record<string, boolean>;
 
+export enum GameTime {
+    Day = 0,
+    Evening = 1,
+    Night = 2,
+}
+
 type DiscordHubState = {
     townOccupancy?: TownOccupants;
     userVoiceStates: UserVoiceStates;
     connectionState: signalR.HubConnectionState;
+    gameTime: GameTime
 };
 
 let globalConnection: signalR.HubConnection | null = null;
 let globalState: DiscordHubState = {
     userVoiceStates: {},
-    connectionState: signalR.HubConnectionState.Disconnected
+    connectionState: signalR.HubConnectionState.Disconnected,
+    gameTime: GameTime.Night
 };
 const globalListeners = new Set<(state: DiscordHubState) => void>();
 
@@ -39,7 +47,8 @@ const setState = (updates: Partial<DiscordHubState>) => {
 const resetDiscordHubState = () => {
     globalState = {
         userVoiceStates: {},
-        connectionState: HubConnectionState.Disconnected
+        connectionState: HubConnectionState.Disconnected,
+        gameTime: GameTime.Night
     };
     notifyListeners();
 };
@@ -55,6 +64,10 @@ const createConnection = async () => {
 
     globalConnection.on('TownOccupancyUpdated', (occupants: TownOccupants) => {
         setState({townOccupancy: occupants});
+    });
+
+    globalConnection.on('TownTimeChanged', (gameTime: number) => {
+        setState({gameTime: gameTime as GameTime});
     });
 
     globalConnection.on('UserVoiceStateChanged', (userId: string, isInVoice: boolean) => {

@@ -30,8 +30,6 @@ export function useServerHeartbeat(url = '/api/health', healthyInterval = 5000, 
                 const newStatus = data.status || 'healthy';
                 setStatus(newStatus);
                 setServerTimestamp(new Date(data.timeStamp));
-                console.log(data);
-
                 const nextInterval = newStatus === 'healthy' ? healthyInterval : unhealthyInterval;
                 scheduleNextPing(nextInterval);
             })

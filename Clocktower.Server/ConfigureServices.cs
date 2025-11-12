@@ -20,6 +20,7 @@ public static class ConfigureServices
         {
             options.AddPolicy("AllowReactApp",
                 policy => policy.WithOrigins(
+                        "http://localhost:5120",
                         "http://localhost:5173",
                         "http://37.27.37.160",
                         "https://amarantosclocktower.web.app",

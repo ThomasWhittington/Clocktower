@@ -14,13 +14,16 @@ import {
     HubConnectionState
 } from "@microsoft/signalr";
 import {
+    BackgroundImage,
     Spinner
 } from "@/components/ui";
 
 function Game() {
     const {
-        connectionState
+        connectionState,
+        gameTime
     } = useDiscordHub();
+    
     return (
         <>
             {
@@ -37,7 +40,10 @@ function Game() {
                                 className="w-2 bg-gray-400 hover:bg-gray-600 cursor-col-resize"/>
                             <Panel
                                 className="flex justify-center align-center">
-                                <GameManager/>
+                                <BackgroundImage
+                                    gameTime={gameTime}>
+                                    <GameManager/>
+                                </BackgroundImage>
                             </Panel>
                         </PanelGroup>
                     ) : (

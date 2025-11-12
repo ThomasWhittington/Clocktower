@@ -221,6 +221,14 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
         return null;
     }
 
+    public async Task<(bool success, string message)> SetTime(ulong guildId, GameTime gameTime)
+    {
+        var guild = bot.Client.GetGuild(guildId);
+        if (guild is null) return (false, "Guild not found");
+        await notificationService.BroadcastTownTime(gameTime);
+        return (true, $"Time set to {gameTime}");
+    }
+
 
     private static async Task<bool> CreateNightVoiceChannels(SocketGuild guild)
     {
