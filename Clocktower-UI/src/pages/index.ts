@@ -16,3 +16,8 @@ export {
     default as LoginPage
 }
     from './auth/index.ts'
+
+export {
+    default as ErrorPage
+}
+    from './ErrorPage.tsx'

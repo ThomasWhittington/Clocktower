@@ -7,6 +7,7 @@ import {
 import {
     AuthCallback,
     BotCallback,
+    ErrorPage,
     Game,
     Home,
     Join,
@@ -58,6 +59,10 @@ function App() {
                                 path="/join"
                                 element={
                                     <Join/>}/>
+                            <Route
+                                path="/error"
+                                element={
+                                    <ErrorPage/>}/>
                         </Routes>
                     </Router>
                     {loggedIn &&

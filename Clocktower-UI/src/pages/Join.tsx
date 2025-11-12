@@ -23,7 +23,7 @@ const Join = () => {
             const error = urlParams.get('error');
 
             if (error) {
-                window.location.href = '/join?error=' + encodeURIComponent(error);
+                window.location.href = '/error?error=' + encodeURIComponent(error);
                 return;
             }
 
@@ -36,7 +36,7 @@ const Join = () => {
 
                     if (error) {
                         console.error('Failed to get join data:', error);
-                        window.location.href = '/join?error=join_data_failed';
+                        window.location.href = '/error?error=join_data_failed';
                     } else {
                         if (data && data.user && data.guildId) {
                             setCurrentUser({
@@ -49,15 +49,15 @@ const Join = () => {
                             window.location.href = '/game';
                         } else {
                             console.error('Unexpected join data:', data);
-                            window.location.href = '/join?error=join_data_failed';
+                            window.location.href = '/error?error=join_data_failed';
                         }
                     }
                 } catch (error) {
                     console.error('Failed to get join data:', error);
-                    window.location.href = '/join?error=join_data_failed';
+                    window.location.href = '/error?error=join_data_failed';
                 }
             } else {
-                window.location.href = '/join?error=missing_key';
+                window.location.href = '/error?error=missing_key';
             }
         };
         handleJoin().then(_ => {
