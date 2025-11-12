@@ -22,7 +22,9 @@ public static class ConfigureServices
                 policy => policy.WithOrigins(
                         "http://localhost:5173",
                         "http://37.27.37.160",
-                        "https://amarantosclocktower.web.app"
+                        "https://amarantosclocktower.web.app",
+                        "https://clocktower.glasmerio.uk"
+
                         )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
