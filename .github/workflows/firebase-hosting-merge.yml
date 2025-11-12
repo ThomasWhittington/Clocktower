@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: echo "VITE_CLOCKTOWER_SERVER_URI=${{ vars.CLOCKTOWER_SERVER_URI }}"
       - run: npm ci && npm run build
         working-directory: ./Clocktower-UI
         env:
