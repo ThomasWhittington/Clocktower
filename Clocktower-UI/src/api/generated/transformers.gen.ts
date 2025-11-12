@@ -11,8 +11,21 @@ import type {
     GetRolesApiResponse,
     GetTownOccupancyApiResponse,
     GetTownStatusApiResponse,
+    HealthApiResponse,
     StartGameApiResponse
 } from './types.gen';
+
+const clocktowerServerAdminEndpointsHealthResponseSchemaResponseTransformer = (data: any) => {
+    if (data.timeStamp) {
+        data.timeStamp = new Date(data.timeStamp);
+    }
+    return data;
+};
+
+export const healthApiResponseTransformer = async (data: any): Promise<HealthApiResponse> => {
+    data = clocktowerServerAdminEndpointsHealthResponseSchemaResponseTransformer(data);
+    return data;
+};
 
 export const checkGuildApiResponseTransformer = async (data: any): Promise<CheckGuildApiResponse> => {
     data = clocktowerServerDiscordEndpointsCheckGuildResponseSchemaResponseTransformer(data);

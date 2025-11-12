@@ -54,6 +54,8 @@ import type {
     GetTownStatusApiData,
     GetTownStatusApiErrors,
     GetTownStatusApiResponses,
+    HealthApiData,
+    HealthApiResponses,
     InviteUserApiData,
     InviteUserApiErrors,
     InviteUserApiResponses,
@@ -79,7 +81,9 @@ import type {
     ToggleStoryTellerApiResponses
 } from './types.gen';
 
-export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> =
+    Options2<TData, ThrowOnError>
+    & {
     /**
      * You can provide a client instance returned by `createClient()` instead of
      * individual options. This might be also useful if you want to implement a
@@ -91,6 +95,18 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      * used to access values that aren't defined as part of the SDK function.
      */
     meta?: Record<string, unknown>;
+};
+
+/**
+ * Checks the health of the server
+ *
+ * Checks the health of the server
+ */
+export const healthApi = <ThrowOnError extends boolean = false>(options?: Options<HealthApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<HealthApiResponses, unknown, ThrowOnError>({
+        url: '/api/admin/health',
+        ...options
+    });
 };
 
 /**

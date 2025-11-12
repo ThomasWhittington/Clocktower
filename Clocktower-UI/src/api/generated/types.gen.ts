@@ -4,6 +4,11 @@ export type ClientOptions = {
     baseUrl: 'http://localhost:5120' | (string & {});
 };
 
+export type ClocktowerServerAdminEndpointsHealthResponse = {
+    status?: string | null;
+    timeStamp?: Date;
+};
+
 export type ClocktowerServerDataChannelOccupants = {
     channel?: ClocktowerServerDataMiniChannel;
     occupants?: Array<ClocktowerServerDataMiniUser> | null;
@@ -43,9 +48,18 @@ export type ClocktowerServerDataTownOccupants = {
     channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
 };
 
-export type ClocktowerServerDataTypesEnumEdition = 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
+export type ClocktowerServerDataTypesEnumEdition =
+    'TroubleBrewing'
+    | 'SectsAndViolets'
+    | 'BadMoonRising'
+    | 'Experimental';
 
-export type ClocktowerServerDataTypesEnumRoleType = 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
+export type ClocktowerServerDataTypesEnumRoleType =
+    'Townsfolk'
+    | 'Outsider'
+    | 'Minion'
+    | 'Demon'
+    | 'Traveller';
 
 export type ClocktowerServerDataTypesJoinData = {
     guildId?: string | null;
@@ -111,6 +125,22 @@ export type ClocktowerServerDataGameStateWritable = {
 export type ClocktowerServerDataTownOccupantsWritable = {
     channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
 };
+
+export type HealthApiData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/health';
+};
+
+export type HealthApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerAdminEndpointsHealthResponse;
+};
+
+export type HealthApiResponse = HealthApiResponses[keyof HealthApiResponses];
 
 export type CheckGuildApiData = {
     body?: never;

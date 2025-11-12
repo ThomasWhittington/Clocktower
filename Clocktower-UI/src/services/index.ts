@@ -10,3 +10,7 @@ export {
     authService
 }
     from './authService.ts'
+export {
+    adminService
+}
+    from './adminService.ts'

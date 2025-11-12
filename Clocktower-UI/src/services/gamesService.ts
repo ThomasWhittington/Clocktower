@@ -7,14 +7,20 @@ import {
     getGamesApi,
     loadDummyGamesApi,
     startGameApi
-} from "@/generated";
+} from "@/api";
+import {
+    apiClient
+} from "@/api/api-client.ts";
 
 async function getGame(id: string): Promise<GameState> {
 
     const {
         data,
         error
-    } = await getGameApi({path: {"gameId": id}});
+    } = await getGameApi({
+        client: apiClient,
+        path: {"gameId": id}
+    });
 
     if (error) {
         console.error('Failed to get game:', error);
@@ -37,7 +43,7 @@ async function getGames(): Promise<GameState[]> {
     const {
         data,
         error
-    } = await getGamesApi();
+    } = await getGamesApi({client: apiClient});
 
     if (error) {
         console.error('Failed to fetch games:', error);
@@ -51,7 +57,7 @@ async function loadDummyData(): Promise<string | undefined> {
     const {
         data,
         error
-    } = await loadDummyGamesApi();
+    } = await loadDummyGamesApi({client: apiClient});
 
     if (error) {
         console.error('Failed to load dummy data:', error);
@@ -66,7 +72,10 @@ async function startGame(id: string): Promise<GameState> {
     const {
         data,
         error
-    } = await startGameApi({path: {"gameId": id}});
+    } = await startGameApi({
+        client: apiClient,
+        path: {"gameId": id}
+    });
     if (error) {
         console.error('Failed to start game:', error);
         throw new Error('Failed to start game');

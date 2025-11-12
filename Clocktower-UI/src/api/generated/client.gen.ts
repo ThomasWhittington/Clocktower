@@ -21,5 +21,5 @@ import type {
 export type CreateClientConfig<T extends ClientOptions = ClientOptions2> = (override?: Config<ClientOptions & T>) => Config<Required<ClientOptions> & T>;
 
 export const client = createClient(createConfig<ClientOptions2>({
-    baseUrl: import.meta.env.VITE_CLOCKTOWER_SERVER_URI
+    baseUrl: 'http://localhost:5120'
 }));
