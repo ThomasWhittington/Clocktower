@@ -34,6 +34,7 @@ function DiscordTownCategory({category}: Readonly<{
                             channel={channel}
                         />
                     ))}
+                    <br/>
                 </div>
             )}
         </div>
