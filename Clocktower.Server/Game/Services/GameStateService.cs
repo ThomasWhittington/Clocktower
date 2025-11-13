@@ -1,16 +1,16 @@
-﻿using System.Collections.Concurrent;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Clocktower.Server.Data.Stores;
 
 namespace Clocktower.Server.Game.Services;
 
 public class GameStateService
 {
-    private readonly ConcurrentDictionary<string, GameState> _games = new();
+    public IEnumerable<GameState> GetGames() =>
+        GameStateStore.GetAll();
 
-    public GameState[] GetGames()
-    {
-        return _games.Values.ToArray();
-    }
+    public IEnumerable<GameState> GetGames(string guildId) =>
+        GameStateStore.GetGames(guildId);
+
 
     public (bool success, string message) LoadDummyData()
     {
@@ -21,10 +21,10 @@ public class GameStateService
             return (false, "Failed to deserialize json");
         }
 
-        _games.Clear();
+        GameStateStore.Clear();
         foreach (var gameState in games)
         {
-            _games.TryAdd(gameState.Id, gameState);
+            GameStateStore.Set(gameState.Id, gameState);
         }
 
         return (true, "Loaded dummy data");
@@ -32,9 +32,9 @@ public class GameStateService
 
     public (bool success, GameState? gameState, string message) GetGame(string gameId)
     {
-        bool getSuccessful = _games.TryGetValue(gameId, out var game);
+        var game = GameStateStore.Get(gameId);
 
-        return getSuccessful
+        return game is not null
             ? (true, game, "Game retrieved successfully")
             : (false, null, $"Game ID '{gameId}' not found");
     }
@@ -42,27 +42,26 @@ public class GameStateService
 
     public (bool success, string message) DeleteGame(string gameId)
     {
-        bool deleteSuccessful = _games.TryRemove(gameId, out _);
+        bool deleteSuccessful = GameStateStore.Remove(gameId);
 
         return deleteSuccessful
             ? (true, "Game deleted successfully")
             : (false, $"Game ID '{gameId}' failed to be deleted");
     }
 
-    public (bool success, GameState? gameState, string message) StartNewGame(string name)
+    public (bool success, GameState? gameState, string message) StartNewGame(string guildId, string gameId)
     {
-        var id = Guid.NewGuid().ToString();
         var newGameState = new GameState
         {
-            Name = name,
-            Id = id
+            Id = gameId,
+            GuildId = guildId
         };
 
-        bool addSuccessful = _games.TryAdd(id, newGameState);
+        bool addSuccessful = GameStateStore.Set(gameId, newGameState);
 
         return addSuccessful
             ? (true, newGameState, "Game started successfully")
-            : (false, null, $"Game Name '{name}' already exists");
+            : (false, null, $"Game Id '{gameId}' already exists");
     }
 
     public (bool success, Player? newPlayer, string message, AddPlayerError error) AddPlayerToGame(string gameId, string playerName)

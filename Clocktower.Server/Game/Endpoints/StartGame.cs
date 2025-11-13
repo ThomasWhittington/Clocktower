@@ -4,32 +4,39 @@
 public class StartGame : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{name}/start", Handle)
+        .MapPost("/{gameId}/start/{guildId}", Handle)
         .SetOpenApiOperationId<StartGame>()
         .WithSummary("Starts new game state for id")
         .WithRequestValidation<Request>();
 
     private static Results<Created<GameState>, BadRequest<string>> Handle([AsParameters] Request request, GameStateService gameStateService)
     {
-        var name = request.Name.Trim();
-        var result = gameStateService.StartNewGame(name);
+        var gameId = request.GameId.Trim();
+
+        var result = gameStateService.StartNewGame(request.GuildId, gameId);
 
         return result.success
-            ? TypedResults.Created($"/games/{name}", result.gameState)
+            ? TypedResults.Created($"/games/{result.gameState!.Id}", result.gameState)
             : TypedResults.BadRequest(result.message);
     }
 
     [UsedImplicitly]
-    public record Request(string Name);
+    public record Request(string GameId, string GuildId);
 
     [UsedImplicitly]
     public class RequestValidator : AbstractValidator<Request>
     {
         public RequestValidator()
         {
-            RuleFor(x => x.Name.Trim())
-                .MinimumLength(3).WithMessage("Name cannot be less than 3 characters")
-                .MaximumLength(32).WithMessage("Name cannot be longer than 32 characters");
+            RuleFor(x => x.GameId.Trim())
+                .MinimumLength(3).WithMessage("GameId cannot be less than 3 characters")
+                .MaximumLength(32).WithMessage("GameId cannot be longer than 32 characters");
+
+            RuleFor(x => x.GuildId)
+                .NotEmpty()
+                .WithMessage("GuildId cannot be empty")
+                .Must(Validation.BeValidDiscordSnowflake)
+                .WithMessage("GuildId must be a valid Discord snowflake");
         }
     }
 }

@@ -361,7 +361,7 @@ export const getGameApi = <ThrowOnError extends boolean = false>(options: Option
 };
 
 /**
- * Gets all games
+ * Gets all games, optionally filtered by guildId
  */
 export const getGamesApi = <ThrowOnError extends boolean = false>(options?: Options<GetGamesApiData, ThrowOnError>) => {
     return (options?.client ?? client).get<GetGamesApiResponses, GetGamesApiErrors, ThrowOnError>({
@@ -385,7 +385,7 @@ export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?
  */
 export const startGameApi = <ThrowOnError extends boolean = false>(options: Options<StartGameApiData, ThrowOnError>) => {
     return (options.client ?? client).post<StartGameApiResponses, StartGameApiErrors, ThrowOnError>({
-        url: '/api/games/{name}/start',
+        url: '/api/games/{gameId}/start/{guildId}',
         ...options
     });
 };

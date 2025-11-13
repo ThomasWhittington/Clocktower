@@ -34,7 +34,7 @@ async function getGame(id: string): Promise<GameState> {
     }
     return {
         id: id,
-        name: '',
+        guildId: '',
         players: [],
         maxPlayers: 0,
         isFull: false
@@ -56,6 +56,26 @@ async function getGames(): Promise<GameState[]> {
     return data?.map(mapToGameState) ?? [];
 }
 
+async function getGamesInGuild(guildId: string): Promise<GameState[]> {
+
+    const {
+        data,
+        error
+    } = await getGamesApi({
+        client: apiClient,
+        query: {
+            guildId: guildId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to fetch games for guild:', error);
+        throw new Error('Failed to fetch games for guild');
+    }
+
+    return data?.map(mapToGameState) ?? [];
+}
+
 async function loadDummyData(): Promise<string | undefined> {
     const {
         data,
@@ -70,14 +90,17 @@ async function loadDummyData(): Promise<string | undefined> {
     return data;
 }
 
-async function startGame(name: string): Promise<GameState> {
+async function startGame(gameId: string, guildId: string): Promise<GameState> {
 
     const {
         data,
         error
     } = await startGameApi({
         client: apiClient,
-        path: {name: name}
+        path: {
+            guildId: guildId,
+            gameId: gameId,
+        }
     });
     if (error) {
         console.error('Failed to start game:', error);
@@ -88,8 +111,8 @@ async function startGame(name: string): Promise<GameState> {
         return mapToGameState(data);
     }
     return {
-        id:'',
-        name: name,
+        id: '',
+        guildId: guildId,
         players: [],
         maxPlayers: 0,
         isFull: false
@@ -99,6 +122,7 @@ async function startGame(name: string): Promise<GameState> {
 export const gamesService = {
     getGame,
     getGames,
+    getGamesInGuild,
     loadDummyData,
     startGame
 }

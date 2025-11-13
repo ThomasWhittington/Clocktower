@@ -1,6 +1,7 @@
 [
   {
     "Id": "test1",
+    "GuildId": "123456",
     "MaxPlayers": 0,
     "Players": [
       {
@@ -27,6 +28,7 @@
   },
   {
     "Id": "test2",
+    "GuildId": "654321",
     "MaxPlayers": 8,
     "Players": [
       {

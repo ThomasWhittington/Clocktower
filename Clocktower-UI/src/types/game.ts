@@ -8,7 +8,7 @@ import type {
 
 export type GameState = {
     id: string;
-    name: string,
+    guildId: string,
     maxPlayers: number;
     players: Player[];
     isFull: boolean;
@@ -21,7 +21,7 @@ export function mapToGameState(apiGame: ClocktowerServerDataGameState): GameStat
 
     return {
         id: apiGame.id ?? '',
-        name: apiGame.name?? '',
+        guildId: apiGame.guildId?? '',
         maxPlayers: apiGame.maxPlayers ?? 0,
         players: players,
         isFull: apiGame.isFull ?? false

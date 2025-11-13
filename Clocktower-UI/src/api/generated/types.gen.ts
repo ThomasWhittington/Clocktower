@@ -16,10 +16,10 @@ export type ClocktowerServerDataChannelOccupants = {
 
 export type ClocktowerServerDataGameState = {
     id?: string | null;
-    name?: string | null;
     players?: Array<ClocktowerServerDataTypesPlayer> | null;
     maxPlayers?: number;
     readonly isFull?: boolean;
+    guildId?: string | null;
 };
 
 export type ClocktowerServerDataMiniCategory = {
@@ -112,9 +112,9 @@ export type MicrosoftAspNetCoreHttpHttpValidationProblemDetails = {
 
 export type ClocktowerServerDataGameStateWritable = {
     id?: string | null;
-    name?: string | null;
     players?: Array<ClocktowerServerDataTypesPlayer> | null;
     maxPlayers?: number;
+    guildId?: string | null;
 };
 
 export type ClocktowerServerDataTownOccupantsWritable = {
@@ -703,7 +703,9 @@ export type GetGameApiResponse = GetGameApiResponses[keyof GetGameApiResponses];
 export type GetGamesApiData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        guildId?: string;
+    };
     url: '/api/games';
 };
 
@@ -753,10 +755,11 @@ export type LoadDummyGamesApiResponse = LoadDummyGamesApiResponses[keyof LoadDum
 export type StartGameApiData = {
     body?: never;
     path: {
-        name: string;
+        gameId: string;
+        guildId: string;
     };
     query?: never;
-    url: '/api/games/{name}/start';
+    url: '/api/games/{gameId}/start/{guildId}';
 };
 
 export type StartGameApiErrors = {

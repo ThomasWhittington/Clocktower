@@ -69,7 +69,7 @@ function GameManager() {
     const startGame = async () => {
         clearError();
         setIsLoading(true);
-        gamesService.startGame(id).then(data => {
+        gamesService.startGame(id, guildId).then(data => {
             setGame(data);
             getGames();
         })
