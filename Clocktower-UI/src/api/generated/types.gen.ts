@@ -19,6 +19,8 @@ export type ClocktowerServerDataGameState = {
     guildId?: string | null;
     players?: Array<ClocktowerServerDataTypesPlayer> | null;
     maxPlayers?: number;
+    createdBy?: string | null;
+    createdDate?: Date;
     readonly isFull?: boolean;
 };
 
@@ -116,6 +118,8 @@ export type ClocktowerServerDataGameStateWritable = {
     guildId?: string | null;
     players?: Array<ClocktowerServerDataTypesPlayer> | null;
     maxPlayers?: number;
+    createdBy?: string | null;
+    createdDate?: Date;
 };
 
 export type ClocktowerServerDataTownOccupantsWritable = {

@@ -114,6 +114,9 @@ const clocktowerServerDataGameStateSchemaResponseTransformer = (data: any) => {
             return clocktowerServerDataTypesPlayerSchemaResponseTransformer(item);
         });
     }
+    if (data.createdDate) {
+        data.createdDate = new Date(data.createdDate);
+    }
     return data;
 };
 

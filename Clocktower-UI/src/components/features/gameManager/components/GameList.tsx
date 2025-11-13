@@ -1,5 +1,6 @@
-﻿import React
-    from 'react';
+﻿import React, {
+    useEffect
+} from 'react';
 import type {
     GameState
 } from "@/types";
@@ -13,8 +14,10 @@ interface GameListProps {
 }
 
 export const GameList: React.FC<GameListProps> = ({games}) => {
-    const setGameId = useAppStore((state)=>state.setGameId);
-    
+    const setGameId = useAppStore((state) => state.setGameId);
+    useEffect(() => {
+        console.log(games)
+    }, []);
     return (
         <div
             className="mt-4">
@@ -24,7 +27,7 @@ export const GameList: React.FC<GameListProps> = ({games}) => {
                 {games.length === 0 ? (
                     <p className="text-gray-400">No games available</p>
                 ) : (
-                    games.map((game) => (
+                    games.map((game: GameState) => (
                         <div
                             key={game.id}
                             className="bg-gray-800 p-4 rounded-lg">
@@ -33,8 +36,14 @@ export const GameList: React.FC<GameListProps> = ({games}) => {
                             <p className="text-gray-400">Players: {game.players.length}{game.maxPlayers > 0 ? `/${game.maxPlayers}` : ''}</p>
                             {game.isFull &&
                                 <p>FULL</p>}
-                            
-                            <button className="btn-outline" onClick={()=>setGameId(game.id)}>Select</button>
+                            {game.createdDate &&
+                                <h5 className="sm text-gray-600">{new Date(game.createdDate).toDateString()}</h5>}
+                            <h5 className="sm text-gray-600">{game.createdBy}</h5>
+
+                            <button
+                                className="btn-outline"
+                                onClick={() => setGameId(game.id)}>Select
+                            </button>
                         </div>
                     ))
                 )}

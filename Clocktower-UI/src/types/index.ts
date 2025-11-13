@@ -1,5 +1,5 @@
 ﻿export *
-    from './game.ts'
+    from './gameState.ts'
 
 export *
     from './channelOccupants.ts'

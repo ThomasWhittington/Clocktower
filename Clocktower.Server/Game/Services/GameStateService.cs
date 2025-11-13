@@ -54,7 +54,8 @@ public class GameStateService
         var newGameState = new GameState
         {
             Id = gameId,
-            GuildId = guildId
+            GuildId = guildId,
+            CreatedDate = DateTime.UtcNow
         };
 
         bool addSuccessful = GameStateStore.Set(gameId, newGameState);

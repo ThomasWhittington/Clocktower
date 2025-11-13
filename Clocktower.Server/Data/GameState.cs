@@ -7,5 +7,8 @@ public class GameState
     public List<Player> Players { get; set; } = [];
     public int MaxPlayers { get; set; } = 0;
 
+    public string CreatedBy { get; set; }
+    public DateTime CreatedDate { get; set; }
+
     public bool IsFull => MaxPlayers != 0 && Players.Count >= MaxPlayers;
 }

@@ -37,7 +37,9 @@ async function getGame(id: string): Promise<GameState> {
         guildId: '',
         players: [],
         maxPlayers: 0,
-        isFull: false
+        isFull: false,
+        createdBy: '',
+        createdDate: new Date(2000, 1, 1)
     };
 }
 
@@ -91,7 +93,8 @@ async function loadDummyData(): Promise<string | undefined> {
 }
 
 async function startGame(gameId: string, guildId: string): Promise<GameState> {
-
+    console.log(gameId)
+    console.log(guildId)
     const {
         data,
         error
@@ -115,7 +118,9 @@ async function startGame(gameId: string, guildId: string): Promise<GameState> {
         guildId: guildId,
         players: [],
         maxPlayers: 0,
-        isFull: false
+        isFull: false,
+        createdBy: '',
+        createdDate: new Date(2000, 1, 1)
     };
 }
 

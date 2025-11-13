@@ -71,7 +71,7 @@
     "tags": [],
     "title": "gamestate start date",
     "description": "Add start date to gamestate so user can determine most recent",
-    "status": "TODO",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,
@@ -83,6 +83,19 @@
         "minute": 38,
         "second": 32,
         "nano": 281949300
+      }
+    },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 13
+      },
+      "time": {
+        "hour": 22,
+        "minute": 49,
+        "second": 36,
+        "nano": 589377200
       }
     },
     "isImported": false
