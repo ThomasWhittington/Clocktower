@@ -337,9 +337,8 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
             if (guild is null) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
             var user = guild.GetUser(userId);
             if (user is null) return (InviteUserOutcome.UserNotFoundError, $"Couldn't find user: {userId}");
-
-
-            var response = new JoinData(guildId.ToString(), new MiniUser(user.Id.ToString(), user.DisplayName, user.GetAvatarUrl()), gameId);
+            
+            var response = new JoinData(guildId.ToString(), new MiniUser(user.Id.ToString(), user.DisplayName, user.GetDisplayAvatarUrl()), gameId);
             var tempKey = Guid.NewGuid().ToString();
             cache.Set($"join_data_{tempKey}", response, TimeSpan.FromMinutes(5));
             var url = _secrets.FeUri + $"/join?key={tempKey}";
