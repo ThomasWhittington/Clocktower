@@ -23,7 +23,7 @@ public class TownOccupants(List<MiniCategory> channelCategories)
 
     public void MoveUser(SocketUser user, SocketVoiceState? newChannel)
     {
-        var miniUser = new MiniUser(user.Id.ToString(), user.Username, user.GetAvatarUrl());
+        var miniUser = new MiniUser(user.Id.ToString(), user.GlobalName, user.GetAvatarUrl());
 
         ChannelCategories = ChannelCategories.Select(category =>
             category with
