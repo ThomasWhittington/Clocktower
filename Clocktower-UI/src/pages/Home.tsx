@@ -15,6 +15,9 @@ import type {
 import {
     GuildsList
 } from "@/components/ui";
+import {
+    GameManager
+} from "@/components/features";
 
 function Home() {
     const loggedIn = useAppStore((state) => state.loggedIn);
@@ -50,6 +53,8 @@ function Home() {
                         >
                             Add Bot To Server
                         </button>
+
+                        <GameManager/>
                     </>
                 ) : (
                     <>

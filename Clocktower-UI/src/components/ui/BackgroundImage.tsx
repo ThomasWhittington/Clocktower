@@ -4,7 +4,7 @@
 import React
     from "react";
 
-export const BackgroundImage = ({ gameTime, children }: { gameTime: GameTime, children: React.ReactNode }) => {
+export const BackgroundImage = ({ gameTime, children }: { gameTime: GameTime, children?: React.ReactNode }) => {
     const backgrounds = {
         [GameTime.Day]: '/images/day-bg.png',
         [GameTime.Evening]: '/images/evening-bg.png',

@@ -16,9 +16,6 @@ import {
     BackgroundImage,
     Spinner
 } from "@/components/ui";
-import {
-    GameManager
-} from "@/components/features";
 
 function Game() {
     const {
@@ -44,7 +41,6 @@ function Game() {
                                 className="flex justify-center align-center">
                                 <BackgroundImage
                                     gameTime={gameTime}>
-                                    <GameManager/>
                                 </BackgroundImage>
                             </Panel>
                         </PanelGroup>
