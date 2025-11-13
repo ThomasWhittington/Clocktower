@@ -130,5 +130,49 @@
       }
     },
     "isImported": false
+  },
+  {
+    "id": "TASK_28",
+    "priority": "LOW",
+    "tags": [],
+    "title": "Simplify secrets",
+    "description": "Some secrets use the same url, only store the base url, handle the actual endpoints in code",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 13
+      },
+      "time": {
+        "hour": 17,
+        "minute": 41,
+        "second": 57,
+        "nano": 512645600
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_36",
+    "priority": "LOW",
+    "tags": [],
+    "title": "Storyteller page",
+    "description": "Move gamemanager to storyteller page. Ensure only users that created the game can access it",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 13
+      },
+      "time": {
+        "hour": 17,
+        "minute": 44,
+        "second": 22,
+        "nano": 56760900
+      }
+    },
+    "isImported": false
   }
 ]
