@@ -222,9 +222,11 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
         return null;
     }
 
-    public async Task<(bool success, string message)> SetTime(ulong guildId, GameTime gameTime)
+    public async Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime)
     {
-        var guild = bot.Client.GetGuild(guildId);
+        var gameState = GameStateStore.Get(gameId);
+        if (gameState is null) return (false, "Game not found");
+        var guild = bot.Client.GetGuild(ulong.Parse(gameState.GuildId));
         if (guild is null) return (false, "Guild not found");
         await notificationService.BroadcastTownTime(gameTime);
         return (true, $"Time set to {gameTime}");

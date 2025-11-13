@@ -562,12 +562,12 @@ export type RebuildTownApiResponse = RebuildTownApiResponses[keyof RebuildTownAp
 export type SetTimeApiData = {
     body?: never;
     path: {
-        guildId: string;
+        gameId: string;
     };
     query: {
         GameTime: ClocktowerServerDataTypesEnumGameTime;
     };
-    url: '/api/discord/town/{guildId}/time';
+    url: '/api/discord/town/{gameId}/time';
 };
 
 export type SetTimeApiErrors = {

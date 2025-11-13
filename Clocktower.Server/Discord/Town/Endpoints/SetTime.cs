@@ -6,7 +6,7 @@ namespace Clocktower.Server.Discord.Town.Endpoints;
 public class SetTime : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{guildId}/time", Handle)
+        .MapPost("/{gameId}/time", Handle)
         .SetOpenApiOperationId<SetTime>()
         .WithSummary("Sets the time of the town")
         .WithDescription("Sets the game state of the town based on the day time");
@@ -14,9 +14,9 @@ public class SetTime : IEndpoint
 
     private static async Task<Results<Ok<string>, BadRequest<string>>> Handle([AsParameters] Request request, IDiscordTownService discordTownService)
     {
-        var guildId = ulong.Parse(request.GuildId);
+        var gameId = request.GameId.Trim();
 
-        var (success, message) = await discordTownService.SetTime(guildId, request.GameTime);
+        var (success, message) = await discordTownService.SetTime(gameId, request.GameTime);
         if (success)
         {
             return TypedResults.Ok(message);
@@ -27,18 +27,16 @@ public class SetTime : IEndpoint
 
 
     [UsedImplicitly]
-    public record Request(string GuildId, GameTime GameTime);
+    public record Request(string GameId, GameTime GameTime);
 
     [UsedImplicitly]
     public class RequestValidator : AbstractValidator<Request>
     {
         public RequestValidator()
         {
-            RuleFor(x => x.GuildId)
+            RuleFor(x => x.GameId)
                 .NotEmpty()
-                .WithMessage("GuildId cannot be empty")
-                .Must(Common.Validation.BeValidDiscordSnowflake)
-                .WithMessage("GuildId must be a valid Discord snowflake");
+                .WithMessage("GameId cannot be empty");
 
             RuleFor(x => x.GameTime)
                 .NotEmpty()

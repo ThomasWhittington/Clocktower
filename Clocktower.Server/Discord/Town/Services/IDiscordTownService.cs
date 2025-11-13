@@ -11,5 +11,5 @@ public interface IDiscordTownService
     Task<(InviteUserOutcome outcome, string message)> InviteUser(string gameId, ulong userId);
     Task<(bool success, TownOccupants? townOccupants, string message)> GetTownOccupancy(ulong guildId);
     JoinData? GetJoinData(string key);
-    Task<(bool success, string message)> SetTime(ulong guildId, GameTime gameTime);
+    Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime);
 }

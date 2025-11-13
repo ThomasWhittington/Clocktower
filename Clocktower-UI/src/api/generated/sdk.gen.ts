@@ -313,7 +313,7 @@ export const rebuildTownApi = <ThrowOnError extends boolean = false>(options: Op
  */
 export const setTimeApi = <ThrowOnError extends boolean = false>(options: Options<SetTimeApiData, ThrowOnError>) => {
     return (options.client ?? client).post<SetTimeApiResponses, SetTimeApiErrors, ThrowOnError>({
-        url: '/api/discord/town/{guildId}/time',
+        url: '/api/discord/town/{gameId}/time',
         ...options
     });
 };

@@ -1,6 +1,7 @@
 ﻿import {
     checkGuildApi,
     type CheckGuildApiResponse,
+    type ClocktowerServerDataTypesEnumGameTime,
     getAuthDataApi,
     getGuildsWithUserApi,
     getJoinDataApi,
@@ -10,7 +11,8 @@
     inviteUserApi,
     moveUserToChannelApi,
     rebuildTownApi,
-    type RebuildTownApiResponse
+    type RebuildTownApiResponse,
+    setTimeApi
 } from '@/api';
 import {
     mapToMiniGuild,
@@ -21,7 +23,9 @@ import {
 import {
     apiClient
 } from "@/api/api-client.ts";
-
+import {
+    GameTime
+} from "@/components/features/discordTownPanel/hooks";
 
 async function checkGuild(id: string): Promise<CheckGuildApiResponse> {
     const {
@@ -192,6 +196,37 @@ async function getJoinData(key: string) {
     });
 }
 
+async function setTime(gameId: string, gameTime: GameTime) {
+    const {
+        error
+    } = await setTimeApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+        },
+        query: {
+            GameTime: gameTimeToString(gameTime)
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set the game time:', error);
+        throw new Error(error.toString());
+    }
+}
+
+const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGameTime => {
+    switch (gameTime) {
+        case GameTime.Day:
+            return 'Day';
+        case GameTime.Evening:
+            return 'Evening';
+        case GameTime.Night:
+            return 'Night';
+        default:
+            throw new Error(`Unknown GameTime value: ${gameTime}`);
+    }
+};
 export const discordService = {
     checkGuild,
     getGuildsWithUser,
@@ -201,5 +236,6 @@ export const discordService = {
     moveUserToChannel,
     getAuthData,
     inviteUser,
-    getJoinData
+    getJoinData,
+    setTime
 }
