@@ -27,6 +27,9 @@ function GameManager() {
     const [hasError, setHasError] = useState(false);
     const [error, setError] = useState('');
     const guildId = useAppStore((state) => state.guildId);
+    const gameId = useAppStore((state) => state.gameId);
+    const setGameId = useAppStore((state) => state.setGameId);
+    
     const clearError = () => {
         setHasError(false);
         setError('');
@@ -71,6 +74,7 @@ function GameManager() {
         setIsLoading(true);
         gamesService.startGame(id, guildId).then(data => {
             setGame(data);
+            setGameId(data.id);
             getGames();
         })
             .catch((err) => handleError(err))
@@ -80,8 +84,7 @@ function GameManager() {
     const inviteUser = async () => {
         clearError();
         setIsLoading(true);
-        await discordService.inviteUser(guildId, id).then(data => {
-            console.log(data)
+        await discordService.inviteUser(gameId, id).then(_ => {
         })
             .catch((err) => handleError(err))
             .finally(() => setIsLoading(false));
@@ -112,6 +115,8 @@ function GameManager() {
                             </div>
                         )}
 
+                        <h1>Current Game: {gameId}</h1>
+                        
                         <button
                             onClick={loadDummyData}
                             className="btn-primary">

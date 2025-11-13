@@ -271,13 +271,13 @@ export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: 
 };
 
 /**
- * Invites user to the specified guild
+ * Invites user to the specified game
  *
- * Invites user to the specified guild
+ * Invites user to the specified game
  */
 export const inviteUserApi = <ThrowOnError extends boolean = false>(options: Options<InviteUserApiData, ThrowOnError>) => {
     return (options.client ?? client).post<InviteUserApiResponses, InviteUserApiErrors, ThrowOnError>({
-        url: '/api/discord/town/{guildId}/invite/{userId}',
+        url: '/api/discord/town/{gameId}/invite/{userId}',
         ...options
     });
 };

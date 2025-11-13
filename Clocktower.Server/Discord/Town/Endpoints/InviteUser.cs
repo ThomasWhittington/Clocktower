@@ -6,41 +6,45 @@ namespace Clocktower.Server.Discord.Town.Endpoints;
 public class InviteUser : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{guildId}/invite/{userId}", Handle)
+        .MapPost("/{gameId}/invite/{userId}", Handle)
         .SetOpenApiOperationId<InviteUser>()
-        .WithSummary("Invites user to the specified guild")
-        .WithDescription("Invites user to the specified guild")
-        .WithRequestValidation<GuildAndUserRequest>();
+        .WithSummary("Invites user to the specified game")
+        .WithDescription("Invites user to the specified game")
+        .WithRequestValidation<Request>();
 
-    private static async Task<Results<Ok<bool>, BadRequest<string>>> Handle(
-        [AsParameters] GuildAndUserRequest request,
+    private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle(
+        [AsParameters] Request request,
         IDiscordTownService discordTownService)
     {
-        var guildId = ulong.Parse(request.GuildId);
+        var gameId = request.GameId.Trim();
         var userId = ulong.Parse(request.UserId);
 
-        var (success, message) = await discordTownService.InviteUser(guildId, userId);
-        if (success)
-        {
-            return TypedResults.Ok(success);
-        }
+        var (outcome, message) = await discordTownService.InviteUser(gameId, userId);
 
-        return TypedResults.BadRequest(message);
+        switch (outcome)
+        {
+            case InviteUserOutcome.InviteSent: return TypedResults.Ok(message);
+            case InviteUserOutcome.GameDoesNotExistError:
+            case InviteUserOutcome.UserNotFoundError:
+                return TypedResults.NotFound(message);
+            case InviteUserOutcome.InvalidGuildError:
+            case InviteUserOutcome.UnknownError:
+            default:
+                return TypedResults.BadRequest(message);
+        }
     }
 
     [UsedImplicitly]
-    public record GuildAndUserRequest(string GuildId, string UserId);
+    public record Request(string GameId, string UserId);
 
     [UsedImplicitly]
-    public class GuildAndUserRequestValidator : AbstractValidator<GuildAndUserRequest>
+    public class RequestValidator : AbstractValidator<Request>
     {
-        public GuildAndUserRequestValidator()
+        public RequestValidator()
         {
-            RuleFor(x => x.GuildId)
+            RuleFor(x => x.GameId)
                 .NotEmpty()
-                .WithMessage("GuildId cannot be empty")
-                .Must(Common.Validation.BeValidDiscordSnowflake)
-                .WithMessage("GuildId must be a valid Discord snowflake");
+                .WithMessage("GameId cannot be empty");
 
             RuleFor(x => x.UserId)
                 .NotEmpty()

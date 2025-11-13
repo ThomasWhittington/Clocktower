@@ -8,6 +8,9 @@ import {
 import {
     useTownOccupancy
 } from "./hooks";
+import {
+    useAppStore
+} from "@/store";
 
 function DiscordTownPanel() {
     const {
@@ -15,6 +18,7 @@ function DiscordTownPanel() {
         isLoading,
         error
     } = useTownOccupancy();
+    const gameId = useAppStore((state) => state.gameId);
 
     return (
         <div
@@ -33,6 +37,8 @@ function DiscordTownPanel() {
                         townOccupancy={townOccupancy}/>
                 </div>
             }
+            {gameId &&
+                <h2>Current Game: {gameId}</h2>}
         </div>
     );
 }

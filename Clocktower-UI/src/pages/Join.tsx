@@ -14,16 +14,17 @@ import {
 const Join = () => {
     const setCurrentUser = useAppStore((state) => state.setCurrentUser);
     const setGuildId = useAppStore((state) => state.setGuildId);
+    const setGameId = useAppStore((state) => state.setGameId);
 
     useEffect(() => {
         const handleJoin = async () => {
             resetAllApplicationState();
-            const urlParams = new URLSearchParams(window.location.search);
+            const urlParams = new URLSearchParams(globalThis.location.search);
             const key = urlParams.get('key');
-            const error = urlParams.get('error');
+            const urlError = urlParams.get('error');
             console.log(urlParams);
-            if (error) {
-                window.location.href = '/error?error=' + encodeURIComponent(error);
+            if (urlError) {
+                globalThis.location.href = '/error?error=' + encodeURIComponent(urlError);
                 return;
             }
             if (key) {
@@ -34,28 +35,27 @@ const Join = () => {
                     } = await discordService.getJoinData(key);
                     if (error) {
                         console.error('Failed to get join data:', error);
-                        window.location.href = '/error?error=join_data_failed';
-                    } else {
-                        if (data && data.user && data.guildId) {
-                            setCurrentUser({
-                                id: data.user?.id ?? '',
-                                name: data.user?.name ?? '',
-                                avatarUrl: data.user?.avatarUrl ?? ''
-                            });
-                            setGuildId(data.guildId);
+                        globalThis.location.href = '/error?error=join_data_failed';
+                    } else if (data?.user && data.guildId && data.gameId) {
+                        setCurrentUser({
+                            id: data.user?.id ?? '',
+                            name: data.user?.name ?? '',
+                            avatarUrl: data.user?.avatarUrl ?? ''
+                        });
+                        setGuildId(data.guildId);
+                        setGameId(data.gameId);
 
-                            window.location.href = '/game';
-                        } else {
-                            console.error('Unexpected join data:', data);
-                            window.location.href = '/error?error=join_data_failed';
-                        }
+                        globalThis.location.href = '/game';
+                    } else {
+                        console.error('Unexpected join data:', data);
+                        globalThis.location.href = '/error?error=join_data_failed';
                     }
                 } catch (error) {
                     console.error('Failed to get join data:', error);
-                    window.location.href = '/error?error=join_data_failed';
+                    globalThis.location.href = '/error?error=join_data_failed';
                 }
             } else {
-                window.location.href = '/error?error=missing_key';
+                globalThis.location.href = '/error?error=missing_key';
             }
         };
         handleJoin().then(_ => {

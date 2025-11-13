@@ -16,10 +16,10 @@ export type ClocktowerServerDataChannelOccupants = {
 
 export type ClocktowerServerDataGameState = {
     id?: string | null;
+    guildId?: string | null;
     players?: Array<ClocktowerServerDataTypesPlayer> | null;
     maxPlayers?: number;
     readonly isFull?: boolean;
-    guildId?: string | null;
 };
 
 export type ClocktowerServerDataMiniCategory = {
@@ -58,6 +58,7 @@ export type ClocktowerServerDataTypesEnumRoleType = 'Townsfolk' | 'Outsider' | '
 export type ClocktowerServerDataTypesJoinData = {
     guildId?: string | null;
     user?: ClocktowerServerDataMiniUser;
+    gameId?: string | null;
 };
 
 export type ClocktowerServerDataTypesPlayer = {
@@ -112,9 +113,9 @@ export type MicrosoftAspNetCoreHttpHttpValidationProblemDetails = {
 
 export type ClocktowerServerDataGameStateWritable = {
     id?: string | null;
+    guildId?: string | null;
     players?: Array<ClocktowerServerDataTypesPlayer> | null;
     maxPlayers?: number;
-    guildId?: string | null;
 };
 
 export type ClocktowerServerDataTownOccupantsWritable = {
@@ -469,11 +470,11 @@ export type GetTownStatusApiResponse = GetTownStatusApiResponses[keyof GetTownSt
 export type InviteUserApiData = {
     body?: never;
     path: {
-        guildId: string;
+        gameId: string;
         userId: string;
     };
     query?: never;
-    url: '/api/discord/town/{guildId}/invite/{userId}';
+    url: '/api/discord/town/{gameId}/invite/{userId}';
 };
 
 export type InviteUserApiErrors = {
@@ -481,6 +482,10 @@ export type InviteUserApiErrors = {
      * Bad Request
      */
     400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: string;
 };
 
 export type InviteUserApiError = InviteUserApiErrors[keyof InviteUserApiErrors];
@@ -489,7 +494,7 @@ export type InviteUserApiResponses = {
     /**
      * OK
      */
-    200: boolean;
+    200: string;
 };
 
 export type InviteUserApiResponse = InviteUserApiResponses[keyof InviteUserApiResponses];

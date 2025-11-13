@@ -8,7 +8,7 @@ public interface IDiscordTownService
     Task<(bool success, string message)> RebuildTown(ulong guildId);
     (bool success, bool exists, string message) TownExists(ulong guildId);
     Task<(bool success, string message)> ToggleStoryTeller(ulong guildId, ulong userId);
-    Task<(bool success, string message)> InviteUser(ulong guildId, ulong userId);
+    Task<(InviteUserOutcome outcome, string message)> InviteUser(string gameId, ulong userId);
     Task<(bool success, TownOccupants? townOccupants, string message)> GetTownOccupancy(ulong guildId);
     JoinData? GetJoinData(string key);
     Task<(bool success, string message)> SetTime(ulong guildId, GameTime gameTime);

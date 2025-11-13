@@ -3,6 +3,9 @@
 import type {
     GameState
 } from "@/types";
+import {
+    useAppStore
+} from "@/store";
 
 
 interface GameListProps {
@@ -10,6 +13,8 @@ interface GameListProps {
 }
 
 const GameList: React.FC<GameListProps> = ({games}) => {
+    const setGameId = useAppStore((state)=>state.setGameId);
+    
     return (
         <div
             className="mt-4">
@@ -28,6 +33,8 @@ const GameList: React.FC<GameListProps> = ({games}) => {
                             <p className="text-gray-400">Players: {game.players.length}{game.maxPlayers > 0 ? `/${game.maxPlayers}` : ''}</p>
                             {game.isFull &&
                                 <p>FULL</p>}
+                            
+                            <button className="btn-outline" onClick={()=>setGameId(game.id)}>Select</button>
                         </div>
                     ))
                 )}

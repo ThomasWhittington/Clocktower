@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Socket;
 using Discord;
@@ -323,28 +324,31 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
         }
     }
 
-    public async Task<(bool success, string message)> InviteUser(ulong guildId, ulong userId)
+    public async Task<(InviteUserOutcome outcome, string message )> InviteUser(string gameId, ulong userId)
     {
         try
         {
+            var gameState = GameStateStore.Get(gameId);
+            if (gameState is null) return (InviteUserOutcome.GameDoesNotExistError, $"Couldn't find game with id: {gameId}");
+            if (!ulong.TryParse(gameState.GuildId, out var guildId)) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
             var guild = bot.Client.GetGuild(guildId);
-            if (guild is null) return (false, "Guild not found");
-            var user = await bot.Client.GetUserAsync(userId);
-            if (user is null) return (false, $"Couldn't find user: {userId}");
+            if (guild is null) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
+            var user = guild.GetUser(userId);
+            if (user is null) return (InviteUserOutcome.UserNotFoundError, $"Couldn't find user: {userId}");
 
 
-            var response = new JoinData(guildId.ToString(), new MiniUser(user.Id.ToString(), user.Username, user.GetAvatarUrl()));
+            var response = new JoinData(guildId.ToString(), new MiniUser(user.Id.ToString(), user.Username, user.GetAvatarUrl()), gameId);
             var tempKey = Guid.NewGuid().ToString();
             cache.Set($"join_data_{tempKey}", response, TimeSpan.FromMinutes(5));
             var url = _secrets.FeUri + $"/join?key={tempKey}";
 
             var dmChannel = await user.CreateDMChannelAsync();
             await dmChannel.SendMessageAsync($"[Join here]({url})");
-            return (true, "Sent message to user");
+            return (InviteUserOutcome.InviteSent, "Sent message to user");
         }
         catch (Exception)
         {
-            return (false, "Failed to send message to user");
+            return (InviteUserOutcome.UnknownError, "Failed to send message to user");
         }
     }
 }

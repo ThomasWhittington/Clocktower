@@ -164,24 +164,23 @@ async function getGuildsWithUser(userId: string): Promise<MiniGuild[]> {
     return [];
 }
 
-async function inviteUser(guildId: string, userId: string): Promise<boolean> {
+async function inviteUser(gameId: string, userId: string): Promise<boolean> {
     const {
-        data,
         error
     } = await inviteUserApi({
         client: apiClient,
         path: {
-            guildId: guildId,
+            gameId: gameId,
             userId: userId
         }
     });
 
     if (error) {
-        console.error('Failed to get guilds:', error);
+        console.error('Failed to invite user:', error);
         throw new Error(error.toString());
     }
 
-    return data ?? false;
+    return true;
 }
 
 async function getJoinData(key: string) {
