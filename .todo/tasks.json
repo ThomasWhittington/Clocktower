@@ -1,0 +1,134 @@
+[
+  {
+    "id": "TASK_1",
+    "priority": "LOW",
+    "tags": [],
+    "title": "SignalR per game",
+    "description": "When signing up to signalR. provide the game id and user id. Then have signal R send notifications to specific players",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 13
+      },
+      "time": {
+        "hour": 17,
+        "minute": 36,
+        "second": 15,
+        "nano": 34311000
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_3",
+    "priority": "LOW",
+    "tags": [],
+    "title": "Add signalR on connect",
+    "description": "When a user reconnects to a game session, the server should inform them of the game state to ensure they don\u0027t fall behind",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 13
+      },
+      "time": {
+        "hour": 17,
+        "minute": 37,
+        "second": 8,
+        "nano": 521252200
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_6",
+    "priority": "LOW",
+    "tags": [],
+    "title": "Player games endpoint",
+    "description": "Endpoint to return gameIds which the player is a part of\n",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 13
+      },
+      "time": {
+        "hour": 17,
+        "minute": 38,
+        "second": 6,
+        "nano": 209103700
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_10",
+    "priority": "LOW",
+    "tags": [],
+    "title": "gamestate start date",
+    "description": "Add start date to gamestate so user can determine most recent",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 13
+      },
+      "time": {
+        "hour": 17,
+        "minute": 38,
+        "second": 32,
+        "nano": 281949300
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_15",
+    "priority": "LOW",
+    "tags": [],
+    "title": "Add clocktower bot",
+    "description": "Add clocktower bot functionality from the current one (move to town hall, go to bed etc)",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 13
+      },
+      "time": {
+        "hour": 17,
+        "minute": 39,
+        "second": 4,
+        "nano": 252750000
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_21",
+    "priority": "LOW",
+    "tags": [],
+    "title": "Add discord user status icons",
+    "description": "Add muted/ deafened icons to town user status",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 13
+      },
+      "time": {
+        "hour": 17,
+        "minute": 39,
+        "second": 34,
+        "nano": 814565500
+      }
+    },
+    "isImported": false
+  }
+]
