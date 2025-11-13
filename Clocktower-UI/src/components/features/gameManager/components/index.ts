@@ -1,1 +1,2 @@
-﻿export {default} from './GameList';
+﻿export {GameList} from './GameList';
+export {TimeOfDaySwitch} from'./TimeOfDaySwitch';

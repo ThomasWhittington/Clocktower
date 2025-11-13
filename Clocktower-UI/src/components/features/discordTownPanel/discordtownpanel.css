@@ -12,13 +12,9 @@
     }
 
     .channel-button {
-        @apply absolute -top-3 left-4 bg-discord px-2 text-sm font-semibold text-white!;
+        @apply absolute -top-3 left-4 bg-discord px-2 text-sm font-semibold text-white! rounded-2xl hover:bg-forestgreen;
     }
-
-    .channel-button:hover {
-        @apply bg-forestgreen rounded-2xl;
-    }
-
+    
     .channel-button-enabled {
         @apply cursor-pointer;
     }

@@ -12,7 +12,7 @@ interface GameListProps {
     games: GameState[];
 }
 
-const GameList: React.FC<GameListProps> = ({games}) => {
+export const GameList: React.FC<GameListProps> = ({games}) => {
     const setGameId = useAppStore((state)=>state.setGameId);
     
     return (
@@ -43,4 +43,3 @@ const GameList: React.FC<GameListProps> = ({games}) => {
     );
 };
 
-export default GameList;

@@ -5,9 +5,6 @@ import {
     Spinner
 } from '@/components/ui';
 
-import GameList
-    from "./components";
-
 import {
     discordService,
     gamesService
@@ -18,18 +15,22 @@ import type {
 import {
     useAppStore
 } from "@/store";
+import {
+    GameList,
+    TimeOfDaySwitch
+} from "@/components/features/gameManager/components";
 
 function GameManager() {
     const [isLoading, setIsLoading] = useState(false);
     const [games, setGames] = useState<GameState[]>([]);
     const [game, setGame] = useState<GameState>();
-    const [id, setId] = useState('');
+    const [text, setText] = useState('');
     const [hasError, setHasError] = useState(false);
     const [error, setError] = useState('');
     const guildId = useAppStore((state) => state.guildId);
     const gameId = useAppStore((state) => state.gameId);
     const setGameId = useAppStore((state) => state.setGameId);
-    
+
     const clearError = () => {
         setHasError(false);
         setError('');
@@ -64,7 +65,7 @@ function GameManager() {
     const getGame = async () => {
         clearError();
         setIsLoading(true);
-        gamesService.getGame(id).then(data => setGame(data))
+        gamesService.getGame(text).then(data => setGame(data))
             .catch((err) => handleError(err))
             .finally(() => setIsLoading(false));
     }
@@ -72,7 +73,7 @@ function GameManager() {
     const startGame = async () => {
         clearError();
         setIsLoading(true);
-        gamesService.startGame(id, guildId).then(data => {
+        gamesService.startGame(text, guildId).then(data => {
             setGame(data);
             setGameId(data.id);
             getGames();
@@ -84,12 +85,12 @@ function GameManager() {
     const inviteUser = async () => {
         clearError();
         setIsLoading(true);
-        await discordService.inviteUser(gameId, id).then(_ => {
+        await discordService.inviteUser(gameId, text).then(_ => {
         })
             .catch((err) => handleError(err))
             .finally(() => setIsLoading(false));
     }
-
+    
     return (
         <div>
             <h2 className="text-3xl font-bold mb-6 text-gray-200">Game Manager</h2>
@@ -116,7 +117,7 @@ function GameManager() {
                         )}
 
                         <h1>Current Game: {gameId}</h1>
-                        
+
                         <button
                             onClick={loadDummyData}
                             className="btn-primary">
@@ -130,8 +131,8 @@ function GameManager() {
                         </button>
                         <br/>
                         <input
-                            value={id}
-                            onChange={e => setId(e.target.value)}
+                            value={text}
+                            onChange={e => setText(e.target.value)}
                         />
                         <button
                             onClick={startGame}
@@ -148,12 +149,13 @@ function GameManager() {
                             className="btn-primary">
                             Invite User
                         </button>
+                        <br/>
+                        <TimeOfDaySwitch/>
                         <GameList
                             games={games}/>
                         <br/>
 
                         <pre>{JSON.stringify(game, null, 2)}</pre>
-
 
                     </>)
             }
