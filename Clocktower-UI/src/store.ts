@@ -26,16 +26,8 @@ const getStoredGuildId = (): string => {
     return localStorage.getItem('guildId') || '';
 };
 
-const getStoredGameId = (): string => {
-    return localStorage.getItem('gameId') || '';
-};
-
 const setStoredGuildId = (id: string) => {
     localStorage.setItem('guildId', id);
-};
-
-const setStoredGameId = (id: string) => {
-    localStorage.setItem('gameId', id);
 };
 
 const getStoredUser = (): User | undefined => {
@@ -60,7 +52,7 @@ const getInitialState = () => ({
 export const useAppStore = create<AppState>(
     (set) => ({
         guildId: getStoredGuildId(),
-        gameId: getStoredGameId(),
+        gameId: '',
         currentUser: getStoredUser(),
         loggedIn: getLoggedIn(),
         setGuildId: (id) => {
@@ -68,7 +60,6 @@ export const useAppStore = create<AppState>(
             set(() => ({guildId: id}));
         },
         setGameId: (id) => {
-            setStoredGameId(id);
             set(() => ({gameId: id}));
         },
         setCurrentUser: (user) => {
