@@ -82,6 +82,7 @@ h1 {
 .btn-primary {
     @apply bg-[#5865F2] hover:bg-[#4754b8] text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer;
 }
+
 .btn-secondary {
     @apply bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer;
 }
@@ -103,7 +104,7 @@ h1 {
     position: absolute;
     width: 15px;
     height: 15px;
-    opacity:1;
+    opacity: 1;
     transition: opacity 0.3s ease;
     cursor: pointer;
 }
@@ -114,5 +115,6 @@ h1 {
 
 @theme {
     --color-discord: #1f2936;
+    --color-forestgreen: #4d8e53;
 }
 

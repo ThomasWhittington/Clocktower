@@ -16,9 +16,9 @@
     }
 
     .channel-button:hover {
-        @apply bg-[#4d8e53] rounded-2xl;
+        @apply bg-forestgreen rounded-2xl;
     }
-    
+
     .channel-button-enabled {
         @apply cursor-pointer;
     }
@@ -28,16 +28,29 @@
     }
 
     .channel-occupants {
-        @apply mt-2;
+        @apply mt-2 p-2 pl-4;
     }
+
     #discord-town-panel {
         @apply max-h-screen overflow-y-auto pl-2;
         scrollbar-gutter: stable;
         direction: rtl;
 
     }
+
     #discord-town-panel > * {
         direction: ltr;
+    }
 
+    .town-user-status {
+        @apply flex flex-row w-1/2;
+    }
+
+    .town-user-status > img {
+        @apply size-7 rounded-full mr-2;
+    }
+    
+    .town-user-status>p{
+        @apply content-center;
     }
 }

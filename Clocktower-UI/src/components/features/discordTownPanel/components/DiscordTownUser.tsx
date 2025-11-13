@@ -6,9 +6,13 @@ function DiscordTownUser({user}: {
     user: MiniUser
 }) {
     return (
-        <>
-            <p className="text-purple-700">{user.name}</p>
-        </>
+        <div
+            className="town-user-status">
+            <img
+                src={user.avatarUrl}
+                alt={user.name}/>
+            <p>{user.name}</p>
+        </div>
     );
 }
 
