@@ -137,7 +137,7 @@
     "tags": [],
     "title": "Simplify secrets",
     "description": "Some secrets use the same url, only store the base url, handle the actual endpoints in code",
-    "status": "TODO",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,
@@ -149,6 +149,19 @@
         "minute": 41,
         "second": 57,
         "nano": 512645600
+      }
+    },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 13
+      },
+      "time": {
+        "hour": 22,
+        "minute": 23,
+        "second": 36,
+        "nano": 315429600
       }
     },
     "isImported": false

@@ -19,14 +19,16 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IMemoryCache c
     {
         const string scopes = "identify guilds";
 
-        if (string.IsNullOrEmpty(_secrets.DiscordClientId) || string.IsNullOrEmpty(_secrets.DiscordRedirectUri))
+        if (string.IsNullOrEmpty(_secrets.DiscordClientId) || string.IsNullOrEmpty(_secrets.ServerUri))
         {
             return (false, string.Empty, "Discord OAuth not properly configured");
         }
 
+        var redirectUri = _secrets.ServerUri + "/api/discord/auth/callback";
+
         var authorizationUrl = $"https://discord.com/api/oauth2/authorize" +
                                $"?client_id={_secrets.DiscordClientId}" +
-                               $"&redirect_uri={Uri.EscapeDataString(_secrets.DiscordRedirectUri)}" +
+                               $"&redirect_uri={Uri.EscapeDataString(redirectUri)}" +
                                $"&response_type=code" +
                                $"&scope={Uri.EscapeDataString(scopes)}";
 
@@ -84,14 +86,14 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IMemoryCache c
         if (string.IsNullOrEmpty(_secrets.DiscordClientId)) return (false, string.Empty, "Discord OAuth not properly configured");
 
         var permissionsInt = 8;
-
+        var redirectUri = _secrets.ServerUri + "/api/discord/auth/bot-callback";
         var authorizationUrl = $"https://discord.com/oauth2/authorize" +
                                $"?client_id={_secrets.DiscordClientId}" +
                                $"&permissions={permissionsInt}" +
                                $"&integration_type=0" +
                                $"&scope=bot" +
                                $"&response_type=code" +
-                               $"&redirect_uri={Uri.EscapeDataString(_secrets.DiscordBotRedirectUri)}";
+                               $"&redirect_uri={Uri.EscapeDataString(redirectUri)}";
 
         return (true, authorizationUrl, "Bot addition Url generated");
     }
@@ -109,12 +111,13 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IMemoryCache c
 
     private async Task<TokenResponse?> ExchangeCodeForToken(string code, HttpClient httpClient)
     {
+        var redirectUri = _secrets.ServerUri + "/api/discord/auth/callback";
         var tokenRequest = new FormUrlEncodedContent([
             new KeyValuePair<string, string>("client_id", _secrets.DiscordClientId),
             new KeyValuePair<string, string>("client_secret", _secrets.DiscordClientSecret),
             new KeyValuePair<string, string>("grant_type", "authorization_code"),
             new KeyValuePair<string, string>("code", code),
-            new KeyValuePair<string, string>("redirect_uri", _secrets.DiscordRedirectUri)
+            new KeyValuePair<string, string>("redirect_uri", redirectUri)
         ]);
 
         var response = await httpClient.PostAsync("https://discord.com/api/oauth2/token", tokenRequest);
