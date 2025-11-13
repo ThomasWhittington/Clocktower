@@ -23,7 +23,8 @@ const GameList: React.FC<GameListProps> = ({games}) => {
                         <div
                             key={game.id}
                             className="bg-gray-800 p-4 rounded-lg">
-                            <h4 className="text-lg font-medium text-gray-200">{game.id}</h4>
+                            <h4 className="text-lg font-medium text-gray-200">{game.name}</h4>
+                            <h5 className="sm text-gray-600">{game.id}</h5>
                             <p className="text-gray-400">Players: {game.players.length}{game.maxPlayers > 0 ? `/${game.maxPlayers}` : ''}</p>
                             {game.isFull &&
                                 <p>FULL</p>}

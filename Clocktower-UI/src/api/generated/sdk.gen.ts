@@ -73,6 +73,9 @@ import type {
     SendMessageApiData,
     SendMessageApiErrors,
     SendMessageApiResponses,
+    SetTimeApiData,
+    SetTimeApiErrors,
+    SetTimeApiResponses,
     StartGameApiData,
     StartGameApiErrors,
     StartGameApiResponses,
@@ -81,9 +84,7 @@ import type {
     ToggleStoryTellerApiResponses
 } from './types.gen';
 
-export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> =
-    Options2<TData, ThrowOnError>
-    & {
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
      * You can provide a client instance returned by `createClient()` instead of
      * individual options. This might be also useful if you want to implement a
@@ -306,6 +307,18 @@ export const rebuildTownApi = <ThrowOnError extends boolean = false>(options: Op
 };
 
 /**
+ * Sets the time of the town
+ *
+ * Sets the game state of the town based on the day time
+ */
+export const setTimeApi = <ThrowOnError extends boolean = false>(options: Options<SetTimeApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetTimeApiResponses, SetTimeApiErrors, ThrowOnError>({
+        url: '/api/discord/town/{guildId}/time',
+        ...options
+    });
+};
+
+/**
  * Toggles the storyteller role for a user
  *
  * Adds or removes the storyteller role from the specified user
@@ -372,7 +385,7 @@ export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?
  */
 export const startGameApi = <ThrowOnError extends boolean = false>(options: Options<StartGameApiData, ThrowOnError>) => {
     return (options.client ?? client).post<StartGameApiResponses, StartGameApiErrors, ThrowOnError>({
-        url: '/api/games/{gameId}/start',
+        url: '/api/games/{name}/start',
         ...options
     });
 };

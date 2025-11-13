@@ -19,7 +19,9 @@ async function getGame(id: string): Promise<GameState> {
         error
     } = await getGameApi({
         client: apiClient,
-        path: {"gameId": id}
+        path: {
+            gameId: id
+        }
     });
 
     if (error) {
@@ -32,6 +34,7 @@ async function getGame(id: string): Promise<GameState> {
     }
     return {
         id: id,
+        name: '',
         players: [],
         maxPlayers: 0,
         isFull: false
@@ -67,14 +70,14 @@ async function loadDummyData(): Promise<string | undefined> {
     return data;
 }
 
-async function startGame(id: string): Promise<GameState> {
+async function startGame(name: string): Promise<GameState> {
 
     const {
         data,
         error
     } = await startGameApi({
         client: apiClient,
-        path: {"gameId": id}
+        path: {name: name}
     });
     if (error) {
         console.error('Failed to start game:', error);
@@ -85,7 +88,8 @@ async function startGame(id: string): Promise<GameState> {
         return mapToGameState(data);
     }
     return {
-        id: id,
+        id:'',
+        name: name,
         players: [],
         maxPlayers: 0,
         isFull: false

@@ -3,6 +3,7 @@
 public class GameState
 {
     public string Id { get; set; }
+    public string Name { get; set; }
     public List<Player> Players { get; set; } = [];
     public int MaxPlayers { get; set; } = 0;
 

@@ -16,6 +16,7 @@ export type ClocktowerServerDataChannelOccupants = {
 
 export type ClocktowerServerDataGameState = {
     id?: string | null;
+    name?: string | null;
     players?: Array<ClocktowerServerDataTypesPlayer> | null;
     maxPlayers?: number;
     readonly isFull?: boolean;
@@ -48,18 +49,11 @@ export type ClocktowerServerDataTownOccupants = {
     channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
 };
 
-export type ClocktowerServerDataTypesEnumEdition =
-    'TroubleBrewing'
-    | 'SectsAndViolets'
-    | 'BadMoonRising'
-    | 'Experimental';
+export type ClocktowerServerDataTypesEnumEdition = 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
 
-export type ClocktowerServerDataTypesEnumRoleType =
-    'Townsfolk'
-    | 'Outsider'
-    | 'Minion'
-    | 'Demon'
-    | 'Traveller';
+export type ClocktowerServerDataTypesEnumGameTime = 'Day' | 'Evening' | 'Night';
+
+export type ClocktowerServerDataTypesEnumRoleType = 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
 
 export type ClocktowerServerDataTypesJoinData = {
     guildId?: string | null;
@@ -118,6 +112,7 @@ export type MicrosoftAspNetCoreHttpHttpValidationProblemDetails = {
 
 export type ClocktowerServerDataGameStateWritable = {
     id?: string | null;
+    name?: string | null;
     players?: Array<ClocktowerServerDataTypesPlayer> | null;
     maxPlayers?: number;
 };
@@ -559,6 +554,35 @@ export type RebuildTownApiResponses = {
 
 export type RebuildTownApiResponse = RebuildTownApiResponses[keyof RebuildTownApiResponses];
 
+export type SetTimeApiData = {
+    body?: never;
+    path: {
+        guildId: string;
+    };
+    query: {
+        GameTime: ClocktowerServerDataTypesEnumGameTime;
+    };
+    url: '/api/discord/town/{guildId}/time';
+};
+
+export type SetTimeApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: string;
+};
+
+export type SetTimeApiError = SetTimeApiErrors[keyof SetTimeApiErrors];
+
+export type SetTimeApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetTimeApiResponse = SetTimeApiResponses[keyof SetTimeApiResponses];
+
 export type ToggleStoryTellerApiData = {
     body?: never;
     path: {
@@ -729,10 +753,10 @@ export type LoadDummyGamesApiResponse = LoadDummyGamesApiResponses[keyof LoadDum
 export type StartGameApiData = {
     body?: never;
     path: {
-        gameId: string;
+        name: string;
     };
     query?: never;
-    url: '/api/games/{gameId}/start';
+    url: '/api/games/{name}/start';
 };
 
 export type StartGameApiErrors = {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.Json;
-using Clocktower.Server.Data;
 
 namespace Clocktower.Server.Game.Services;
 
@@ -50,18 +49,20 @@ public class GameStateService
             : (false, $"Game ID '{gameId}' failed to be deleted");
     }
 
-    public (bool success, GameState? gameState, string message) StartNewGame(string gameId)
+    public (bool success, GameState? gameState, string message) StartNewGame(string name)
     {
+        var id = Guid.NewGuid().ToString();
         var newGameState = new GameState
         {
-            Id = gameId
+            Name = name,
+            Id = id
         };
 
-        bool addSuccessful = _games.TryAdd(gameId, newGameState);
+        bool addSuccessful = _games.TryAdd(id, newGameState);
 
         return addSuccessful
             ? (true, newGameState, "Game started successfully")
-            : (false, null, $"Game ID '{gameId}' already exists");
+            : (false, null, $"Game Name '{name}' already exists");
     }
 
     public (bool success, Player? newPlayer, string message, AddPlayerError error) AddPlayerToGame(string gameId, string playerName)
