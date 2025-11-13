@@ -15,6 +15,10 @@
         @apply absolute -top-3 left-4 bg-discord px-2 text-sm font-semibold text-white!;
     }
 
+    .channel-button:hover {
+        @apply bg-[#4d8e53] rounded-2xl;
+    }
+    
     .channel-button-enabled {
         @apply cursor-pointer;
     }
@@ -26,14 +30,13 @@
     .channel-occupants {
         @apply mt-2;
     }
-
-    #discord-town {
+    #discord-town-panel {
         @apply max-h-screen overflow-y-auto pl-2;
         scrollbar-gutter: stable;
         direction: rtl;
 
     }
-    #discord-town > * {
+    #discord-town-panel > * {
         direction: ltr;
 
     }
