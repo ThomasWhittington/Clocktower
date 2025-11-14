@@ -8,10 +8,10 @@ import type {
 interface AppState {
     loggedIn: boolean,
     guildId: string,
-    gameId: string,
+    gameId: string | null,
     currentUser?: User,
     setGuildId: (value: string) => void;
-    setGameId: (value: string) => void;
+    setGameId: (value: string | null) => void;
     setCurrentUser: (value: User) => void;
     clearSession: () => void;
     reset: () => void;
@@ -34,8 +34,12 @@ const setStoredGuildId = (id: string) => {
     localStorage.setItem('guildId', id);
 };
 
-const setStoredGameId = (id: string) => {
-    localStorage.setItem('gameId', id);
+const setStoredGameId = (id: string | null) => {
+    if (id) {
+        localStorage.setItem('gameId', id);
+    } else {
+        localStorage.removeItem('gameId');
+    }
 };
 
 const getStoredUser = (): User | undefined => {

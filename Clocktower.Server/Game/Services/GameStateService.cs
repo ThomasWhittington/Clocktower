@@ -1,9 +1,10 @@
 ﻿using System.Text.Json;
 using Clocktower.Server.Data.Stores;
+using Clocktower.Server.Discord.Services;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GameStateService
+public class GameStateService(DiscordBotService bot)
 {
     public IEnumerable<GameState> GetGames() =>
         GameStateStore.GetAll();
@@ -11,6 +12,12 @@ public class GameStateService
     public IEnumerable<GameState> GetGames(string guildId) =>
         GameStateStore.GetGames(guildId);
 
+    public IEnumerable<MiniGameState> GetPlayerGames(string userId)
+    {
+        var playerGames = GameStateStore.GetPlayerGames(userId);
+        var miniGameStates = playerGames.Select(o => new MiniGameState(o.Id, o.CreatedBy, o.CreatedDate));
+        return miniGameStates;
+    }
 
     public (bool success, string message) LoadDummyData()
     {
@@ -49,13 +56,16 @@ public class GameStateService
             : (false, $"Game ID '{gameId}' failed to be deleted");
     }
 
-    public (bool success, GameState? gameState, string message) StartNewGame(string guildId, string gameId)
+    public (bool success, GameState? gameState, string message) StartNewGame(string guildId, string gameId, ulong userId)
     {
+        var user = bot.Client.GetUser(userId);
+        if (user is null) return (false, null, "Couldn't find user");
         var newGameState = new GameState
         {
             Id = gameId,
             GuildId = guildId,
-            CreatedDate = DateTime.UtcNow
+            CreatedDate = DateTime.UtcNow,
+            CreatedBy = user.AsGameUser()
         };
 
         bool addSuccessful = GameStateStore.Set(gameId, newGameState);
@@ -67,6 +77,9 @@ public class GameStateService
 
     public (bool success, Player? newPlayer, string message, AddPlayerError error) AddPlayerToGame(string gameId, string playerName)
     {
+        throw new NotImplementedException();
+
+        /*
         var gameResult = GetGame(gameId);
         if (!gameResult.success || gameResult.gameState == null)
             return (false, null, gameResult.message, AddPlayerError.GameNotFound);
@@ -83,6 +96,7 @@ public class GameStateService
         gameResult.gameState.Players.Add(newPlayer);
 
         return (true, newPlayer, "Player added successfully", AddPlayerError.NoError);
+        */
     }
 }
 

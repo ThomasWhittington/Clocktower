@@ -8,6 +8,7 @@ import type {
     GetGamesApiResponse,
     GetGuildsWithUserApiResponse,
     GetJoinDataApiResponse,
+    GetPlayerGamesApiResponse,
     GetRolesApiResponse,
     GetTownOccupancyApiResponse,
     GetTownStatusApiResponse,
@@ -47,13 +48,13 @@ export const getGuildsWithUserApiResponseTransformer = async (data: any): Promis
 };
 
 export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetAuthDataApiResponse> => {
-    data = clocktowerServerDataMiniUserSchemaResponseTransformer(data);
+    data = clocktowerServerDataGameUserSchemaResponseTransformer(data);
     return data;
 };
 
 const clocktowerServerDataTypesJoinDataSchemaResponseTransformer = (data: any) => {
     if (data.user) {
-        data.user = clocktowerServerDataMiniUserSchemaResponseTransformer(data.user);
+        data.user = clocktowerServerDataGameUserSchemaResponseTransformer(data.user);
     }
     return data;
 };
@@ -87,7 +88,7 @@ const clocktowerServerDataChannelOccupantsSchemaResponseTransformer = (data: any
     }
     if (data.occupants) {
         data.occupants = data.occupants.map((item: any) => {
-            return clocktowerServerDataMiniUserSchemaResponseTransformer(item);
+            return clocktowerServerDataGameUserSchemaResponseTransformer(item);
         });
     }
     return data;
@@ -111,8 +112,11 @@ export const addPlayerToGameApiResponseTransformer = async (data: any): Promise<
 const clocktowerServerDataGameStateSchemaResponseTransformer = (data: any) => {
     if (data.players) {
         data.players = data.players.map((item: any) => {
-            return clocktowerServerDataTypesPlayerSchemaResponseTransformer(item);
+            return clocktowerServerDataGameUserSchemaResponseTransformer(item);
         });
+    }
+    if (data.createdBy) {
+        data.createdBy = clocktowerServerDataGameUserSchemaResponseTransformer(data.createdBy);
     }
     if (data.createdDate) {
         data.createdDate = new Date(data.createdDate);
@@ -128,6 +132,23 @@ export const getGameApiResponseTransformer = async (data: any): Promise<GetGameA
 export const getGamesApiResponseTransformer = async (data: any): Promise<GetGamesApiResponse> => {
     data = data.map((item: any) => {
         return clocktowerServerDataGameStateSchemaResponseTransformer(item);
+    });
+    return data;
+};
+
+const clocktowerServerDataMiniGameStateSchemaResponseTransformer = (data: any) => {
+    if (data.createdBy) {
+        data.createdBy = clocktowerServerDataGameUserSchemaResponseTransformer(data.createdBy);
+    }
+    if (data.createdDate) {
+        data.createdDate = new Date(data.createdDate);
+    }
+    return data;
+};
+
+export const getPlayerGamesApiResponseTransformer = async (data: any): Promise<GetPlayerGamesApiResponse> => {
+    data = data.map((item: any) => {
+        return clocktowerServerDataMiniGameStateSchemaResponseTransformer(item);
     });
     return data;
 };

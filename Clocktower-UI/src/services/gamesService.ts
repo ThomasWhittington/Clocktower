@@ -12,7 +12,7 @@ import {
     apiClient
 } from "@/api/api-client.ts";
 
-async function getGame(id: string): Promise<GameState> {
+async function getGame(id: string): Promise<GameState | null> {
 
     const {
         data,
@@ -29,18 +29,8 @@ async function getGame(id: string): Promise<GameState> {
         throw new Error('Failed to get game');
     }
 
-    if (data) {
-        return mapToGameState(data);
-    }
-    return {
-        id: id,
-        guildId: '',
-        players: [],
-        maxPlayers: 0,
-        isFull: false,
-        createdBy: '',
-        createdDate: new Date(2000, 1, 1)
-    };
+    if (!data) return null;
+    return mapToGameState(data);
 }
 
 async function getGames(): Promise<GameState[]> {
@@ -54,7 +44,6 @@ async function getGames(): Promise<GameState[]> {
         console.error('Failed to fetch games:', error);
         throw new Error('Failed to fetch games');
     }
-
     return data?.map(mapToGameState) ?? [];
 }
 
@@ -92,9 +81,7 @@ async function loadDummyData(): Promise<string | undefined> {
     return data;
 }
 
-async function startGame(gameId: string, guildId: string): Promise<GameState> {
-    console.log(gameId)
-    console.log(guildId)
+async function startGame(gameId: string, guildId: string, userId: string): Promise<GameState | null> {
     const {
         data,
         error
@@ -103,6 +90,7 @@ async function startGame(gameId: string, guildId: string): Promise<GameState> {
         path: {
             guildId: guildId,
             gameId: gameId,
+            userId: userId
         }
     });
     if (error) {
@@ -110,18 +98,8 @@ async function startGame(gameId: string, guildId: string): Promise<GameState> {
         throw new Error('Failed to start game');
     }
 
-    if (data) {
-        return mapToGameState(data);
-    }
-    return {
-        id: '',
-        guildId: guildId,
-        players: [],
-        maxPlayers: 0,
-        isFull: false,
-        createdBy: '',
-        createdDate: new Date(2000, 1, 1)
-    };
+    if (!data) return null;
+    return mapToGameState(data);
 }
 
 export const gamesService = {

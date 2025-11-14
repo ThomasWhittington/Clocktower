@@ -53,11 +53,7 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IMemoryCache c
             var userInfo = await GetDiscordUserInfo(tokenResponse.AccessToken, httpClient);
             if (userInfo == null) return errorUrl + Uri.EscapeDataString("Failed to get user information");
 
-            var avatarUrl = userInfo.Avatar != null
-                ? $"https://cdn.discordapp.com/avatars/{userInfo.Id}/{userInfo.Avatar}.png"
-                : "https://cdn.discordapp.com/embed/avatars/0.png";
-
-            var response = new MiniUser(userInfo.Id, userInfo.Username, avatarUrl);
+            var response = userInfo.AsGameUser();
             var tempKey = Guid.NewGuid().ToString();
             cache.Set($"auth_data_{tempKey}", response, TimeSpan.FromMinutes(5));
 
@@ -98,9 +94,9 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IMemoryCache c
         return (true, authorizationUrl, "Bot addition Url generated");
     }
 
-    public MiniUser? GetAuthData(string key)
+    public GameUser? GetAuthData(string key)
     {
-        if (cache.TryGetValue($"auth_data_{key}", out var userData) && userData is MiniUser response)
+        if (cache.TryGetValue($"auth_data_{key}", out var userData) && userData is GameUser response)
         {
             cache.Remove($"auth_data_{key}");
             return response;
@@ -146,21 +142,4 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IMemoryCache c
         var json = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<DiscordUser>(json, _deserializationOptions);
     }
-
-    private sealed record TokenResponse(
-        string AccessToken,
-        string TokenType,
-        int ExpiresIn,
-        string RefreshToken,
-        string Scope
-    );
-
-    private sealed record DiscordUser(
-        string Id,
-        string Username,
-        string? Email,
-        string? Avatar,
-        bool? Verified,
-        string Discriminator
-    );
 }

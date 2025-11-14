@@ -49,7 +49,7 @@
     "tags": [],
     "title": "Player games endpoint",
     "description": "Endpoint to return gameIds which the player is a part of\n",
-    "status": "TODO",
+    "status": "IN_PROGRESS",
     "date": {
       "date": {
         "year": 2025,

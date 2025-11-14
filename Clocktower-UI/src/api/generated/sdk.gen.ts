@@ -46,6 +46,8 @@ import type {
     GetJoinDataApiData,
     GetJoinDataApiErrors,
     GetJoinDataApiResponses,
+    GetPlayerGamesApiData,
+    GetPlayerGamesApiResponses,
     GetRolesApiData,
     GetRolesApiResponses,
     GetTownOccupancyApiData,
@@ -371,6 +373,16 @@ export const getGamesApi = <ThrowOnError extends boolean = false>(options?: Opti
 };
 
 /**
+ * Get the game state by id
+ */
+export const getPlayerGamesApi = <ThrowOnError extends boolean = false>(options: Options<GetPlayerGamesApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetPlayerGamesApiResponses, unknown, ThrowOnError>({
+        url: '/api/games/{userId}',
+        ...options
+    });
+};
+
+/**
  * Loads dummy data from saved json file
  */
 export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?: Options<LoadDummyGamesApiData, ThrowOnError>) => {
@@ -385,7 +397,7 @@ export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?
  */
 export const startGameApi = <ThrowOnError extends boolean = false>(options: Options<StartGameApiData, ThrowOnError>) => {
     return (options.client ?? client).post<StartGameApiResponses, StartGameApiErrors, ThrowOnError>({
-        url: '/api/games/{gameId}/start/{guildId}',
+        url: '/api/games/{gameId}/start/{guildId}/{userId}',
         ...options
     });
 };

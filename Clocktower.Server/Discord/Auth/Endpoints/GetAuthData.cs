@@ -13,11 +13,12 @@ public class GetAuthData : IEndpoint
             .WithSummary("Get temporary auth data")
             .WithDescription("Retrieves temporary authentication data by key");
     }
-    private static Results<Ok<MiniUser>, NotFound> Handle(
+
+    private static Results<Ok<GameUser>, NotFound> Handle(
         string key,
         [FromServices] IDiscordAuthService discordAuthService)
     {
-        var miniUser = discordAuthService.GetAuthData(key);
-        return miniUser != null ? TypedResults.Ok(miniUser) : TypedResults.NotFound();
+        var gameUser = discordAuthService.GetAuthData(key);
+        return gameUser != null ? TypedResults.Ok(gameUser) : TypedResults.NotFound();
     }
 }

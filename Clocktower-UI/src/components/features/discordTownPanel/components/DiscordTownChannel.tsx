@@ -32,16 +32,10 @@ function DiscordTownChannel({channel}: Readonly<{
             currentUser != undefined &&
             ValidationUtils.isValidDiscordId(currentUser.id))
         ) {
-            console.error('Ids were not valid');
-            console.log(guildId);
-            console.log(channel.channel.id);
-            console.log(currentUser!.id);
-
             return;
         }
 
         await discordService.moveUserToChannel(guildId, currentUser.id, channel.channel.id)
-            .then((data) => console.log(data))
             .catch((err) => console.error(err));
 
     }

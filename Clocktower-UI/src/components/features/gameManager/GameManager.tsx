@@ -23,12 +23,13 @@ import {
 function GameManager() {
     const [isLoading, setIsLoading] = useState(false);
     const [games, setGames] = useState<GameState[]>([]);
-    const [game, setGame] = useState<GameState>();
+    const [game, setGame] = useState<GameState | null>();
     const [text, setText] = useState('');
     const [hasError, setHasError] = useState(false);
     const [error, setError] = useState('');
     const guildId = useAppStore((state) => state.guildId);
     const gameId = useAppStore((state) => state.gameId);
+    const currentUser = useAppStore((state) => state.currentUser);
     const setGameId = useAppStore((state) => state.setGameId);
 
     const clearError = () => {
@@ -73,9 +74,9 @@ function GameManager() {
     const startGame = async () => {
         clearError();
         setIsLoading(true);
-        gamesService.startGame(text, guildId).then(data => {
+        gamesService.startGame(text, guildId, currentUser?.id!).then(data => {
             setGame(data);
-            setGameId(data.id);
+            setGameId(data?.id ?? null);
             getGames();
         })
             .catch((err) => handleError(err))
@@ -83,6 +84,7 @@ function GameManager() {
     }
 
     const inviteUser = async () => {
+        if (!gameId) return;
         clearError();
         setIsLoading(true);
         await discordService.inviteUser(gameId, text).then(_ => {
@@ -90,7 +92,7 @@ function GameManager() {
             .catch((err) => handleError(err))
             .finally(() => setIsLoading(false));
     }
-    
+
     return (
         <div>
             <h2 className="text-3xl font-bold mb-6 text-gray-200">Game Manager</h2>
@@ -107,7 +109,7 @@ function GameManager() {
                                     <span>{error}</span>
                                     <button
                                         onClick={clearError}
-                                        className="ml-2 !bg-white  !border-red-400 text-red-500 hover:text-red-700 font-bold"
+                                        className="ml-2 bg-white! border-red-400! text-red-500 hover:text-red-700 font-bold"
                                         aria-label="Dismiss error"
                                     >
                                         ×
@@ -144,11 +146,13 @@ function GameManager() {
                             className="btn-primary">
                             Get game
                         </button>
-                        <button
-                            onClick={inviteUser}
-                            className="btn-primary">
-                            Invite User
-                        </button>
+                        {gameId &&
+                            <button
+                                onClick={inviteUser}
+                                className="btn-primary">
+                                Invite User
+                            </button>
+                        }
                         <br/>
                         <TimeOfDaySwitch/>
                         <GameList

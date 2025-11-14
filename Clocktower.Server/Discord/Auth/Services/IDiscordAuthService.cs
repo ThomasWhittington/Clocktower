@@ -6,5 +6,5 @@ public interface IDiscordAuthService
     Task<string> HandleCallback(string? error, string? code);
     string HandleBotCallback(string? error, string? code, string? guildId);
     (bool success, string url, string message) GetAddBotUrl();
-    MiniUser? GetAuthData(string key);
+    GameUser? GetAuthData(string key);
 }

@@ -22,7 +22,6 @@ const Join = () => {
             const urlParams = new URLSearchParams(globalThis.location.search);
             const key = urlParams.get('key');
             const urlError = urlParams.get('error');
-            console.log(urlParams);
             if (urlError) {
                 globalThis.location.href = '/error?error=' + encodeURIComponent(urlError);
                 return;

@@ -1,33 +1,35 @@
-﻿import {
-    mapToPlayer,
-    type Player
-} from "./player.ts";
-import type {
+﻿import type {
     ClocktowerServerDataGameState
 } from "@/api";
+import {
+    type GameUser,
+    mapToGameUser
+} from "@/types/gameUser.ts";
 
 export type GameState = {
     id: string;
     guildId: string,
     maxPlayers: number;
-    players: Player[];
+    players: GameUser[];
     isFull: boolean;
     createdDate: Date,
-    createdBy: string
+    createdBy: GameUser
 }
 
 export function mapToGameState(apiGame: ClocktowerServerDataGameState): GameState {
-    const players = (apiGame.players ?? [])
-        .map(player => mapToPlayer(player));
+    let players: GameUser[] = [];
+    if (apiGame.players!.length > 0) {
+        players = apiGame.players!
+            .map(player => mapToGameUser(player));
+    }
 
-console.log(apiGame)
     return {
-        id: apiGame.id ?? '',
-        guildId: apiGame.guildId ?? '',
-        maxPlayers: apiGame.maxPlayers ?? 0,
+        id: apiGame.id!,
+        guildId: apiGame.guildId!,
+        maxPlayers: apiGame.maxPlayers!,
         players: players,
-        isFull: apiGame.isFull ?? false,
-        createdDate:apiGame.createdDate ?? new Date(2000, 1, 1),
-        createdBy: apiGame.createdBy ?? ''
+        isFull: apiGame.isFull!,
+        createdDate: apiGame.createdDate!,
+        createdBy: mapToGameUser(apiGame.createdBy!)
     };
 }

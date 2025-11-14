@@ -11,7 +11,7 @@ export *
     from './miniChannel.ts'
 
 export *
-    from './miniUser.ts'
+    from './gameUser.ts'
 
 export *
     from './townOccupants.ts'

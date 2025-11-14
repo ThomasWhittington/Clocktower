@@ -7,15 +7,15 @@ export type MiniChannel = {
     name: string;
 };
 
-export function mapToMiniChannel(apiMiniUser: ClocktowerServerDataMiniChannel | undefined): MiniChannel {
-    if (!apiMiniUser) {
+export function mapToMiniChannel(apiMiniChannel: ClocktowerServerDataMiniChannel | undefined): MiniChannel {
+    if (!apiMiniChannel) {
         return {
             id: '',
             name: "Unknown channel"
         };
     }
     return {
-        id: apiMiniUser.id ?? '',
-        name: apiMiniUser.name ?? "Unknown channel"
+        id: apiMiniChannel.id ?? '',
+        name: apiMiniChannel.name ?? "Unknown channel"
     };
 }

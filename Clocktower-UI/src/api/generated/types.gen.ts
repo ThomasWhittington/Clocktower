@@ -11,17 +11,25 @@ export type ClocktowerServerAdminEndpointsHealthResponse = {
 
 export type ClocktowerServerDataChannelOccupants = {
     channel?: ClocktowerServerDataMiniChannel;
-    occupants?: Array<ClocktowerServerDataMiniUser> | null;
+    occupants?: Array<ClocktowerServerDataGameUser> | null;
 };
 
 export type ClocktowerServerDataGameState = {
     id?: string | null;
     guildId?: string | null;
-    players?: Array<ClocktowerServerDataTypesPlayer> | null;
+    players?: Array<ClocktowerServerDataGameUser> | null;
     maxPlayers?: number;
-    createdBy?: string | null;
+    createdBy?: ClocktowerServerDataGameUser;
     createdDate?: Date;
     readonly isFull?: boolean;
+};
+
+export type ClocktowerServerDataGameUser = {
+    id?: string | null;
+    name?: string | null;
+    avatarUrl?: string | null;
+    isPlaying?: boolean;
+    isPresent?: boolean;
 };
 
 export type ClocktowerServerDataMiniCategory = {
@@ -35,15 +43,15 @@ export type ClocktowerServerDataMiniChannel = {
     name?: string | null;
 };
 
+export type ClocktowerServerDataMiniGameState = {
+    gameId?: string | null;
+    createdBy?: ClocktowerServerDataGameUser;
+    createdDate?: Date;
+};
+
 export type ClocktowerServerDataMiniGuild = {
     id?: string | null;
     name?: string | null;
-};
-
-export type ClocktowerServerDataMiniUser = {
-    id?: string | null;
-    name?: string | null;
-    avatarUrl?: string | null;
 };
 
 export type ClocktowerServerDataTownOccupants = {
@@ -59,7 +67,7 @@ export type ClocktowerServerDataTypesEnumRoleType = 'Townsfolk' | 'Outsider' | '
 
 export type ClocktowerServerDataTypesJoinData = {
     guildId?: string | null;
-    user?: ClocktowerServerDataMiniUser;
+    user?: ClocktowerServerDataGameUser;
     gameId?: string | null;
 };
 
@@ -116,9 +124,9 @@ export type MicrosoftAspNetCoreHttpHttpValidationProblemDetails = {
 export type ClocktowerServerDataGameStateWritable = {
     id?: string | null;
     guildId?: string | null;
-    players?: Array<ClocktowerServerDataTypesPlayer> | null;
+    players?: Array<ClocktowerServerDataGameUser> | null;
     maxPlayers?: number;
-    createdBy?: string | null;
+    createdBy?: ClocktowerServerDataGameUser;
     createdDate?: Date;
 };
 
@@ -301,7 +309,7 @@ export type GetAuthDataApiResponses = {
     /**
      * OK
      */
-    200: ClocktowerServerDataMiniUser;
+    200: ClocktowerServerDataGameUser;
 };
 
 export type GetAuthDataApiResponse = GetAuthDataApiResponses[keyof GetAuthDataApiResponses];
@@ -736,6 +744,24 @@ export type GetGamesApiResponses = {
 
 export type GetGamesApiResponse = GetGamesApiResponses[keyof GetGamesApiResponses];
 
+export type GetPlayerGamesApiData = {
+    body?: never;
+    path: {
+        userId: string;
+    };
+    query?: never;
+    url: '/api/games/{userId}';
+};
+
+export type GetPlayerGamesApiResponses = {
+    /**
+     * OK
+     */
+    200: Array<ClocktowerServerDataMiniGameState>;
+};
+
+export type GetPlayerGamesApiResponse = GetPlayerGamesApiResponses[keyof GetPlayerGamesApiResponses];
+
 export type LoadDummyGamesApiData = {
     body?: never;
     path?: never;
@@ -766,9 +792,10 @@ export type StartGameApiData = {
     path: {
         gameId: string;
         guildId: string;
+        userId: string;
     };
     query?: never;
-    url: '/api/games/{gameId}/start/{guildId}';
+    url: '/api/games/{gameId}/start/{guildId}/{userId}';
 };
 
 export type StartGameApiErrors = {

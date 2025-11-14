@@ -22,9 +22,7 @@ public static class DiscordGuildExtensions
 
         return (from discordChannel in channels
             let miniChannel = new MiniChannel(discordChannel.Id.ToString(), discordChannel.Name)
-            let occupants = discordChannel.ConnectedUsers.Select(discordChannelUser =>
-                new MiniUser(discordChannelUser.Id.ToString(), discordChannelUser.DisplayName, discordChannelUser.GetDisplayAvatarUrl())
-            ).ToList()
+            let occupants = discordChannel.ConnectedUsers.Select(discordChannelUser => discordChannelUser.AsGameUser()).ToList()
             select new ChannelOccupants(miniChannel, occupants)).ToList();
     }
 
@@ -42,5 +40,24 @@ public static class DiscordGuildExtensions
     public static SocketRole? GetRole(this SocketGuild guild, string roleName)
     {
         return guild.Roles.FirstOrDefault(o => o.Name == roleName);
+    }
+
+    public static GameUser AsGameUser(this SocketGuildUser user)
+    {
+        return new GameUser(user.Id.ToString(), user.DisplayName, user.GetDisplayAvatarUrl());
+    }
+
+    public static GameUser AsGameUser(this SocketUser user)
+    {
+        return new GameUser(user.Id.ToString(), user.GlobalName, user.GetDisplayAvatarUrl());
+    }
+
+    public static GameUser AsGameUser(this DiscordUser user)
+    {
+        var avatarUrl = user.Avatar != null
+            ? $"https://cdn.discordapp.com/avatars/{user.Id}/{user.Avatar}.png"
+            : "https://cdn.discordapp.com/embed/avatars/0.png";
+
+       return new GameUser(user.Id, user.Username, avatarUrl);
     }
 }

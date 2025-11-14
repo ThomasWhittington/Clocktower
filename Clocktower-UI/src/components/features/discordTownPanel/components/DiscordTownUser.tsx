@@ -1,16 +1,18 @@
 ﻿import type {
-    MiniUser
+    GameUser
 } from "@/types";
 
-function DiscordTownUser({user}: {
-    user: MiniUser
-}) {
+function DiscordTownUser({user}: Readonly<{
+    user: GameUser
+}>) {
     return (
         <div
             className="town-user-status">
-            <img
-                src={user.avatarUrl}
-                alt={user.name}/>
+            {user.avatarUrl &&
+                <img
+                    src={user.avatarUrl}
+                    alt={user.name}/>
+            }
             <p>{user.name}</p>
         </div>
     );

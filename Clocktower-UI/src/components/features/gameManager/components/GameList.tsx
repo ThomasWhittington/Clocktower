@@ -1,7 +1,4 @@
-﻿import React, {
-    useEffect
-} from 'react';
-import type {
+﻿import type {
     GameState
 } from "@/types";
 import {
@@ -15,9 +12,6 @@ interface GameListProps {
 
 export const GameList: React.FC<GameListProps> = ({games}) => {
     const setGameId = useAppStore((state) => state.setGameId);
-    useEffect(() => {
-        console.log(games)
-    }, []);
     return (
         <div
             className="mt-4">
@@ -38,7 +32,7 @@ export const GameList: React.FC<GameListProps> = ({games}) => {
                                 <p>FULL</p>}
                             {game.createdDate &&
                                 <h5 className="sm text-gray-600">{new Date(game.createdDate).toDateString()}</h5>}
-                            <h5 className="sm text-gray-600">{game.createdBy}</h5>
+                            <h5 className="sm text-gray-600">{game.createdBy.name}</h5>
 
                             <button
                                 className="btn-outline"

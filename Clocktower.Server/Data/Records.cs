@@ -5,7 +5,7 @@ namespace Clocktower.Server.Data;
 public record MiniGuild(string Id, string Name);
 
 [UsedImplicitly]
-public record ChannelOccupants(MiniChannel Channel, IEnumerable<MiniUser> Occupants);
+public record ChannelOccupants(MiniChannel Channel, IEnumerable<GameUser> Occupants);
 
 [UsedImplicitly]
 public record MiniChannel(string Id, string Name);
@@ -13,9 +13,24 @@ public record MiniChannel(string Id, string Name);
 [UsedImplicitly]
 public record MiniCategory(string Id, string Name, IEnumerable<ChannelOccupants> Channels);
 
-[UsedImplicitly]
-public record MiniUser(string Id, string Name, string? AvatarUrl);
+public sealed record TokenResponse(
+    string AccessToken,
+    string TokenType,
+    int ExpiresIn,
+    string RefreshToken,
+    string Scope
+);
 
+public sealed record DiscordUser(
+    string Id,
+    string Username,
+    string? Email,
+    string? Avatar,
+    bool? Verified,
+    string Discriminator
+);
+
+[UsedImplicitly]
 public class TownOccupants(List<MiniCategory> channelCategories)
 {
     public int UserCount => ChannelCategories.Sum(category => category.Channels.Sum(channel => channel.Occupants.Count()));
@@ -23,8 +38,6 @@ public class TownOccupants(List<MiniCategory> channelCategories)
 
     public void MoveUser(SocketUser user, SocketVoiceState? newChannel)
     {
-        var miniUser = new MiniUser(user.Id.ToString(), user.GlobalName, user.GetDisplayAvatarUrl());
-
         ChannelCategories = ChannelCategories.Select(category =>
             category with
             {
@@ -36,11 +49,15 @@ public class TownOccupants(List<MiniCategory> channelCategories)
 
                     if (newChannel?.VoiceChannel?.Id.ToString() == channel.Channel.Id)
                     {
-                        occupantsList.Add(miniUser);
+                        occupantsList.Add(user.AsGameUser());
                     }
 
                     return channel with { Occupants = occupantsList };
                 }).ToList()
-            }).ToList();
+            }
+        ).ToList();
     }
 }
+
+[UsedImplicitly]
+public record MiniGameState(string GameId, GameUser CreatedBy, DateTime CreatedDate);
