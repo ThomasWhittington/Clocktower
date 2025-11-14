@@ -11,9 +11,6 @@ import {
 import type {
     AddBotApiData,
     AddBotApiErrors,
-    AddPlayerToGameApiData,
-    AddPlayerToGameApiErrors,
-    AddPlayerToGameApiResponses,
     BotCallbackApiData,
     BotCallbackApiErrors,
     CallbackApiData,
@@ -328,16 +325,6 @@ export const setTimeApi = <ThrowOnError extends boolean = false>(options: Option
 export const toggleStoryTellerApi = <ThrowOnError extends boolean = false>(options: Options<ToggleStoryTellerApiData, ThrowOnError>) => {
     return (options.client ?? client).post<ToggleStoryTellerApiResponses, ToggleStoryTellerApiErrors, ThrowOnError>({
         url: '/api/discord/town/{guildId}/{userId}',
-        ...options
-    });
-};
-
-/**
- * Add player to game
- */
-export const addPlayerToGameApi = <ThrowOnError extends boolean = false>(options: Options<AddPlayerToGameApiData, ThrowOnError>) => {
-    return (options.client ?? client).post<AddPlayerToGameApiResponses, AddPlayerToGameApiErrors, ThrowOnError>({
-        url: '/api/games/{gameId}/players',
         ...options
     });
 };

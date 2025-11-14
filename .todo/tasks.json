@@ -49,7 +49,7 @@
     "tags": [],
     "title": "Player games endpoint",
     "description": "Endpoint to return gameIds which the player is a part of\n",
-    "status": "IN_PROGRESS",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,
@@ -61,6 +61,19 @@
         "minute": 38,
         "second": 6,
         "nano": 209103700
+      }
+    },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 14
+      },
+      "time": {
+        "hour": 21,
+        "minute": 17,
+        "second": 3,
+        "nano": 570930500
       }
     },
     "isImported": false
@@ -197,6 +210,28 @@
         "minute": 44,
         "second": 22,
         "nano": 56760900
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_45",
+    "priority": "LOW",
+    "tags": [],
+    "title": "Home page \"in games\"",
+    "description": "On home page, list games which the user is in. When clicked they load the game ",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 14
+      },
+      "time": {
+        "hour": 21,
+        "minute": 16,
+        "second": 57,
+        "nano": 176325300
       }
     },
     "isImported": false
