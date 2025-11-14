@@ -71,11 +71,6 @@ export type ClocktowerServerDataTypesJoinData = {
     gameId?: string | null;
 };
 
-export type ClocktowerServerDataTypesPlayer = {
-    id?: number;
-    name?: string | null;
-};
-
 export type ClocktowerServerDataTypesRoleRole = {
     name?: string | null;
     description?: string | null;
@@ -627,43 +622,6 @@ export type ToggleStoryTellerApiResponses = {
 };
 
 export type ToggleStoryTellerApiResponse = ToggleStoryTellerApiResponses[keyof ToggleStoryTellerApiResponses];
-
-export type AddPlayerToGameApiData = {
-    body?: never;
-    path: {
-        gameId: string;
-    };
-    query: {
-        PlayerName: string;
-    };
-    url: '/api/games/{gameId}/players';
-};
-
-export type AddPlayerToGameApiErrors = {
-    /**
-     * Bad Request
-     */
-    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
-    /**
-     * Not Found
-     */
-    404: string;
-    /**
-     * Conflict
-     */
-    409: string;
-};
-
-export type AddPlayerToGameApiError = AddPlayerToGameApiErrors[keyof AddPlayerToGameApiErrors];
-
-export type AddPlayerToGameApiResponses = {
-    /**
-     * Created
-     */
-    201: ClocktowerServerDataTypesPlayer;
-};
-
-export type AddPlayerToGameApiResponse = AddPlayerToGameApiResponses[keyof AddPlayerToGameApiResponses];
 
 export type DeleteGameApiData = {
     body?: never;
