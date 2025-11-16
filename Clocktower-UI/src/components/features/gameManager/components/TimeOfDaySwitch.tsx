@@ -3,7 +3,7 @@
 } from "@/services";
 import {
     GameTime
-} from "@/components/features/discordTownPanel/hooks";
+} from "@/hooks";
 import {
     useAppStore
 } from "@/store";
@@ -11,6 +11,7 @@ import {
 export const TimeOfDaySwitch = () => {
     const gameId = useAppStore((state) => state.gameId);
     const setTime = async (gameTime: GameTime) => {
+        if (!gameId) return;
         await discordService.setTime(gameId, gameTime)
     }
 

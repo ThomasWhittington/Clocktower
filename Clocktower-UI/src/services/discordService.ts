@@ -25,7 +25,7 @@ import {
 } from "@/api/api-client.ts";
 import {
     GameTime
-} from "@/components/features/discordTownPanel/hooks";
+} from "@/hooks";
 
 async function checkGuild(id: string): Promise<CheckGuildApiResponse> {
     const {

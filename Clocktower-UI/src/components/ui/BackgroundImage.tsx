@@ -1,6 +1,6 @@
 ﻿import {
     GameTime
-} from "@/components/features/discordTownPanel/hooks";
+} from "@/hooks";
 import React
     from "react";
 

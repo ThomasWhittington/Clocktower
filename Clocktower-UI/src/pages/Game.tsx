@@ -8,7 +8,7 @@ import {
 } from "../components/features";
 import {
     useDiscordHub
-} from "@/components/features/discordTownPanel/hooks";
+} from "@/hooks";
 import {
     HubConnectionState
 } from "@microsoft/signalr";

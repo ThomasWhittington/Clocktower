@@ -14,7 +14,7 @@ import {
 import {
     updateDiscordHubState,
     useDiscordHub
-} from "./useDiscordHub.ts";
+} from "@/hooks";
 
 export const useUserVoiceStatus = () => {
     const currentUser = useAppStore((state) => state.currentUser);

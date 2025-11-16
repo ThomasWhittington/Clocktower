@@ -8,7 +8,7 @@ import {
 } from '@/store';
 import {
     useDiscordHub
-} from './useDiscordHub';
+} from "@/hooks";
 import {
     discordService
 } from '@/services';
