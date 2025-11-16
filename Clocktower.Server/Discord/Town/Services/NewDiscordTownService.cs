@@ -70,7 +70,9 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
     {
         try
         {
-            await notificationService.BroadcastTownOccupancyUpdate(new TownOccupants([]));
+            var gameState = GameStateStore.GetGames(guildId.ToString()).FirstOrDefault();
+            if (gameState is null) return (false, "Failed to find gameState");
+            await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, new TownOccupants([]));
             var delete = await DeleteTown(guildId);
             if (!delete.success) return delete;
             var create = await CreateTown(guildId);
@@ -191,6 +193,9 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
         {
             var gotInCache = _townOccupants.TryGetValue(guildId, out TownOccupants? thisTownOccupancy);
             if (gotInCache && thisTownOccupancy != null) return (true, thisTownOccupancy, "Got from cache");
+            var gameState = GameStateStore.GetGames(guildId.ToString()).FirstOrDefault();
+            if (gameState is null) return (false, null, "Failed to find gameState");
+
             var guild = bot.Client.GetGuild(guildId);
 
             var channelCategories = new List<MiniCategory>();
@@ -202,7 +207,7 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
             var townOccupants = new TownOccupants(channelCategories);
 
             _townOccupants.TryAdd(guildId, townOccupants);
-            await notificationService.BroadcastTownOccupancyUpdate(_townOccupants[guildId]);
+            await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, _townOccupants[guildId]);
             return (true, townOccupants, $"Town occupancy {townOccupants.UserCount}");
         }
         catch (Exception ex)
@@ -234,7 +239,7 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
         if (gameState is null) return (false, "Game not found");
         var guild = bot.Client.GetGuild(ulong.Parse(gameState.GuildId));
         if (guild is null) return (false, "Guild not found");
-        await notificationService.BroadcastTownTime(gameTime);
+        await notificationService.BroadcastTownTime(gameId, gameTime);
         return (true, $"Time set to {gameTime}");
     }
 

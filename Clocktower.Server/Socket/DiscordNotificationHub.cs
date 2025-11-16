@@ -9,4 +9,13 @@ public interface IDiscordNotificationClient
     Task TownTimeChanged(int gameTime);
 }
 
-public sealed class DiscordNotificationHub : Hub<IDiscordNotificationClient>;
+public sealed class DiscordNotificationHub : Hub<IDiscordNotificationClient>
+{
+    [UsedImplicitly]
+    public Task JoinGameGroup(string gameId) => Groups.AddToGroupAsync(Context.ConnectionId, GetGameGroupName(gameId));
+
+    [UsedImplicitly]
+    public Task LeaveGameGroup(string gameId) => Groups.RemoveFromGroupAsync(Context.ConnectionId, GetGameGroupName(gameId));
+
+    private static string GetGameGroupName(string gameId) => $"game:{gameId}";
+}

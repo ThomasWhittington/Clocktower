@@ -11,6 +11,9 @@ import {
 import type {
     TownOccupants
 } from '@/types';
+import {
+    useAppStore
+} from "@/store";
 
 type UserVoiceStates = Record<string, boolean>;
 
@@ -95,15 +98,24 @@ const createConnection = async () => {
 export const useDiscordHub = () => {
     const [state, setState] = useState<DiscordHubState>(globalState);
     const listenerRef = useRef<(state: DiscordHubState) => void>(null);
+    const gameId = useAppStore((state) => state.gameId);
 
     useEffect(() => {
         const listener = (newState: DiscordHubState) => setState(newState);
         listenerRef.current = listener;
         globalListeners.add(listener);
 
-        // Auto-connect on first subscription
         if (globalListeners.size === 1) {
-            createConnection();
+            (async () => {
+                await createConnection();
+                if (gameId) {
+                    await joinGameGroup(gameId);
+                } else {
+                    console.warn('Failed to join game signals: no gameId');
+                }
+            })();
+        } else if (gameId && globalConnection?.state === HubConnectionState.Connected) {
+            joinGameGroup(gameId).catch(console.error);
         }
 
         return () => {
@@ -124,6 +136,20 @@ export const useDiscordHub = () => {
     }, []);
 
     return state;
+};
+
+export const joinGameGroup = async (gameId: string) => {
+    if (!globalConnection || globalConnection.state !== HubConnectionState.Connected) {
+        return;
+    }
+    await globalConnection.invoke('JoinGameGroup', gameId);
+};
+
+export const leaveGameGroup = async (gameId: string) => {
+    if (!globalConnection || globalConnection.state !== HubConnectionState.Connected) {
+        return;
+    }
+    await globalConnection.invoke('LeaveGameGroup', gameId);
 };
 
 export const updateDiscordHubState = (updates: Partial<DiscordHubState>) => {
