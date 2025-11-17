@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Socket;
@@ -10,7 +11,7 @@ using Microsoft.Extensions.Options;
 namespace Clocktower.Server.Discord.Town.Services;
 
 [UsedImplicitly]
-public class DiscordTownService(DiscordBotService bot, INotificationService notificationService, IMemoryCache cache, IOptions<Secrets> secretsOptions) : IDiscordTownService
+public class DiscordTownService(DiscordBotService bot, INotificationService notificationService, IJwtWriter jwtWriter, IMemoryCache cache, IOptions<Secrets> secretsOptions) : IDiscordTownService
 {
     private readonly Secrets _secrets = secretsOptions.Value;
     private const string TownSquareName = "⛲ Town Square";
@@ -337,6 +338,11 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
         }
     }
 
+    public async Task PingUser(string userId)
+    {
+        await notificationService.PingUser(userId, "Ping!");
+    }
+
     public async Task<(InviteUserOutcome outcome, string message )> InviteUser(string gameId, ulong userId)
     {
         try
@@ -349,7 +355,8 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
             var user = guild.GetUser(userId);
             if (user is null) return (InviteUserOutcome.UserNotFoundError, $"Couldn't find user: {userId}");
             var thisGameUser = user.AsGameUser();
-            var response = new JoinData(guildId.ToString(), thisGameUser, gameId);
+            var jwt = jwtWriter.GetJwtToken(thisGameUser.Id, thisGameUser.Name);
+            var response = new JoinData(guildId.ToString(), thisGameUser, gameId, jwt);
             var tempKey = Guid.NewGuid().ToString();
             cache.Set($"join_data_{tempKey}", response, TimeSpan.FromMinutes(5));
             var url = _secrets.FeUri + $"/join?key={tempKey}";

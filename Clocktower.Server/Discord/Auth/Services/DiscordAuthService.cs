@@ -1,12 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using Clocktower.Server.Common.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
 namespace Clocktower.Server.Discord.Auth.Services;
 
-public class DiscordAuthService(IOptions<Secrets> secretsOptions, IMemoryCache cache) : IDiscordAuthService
+public class DiscordAuthService(IOptions<Secrets> secretsOptions, IJwtWriter jwtWriter, IMemoryCache cache) : IDiscordAuthService
 {
     private readonly Secrets _secrets = secretsOptions.Value;
 
@@ -54,8 +55,10 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IMemoryCache c
             if (userInfo == null) return errorUrl + Uri.EscapeDataString("Failed to get user information");
 
             var response = userInfo.AsGameUser();
+            var jwt = jwtWriter.GetJwtToken(response.Id, response.Name);
+            var userAuthData = new UserAuthData(response, jwt);
             var tempKey = Guid.NewGuid().ToString();
-            cache.Set($"auth_data_{tempKey}", response, TimeSpan.FromMinutes(5));
+            cache.Set($"auth_data_{tempKey}", userAuthData, TimeSpan.FromMinutes(5));
 
             return frontendUrl + tempKey;
         }
@@ -94,9 +97,9 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IMemoryCache c
         return (true, authorizationUrl, "Bot addition Url generated");
     }
 
-    public GameUser? GetAuthData(string key)
+    public UserAuthData? GetAuthData(string key)
     {
-        if (cache.TryGetValue($"auth_data_{key}", out var userData) && userData is GameUser response)
+        if (cache.TryGetValue($"auth_data_{key}", out var userData) && userData is UserAuthData response)
         {
             cache.Remove($"auth_data_{key}");
             return response;

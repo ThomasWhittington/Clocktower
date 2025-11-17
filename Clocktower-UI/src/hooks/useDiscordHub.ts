@@ -56,11 +56,13 @@ const resetDiscordHubState = () => {
     notifyListeners();
 };
 
-const createConnection = async () => {
+const createConnection = async (jwt?: string) => {
     if (globalConnection) return;
 
     globalConnection = new signalR.HubConnectionBuilder()
-        .withUrl(import.meta.env.VITE_CLOCKTOWER_SERVER_URI + '/discordHub')
+        .withUrl(import.meta.env.VITE_CLOCKTOWER_SERVER_URI + '/discordHub', {
+            accessTokenFactory: () => jwt ?? ''
+        })
         .withAutomaticReconnect()
         .configureLogging(signalR.LogLevel.Information)
         .build();
@@ -71,6 +73,10 @@ const createConnection = async () => {
 
     globalConnection.on('TownTimeChanged', (gameTime: number) => {
         setState({gameTime: gameTime as GameTime});
+    });
+
+    globalConnection.on('PingUser', (message: string) => {
+        console.log(`ping from server: ${message}`);
     });
 
     globalConnection.on('UserVoiceStateChanged', (userId: string, isInVoice: boolean) => {
@@ -98,7 +104,11 @@ const createConnection = async () => {
 export const useDiscordHub = () => {
     const [state, setState] = useState<DiscordHubState>(globalState);
     const listenerRef = useRef<(state: DiscordHubState) => void>(null);
-    const gameId = useAppStore((state) => state.gameId);
+
+    const {
+        gameId,
+        jwt
+    } = useAppStore.getState();
 
     useEffect(() => {
         const listener = (newState: DiscordHubState) => setState(newState);
@@ -107,7 +117,7 @@ export const useDiscordHub = () => {
 
         if (globalListeners.size === 1) {
             (async () => {
-                await createConnection();
+                await createConnection(jwt);
                 if (gameId) {
                     await joinGameGroup(gameId);
                 } else {
@@ -133,7 +143,7 @@ export const useDiscordHub = () => {
                 }, 100);
             }
         };
-    }, []);
+    }, [gameId, jwt]);
 
     return state;
 };

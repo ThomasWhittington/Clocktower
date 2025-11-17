@@ -10,7 +10,11 @@ global using Clocktower.Server.Data.Filters;
 global using Clocktower.Server.Game.Services;
 global using Clocktower.Server.Common.Api.Extensions;
 global using Clocktower.Server.Common;
+using System.Text;
 using Clocktower.Server;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Protocols.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -21,7 +25,51 @@ try
 {
     Log.Information("Starting web application");
     var builder = WebApplication.CreateBuilder(args);
+
+
     builder.AddServices();
+
+    var secrets = builder.Configuration.GetSection(nameof(Secrets)).Get<Secrets>()!;
+    var secretsValidation = secrets.HasAllSecrets();
+    if (!secretsValidation.success)
+    {
+        throw new InvalidConfigurationException($"Secrets invalid: {secretsValidation.message}");
+    }
+
+    builder.Services.AddAuthentication("Bearer")
+        .AddJwtBearer("Bearer", options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = secrets.ServerUri,
+                ValidateAudience = true,
+                ValidAudience = secrets.Jwt.Audience,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(secrets.Jwt.SigningKey)
+                ),
+                ValidateLifetime = true,
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+                    if (!string.IsNullOrEmpty(accessToken) &&
+                        path.StartsWithSegments("/discordHub"))
+                    {
+                        context.Token = accessToken;
+                    }
+
+                    return Task.CompletedTask;
+                }
+            };
+        });
+
+
     var app = builder.Build();
     app.Configure();
 

@@ -1,9 +1,11 @@
 ﻿using System.Text.Json.Serialization;
+using Clocktower.Server.Common.Services;
 using Clocktower.Server.Discord.Auth.Services;
 using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Discord.Town.Services;
 using Clocktower.Server.Socket;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
@@ -25,8 +27,7 @@ public static class ConfigureServices
                         "http://37.27.37.160",
                         "https://amarantosclocktower.web.app",
                         "https://clocktower.glasmerio.uk"
-
-                        )
+                    )
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials());
@@ -37,6 +38,8 @@ public static class ConfigureServices
         builder.AddSignalR();
         builder.ConfigureJson();
         builder.Services.Configure<Secrets>(builder.Configuration.GetSection(nameof(Secrets)));
+        builder.Services.AddSingleton<IJwtWriter, JwtWriter>();
+        builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
         builder.Services.AddSingleton<INotificationService, NotificationService>();
         builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
         builder.Services.AddSingleton<IDiscordAuthService, DiscordAuthService>();

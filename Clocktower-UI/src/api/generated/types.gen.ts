@@ -69,6 +69,7 @@ export type ClocktowerServerDataTypesJoinData = {
     guildId?: string | null;
     user?: ClocktowerServerDataGameUser;
     gameId?: string | null;
+    jwt?: string | null;
 };
 
 export type ClocktowerServerDataTypesRoleRole = {
@@ -76,6 +77,11 @@ export type ClocktowerServerDataTypesRoleRole = {
     description?: string | null;
     type?: ClocktowerServerDataTypesEnumRoleType;
     edition?: ClocktowerServerDataTypesEnumEdition;
+};
+
+export type ClocktowerServerDataUserAuthData = {
+    gameUser?: ClocktowerServerDataGameUser;
+    jwt?: string | null;
 };
 
 export type ClocktowerServerDiscordEndpointsCheckGuildResponse = {
@@ -304,7 +310,7 @@ export type GetAuthDataApiResponses = {
     /**
      * OK
      */
-    200: ClocktowerServerDataGameUser;
+    200: ClocktowerServerDataUserAuthData;
 };
 
 export type GetAuthDataApiResponse = GetAuthDataApiResponses[keyof GetAuthDataApiResponses];
@@ -534,6 +540,31 @@ export type MoveUserToChannelApiResponses = {
 };
 
 export type MoveUserToChannelApiResponse = MoveUserToChannelApiResponses[keyof MoveUserToChannelApiResponses];
+
+export type PingUserApiData = {
+    body?: never;
+    path: {
+        userId: string;
+    };
+    query?: never;
+    url: '/api/discord/town/ping/{userId}';
+};
+
+export type PingUserApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+};
+
+export type PingUserApiError = PingUserApiErrors[keyof PingUserApiErrors];
+
+export type PingUserApiResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type RebuildTownApiData = {
     body?: never;

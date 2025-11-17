@@ -66,6 +66,9 @@ import type {
     MoveUserToChannelApiData,
     MoveUserToChannelApiErrors,
     MoveUserToChannelApiResponses,
+    PingUserApiData,
+    PingUserApiErrors,
+    PingUserApiResponses,
     RebuildTownApiData,
     RebuildTownApiErrors,
     RebuildTownApiResponses,
@@ -289,6 +292,18 @@ export const inviteUserApi = <ThrowOnError extends boolean = false>(options: Opt
 export const moveUserToChannelApi = <ThrowOnError extends boolean = false>(options: Options<MoveUserToChannelApiData, ThrowOnError>) => {
     return (options.client ?? client).post<MoveUserToChannelApiResponses, MoveUserToChannelApiErrors, ThrowOnError>({
         url: '/api/discord/town/{guildId}/{userId}/{channelId}',
+        ...options
+    });
+};
+
+/**
+ * Pings user
+ *
+ * Sends a ping to the user if online
+ */
+export const pingUserApi = <ThrowOnError extends boolean = false>(options: Options<PingUserApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<PingUserApiResponses, PingUserApiErrors, ThrowOnError>({
+        url: '/api/discord/town/ping/{userId}',
         ...options
     });
 };

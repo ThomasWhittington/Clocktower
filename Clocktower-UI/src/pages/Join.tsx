@@ -12,9 +12,12 @@ import {
 } from "@/utils";
 
 const Join = () => {
-    const setCurrentUser = useAppStore((state) => state.setCurrentUser);
-    const setGuildId = useAppStore((state) => state.setGuildId);
-    const setGameId = useAppStore((state) => state.setGameId);
+    const {
+        setJwt,
+        setCurrentUser,
+        setGuildId,
+        setGameId
+    } = useAppStore.getState();
 
     useEffect(() => {
         const handleJoin = async () => {
@@ -32,6 +35,7 @@ const Join = () => {
                         data,
                         error
                     } = await discordService.getJoinData(key);
+
                     if (error) {
                         console.error('Failed to get join data:', error);
                         globalThis.location.href = '/error?error=join_data_failed';
@@ -43,6 +47,7 @@ const Join = () => {
                         });
                         setGuildId(data.guildId);
                         setGameId(data.gameId);
+                        setJwt(data?.jwt ?? undefined);
 
                         globalThis.location.href = '/game';
                     } else {

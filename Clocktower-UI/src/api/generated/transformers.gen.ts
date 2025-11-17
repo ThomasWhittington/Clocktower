@@ -46,8 +46,15 @@ export const getGuildsWithUserApiResponseTransformer = async (data: any): Promis
     return data;
 };
 
+const clocktowerServerDataUserAuthDataSchemaResponseTransformer = (data: any) => {
+    if (data.gameUser) {
+        data.gameUser = clocktowerServerDataGameUserSchemaResponseTransformer(data.gameUser);
+    }
+    return data;
+};
+
 export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetAuthDataApiResponse> => {
-    data = clocktowerServerDataGameUserSchemaResponseTransformer(data);
+    data = clocktowerServerDataUserAuthDataSchemaResponseTransformer(data);
     return data;
 };
 

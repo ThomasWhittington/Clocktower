@@ -30,6 +30,8 @@ public sealed record DiscordUser(
     string Discriminator
 );
 
+public record UserAuthData(GameUser GameUser, string Jwt);
+
 [UsedImplicitly]
 public class TownOccupants(List<MiniCategory> channelCategories)
 {

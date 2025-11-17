@@ -10,12 +10,26 @@ interface AppState {
     guildId: string,
     gameId: string | null,
     currentUser?: User,
+    jwt?: string;
     setGuildId: (value: string) => void;
     setGameId: (value: string | null) => void;
     setCurrentUser: (value: User) => void;
+    setJwt: (value: string | undefined) => void;
     clearSession: () => void;
     reset: () => void;
 }
+
+const getStoredJwt = (): string | undefined => {
+    return localStorage.getItem('jwt') ?? undefined;
+};
+
+const setStoredJwt = (jwt: string | undefined) => {
+    if (jwt) {
+        localStorage.setItem('jwt', jwt);
+    } else {
+        localStorage.removeItem('jwt');
+    }
+};
 
 const getLoggedIn = (): boolean => {
     const currentUser = getStoredUser();
@@ -59,12 +73,14 @@ const getInitialState = () => ({
     guildId: '',
     gameId: '',
     currentUser: undefined,
+    jwt: undefined,
 });
 
 export const useAppStore = create<AppState>(
     (set) => ({
         guildId: getStoredGuildId(),
         gameId: getStoredGameId(),
+        jwt: getStoredJwt(),
         currentUser: getStoredUser(),
         loggedIn: getLoggedIn(),
         setGuildId: (id) => {
@@ -78,6 +94,10 @@ export const useAppStore = create<AppState>(
         setCurrentUser: (user) => {
             setStoredUser(user);
             set(() => ({currentUser: user}));
+        },
+        setJwt: (jwt) => {
+            setStoredJwt(jwt);
+            set(() => ({jwt}));
         },
         clearSession: () => {
             clearStoredSession();

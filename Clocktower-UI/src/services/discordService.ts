@@ -1,6 +1,4 @@
 ﻿import {
-    checkGuildApi,
-    type CheckGuildApiResponse,
     type ClocktowerServerDataTypesEnumGameTime,
     getAuthDataApi,
     getGuildsWithUserApi,
@@ -10,6 +8,7 @@
     type GetTownStatusApiResponse,
     inviteUserApi,
     moveUserToChannelApi,
+    pingUserApi,
     rebuildTownApi,
     type RebuildTownApiResponse,
     setTimeApi
@@ -26,29 +25,6 @@ import {
 import {
     GameTime
 } from "@/hooks";
-
-async function checkGuild(id: string): Promise<CheckGuildApiResponse> {
-    const {
-        data,
-        error
-    } = await checkGuildApi({
-        client: apiClient,
-        path: {
-            guildId: id.toString()
-        }
-    });
-
-    if (error) {
-        console.error('Failed to check guildId:', error);
-        throw new Error(error.toString());
-    }
-
-    return data ?? {
-        valid: false,
-        name: '',
-        message: ''
-    };
-}
 
 async function getTownStatus(id: string): Promise<GetTownStatusApiResponse> {
     const {
@@ -215,6 +191,24 @@ async function setTime(gameId: string, gameTime: GameTime) {
     }
 }
 
+async function pingUser(userId: string): Promise<boolean> {
+    const {
+        error
+    } = await pingUserApi({
+        client: apiClient,
+        path: {
+            userId: userId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to ping user:', error);
+        throw new Error(error.toString());
+    }
+
+    return true;
+}
+
 const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGameTime => {
     switch (gameTime) {
         case GameTime.Day:
@@ -228,7 +222,6 @@ const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGame
     }
 };
 export const discordService = {
-    checkGuild,
     getGuildsWithUser,
     getTownStatus,
     rebuildTown,
@@ -237,5 +230,6 @@ export const discordService = {
     getAuthData,
     inviteUser,
     getJoinData,
-    setTime
+    setTime,
+    pingUser
 }

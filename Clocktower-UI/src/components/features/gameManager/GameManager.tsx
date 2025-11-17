@@ -101,6 +101,16 @@ function GameManager() {
             .finally(() => setIsLoading(false));
     }
 
+    const pingUser = async () => {
+        if (!gameId) return;
+        clearError();
+        setIsLoading(true);
+        await discordService.pingUser(text).then(_ => {
+        })
+            .catch((err) => handleError(err))
+            .finally(() => setIsLoading(false));
+    }
+
     const joinGame = async () => {
         if (!gameId) return;
         await joinGameGroup(gameId);
@@ -138,64 +148,72 @@ function GameManager() {
                                 </div>
                             )}
 
-                            <h1>Current Game: {gameId}</h1>
+                                <h1>Current Game: {gameId}</h1>
 
-                            <button
-                                onClick={loadDummyData}
-                                className="btn-primary">
-                                Load Dummy Data
-                            </button>
-                            <br/>
-                            <button
-                                onClick={getGames}
-                                className="btn-primary">
-                                Get games
-                            </button>
-                            <br/>
-                            <input
-                                value={text}
-                                onChange={e => setText(e.target.value)}
-                            />
-                            <button
-                                onClick={startGame}
-                                className="btn-primary">
-                                Start game
-                            </button>
-                            <button
-                                onClick={getGame}
-                                className="btn-primary">
-                                Get game
-                            </button>
-                            {gameId &&
                                 <button
-                                    onClick={inviteUser}
+                                    onClick={loadDummyData}
                                     className="btn-primary">
-                                    Invite User
+                                    Load Dummy Data
                                 </button>
-                            }
-                            <br/>
-                            <TimeOfDaySwitch/>
+                                <br/>
+                                <button
+                                    onClick={getGames}
+                                    className="btn-primary">
+                                    Get games
+                                </button>
+                                <br/>
+                                <input
+                                    value={text}
+                                    onChange={e => setText(e.target.value)}
+                                />
+                                <button
+                                    onClick={startGame}
+                                    className="btn-primary">
+                                    Start game
+                                </button>
+                                <button
+                                    onClick={getGame}
+                                    className="btn-primary">
+                                    Get game
+                                </button>
                             {gameId &&
                                 <>
                                     <button
-                                        onClick={joinGame}
-                                        className="btn-secondary">
-                                        Join Game
+                                        onClick={inviteUser}
+                                        className="btn-primary">
+                                        Invite User
                                     </button>
+
                                     <button
-                                        onClick={leaveGame}
-                                        className="btn-danger">
-                                        Leave Game
+                                        onClick={pingUser}
+                                        className="btn-secondary">
+                                        Ping User
                                     </button>
                                 </>
                             }
+                                <br/>
+                                <TimeOfDaySwitch/>
+                                {gameId &&
+                                    <>
+                                        <button
+                                            onClick={joinGame}
+                                            className="btn-secondary">
+                                            Join Game
+                                        </button>
+                                        <button
+                                            onClick={leaveGame}
+                                            className="btn-danger">
+                                            Leave Game
+                                        </button>
+                                    </>
+                                }
 
 
-                            <GameList
-                                games={games}/>
-                            <br/>
+                                <GameList
+                                    games={games}/>
+                                <br/>
 
-                            <pre>{JSON.stringify(game, null, 2)}</pre>
+                                <pre>{JSON.stringify(game, null, 2)}</pre>
 
                         </>)
                 }

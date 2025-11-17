@@ -5,7 +5,7 @@
     "tags": [],
     "title": "SignalR per game",
     "description": "When signing up to signalR. provide the game id and user id. Then have signal R send notifications to specific players",
-    "status": "TODO",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,
@@ -19,11 +19,24 @@
         "nano": 34311000
       }
     },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 17
+      },
+      "time": {
+        "hour": 0,
+        "minute": 35,
+        "second": 53,
+        "nano": 751291300
+      }
+    },
     "isImported": false
   },
   {
     "id": "TASK_3",
-    "priority": "LOW",
+    "priority": "HIGH",
     "tags": [],
     "title": "Add signalR on connect",
     "description": "When a user reconnects to a game session, the server should inform them of the game state to ensure they don\u0027t fall behind",
@@ -232,6 +245,28 @@
         "minute": 16,
         "second": 57,
         "nano": 176325300
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_73",
+    "priority": "HIGH",
+    "tags": [],
+    "title": "GameUser storyteller prop ",
+    "description": "Have a isStoryteller property under gameUser that can be used on the FE to toggle elements.\n\nShould also verify if story teller before allowing certain api calls",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 17
+      },
+      "time": {
+        "hour": 0,
+        "minute": 37,
+        "second": 27,
+        "nano": 985345800
       }
     },
     "isImported": false

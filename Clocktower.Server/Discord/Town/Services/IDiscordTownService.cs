@@ -12,4 +12,5 @@ public interface IDiscordTownService
     Task<(bool success, TownOccupants? townOccupants, string message)> GetTownOccupancy(ulong guildId);
     JoinData? GetJoinData(string key);
     Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime);
+    Task PingUser(string userId);
 }

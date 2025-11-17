@@ -9,16 +9,19 @@ import {
 } from "@/store";
 
 const AuthCallback = () => {
-    const setCurrentUser = useAppStore((state) => state.setCurrentUser);
+    const {
+        setJwt,
+        setCurrentUser
+    } = useAppStore.getState();
 
     useEffect(() => {
         const handleAuthCallback = async () => {
-            const urlParams = new URLSearchParams(window.location.search);
+            const urlParams = new URLSearchParams(globalThis.location.search);
             const key = urlParams.get('key');
             const error = urlParams.get('error');
 
             if (error) {
-                window.location.href = '/login?error=' + encodeURIComponent(error);
+                globalThis.location.href = '/login?error=' + encodeURIComponent(error);
                 return;
             }
 
@@ -31,25 +34,28 @@ const AuthCallback = () => {
 
                     if (error) {
                         console.error('Failed to get auth data:', error);
-                        window.location.href = '/login?error=auth_data_failed';
+                        globalThis.location.href = '/login?error=auth_data_failed';
                     } else {
                         setCurrentUser({
-                            id: data?.id ?? '',
-                            name: data?.name ?? '',
-                            avatarUrl: data?.avatarUrl ?? ''
+                            id: data?.gameUser?.id ?? '',
+                            name: data?.gameUser?.name ?? '',
+                            avatarUrl: data?.gameUser?.avatarUrl ?? ''
                         });
-                        window.location.href = '/';
+                        setJwt(data?.jwt ?? undefined);
+
+                        globalThis.location.href = '/';
                     }
                 } catch (error) {
                     console.error('Failed to get auth data:', error);
-                    window.location.href = '/login?error=auth_data_failed';
+                    globalThis.location.href = '/login?error=auth_data_failed';
                 }
             } else {
-                window.location.href = '/login?error=missing_key';
+                globalThis.location.href = '/login?error=missing_key';
             }
         };
 
-        handleAuthCallback();
+        handleAuthCallback().then(_ => {
+        });
     }, []);
 
     return (
