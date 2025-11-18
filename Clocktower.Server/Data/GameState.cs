@@ -10,5 +10,7 @@ public class GameState
     public GameUser CreatedBy { get; set; }
     public DateTime CreatedDate { get; set; }
 
+    public GameTime GameTime { get; set; }
+
     public bool IsFull => MaxPlayers != 0 && Players.Count >= MaxPlayers;
 }

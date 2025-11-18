@@ -10,6 +10,7 @@ global using Clocktower.Server.Data.Filters;
 global using Clocktower.Server.Game.Services;
 global using Clocktower.Server.Common.Api.Extensions;
 global using Clocktower.Server.Common;
+global using Clocktower.Server.Data.Stores;
 using System.Text;
 using Clocktower.Server;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

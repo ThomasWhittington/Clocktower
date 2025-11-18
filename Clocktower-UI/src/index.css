@@ -95,7 +95,13 @@ h1 {
     @apply bg-transparent hover:bg-[#5865F2] text-[#5865F2] hover:text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-[#5865F2] cursor-pointer;
 }
 
+.loading {
+    @apply bg-[url('/images/loading.png')] bg-cover bg-center;
+}
 
+.error {
+    @apply bg-[url('/images/evening-bg.png')] bg-cover bg-center;
+}
 .main-image {
     object-fit: cover;
 }

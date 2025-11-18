@@ -2,7 +2,7 @@
 
 namespace Clocktower.Server.Data.Stores;
 
-public class GameStateStore
+public static class GameStateStore
 {
     private static readonly ConcurrentDictionary<string, GameState> Store = new();
 
@@ -33,6 +33,8 @@ public class GameStateStore
     {
         return GetAll().Where(game => game.GuildId == guildId);
     }
+
+    public static IEnumerable<GameState> GetGames(ulong guildId) => GetGames(guildId.ToString());
 
     public static IEnumerable<GameState> GetAll()
     {

@@ -1,6 +1,4 @@
-using System.Collections.Concurrent;
 using Clocktower.Server.Common.Services;
-using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Socket;
 using Discord;
@@ -37,8 +35,6 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
         ConsultationName
     ];
 
-    private readonly ConcurrentDictionary<ulong, TownOccupants> _townOccupants = new();
-
     public async Task<(bool success, string message)> MoveUser(ulong guildId, ulong userId, ulong channelId)
     {
         try
@@ -71,7 +67,7 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
     {
         try
         {
-            var gameState = GameStateStore.GetGames(guildId.ToString()).FirstOrDefault();
+            var gameState = GameStateStore.GetGames(guildId).FirstOrDefault();
             if (gameState is null) return (false, "Failed to find gameState");
             await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, new TownOccupants([]));
             var delete = await DeleteTown(guildId);
@@ -79,7 +75,7 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
             var create = await CreateTown(guildId);
             if (create.success)
             {
-                _townOccupants.Clear();
+                TownOccupancyStore.Clear();
                 await GetTownOccupancy(guildId);
             }
 
@@ -192,9 +188,9 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
     {
         try
         {
-            var gotInCache = _townOccupants.TryGetValue(guildId, out TownOccupants? thisTownOccupancy);
-            if (gotInCache && thisTownOccupancy != null) return (true, thisTownOccupancy, "Got from cache");
-            var gameState = GameStateStore.GetGames(guildId.ToString()).FirstOrDefault();
+            var thisTownOccupancy = TownOccupancyStore.Get(guildId);
+            if (thisTownOccupancy != null) return (true, thisTownOccupancy, "Got from cache");
+            var gameState = GameStateStore.GetGames(guildId).FirstOrDefault();
             if (gameState is null) return (false, null, "Failed to find gameState");
 
             var guild = bot.Client.GetGuild(guildId);
@@ -207,8 +203,8 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
 
             var townOccupants = new TownOccupants(channelCategories);
 
-            _townOccupants.TryAdd(guildId, townOccupants);
-            await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, _townOccupants[guildId]);
+            TownOccupancyStore.Set(guildId, townOccupants);
+            await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, townOccupants);
             return (true, townOccupants, $"Town occupancy {townOccupants.UserCount}");
         }
         catch (Exception ex)
@@ -241,6 +237,11 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
         var guild = bot.Client.GetGuild(ulong.Parse(gameState.GuildId));
         if (guild is null) return (false, "Guild not found");
         await notificationService.BroadcastTownTime(gameId, gameTime);
+        GameStateStore.TryUpdate(gameId, state =>
+        {
+            state.GameTime = gameTime;
+            return state;
+        });
         return (true, $"Time set to {gameTime}");
     }
 

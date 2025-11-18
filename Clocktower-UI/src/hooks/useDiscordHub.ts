@@ -18,11 +18,15 @@ import {
 type UserVoiceStates = Record<string, boolean>;
 
 export enum GameTime {
-    Day = 0,
-    Evening = 1,
-    Night = 2,
+    Unknown = 0,
+    Day = 1,
+    Evening = 2,
+    Night = 3,
 }
 
+export type GameStateDto = {
+    gameTime: GameTime
+};
 type DiscordHubState = {
     townOccupancy?: TownOccupants;
     userVoiceStates: UserVoiceStates;
@@ -30,6 +34,7 @@ type DiscordHubState = {
     gameTime: GameTime
 };
 
+let joinedGameId: string | null = null;
 let globalConnection: signalR.HubConnection | null = null;
 let globalState: DiscordHubState = {
     userVoiceStates: {},
@@ -39,7 +44,9 @@ let globalState: DiscordHubState = {
 const globalListeners = new Set<(state: DiscordHubState) => void>();
 
 const notifyListeners = () => {
-    globalListeners.forEach(listener => listener({...globalState}));
+    for (const listener of globalListeners) {
+        listener({...globalState});
+    }
 };
 
 const setState = (updates: Partial<DiscordHubState>) => {
@@ -115,30 +122,26 @@ export const useDiscordHub = () => {
         listenerRef.current = listener;
         globalListeners.add(listener);
 
-        if (globalListeners.size === 1) {
-            (async () => {
-                await createConnection(jwt);
-                if (gameId) {
-                    await joinGameGroup(gameId);
-                } else {
-                    console.warn('Failed to join game signals: no gameId');
-                }
-            })();
-        } else if (gameId && globalConnection?.state === HubConnectionState.Connected) {
-            joinGameGroup(gameId).catch(console.error);
-        }
+        (async () => {
+            await createConnection(jwt);
+            if (gameId && globalConnection?.state === HubConnectionState.Connected) {
+                await joinGameGroup(gameId);
+            } else if (!gameId) {
+                console.warn('Failed to join game signals: no gameId');
+            }
+        })().catch(console.error);
 
         return () => {
             if (listenerRef.current) {
                 globalListeners.delete(listenerRef.current);
             }
 
-            // Auto-disconnect when no more listeners
             if (globalListeners.size === 0) {
                 setTimeout(() => {
                     if (globalListeners.size === 0 && globalConnection) {
                         globalConnection.stop();
                         globalConnection = null;
+                        joinedGameId = null;
                     }
                 }, 100);
             }
@@ -152,7 +155,22 @@ export const joinGameGroup = async (gameId: string) => {
     if (!globalConnection || globalConnection.state !== HubConnectionState.Connected) {
         return;
     }
-    await globalConnection.invoke('JoinGameGroup', gameId);
+
+    if (joinedGameId === gameId) {
+        return;
+    }
+
+    if (joinedGameId && joinedGameId !== gameId) {
+        await globalConnection.invoke('LeaveGameGroup', joinedGameId);
+    }
+
+    const snapshot = await globalConnection.invoke<GameStateDto | null>('JoinGameGroup', gameId);
+    joinedGameId = gameId;
+    if (snapshot) {
+        setState({
+            gameTime: snapshot.gameTime
+        });
+    }
 };
 
 export const leaveGameGroup = async (gameId: string) => {
@@ -160,6 +178,7 @@ export const leaveGameGroup = async (gameId: string) => {
         return;
     }
     await globalConnection.invoke('LeaveGameGroup', gameId);
+    joinedGameId = null;
 };
 
 export const updateDiscordHubState = (updates: Partial<DiscordHubState>) => {

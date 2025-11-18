@@ -1,5 +1,4 @@
-﻿using Clocktower.Server.Data.Stores;
-using Clocktower.Server.Discord.Town.Services;
+﻿using Clocktower.Server.Discord.Town.Services;
 using Clocktower.Server.Socket;
 using Discord;
 using Discord.WebSocket;
@@ -21,7 +20,7 @@ public class DiscordBotService : BackgroundService
 
         if (string.IsNullOrEmpty(_secrets.ServerUri))
         {
-            throw new ArgumentNullException("Secrets are not set");
+            throw new ArgumentNullException(nameof(secretsOptions), "Secrets are not set");
         }
     }
 
@@ -49,7 +48,7 @@ public class DiscordBotService : BackgroundService
         var guildId = after.VoiceChannel?.Guild?.Id ?? before.VoiceChannel?.Guild?.Id;
         if (guildId.HasValue && before.VoiceChannel?.Id != after.VoiceChannel?.Id)
         {
-            var gameState = GameStateStore.GetGames(guildId.Value.ToString()).FirstOrDefault();
+            var gameState = GameStateStore.GetGames(guildId.Value).FirstOrDefault();
             if (gameState is null) return;
 
             using var scope = _serviceProvider.CreateScope();

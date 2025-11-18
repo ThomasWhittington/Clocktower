@@ -40,7 +40,7 @@
     "tags": [],
     "title": "Add signalR on connect",
     "description": "When a user reconnects to a game session, the server should inform them of the game state to ensure they don\u0027t fall behind",
-    "status": "TODO",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,
@@ -52,6 +52,19 @@
         "minute": 37,
         "second": 8,
         "nano": 521252200
+      }
+    },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 18
+      },
+      "time": {
+        "hour": 0,
+        "minute": 10,
+        "second": 19,
+        "nano": 740783100
       }
     },
     "isImported": false
@@ -128,7 +141,7 @@
   },
   {
     "id": "TASK_15",
-    "priority": "LOW",
+    "priority": "MEDIUM",
     "tags": [],
     "title": "Add clocktower bot",
     "description": "Add clocktower bot functionality from the current one (move to town hall, go to bed etc)",
@@ -253,7 +266,7 @@
     "id": "TASK_73",
     "priority": "HIGH",
     "tags": [],
-    "title": "GameUser storyteller prop ",
+    "title": "GameUser storyteller prop and auth",
     "description": "Have a isStoryteller property under gameUser that can be used on the FE to toggle elements.\n\nShould also verify if story teller before allowing certain api calls",
     "status": "TODO",
     "date": {
@@ -267,6 +280,50 @@
         "minute": 37,
         "second": 27,
         "nano": 985345800
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_94",
+    "priority": "HIGH",
+    "tags": [],
+    "title": "Unit test coverage of server",
+    "description": "I need to add decent coverage of the server code before it gets out of hand",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 18
+      },
+      "time": {
+        "hour": 0,
+        "minute": 6,
+        "second": 40,
+        "nano": 915808900
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_117",
+    "priority": "MEDIUM",
+    "tags": [],
+    "title": "Look into testing the react/js logic",
+    "description": "See what testing is possible for the react components and the logic in the FE",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 18
+      },
+      "time": {
+        "hour": 0,
+        "minute": 7,
+        "second": 38,
+        "nano": 619056300
       }
     },
     "isImported": false

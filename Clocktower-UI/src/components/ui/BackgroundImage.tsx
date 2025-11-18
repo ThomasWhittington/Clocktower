@@ -6,6 +6,7 @@ import React
 
 export const BackgroundImage = ({ gameTime, children }: { gameTime: GameTime, children?: React.ReactNode }) => {
     const backgrounds = {
+        [GameTime.Unknown]: '/images/day-bg.png',
         [GameTime.Day]: '/images/day-bg.png',
         [GameTime.Evening]: '/images/evening-bg.png',
         [GameTime.Night]: '/images/night-bg.png'
@@ -26,6 +27,7 @@ export const BackgroundImage = ({ gameTime, children }: { gameTime: GameTime, ch
             <div className="absolute inset-0 backdrop-blur-sm" />
 
             <div className="relative z-10">
+                <p>{GameTime[gameTime]}</p>
                 {children}
             </div>
         </div>

@@ -2,7 +2,8 @@
 
 public enum GameTime
 {
-    Day = 0,
-    Evening = 1,
-    Night = 2
+    Unknown = 0,
+    Day = 1,
+    Evening = 2,
+    Night = 3
 }
