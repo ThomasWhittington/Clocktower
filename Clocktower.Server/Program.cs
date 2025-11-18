@@ -69,8 +69,13 @@ try
                 }
             };
         });
-
-
+    builder.Services.AddAuthorizationBuilder()
+        .AddPolicy("StoryTellerForGame", policy =>
+            {
+                policy.RequireClaim("is_storyteller", "true");
+                policy.AddRequirements(new StoryTellerForGameRequirement());
+            }
+        );
     var app = builder.Build();
     app.Configure();
 

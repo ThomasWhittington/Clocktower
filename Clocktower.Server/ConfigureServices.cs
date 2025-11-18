@@ -1,9 +1,11 @@
 ﻿using System.Text.Json.Serialization;
+using Clocktower.Server.Common.Api.Auth;
 using Clocktower.Server.Common.Services;
 using Clocktower.Server.Discord.Auth.Services;
 using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Discord.Town.Services;
 using Clocktower.Server.Socket;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
@@ -49,6 +51,10 @@ public static class ConfigureServices
         builder.Services.AddSingleton<IDiscordTownService, DiscordTownService>();
         builder.Services.AddSingleton<GameStateService>();
         builder.Services.AddValidatorsFromAssembly(typeof(ConfigureServices).Assembly);
+
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddSingleton<IGameAuthorizationService, GameAuthorizationService>();
+        builder.Services.AddSingleton<IAuthorizationHandler, StoryTellerForGameHandler>();
     }
 
     private static void ConfigureJson(this WebApplicationBuilder builder)

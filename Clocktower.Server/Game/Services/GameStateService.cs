@@ -13,7 +13,7 @@ public class GameStateService(DiscordBotService bot)
 
     public IEnumerable<MiniGameState> GetPlayerGames(string userId)
     {
-        var playerGames = GameStateStore.GetPlayerGames(userId);
+        var playerGames = GameStateStore.GetUserGames(userId);
         var miniGameStates = playerGames.Select(o => new MiniGameState(o.Id, o.CreatedBy, o.CreatedDate));
         return miniGameStates;
     }
@@ -59,12 +59,15 @@ public class GameStateService(DiscordBotService bot)
     {
         var user = bot.Client.GetUser(userId);
         if (user is null) return (false, null, "Couldn't find user");
+        var gameUser = user.AsGameUser();
+        gameUser.UserType = UserType.StoryTeller;
         var newGameState = new GameState
         {
             Id = gameId,
             GuildId = guildId,
             CreatedDate = DateTime.UtcNow,
-            CreatedBy = user.AsGameUser()
+            CreatedBy = gameUser,
+            Users = [gameUser]
         };
 
         bool addSuccessful = GameStateStore.Set(gameId, newGameState);

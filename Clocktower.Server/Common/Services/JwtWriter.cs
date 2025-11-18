@@ -8,19 +8,20 @@ namespace Clocktower.Server.Common.Services;
 
 public interface IJwtWriter
 {
-    string GetJwtToken(string userId, string userName);
+    string GetJwtToken(GameUser gameUser);
 }
 
 public class JwtWriter(IOptions<Secrets> secretsOptions) : IJwtWriter
 {
     private readonly Secrets _secrets = secretsOptions.Value;
 
-    public string GetJwtToken(string userId, string userName)
+    public string GetJwtToken(GameUser gameUser)
     {
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, userId),
-            new Claim(ClaimTypes.Name, userName)
+            new Claim(ClaimTypes.NameIdentifier, gameUser.Id),
+            new Claim(ClaimTypes.Name, gameUser.Name),
+            new Claim("is_storyteller", gameUser.UserType == UserType.StoryTeller ? "true" : "false")
         };
 
         var key = new SymmetricSecurityKey(

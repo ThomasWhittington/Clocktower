@@ -7,6 +7,7 @@ public class InviteUser : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{gameId}/invite/{userId}", Handle)
+        .RequireAuthorization("StoryTellerForGame")
         .SetOpenApiOperationId<InviteUser>()
         .WithSummary("Invites user to the specified game")
         .WithDescription("Invites user to the specified game")

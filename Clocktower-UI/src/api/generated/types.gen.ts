@@ -17,10 +17,14 @@ export type ClocktowerServerDataChannelOccupants = {
 export type ClocktowerServerDataGameState = {
     id?: string | null;
     guildId?: string | null;
-    players?: Array<ClocktowerServerDataGameUser> | null;
+    users?: Array<ClocktowerServerDataGameUser> | null;
+    readonly players?: Array<ClocktowerServerDataGameUser> | null;
+    readonly storyTellers?: Array<ClocktowerServerDataGameUser> | null;
+    readonly spectators?: Array<ClocktowerServerDataGameUser> | null;
     maxPlayers?: number;
     createdBy?: ClocktowerServerDataGameUser;
     createdDate?: Date;
+    gameTime?: ClocktowerServerDataTypesEnumGameTime;
     readonly isFull?: boolean;
 };
 
@@ -30,6 +34,7 @@ export type ClocktowerServerDataGameUser = {
     avatarUrl?: string | null;
     isPlaying?: boolean;
     isPresent?: boolean;
+    userType?: ClocktowerServerDataTypesEnumUserType;
 };
 
 export type ClocktowerServerDataMiniCategory = {
@@ -61,9 +66,11 @@ export type ClocktowerServerDataTownOccupants = {
 
 export type ClocktowerServerDataTypesEnumEdition = 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
 
-export type ClocktowerServerDataTypesEnumGameTime = 'Day' | 'Evening' | 'Night';
+export type ClocktowerServerDataTypesEnumGameTime = 'Unknown' | 'Day' | 'Evening' | 'Night';
 
 export type ClocktowerServerDataTypesEnumRoleType = 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
+
+export type ClocktowerServerDataTypesEnumUserType = 'Unknown' | 'Player' | 'StoryTeller' | 'Spectator';
 
 export type ClocktowerServerDataTypesJoinData = {
     guildId?: string | null;
@@ -125,10 +132,11 @@ export type MicrosoftAspNetCoreHttpHttpValidationProblemDetails = {
 export type ClocktowerServerDataGameStateWritable = {
     id?: string | null;
     guildId?: string | null;
-    players?: Array<ClocktowerServerDataGameUser> | null;
+    users?: Array<ClocktowerServerDataGameUser> | null;
     maxPlayers?: number;
     createdBy?: ClocktowerServerDataGameUser;
     createdDate?: Date;
+    gameTime?: ClocktowerServerDataTypesEnumGameTime;
 };
 
 export type ClocktowerServerDataTownOccupantsWritable = {
@@ -739,7 +747,7 @@ export type GetPlayerGamesApiData = {
         userId: string;
     };
     query?: never;
-    url: '/api/games/{userId}';
+    url: '/api/games/player/{userId}';
 };
 
 export type GetPlayerGamesApiResponses = {

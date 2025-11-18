@@ -17,7 +17,10 @@ public static class ConfigureApp
         app.UseSerilogRequestLogging();
         app.UseSwagger();
         app.UseSwaggerUI();
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.MapEndpoints();
+
         app.MapHub<DiscordNotificationHub>("/discordHub");
     }
 }

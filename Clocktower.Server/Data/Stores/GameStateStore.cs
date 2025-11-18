@@ -41,8 +41,8 @@ public static class GameStateStore
         return Store.Values;
     }
 
-    public static IEnumerable<GameState> GetPlayerGames(string userId)
+    public static IEnumerable<GameState> GetUserGames(string userId)
     {
-        return GetAll().Where(game => game.Players.Select(o => o.Id).Contains(userId));
+        return GetAll().Where(game => game.Users.Select(o => o.Id).Contains(userId));
     }
 }

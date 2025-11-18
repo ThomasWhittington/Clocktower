@@ -17,7 +17,7 @@ public static class Endpoints
         endpoints.MapDiscordAuthEndpoints();
         endpoints.MapDiscordTownEndpoints();
     }
-    
+
     private static void MapAdminEndpoints(this IEndpointRouteBuilder app)
     {
         var endpoints = app.MapGroup("/admin")
@@ -26,6 +26,7 @@ public static class Endpoints
         endpoints.MapPublicGroup()
             .MapEndpointsFromNamespace("Clocktower.Server.Admin.Endpoints");
     }
+
     private static void MapRolesEndpoints(this IEndpointRouteBuilder app)
     {
         var endpoints = app.MapGroup("/roles")
@@ -52,7 +53,7 @@ public static class Endpoints
         endpoints.MapPublicGroup()
             .MapEndpointsFromNamespace("Clocktower.Server.Discord.Endpoints");
     }
-    
+
     private static void MapDiscordAuthEndpoints(this IEndpointRouteBuilder app)
     {
         var endpoints = app.MapGroup("/discord/auth")
@@ -61,7 +62,7 @@ public static class Endpoints
         endpoints.MapPublicGroup()
             .MapEndpointsFromNamespace("Clocktower.Server.Discord.Auth.Endpoints");
     }
-    
+
     private static void MapDiscordTownEndpoints(this IEndpointRouteBuilder app)
     {
         var endpoints = app.MapGroup("/discord/town")
@@ -73,8 +74,7 @@ public static class Endpoints
 
     private static RouteGroupBuilder MapPublicGroup(this IEndpointRouteBuilder app, string? prefix = null)
     {
-        return app.MapGroup(prefix ?? string.Empty)
-            .AllowAnonymous();
+        return app.MapGroup(prefix ?? string.Empty);
     }
 
     public static IEndpointRouteBuilder MapEndpoint<TEndpoint>(this IEndpointRouteBuilder app) where TEndpoint : IEndpoint

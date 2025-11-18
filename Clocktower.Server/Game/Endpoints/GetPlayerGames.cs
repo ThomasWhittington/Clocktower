@@ -4,9 +4,9 @@
 public class GetPlayerGames : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapGet("/{userId}", Handle)
+        .MapGet("/player/{userId}", Handle)
         .SetOpenApiOperationId<GetPlayerGames>()
-        .WithSummary("Get the game state by id");
+        .WithSummary("Gets games the player is in");
 
     private static Ok<IEnumerable<MiniGameState>> Handle(string userId, GameStateService gameStateService)
     {

@@ -1,18 +1,23 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Clocktower.Server.Common.Services;
+using Clocktower.Server.Data.Extensions;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Socket;
 
-public sealed class DiscordNotificationHub : Hub<IDiscordNotificationClient>
+public sealed class DiscordNotificationHub(IJwtWriter jwtWriter) : Hub<IDiscordNotificationClient>
 {
     [UsedImplicitly]
-    public async Task<SessionSyncState?> JoinGameGroup(string gameId)
+    public async Task<SessionSyncState?> JoinGameGroup(string gameId, string userId)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, GetGameGroupName(gameId));
-     
+
         var currentGameState = GameStateStore.Get(gameId);
+        var gameUser = currentGameState?.GetUser(userId);
+        if (gameUser is null) return null;
         var currentState = new SessionSyncState
         {
-            GameTime = currentGameState?.GameTime ?? GameTime.Unknown
+            GameTime = currentGameState?.GameTime ?? GameTime.Unknown,
+            Jwt = jwtWriter.GetJwtToken(gameUser)
         };
 
         return currentState;

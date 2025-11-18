@@ -53,6 +53,13 @@ const clocktowerServerDataUserAuthDataSchemaResponseTransformer = (data: any) =>
     return data;
 };
 
+const clocktowerServerDataGameUserSchemaResponseTransformer = (data: any) => {
+    if (data.userType) {
+        data.userType = clocktowerServerDataTypesEnumUserTypeSchemaResponseTransformer(data.userType);
+    }
+    return data;
+};
+
 export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetAuthDataApiResponse> => {
     data = clocktowerServerDataUserAuthDataSchemaResponseTransformer(data);
     return data;
@@ -111,8 +118,23 @@ export const getTownStatusApiResponseTransformer = async (data: any): Promise<Ge
 };
 
 const clocktowerServerDataGameStateSchemaResponseTransformer = (data: any) => {
+    if (data.users) {
+        data.users = data.users.map((item: any) => {
+            return clocktowerServerDataGameUserSchemaResponseTransformer(item);
+        });
+    }
     if (data.players) {
         data.players = data.players.map((item: any) => {
+            return clocktowerServerDataGameUserSchemaResponseTransformer(item);
+        });
+    }
+    if (data.storyTellers) {
+        data.storyTellers = data.storyTellers.map((item: any) => {
+            return clocktowerServerDataGameUserSchemaResponseTransformer(item);
+        });
+    }
+    if (data.spectators) {
+        data.spectators = data.spectators.map((item: any) => {
             return clocktowerServerDataGameUserSchemaResponseTransformer(item);
         });
     }
@@ -121,6 +143,9 @@ const clocktowerServerDataGameStateSchemaResponseTransformer = (data: any) => {
     }
     if (data.createdDate) {
         data.createdDate = new Date(data.createdDate);
+    }
+    if (data.gameTime) {
+        data.gameTime = clocktowerServerDataTypesEnumGameTimeSchemaResponseTransformer(data.gameTime);
     }
     return data;
 };

@@ -268,7 +268,7 @@
     "tags": [],
     "title": "GameUser storyteller prop and auth",
     "description": "Have a isStoryteller property under gameUser that can be used on the FE to toggle elements.\n\nShould also verify if story teller before allowing certain api calls",
-    "status": "TODO",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,
@@ -280,6 +280,19 @@
         "minute": 37,
         "second": 27,
         "nano": 985345800
+      }
+    },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 18
+      },
+      "time": {
+        "hour": 16,
+        "minute": 43,
+        "second": 5,
+        "nano": 117162400
       }
     },
     "isImported": false

@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Clocktower.Server.Data.Extensions;
+using Discord.WebSocket;
 
 namespace Clocktower.Server.Common.Api.Extensions;
 
@@ -42,9 +43,15 @@ public static class DiscordGuildExtensions
         return guild.Roles.FirstOrDefault(o => o.Name == roleName);
     }
 
-    public static GameUser AsGameUser(this SocketGuildUser user)
+    public static GameUser AsGameUser(this SocketGuildUser user, GameState? gameState = null)
     {
-        return new GameUser(user.Id.ToString(), user.DisplayName, user.GetDisplayAvatarUrl());
+        var result = new GameUser(user.Id.ToString(), user.DisplayName, user.GetDisplayAvatarUrl());
+        if (gameState is not null)
+        {
+            result.UserType = gameState.GetUserType(user.Id.ToString());
+        }
+
+        return result;
     }
 
     public static GameUser AsGameUser(this SocketUser user)
@@ -58,6 +65,6 @@ public static class DiscordGuildExtensions
             ? $"https://cdn.discordapp.com/avatars/{user.Id}/{user.Avatar}.png"
             : "https://cdn.discordapp.com/embed/avatars/0.png";
 
-       return new GameUser(user.Id, user.Username, avatarUrl);
+        return new GameUser(user.Id, user.Username, avatarUrl);
     }
 }

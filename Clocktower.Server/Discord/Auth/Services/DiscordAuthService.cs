@@ -55,7 +55,7 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IJwtWriter jwt
             if (userInfo == null) return errorUrl + Uri.EscapeDataString("Failed to get user information");
 
             var response = userInfo.AsGameUser();
-            var jwt = jwtWriter.GetJwtToken(response.Id, response.Name);
+            var jwt = jwtWriter.GetJwtToken(response);
             var userAuthData = new UserAuthData(response, jwt);
             var tempKey = Guid.NewGuid().ToString();
             cache.Set($"auth_data_{tempKey}", userAuthData, TimeSpan.FromMinutes(5));

@@ -24,8 +24,9 @@ export enum GameTime {
     Night = 3,
 }
 
-export type GameStateDto = {
-    gameTime: GameTime
+export type SessionSyncState = {
+    gameTime: GameTime,
+    jwt: string
 };
 type DiscordHubState = {
     townOccupancy?: TownOccupants;
@@ -152,6 +153,11 @@ export const useDiscordHub = () => {
 };
 
 export const joinGameGroup = async (gameId: string) => {
+    const {
+        setJwt,
+        currentUser
+    } = useAppStore.getState();
+
     if (!globalConnection || globalConnection.state !== HubConnectionState.Connected) {
         return;
     }
@@ -164,12 +170,13 @@ export const joinGameGroup = async (gameId: string) => {
         await globalConnection.invoke('LeaveGameGroup', joinedGameId);
     }
 
-    const snapshot = await globalConnection.invoke<GameStateDto | null>('JoinGameGroup', gameId);
+    const snapshot = await globalConnection.invoke<SessionSyncState | null>('JoinGameGroup', gameId, currentUser?.id);
     joinedGameId = gameId;
     if (snapshot) {
         setState({
             gameTime: snapshot.gameTime
         });
+        setJwt(snapshot.jwt);
     }
 };
 

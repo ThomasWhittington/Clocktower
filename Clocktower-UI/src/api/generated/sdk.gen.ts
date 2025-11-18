@@ -375,11 +375,11 @@ export const getGamesApi = <ThrowOnError extends boolean = false>(options?: Opti
 };
 
 /**
- * Get the game state by id
+ * Gets games the player is in
  */
 export const getPlayerGamesApi = <ThrowOnError extends boolean = false>(options: Options<GetPlayerGamesApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetPlayerGamesApiResponses, unknown, ThrowOnError>({
-        url: '/api/games/{userId}',
+        url: '/api/games/player/{userId}',
         ...options
     });
 };

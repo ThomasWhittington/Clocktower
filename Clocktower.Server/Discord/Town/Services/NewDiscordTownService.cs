@@ -355,8 +355,9 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
             if (guild is null) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
             var user = guild.GetUser(userId);
             if (user is null) return (InviteUserOutcome.UserNotFoundError, $"Couldn't find user: {userId}");
-            var thisGameUser = user.AsGameUser();
-            var jwt = jwtWriter.GetJwtToken(thisGameUser.Id, thisGameUser.Name);
+            var thisGameUser = user.AsGameUser(gameState);
+            thisGameUser.UserType = UserType.Player;
+            var jwt = jwtWriter.GetJwtToken(thisGameUser);
             var response = new JoinData(guildId.ToString(), thisGameUser, gameId, jwt);
             var tempKey = Guid.NewGuid().ToString();
             cache.Set($"join_data_{tempKey}", response, TimeSpan.FromMinutes(5));
@@ -368,7 +369,7 @@ public class DiscordTownService(DiscordBotService bot, INotificationService noti
 
             GameStateStore.TryUpdate(gameId, state =>
             {
-                state.Players.Add(thisGameUser);
+                state.Users.Add(thisGameUser);
                 return state;
             });
 
