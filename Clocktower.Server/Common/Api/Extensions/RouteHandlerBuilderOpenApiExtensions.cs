@@ -2,21 +2,24 @@
 
 public static class RouteHandlerBuilderOpenApiExtensions
 {
-    public static RouteHandlerBuilder SetOpenApiOperationId(this RouteHandlerBuilder builder, string operationId)
+    extension(RouteHandlerBuilder builder)
     {
-        return builder.WithOpenApi(operation =>
+        public RouteHandlerBuilder SetOpenApiOperationId(string operationId)
         {
-            operation.OperationId = operationId.ToCamelCase() + "Api";
-            return operation;
-        });
-    }
+            return builder.WithOpenApi(operation =>
+            {
+                operation.OperationId = operationId.ToCamelCase() + "Api";
+                return operation;
+            });
+        }
 
-    public static RouteHandlerBuilder SetOpenApiOperationId<T>(this RouteHandlerBuilder builder) where T : class, IEndpoint
-    {
-        return builder.WithOpenApi(operation =>
+        public RouteHandlerBuilder SetOpenApiOperationId<T>() where T : class, IEndpoint
         {
-            operation.OperationId = typeof(T).Name.ToCamelCase() + "Api";
-            return operation;
-        });
+            return builder.WithOpenApi(operation =>
+            {
+                operation.OperationId = typeof(T).Name.ToCamelCase() + "Api";
+                return operation;
+            });
+        }
     }
 }

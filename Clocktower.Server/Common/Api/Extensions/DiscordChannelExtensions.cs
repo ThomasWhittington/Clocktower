@@ -4,15 +4,24 @@ namespace Clocktower.Server.Common.Api.Extensions;
 
 public static class DiscordChannelExtensions
 {
-    public static async Task DeleteCategoryAsync(this SocketCategoryChannel categoryChannel)
+    extension(SocketCategoryChannel categoryChannel)
     {
-        if (categoryChannel is null) return;
-
-        foreach (var channel in categoryChannel.Channels)
+        public async Task DeleteCategoryAsync()
         {
-            await channel.DeleteAsync();
+            if (categoryChannel is null) return;
+
+            foreach (var channel in categoryChannel.Channels)
+            {
+                await channel.DeleteAsync();
+            }
+
+            await categoryChannel.DeleteAsync();
         }
 
-        await categoryChannel.DeleteAsync();
+        public bool VerifyCategoryChannels(string[] channelNames)
+        {
+            if (categoryChannel.Channels.Count != channelNames.Length) return false;
+            return channelNames.All(channelName => categoryChannel.Channels.Any(o => o.Name == channelName));
+        }
     }
 }
