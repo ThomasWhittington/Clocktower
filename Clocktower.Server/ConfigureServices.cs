@@ -49,6 +49,7 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IJwtWriter, JwtWriter>();
             builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
             builder.Services.AddSingleton<IGameStateStore, GameStateStore>();
+            builder.Services.AddSingleton<ITownOccupancyStore, TownOccupancyStore>();
             builder.Services.AddSingleton<INotificationService, NotificationService>();
             builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
             builder.Services.AddSingleton<IDiscordBotService, DiscordBotService>();

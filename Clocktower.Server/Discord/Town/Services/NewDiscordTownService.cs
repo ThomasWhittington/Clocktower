@@ -13,6 +13,7 @@ public class DiscordTownService(
     IDiscordBotService bot,
     INotificationService notificationService,
     IGameStateStore gameStateStore,
+    ITownOccupancyStore townOccupancyStore,
     IJwtWriter jwtWriter,
     IMemoryCache cache,
     IOptions<Secrets> secretsOptions) : IDiscordTownService
@@ -81,7 +82,7 @@ public class DiscordTownService(
             var create = await CreateTown(guildId);
             if (create.success)
             {
-                TownOccupancyStore.Clear();
+                townOccupancyStore.Clear();
                 await GetTownOccupancy(guildId);
             }
 
@@ -194,7 +195,7 @@ public class DiscordTownService(
     {
         try
         {
-            var thisTownOccupancy = TownOccupancyStore.Get(guildId);
+            var thisTownOccupancy = townOccupancyStore.Get(guildId);
             if (thisTownOccupancy != null) return (true, thisTownOccupancy, "Got from cache");
             var gameState = gameStateStore.GetGuildGames(guildId).FirstOrDefault();
             if (gameState is null) return (false, null, "Failed to find gameState");
@@ -209,7 +210,7 @@ public class DiscordTownService(
 
             var townOccupants = new TownOccupants(channelCategories);
 
-            TownOccupancyStore.Set(guildId, townOccupants);
+            townOccupancyStore.Set(guildId, townOccupants);
             await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, townOccupants);
             return (true, townOccupants, $"Town occupancy {townOccupants.UserCount}");
         }

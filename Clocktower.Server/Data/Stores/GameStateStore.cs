@@ -4,29 +4,29 @@ namespace Clocktower.Server.Data.Stores;
 
 public class GameStateStore : IGameStateStore
 {
-    private static readonly ConcurrentDictionary<string, GameState> Store = new();
+    private readonly ConcurrentDictionary<string, GameState> _store = new();
 
-    public void Clear() => Store.Clear();
+    public void Clear() => _store.Clear();
 
     public GameState? Get(string gameId) =>
-        Store.TryGetValue(gameId, out var state) ? state : null;
+        _store.TryGetValue(gameId, out var state) ? state : null;
 
-    public bool Remove(string gameId) => Store.TryRemove(gameId, out _);
+    public bool Remove(string gameId) => _store.TryRemove(gameId, out _);
 
     public bool Set(string gameId, GameState state)
     {
         var currentValue = Get(gameId);
         if (currentValue is not null) return false;
-        Store[gameId] = state;
+        _store[gameId] = state;
         return true;
     }
 
 
     public bool TryUpdate(string gameId, Func<GameState, GameState> updateFunction)
     {
-        if (!Store.TryGetValue(gameId, out var existing)) return false;
+        if (!_store.TryGetValue(gameId, out var existing)) return false;
 
-        Store[gameId] = updateFunction(existing);
+        _store[gameId] = updateFunction(existing);
         return true;
     }
 
@@ -42,5 +42,5 @@ public class GameStateStore : IGameStateStore
         return GetAll().Where(game => game.Users.Select(o => o.Id).Contains(userId));
     }
 
-    public IEnumerable<GameState> GetAll() => Store.Values;
+    public IEnumerable<GameState> GetAll() => _store.Values;
 }
