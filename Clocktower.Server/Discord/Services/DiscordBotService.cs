@@ -6,23 +6,10 @@ using Microsoft.Extensions.Options;
 
 namespace Clocktower.Server.Discord.Services;
 
-public class DiscordBotService : BackgroundService, IDiscordBotService
+public class DiscordBotService(IOptions<Secrets> secretsOptions, IGameStateStore gameStateStore, IServiceProvider serviceProvider, INotificationService notificationService)
+    : BackgroundService, IDiscordBotService
 {
-    private readonly Secrets _secrets;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly INotificationService _notificationService;
-
-    public DiscordBotService(IOptions<Secrets> secretsOptions, IServiceProvider serviceProvider, INotificationService notificationService)
-    {
-        _serviceProvider = serviceProvider;
-        _notificationService = notificationService;
-        _secrets = secretsOptions.Value;
-
-        if (string.IsNullOrEmpty(_secrets.ServerUri))
-        {
-            throw new ArgumentNullException(nameof(secretsOptions), "Secrets are not set");
-        }
-    }
+    private readonly Secrets _secrets = secretsOptions.Value;
 
     public DiscordSocketClient Client { get; } = new(new DiscordSocketConfig
     {
@@ -48,16 +35,16 @@ public class DiscordBotService : BackgroundService, IDiscordBotService
         var guildId = after.VoiceChannel?.Guild?.Id ?? before.VoiceChannel?.Guild?.Id;
         if (guildId.HasValue && before.VoiceChannel?.Id != after.VoiceChannel?.Id)
         {
-            var gameState = GameStateStore.GetGames(guildId.Value).FirstOrDefault();
+            var gameState = gameStateStore.GetGuildGames(guildId.Value).FirstOrDefault();
             if (gameState is null) return;
 
-            using var scope = _serviceProvider.CreateScope();
+            using var scope = serviceProvider.CreateScope();
             var townService = scope.ServiceProvider.GetRequiredService<IDiscordTownService>();
             var (success, thisTownOccupancy, _) = await townService.GetTownOccupancy(guildId.Value);
             if (!success) return;
             thisTownOccupancy!.MoveUser(user, after);
-            await _notificationService.BroadcastTownOccupancyUpdate(gameState.Id, thisTownOccupancy);
-            await _notificationService.BroadcastUserVoiceStateChanged(gameState.Id, user.Id.ToString(), after.VoiceChannel != null);
+            await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, thisTownOccupancy);
+            await notificationService.BroadcastUserVoiceStateChanged(gameState.Id, user.Id.ToString(), after.VoiceChannel != null);
         }
     }
 

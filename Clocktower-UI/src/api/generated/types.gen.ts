@@ -291,13 +291,6 @@ export type CallbackApiErrors = {
 
 export type CallbackApiError = CallbackApiErrors[keyof CallbackApiErrors];
 
-export type CallbackApiResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
 export type GetAuthDataApiData = {
     body?: never;
     path: {
@@ -722,15 +715,6 @@ export type GetGamesApiData = {
     };
     url: '/api/games';
 };
-
-export type GetGamesApiErrors = {
-    /**
-     * Not Found
-     */
-    404: string;
-};
-
-export type GetGamesApiError = GetGamesApiErrors[keyof GetGamesApiErrors];
 
 export type GetGamesApiResponses = {
     /**

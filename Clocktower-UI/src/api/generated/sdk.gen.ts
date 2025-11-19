@@ -15,7 +15,6 @@ import type {
     BotCallbackApiErrors,
     CallbackApiData,
     CallbackApiErrors,
-    CallbackApiResponses,
     CheckGuildApiData,
     CheckGuildApiErrors,
     CheckGuildApiResponses,
@@ -35,7 +34,6 @@ import type {
     GetGameApiErrors,
     GetGameApiResponses,
     GetGamesApiData,
-    GetGamesApiErrors,
     GetGamesApiResponses,
     GetGuildsWithUserApiData,
     GetGuildsWithUserApiErrors,
@@ -182,7 +180,7 @@ export const botCallbackApi = <ThrowOnError extends boolean = false>(options?: O
  * Handles the callback from Discord OAuth
  */
 export const callbackApi = <ThrowOnError extends boolean = false>(options?: Options<CallbackApiData, ThrowOnError>) => {
-    return (options?.client ?? client).get<CallbackApiResponses, CallbackApiErrors, ThrowOnError>({
+    return (options?.client ?? client).get<unknown, CallbackApiErrors, ThrowOnError>({
         url: '/api/discord/auth/callback',
         ...options
     });
@@ -368,7 +366,7 @@ export const getGameApi = <ThrowOnError extends boolean = false>(options: Option
  * Gets all games, optionally filtered by guildId
  */
 export const getGamesApi = <ThrowOnError extends boolean = false>(options?: Options<GetGamesApiData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetGamesApiResponses, GetGamesApiErrors, ThrowOnError>({
+    return (options?.client ?? client).get<GetGamesApiResponses, unknown, ThrowOnError>({
         url: '/api/games',
         ...options
     });

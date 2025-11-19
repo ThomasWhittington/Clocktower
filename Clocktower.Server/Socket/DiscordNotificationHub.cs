@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Socket;
 
-public sealed class DiscordNotificationHub(IJwtWriter jwtWriter) : Hub<IDiscordNotificationClient>
+public sealed class DiscordNotificationHub(IGameStateStore gameStateStore, IJwtWriter jwtWriter) : Hub<IDiscordNotificationClient>
 {
     [UsedImplicitly]
     public async Task<SessionSyncState?> JoinGameGroup(string gameId, string userId)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, GetGameGroupName(gameId));
 
-        var currentGameState = GameStateStore.Get(gameId);
+        var currentGameState = gameStateStore.Get(gameId);
         var gameUser = currentGameState?.GetUser(userId);
         if (gameUser is null) return null;
         var currentState = new SessionSyncState

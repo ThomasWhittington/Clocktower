@@ -41,22 +41,26 @@ public static class ConfigureServices
             builder.AddSwagger();
             builder.AddSignalR();
             builder.ConfigureJson();
-            builder.Services.Configure<Secrets>(builder.Configuration.GetSection(nameof(Secrets)));
-            builder.Services.AddSingleton<IJwtWriter, JwtWriter>();
-            builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
-            builder.Services.AddSingleton<INotificationService, NotificationService>();
-            builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
-            builder.Services.AddSingleton<IDiscordAuthService, DiscordAuthService>();
-            builder.Services.AddSingleton<IDiscordBotService, DiscordBotService>();
-            builder.Services.AddHostedService(provider => provider.GetRequiredService<IDiscordBotService>());
-            builder.Services.AddSingleton<IDiscordService, DiscordService>();
-            builder.Services.AddSingleton<IDiscordTownService, DiscordTownService>();
-            builder.Services.AddSingleton<IGameStateService, GameStateService>();
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddValidatorsFromAssembly(typeof(ConfigureServices).Assembly);
 
-            builder.Services.AddHttpContextAccessor();
-            builder.Services.AddSingleton<IGameAuthorizationService, GameAuthorizationService>();
-            builder.Services.AddSingleton<IAuthorizationHandler, StoryTellerForGameHandler>();
+            builder.Services.Configure<Secrets>(builder.Configuration.GetSection(nameof(Secrets)));
+            
+            builder.Services.AddSingleton<IJwtWriter, JwtWriter>();
+            builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
+            builder.Services.AddSingleton<IGameStateStore, GameStateStore>();
+            builder.Services.AddSingleton<INotificationService, NotificationService>();
+            builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
+            builder.Services.AddSingleton<IDiscordBotService, DiscordBotService>();
+            builder.Services.AddSingleton<IDiscordService, DiscordService>();
+            builder.Services.AddSingleton<IDiscordTownService, DiscordTownService>();
+
+            builder.Services.AddScoped<IDiscordAuthService, DiscordAuthService>();
+            builder.Services.AddScoped<IGameStateService, GameStateService>();
+            builder.Services.AddScoped<IGameAuthorizationService, GameAuthorizationService>();
+            builder.Services.AddScoped<IAuthorizationHandler, StoryTellerForGameHandler>();
+           
+            builder.Services.AddHostedService(provider => provider.GetRequiredService<IDiscordBotService>());
         }
 
         private void ConfigureJson()

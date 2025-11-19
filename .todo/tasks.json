@@ -340,5 +340,27 @@
       }
     },
     "isImported": false
+  },
+  {
+    "id": "TASK_130",
+    "priority": "HIGH",
+    "tags": [],
+    "title": "Change static stores to DI services",
+    "description": "GameStateStore and TownOccupancyStore should be interfaced services for better testability",
+    "status": "IN_PROGRESS",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 19
+      },
+      "time": {
+        "hour": 14,
+        "minute": 19,
+        "second": 7,
+        "nano": 709796800
+      }
+    },
+    "isImported": false
   }
 ]

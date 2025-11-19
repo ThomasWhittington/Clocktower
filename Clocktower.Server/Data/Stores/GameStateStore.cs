@@ -2,18 +2,18 @@
 
 namespace Clocktower.Server.Data.Stores;
 
-public static class GameStateStore
+public class GameStateStore : IGameStateStore
 {
     private static readonly ConcurrentDictionary<string, GameState> Store = new();
 
-    public static void Clear() => Store.Clear();
+    public void Clear() => Store.Clear();
 
-    public static GameState? Get(string gameId) =>
+    public GameState? Get(string gameId) =>
         Store.TryGetValue(gameId, out var state) ? state : null;
 
-    public static bool Remove(string gameId) => Store.TryRemove(gameId, out _);
+    public bool Remove(string gameId) => Store.TryRemove(gameId, out _);
 
-    public static bool Set(string gameId, GameState state)
+    public bool Set(string gameId, GameState state)
     {
         var currentValue = Get(gameId);
         if (currentValue is not null) return false;
@@ -21,28 +21,26 @@ public static class GameStateStore
         return true;
     }
 
-    public static bool TryUpdate(string gameId, Func<GameState, GameState> updateFn)
+
+    public bool TryUpdate(string gameId, Func<GameState, GameState> updateFunction)
     {
         if (!Store.TryGetValue(gameId, out var existing)) return false;
 
-        Store[gameId] = updateFn(existing);
+        Store[gameId] = updateFunction(existing);
         return true;
     }
 
-    public static IEnumerable<GameState> GetGames(string guildId)
+    public IEnumerable<GameState> GetGuildGames(string guildId)
     {
         return GetAll().Where(game => game.GuildId == guildId);
     }
 
-    public static IEnumerable<GameState> GetGames(ulong guildId) => GetGames(guildId.ToString());
+    public IEnumerable<GameState> GetGuildGames(ulong guildId) => GetGuildGames(guildId.ToString());
 
-    public static IEnumerable<GameState> GetAll()
-    {
-        return Store.Values;
-    }
-
-    public static IEnumerable<GameState> GetUserGames(string userId)
+    public IEnumerable<GameState> GetUserGames(string userId)
     {
         return GetAll().Where(game => game.Users.Select(o => o.Id).Contains(userId));
     }
+
+    public IEnumerable<GameState> GetAll() => Store.Values;
 }

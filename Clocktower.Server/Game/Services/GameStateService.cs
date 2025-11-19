@@ -3,17 +3,17 @@ using Clocktower.Server.Discord.Services;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GameStateService(IDiscordBotService bot) : IGameStateService
+public class GameStateService(IDiscordBotService bot, IGameStateStore gameStateStore) : IGameStateService
 {
     public IEnumerable<GameState> GetGames() =>
-        GameStateStore.GetAll();
+        gameStateStore.GetAll();
 
     public IEnumerable<GameState> GetGuildGames(string guildId) =>
-        GameStateStore.GetGames(guildId);
+        gameStateStore.GetGuildGames(guildId);
 
     public IEnumerable<MiniGameState> GetPlayerGames(string userId)
     {
-        var playerGames = GameStateStore.GetUserGames(userId);
+        var playerGames = gameStateStore.GetUserGames(userId);
         var miniGameStates = playerGames.Select(o => new MiniGameState(o.Id, o.CreatedBy, o.CreatedDate));
         return miniGameStates;
     }
@@ -27,10 +27,10 @@ public class GameStateService(IDiscordBotService bot) : IGameStateService
             return (false, "Failed to deserialize json");
         }
 
-        GameStateStore.Clear();
+        gameStateStore.Clear();
         foreach (var gameState in games)
         {
-            GameStateStore.Set(gameState.Id, gameState);
+            gameStateStore.Set(gameState.Id, gameState);
         }
 
         return (true, "Loaded dummy data");
@@ -38,7 +38,7 @@ public class GameStateService(IDiscordBotService bot) : IGameStateService
 
     public (bool success, GameState? gameState, string message) GetGame(string gameId)
     {
-        var game = GameStateStore.Get(gameId);
+        var game = gameStateStore.Get(gameId);
 
         return game is not null
             ? (true, game, "Game retrieved successfully")
@@ -48,7 +48,7 @@ public class GameStateService(IDiscordBotService bot) : IGameStateService
 
     public (bool success, string message) DeleteGame(string gameId)
     {
-        bool deleteSuccessful = GameStateStore.Remove(gameId);
+        bool deleteSuccessful = gameStateStore.Remove(gameId);
 
         return deleteSuccessful
             ? (true, "Game deleted successfully")
@@ -70,7 +70,7 @@ public class GameStateService(IDiscordBotService bot) : IGameStateService
             Users = [gameUser]
         };
 
-        bool addSuccessful = GameStateStore.Set(gameId, newGameState);
+        bool addSuccessful = gameStateStore.Set(gameId, newGameState);
 
         return addSuccessful
             ? (true, newGameState, "Game started successfully")

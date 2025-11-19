@@ -9,7 +9,13 @@ using Microsoft.Extensions.Options;
 namespace Clocktower.Server.Discord.Town.Services;
 
 [UsedImplicitly]
-public class DiscordTownService(IDiscordBotService bot, INotificationService notificationService, IJwtWriter jwtWriter, IMemoryCache cache, IOptions<Secrets> secretsOptions) : IDiscordTownService
+public class DiscordTownService(
+    IDiscordBotService bot,
+    INotificationService notificationService,
+    IGameStateStore gameStateStore,
+    IJwtWriter jwtWriter,
+    IMemoryCache cache,
+    IOptions<Secrets> secretsOptions) : IDiscordTownService
 {
     private readonly Secrets _secrets = secretsOptions.Value;
     private const string TownSquareName = "⛲ Town Square";
@@ -67,7 +73,7 @@ public class DiscordTownService(IDiscordBotService bot, INotificationService not
     {
         try
         {
-            var gameState = GameStateStore.GetGames(guildId).FirstOrDefault();
+            var gameState = gameStateStore.GetGuildGames(guildId).FirstOrDefault();
             if (gameState is null) return (false, "Failed to find gameState");
             await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, new TownOccupants([]));
             var delete = await DeleteTown(guildId);
@@ -190,7 +196,7 @@ public class DiscordTownService(IDiscordBotService bot, INotificationService not
         {
             var thisTownOccupancy = TownOccupancyStore.Get(guildId);
             if (thisTownOccupancy != null) return (true, thisTownOccupancy, "Got from cache");
-            var gameState = GameStateStore.GetGames(guildId).FirstOrDefault();
+            var gameState = gameStateStore.GetGuildGames(guildId).FirstOrDefault();
             if (gameState is null) return (false, null, "Failed to find gameState");
 
             var guild = bot.Client.GetGuild(guildId);
@@ -217,7 +223,7 @@ public class DiscordTownService(IDiscordBotService bot, INotificationService not
     {
         if (cache.TryGetValue($"join_data_{key}", out var joinData) && joinData is JoinData response)
         {
-            GameStateStore.TryUpdate(response.GameId, state =>
+            gameStateStore.TryUpdate(response.GameId, state =>
             {
                 state.Players.First(o => o.Id == response.User.Id).IsPlaying = true;
                 return state;
@@ -232,12 +238,12 @@ public class DiscordTownService(IDiscordBotService bot, INotificationService not
 
     public async Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime)
     {
-        var gameState = GameStateStore.Get(gameId);
+        var gameState = gameStateStore.Get(gameId);
         if (gameState is null) return (false, "Game not found");
         var guild = bot.Client.GetGuild(ulong.Parse(gameState.GuildId));
         if (guild is null) return (false, "Guild not found");
         await notificationService.BroadcastTownTime(gameId, gameTime);
-        GameStateStore.TryUpdate(gameId, state =>
+        gameStateStore.TryUpdate(gameId, state =>
         {
             state.GameTime = gameTime;
             return state;
@@ -348,7 +354,7 @@ public class DiscordTownService(IDiscordBotService bot, INotificationService not
     {
         try
         {
-            var gameState = GameStateStore.Get(gameId);
+            var gameState = gameStateStore.Get(gameId);
             if (gameState is null) return (InviteUserOutcome.GameDoesNotExistError, $"Couldn't find game with id: {gameId}");
             if (!ulong.TryParse(gameState.GuildId, out var guildId)) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
             var guild = bot.Client.GetGuild(guildId);
@@ -367,7 +373,7 @@ public class DiscordTownService(IDiscordBotService bot, INotificationService not
             await dmChannel.SendMessageAsync($"[Join here]({url})");
 
 
-            GameStateStore.TryUpdate(gameId, state =>
+            gameStateStore.TryUpdate(gameId, state =>
             {
                 state.Users.Add(thisGameUser);
                 return state;
