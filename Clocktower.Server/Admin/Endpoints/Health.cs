@@ -9,7 +9,7 @@ public class Health : IEndpoint
         .WithSummary("Checks the health of the server")
         .WithDescription("Checks the health of the server");
 
-    private static Ok<Response> Handle()
+    internal static Ok<Response> Handle()
     {
         return TypedResults.Ok(new Response("Healthy", DateTime.UtcNow));
     }

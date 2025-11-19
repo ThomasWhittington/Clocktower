@@ -3,7 +3,7 @@ using Clocktower.Server.Discord.Services;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GameStateService(DiscordBotService bot)
+public class GameStateService(DiscordBotService bot) : IGameStateService
 {
     public IEnumerable<GameState> GetGames() =>
         GameStateStore.GetAll();

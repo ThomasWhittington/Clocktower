@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace Clocktower.Server.Game.Endpoints;
+﻿namespace Clocktower.Server.Game.Endpoints;
 
 [UsedImplicitly]
 public class GetGames : IEndpoint
@@ -10,7 +8,7 @@ public class GetGames : IEndpoint
         .SetOpenApiOperationId<GetGames>()
         .WithSummary("Gets all games, optionally filtered by guildId");
 
-    private static Results<Ok<IEnumerable<GameState>>, NotFound<string>> Handle(GameStateService gameStateService, [FromQuery] string? guildId)
+    internal static Ok<IEnumerable<GameState>> Handle([FromServices] IGameStateService gameStateService, [FromQuery] string? guildId)
     {
         var games = string.IsNullOrWhiteSpace(guildId)
             ? gameStateService.GetGames()

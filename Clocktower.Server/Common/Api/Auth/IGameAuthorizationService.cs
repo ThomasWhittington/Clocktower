@@ -2,5 +2,5 @@
 
 public interface IGameAuthorizationService
 {
-    bool IsStoryTellerForGameAsync(string userId, string gameId);
+    bool IsStoryTellerForGame(string userId, string gameId);
 }

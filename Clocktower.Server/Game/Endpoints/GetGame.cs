@@ -1,6 +1,4 @@
-﻿using Clocktower.Server.Data;
-
-namespace Clocktower.Server.Game.Endpoints;
+﻿namespace Clocktower.Server.Game.Endpoints;
 
 [UsedImplicitly]
 public class GetGame : IEndpoint
@@ -10,7 +8,7 @@ public class GetGame : IEndpoint
         .SetOpenApiOperationId<GetGame>()
         .WithSummary("Get the game state by id");
 
-    private static Results<Ok<GameState>, NotFound<string>> Handle(string gameId, GameStateService gameStateService)
+    internal static Results<Ok<GameState>, NotFound<string>> Handle(string gameId, [FromServices] IGameStateService gameStateService)
     {
         var result = gameStateService.GetGame(gameId.Trim());
 

@@ -9,16 +9,14 @@ public class StartGame : IEndpoint
         .WithSummary("Starts new game state for id")
         .WithRequestValidation<Request>();
 
-    private static Results<Created<GameState>, BadRequest<string>> Handle([AsParameters] Request request, GameStateService gameStateService)
+    internal static Results<Created<GameState>, BadRequest<string>> Handle([AsParameters] Request request, [FromServices] IGameStateService gameStateService)
     {
         var gameId = request.GameId.Trim();
         var userId = ulong.Parse(request.UserId);
 
         var result = gameStateService.StartNewGame(request.GuildId, gameId, userId);
 
-        return result.success
-            ? TypedResults.Created($"/games/{result.gameState!.Id}", result.gameState)
-            : TypedResults.BadRequest(result.message);
+        return result.success ? TypedResults.Created($"/games/{result.gameState!.Id}", result.gameState) : TypedResults.BadRequest(result.message);
     }
 
     [UsedImplicitly]
@@ -29,7 +27,7 @@ public class StartGame : IEndpoint
     {
         public RequestValidator()
         {
-            RuleFor(x => x.GameId.Trim())
+            RuleFor(x => x.GameId)
                 .MinimumLength(3).WithMessage("GameId cannot be less than 3 characters")
                 .MaximumLength(32).WithMessage("GameId cannot be longer than 32 characters");
 

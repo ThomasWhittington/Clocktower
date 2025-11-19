@@ -11,12 +11,16 @@ global using Clocktower.Server.Game.Services;
 global using Clocktower.Server.Common.Api.Extensions;
 global using Clocktower.Server.Common;
 global using Clocktower.Server.Data.Stores;
+global using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Clocktower.Server;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Protocols.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+
+[assembly: InternalsVisibleTo("Clocktower.ServerTests")]
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()

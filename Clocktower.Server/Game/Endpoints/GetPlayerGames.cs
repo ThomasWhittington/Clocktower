@@ -8,7 +8,7 @@ public class GetPlayerGames : IEndpoint
         .SetOpenApiOperationId<GetPlayerGames>()
         .WithSummary("Gets games the player is in");
 
-    private static Ok<IEnumerable<MiniGameState>> Handle(string userId, GameStateService gameStateService)
+    internal static Ok<IEnumerable<MiniGameState>> Handle(string userId, [FromServices] IGameStateService gameStateService)
     {
         var result = gameStateService.GetPlayerGames(userId.Trim());
         return TypedResults.Ok(result);

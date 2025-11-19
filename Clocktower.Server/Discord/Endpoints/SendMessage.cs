@@ -1,5 +1,4 @@
 ﻿using Clocktower.Server.Discord.Services;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Clocktower.Server.Discord.Endpoints;
 

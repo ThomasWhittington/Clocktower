@@ -9,7 +9,7 @@ public class DeleteGame : IEndpoint
         .WithSummary("Deletes a game by id");
 
 
-    private static Results<Ok, NotFound<string>> Handle(string gameId, GameStateService gameStateService)
+    internal static Results<Ok, NotFound<string>> Handle(string gameId, [FromServices] IGameStateService gameStateService)
     {
         var result = gameStateService.DeleteGame(gameId.Trim());
 
