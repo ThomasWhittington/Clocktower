@@ -3,12 +3,12 @@ using Clocktower.Server.Discord.Services;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GameStateService(DiscordBotService bot) : IGameStateService
+public class GameStateService(IDiscordBotService bot) : IGameStateService
 {
     public IEnumerable<GameState> GetGames() =>
         GameStateStore.GetAll();
 
-    public IEnumerable<GameState> GetGames(string guildId) =>
+    public IEnumerable<GameState> GetGuildGames(string guildId) =>
         GameStateStore.GetGames(guildId);
 
     public IEnumerable<MiniGameState> GetPlayerGames(string userId)

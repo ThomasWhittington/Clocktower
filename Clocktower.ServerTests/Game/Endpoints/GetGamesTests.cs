@@ -12,7 +12,7 @@ public class GetGamesTests
     private void MockResponse(GameState[] allGames, GameState[] guildGames)
     {
         _mockGameStateService.Setup(o => o.GetGames()).Returns(allGames);
-        _mockGameStateService.Setup(o => o.GetGames(It.IsAny<string>())).Returns(guildGames);
+        _mockGameStateService.Setup(o => o.GetGuildGames(It.IsAny<string>())).Returns(guildGames);
     }
 
     [TestInitialize]
@@ -55,7 +55,7 @@ public class GetGamesTests
         var result = GetGames.Handle(_mockGameStateService.Object, guildId);
 
         _mockGameStateService.Verify(o => o.GetGames(), Times.Once);
-        _mockGameStateService.Verify(o => o.GetGames(It.IsAny<string>()), Times.Never);
+        _mockGameStateService.Verify(o => o.GetGuildGames(It.IsAny<string>()), Times.Never);
 
         var response = result.Should().BeOfType<Ok<IEnumerable<GameState>>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);
@@ -82,7 +82,7 @@ public class GetGamesTests
         var result = GetGames.Handle(_mockGameStateService.Object, guildId);
 
         _mockGameStateService.Verify(o => o.GetGames(), Times.Never);
-        _mockGameStateService.Verify(o => o.GetGames(It.IsAny<string>()), Times.Once);
+        _mockGameStateService.Verify(o => o.GetGuildGames(It.IsAny<string>()), Times.Once);
 
         var response = result.Should().BeOfType<Ok<IEnumerable<GameState>>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);

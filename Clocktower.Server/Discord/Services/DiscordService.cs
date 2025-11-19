@@ -1,6 +1,6 @@
 ﻿namespace Clocktower.Server.Discord.Services;
 
-public class DiscordService(DiscordBotService bot) : IDiscordService
+public class DiscordService(IDiscordBotService bot) : IDiscordService
 {
     public (bool success, bool valid, string guildName, string message) CheckGuildId(ulong guildId)
     {

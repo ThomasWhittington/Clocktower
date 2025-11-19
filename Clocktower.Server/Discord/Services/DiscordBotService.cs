@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Clocktower.Server.Discord.Services;
 
-public class DiscordBotService : BackgroundService
+public class DiscordBotService : BackgroundService, IDiscordBotService
 {
     private readonly Secrets _secrets;
     private readonly IServiceProvider _serviceProvider;

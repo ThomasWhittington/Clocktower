@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 namespace Clocktower.Server.Discord.Town.Services;
 
 [UsedImplicitly]
-public class DiscordTownService(DiscordBotService bot, INotificationService notificationService, IJwtWriter jwtWriter, IMemoryCache cache, IOptions<Secrets> secretsOptions) : IDiscordTownService
+public class DiscordTownService(IDiscordBotService bot, INotificationService notificationService, IJwtWriter jwtWriter, IMemoryCache cache, IOptions<Secrets> secretsOptions) : IDiscordTownService
 {
     private readonly Secrets _secrets = secretsOptions.Value;
     private const string TownSquareName = "⛲ Town Square";

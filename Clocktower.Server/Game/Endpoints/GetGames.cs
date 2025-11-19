@@ -12,7 +12,7 @@ public class GetGames : IEndpoint
     {
         var games = string.IsNullOrWhiteSpace(guildId)
             ? gameStateService.GetGames()
-            : gameStateService.GetGames(guildId);
+            : gameStateService.GetGuildGames(guildId);
 
         return TypedResults.Ok(games);
     }
