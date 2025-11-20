@@ -17,12 +17,7 @@ public class GetGuildsWithUser : IEndpoint
         var userId = ulong.Parse(request.UserId);
 
         var (success, guilds, message) = discordService.GetGuildsWithUser(userId);
-        if (success)
-        {
-            return TypedResults.Ok(new Response(guilds));
-        }
-
-        return TypedResults.BadRequest(message);
+        return success ? TypedResults.Ok(new Response(guilds)) : TypedResults.BadRequest(message);
     }
 
     [UsedImplicitly]

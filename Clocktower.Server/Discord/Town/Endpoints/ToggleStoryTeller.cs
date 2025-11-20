@@ -6,41 +6,33 @@ namespace Clocktower.Server.Discord.Town.Endpoints;
 public class ToggleStoryTeller : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{guildId}/{userId}", Handle)
+        .MapPost("/{gameId}/{userId}", Handle)
         .SetOpenApiOperationId<ToggleStoryTeller>()
         .WithSummary("Toggles the storyteller role for a user")
         .WithDescription("Adds or removes the storyteller role from the specified user")
-        .WithRequestValidation<GuildAndUserRequest>();
+        .WithRequestValidation<Request>();
 
     private static async Task<Results<Ok<string>, BadRequest<string>>> Handle(
-        [AsParameters] GuildAndUserRequest request,
+        [AsParameters] Request request,
         IDiscordTownService discordTownService)
     {
-        var guildId = ulong.Parse(request.GuildId);
         var userId = ulong.Parse(request.UserId);
 
-        var (success, message) = await discordTownService.ToggleStoryTeller(guildId, userId);
-        if (success)
-        {
-            return TypedResults.Ok(message);
-        }
-
-        return TypedResults.BadRequest(message);
+        var (success, message) = await discordTownService.ToggleStoryTeller(request.GameId.Trim(), userId);
+        return success ? TypedResults.Ok(message) : TypedResults.BadRequest(message);
     }
 
     [UsedImplicitly]
-    public record GuildAndUserRequest(string GuildId, string UserId);
+    public record Request(string GameId, string UserId);
 
     [UsedImplicitly]
-    public class GuildAndUserRequestValidator : AbstractValidator<GuildAndUserRequest>
+    public class RequestValidator : AbstractValidator<Request>
     {
-        public GuildAndUserRequestValidator()
+        public RequestValidator()
         {
-            RuleFor(x => x.GuildId)
+            RuleFor(x => x.GameId)
                 .NotEmpty()
-                .WithMessage("GuildId cannot be empty")
-                .Must(Common.Validation.BeValidDiscordSnowflake)
-                .WithMessage("GuildId must be a valid Discord snowflake");
+                .WithMessage("GameId cannot be empty");
 
             RuleFor(x => x.UserId)
                 .NotEmpty()

@@ -1,6 +1,6 @@
 ﻿namespace Clocktower.Server.Data;
 
-public class GameState
+public class GameState : IIdentifiable
 {
     public string Id { get; set; }
     public string GuildId { get; set; }

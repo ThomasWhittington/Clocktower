@@ -1,8 +1,10 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Clocktower.Server.Common.Api.Filters;
 
 namespace Clocktower.Server;
 
+[ExcludeFromCodeCoverage]
 public static class Endpoints
 {
     public static void MapEndpoints(this WebApplication app)

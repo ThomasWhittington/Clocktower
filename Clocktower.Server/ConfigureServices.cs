@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO.Abstractions;
 using System.Text.Json.Serialization;
 using Clocktower.Server.Common.Api.Auth;
 using Clocktower.Server.Common.Services;
@@ -15,6 +16,7 @@ using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 namespace Clocktower.Server;
 
+[ExcludeFromCodeCoverage]
 public static class ConfigureServices
 {
     extension(WebApplicationBuilder builder)
@@ -47,7 +49,7 @@ public static class ConfigureServices
             builder.Services.AddValidatorsFromAssembly(typeof(ConfigureServices).Assembly);
 
             builder.Services.Configure<Secrets>(builder.Configuration.GetSection(nameof(Secrets)));
-            
+
             builder.Services.AddSingleton<IJwtWriter, JwtWriter>();
             builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
             builder.Services.AddSingleton<IGameStateStore, GameStateStore>();
@@ -58,13 +60,13 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IDiscordService, DiscordService>();
             builder.Services.AddSingleton<IDiscordTownService, DiscordTownService>();
             builder.Services.AddSingleton<IFileSystem, FileSystem>();
-            
+
             builder.Services.AddScoped<IDiscordAuthService, DiscordAuthService>();
             builder.Services.AddScoped<IGameStateService, GameStateService>();
             builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddScoped<IGameAuthorizationService, GameAuthorizationService>();
             builder.Services.AddScoped<IAuthorizationHandler, StoryTellerForGameHandler>();
-           
+
             builder.Services.AddHostedService(provider => provider.GetRequiredService<IDiscordBotService>());
         }
 

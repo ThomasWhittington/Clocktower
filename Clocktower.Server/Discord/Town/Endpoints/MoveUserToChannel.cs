@@ -19,12 +19,7 @@ public class MoveUserToChannel : IEndpoint
         var channelId = ulong.Parse(request.ChannelId);
 
         var (success, message) = await discordTownService.MoveUser(guildId, userId, channelId);
-        if (success)
-        {
-            return TypedResults.Ok(message);
-        }
-
-        return TypedResults.BadRequest(message);
+        return success ? TypedResults.Ok(message) : TypedResults.BadRequest(message);
     }
 
 

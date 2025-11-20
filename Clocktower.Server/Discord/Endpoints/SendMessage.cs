@@ -18,12 +18,7 @@ public class SendMessage : IEndpoint
         var userId = ulong.Parse(request.UserId);
 
         var (success, message) = await discordService.SendMessage(userId, request.Message);
-        if (success)
-        {
-            return TypedResults.Ok();
-        }
-
-        return TypedResults.BadRequest(message);
+        return success ? TypedResults.Ok() : TypedResults.BadRequest(message);
     }
 
 

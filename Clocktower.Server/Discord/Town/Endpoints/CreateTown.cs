@@ -18,11 +18,6 @@ public class CreateTown : IEndpoint
         var guildId = ulong.Parse(request.GuildId);
         
         var (success, message) = await discordTownService.CreateTown(guildId);
-        if (success)
-        {
-            return TypedResults.Ok(message);
-        }
-
-        return TypedResults.BadRequest(message);
+        return success ? TypedResults.Ok(message) : TypedResults.BadRequest(message);
     }
 }

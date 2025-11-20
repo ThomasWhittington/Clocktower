@@ -375,5 +375,29 @@
       }
     },
     "isImported": false
+  },
+  {
+    "id": "TASK_157",
+    "priority": "MEDIUM",
+    "tags": [
+      "todo"
+    ],
+    "title": "",
+    "description": "[TODO] should update user status in game state. Also take in gameId rather than guildId",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 20
+      },
+      "time": {
+        "hour": 13,
+        "minute": 34,
+        "second": 40,
+        "nano": 978937100
+      }
+    },
+    "isImported": false
   }
 ]

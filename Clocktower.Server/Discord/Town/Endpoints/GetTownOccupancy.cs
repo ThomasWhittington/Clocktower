@@ -18,11 +18,6 @@ public class GetTownOccupancy : IEndpoint
         var guildId = ulong.Parse(request.GuildId);
 
         var (success, townOccupants, message) = await discordTownService.GetTownOccupancy(guildId);
-        if (success)
-        {
-            return TypedResults.Ok(townOccupants);
-        }
-
-        return TypedResults.BadRequest(message);
+        return success ? TypedResults.Ok(townOccupants) : TypedResults.BadRequest(message);
     }
 }

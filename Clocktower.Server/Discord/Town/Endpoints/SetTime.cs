@@ -17,12 +17,7 @@ public class SetTime : IEndpoint
         var gameId = request.GameId.Trim();
 
         var (success, message) = await discordTownService.SetTime(gameId, request.GameTime);
-        if (success)
-        {
-            return TypedResults.Ok(message);
-        }
-
-        return TypedResults.BadRequest(message);
+        return success ? TypedResults.Ok(message) : TypedResults.BadRequest(message);
     }
 
 

@@ -1,4 +1,5 @@
 using Clocktower.Server.Common.Services;
+using Clocktower.Server.Data.Extensions;
 using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Socket;
 using Discord;
@@ -165,23 +166,50 @@ public class DiscordTownService(
         }
     }
 
-    public async Task<(bool success, string message)> ToggleStoryTeller(ulong guildId, ulong userId)
+    public async Task<(bool success, string message)> ToggleStoryTeller(string gameId, ulong userId)
     {
         try
         {
+            var gameState = gameStateStore.Get(gameId);
+            if (gameState is null) return (false, $"Couldn't find game with id: {gameId}");
+            if (!ulong.TryParse(gameState.GuildId, out var guildId)) return (false, "GameState contained a guildId that could not be found");
             var guild = bot.Client.GetGuild(guildId);
             var role = guild.GetRole(StoryTellerRoleName);
             if (role is null) return (false, $"{StoryTellerRoleName} role does not exist");
             var user = guild.GetUser(userId);
             if (user is null) return (false, "User not found");
-            if (user.Roles.Any(r => r.Id == role.Id))
+
+            bool isStoryTellerAlready = user.Roles.Any(r => r.Id == role.Id);
+
+            var thisUser = gameState.Users.GetById(userId);
+            if (thisUser is null)
+            {
+                gameStateStore.TryUpdate(gameId, state =>
+                {
+                    state.Users.Add(user.AsGameUser());
+                    return state;
+                });
+            }
+
+            if (isStoryTellerAlready)
             {
                 await user.RemoveRoleAsync(role);
+                gameStateStore.TryUpdate(gameId, state =>
+                {
+                    state.Users.GetById(userId)!.UserType = UserType.Spectator;
+                    return state;
+                });
+
                 return (true, $"User {user.DisplayName} is no longer a {StoryTellerRoleName}");
             }
             else
             {
                 await user.AddRoleAsync(role);
+                gameStateStore.TryUpdate(gameId, state =>
+                {
+                    state.Users.GetById(userId)!.UserType = UserType.StoryTeller;
+                    return state;
+                });
                 return (true, $"User {user.DisplayName} is now a {StoryTellerRoleName}");
             }
         }
