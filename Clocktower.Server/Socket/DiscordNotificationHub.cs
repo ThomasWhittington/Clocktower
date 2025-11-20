@@ -9,8 +9,6 @@ public sealed class DiscordNotificationHub(IGameStateStore gameStateStore, IJwtW
     [UsedImplicitly]
     public async Task<SessionSyncState?> JoinGameGroup(string gameId, string userId)
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, GetGameGroupName(gameId));
-
         var currentGameState = gameStateStore.Get(gameId);
         var gameUser = currentGameState?.GetUser(userId);
         if (gameUser is null) return null;
@@ -19,6 +17,8 @@ public sealed class DiscordNotificationHub(IGameStateStore gameStateStore, IJwtW
             GameTime = currentGameState?.GameTime ?? GameTime.Unknown,
             Jwt = jwtWriter.GetJwtToken(gameUser)
         };
+        
+        await Groups.AddToGroupAsync(Context.ConnectionId, GetGameGroupName(gameId));
 
         return currentState;
     }
@@ -27,12 +27,4 @@ public sealed class DiscordNotificationHub(IGameStateStore gameStateStore, IJwtW
     public Task LeaveGameGroup(string gameId) => Groups.RemoveFromGroupAsync(Context.ConnectionId, GetGameGroupName(gameId));
 
     private static string GetGameGroupName(string gameId) => $"game:{gameId}";
-}
-
-public interface IDiscordNotificationClient
-{
-    Task TownOccupancyUpdated(TownOccupants townOccupants);
-    Task UserVoiceStateChanged(string userId, bool isInVoice);
-    Task TownTimeChanged(int gameTime);
-    Task PingUser(string message);
 }
