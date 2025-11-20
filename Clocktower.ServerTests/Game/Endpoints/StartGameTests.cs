@@ -11,9 +11,9 @@ public class StartGameTests
     private const string ResponseMessage = "Response";
 
     private static StartGame.Request GetRandomRequest() => new(
-        CommonMethods.GetRandomStringId(),
-        CommonMethods.GetRandomSnowflakeId(),
-        CommonMethods.GetRandomSnowflakeId()
+        CommonMethods.GetRandomString(),
+        CommonMethods.GetRandomSnowflakeStringId(),
+        CommonMethods.GetRandomSnowflakeStringId()
     );
 
     private void MockResponse(bool success, GameState? gameState)
@@ -66,7 +66,7 @@ public class StartGameTests
         var request = GetRandomRequest();
         var gameState = new GameState
         {
-            Id = CommonMethods.GetRandomStringId()
+            Id = CommonMethods.GetRandomString()
         };
         MockResponse(true, gameState);
 

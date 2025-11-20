@@ -2,6 +2,7 @@
 
 public static class CommonMethods
 {
-    public static string GetRandomStringId() => Guid.NewGuid().ToString();
-    public static string GetRandomSnowflakeId() => new Random((int)DateTime.Now.Ticks).NextInt64().ToString();
+    public static string GetRandomString() => Guid.NewGuid().ToString();
+    public static string GetRandomSnowflakeStringId() => GetRandomSnowflakeNumberId().ToString();
+    public static ulong GetRandomSnowflakeNumberId() => (ulong)new Random((int)DateTime.Now.Ticks).NextInt64();
 }

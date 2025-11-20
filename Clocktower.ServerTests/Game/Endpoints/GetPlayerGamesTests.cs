@@ -37,13 +37,13 @@ public class GetPlayerGamesTests
     [TestMethod]
     public void Handle_ReturnsOkPlayerGamesGames()
     {
-        var userId = CommonMethods.GetRandomStringId();
+        var userId = CommonMethods.GetRandomString();
         var playerGames = new MiniGameState[]
         {
-            new(CommonMethods.GetRandomStringId(), new GameUser(
-                CommonMethods.GetRandomStringId(),
-                CommonMethods.GetRandomStringId(),
-                CommonMethods.GetRandomStringId()
+            new(CommonMethods.GetRandomString(), new GameUser(
+                CommonMethods.GetRandomString(),
+                CommonMethods.GetRandomString(),
+                CommonMethods.GetRandomString()
             ), DateTime.UtcNow),
         };
 

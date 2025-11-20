@@ -50,8 +50,8 @@ public class GameAuthorizationServiceTests
     [TestMethod]
     public void IsStoryTellerForGame_ReturnsFalse_WhenUnknownGameId()
     {
-        string userId = CommonMethods.GetRandomStringId();
-        string gameId = CommonMethods.GetRandomStringId();
+        string userId = CommonMethods.GetRandomString();
+        string gameId = CommonMethods.GetRandomString();
         var gameState = CreateGameState("dummy", [new ValueTuple<string, UserType>(userId, UserType.StoryTeller)]);
         MockResponse("dummy", gameState);
         
@@ -63,8 +63,8 @@ public class GameAuthorizationServiceTests
     [TestMethod]
     public void IsStoryTellerForGame_ReturnFalse_WhenUnknownUserId()
     {
-        string userId = CommonMethods.GetRandomStringId();
-        string gameId = CommonMethods.GetRandomStringId();
+        string userId = CommonMethods.GetRandomString();
+        string gameId = CommonMethods.GetRandomString();
         var gameState = new GameState { Id = gameId };
         MockResponse(gameId, gameState);
 
@@ -76,8 +76,8 @@ public class GameAuthorizationServiceTests
     [TestMethod]
     public void IsStoryTellerForGame_ReturnsFalse_WhenUnknownUserIdUnknownGameId()
     {
-        string userId = CommonMethods.GetRandomStringId();
-        string gameId = CommonMethods.GetRandomStringId();
+        string userId = CommonMethods.GetRandomString();
+        string gameId = CommonMethods.GetRandomString();
         var gameState = new GameState { Id = "dummy" };
         MockResponse(gameId, gameState);
 
@@ -89,8 +89,8 @@ public class GameAuthorizationServiceTests
     [TestMethod]
     public void IsStoryTellerForGame_ReturnsFalse_WhenPlayerNotStoryTeller()
     {
-        string userId = CommonMethods.GetRandomStringId();
-        string gameId = CommonMethods.GetRandomStringId();
+        string userId = CommonMethods.GetRandomString();
+        string gameId = CommonMethods.GetRandomString();
         var gameState = CreateGameState(gameId, [new ValueTuple<string, UserType>(userId, UserType.Player)]);
         MockResponse(gameId, gameState);
 
@@ -102,8 +102,8 @@ public class GameAuthorizationServiceTests
     [TestMethod]
     public void IsStoryTellerForGame_ReturnsTrue_WhenPlayerIsStoryTeller()
     {
-        string userId = CommonMethods.GetRandomStringId();
-        string gameId = CommonMethods.GetRandomStringId();
+        string userId = CommonMethods.GetRandomString();
+        string gameId = CommonMethods.GetRandomString();
         var gameState = CreateGameState(gameId, [new ValueTuple<string, UserType>(userId, UserType.StoryTeller)]);
         MockResponse(gameId, gameState);
 

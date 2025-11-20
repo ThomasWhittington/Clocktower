@@ -39,7 +39,7 @@ public class DeleteGameTests
     [TestMethod]
     public void Handle_ReturnsNotFound_WhenServiceDeleteGameReturnsFalse()
     {
-        var gameId = CommonMethods.GetRandomStringId();
+        var gameId = CommonMethods.GetRandomString();
         MockResponse(false);
 
         var result = DeleteGame.Handle(gameId, _mockGameStateService.Object);
@@ -55,7 +55,7 @@ public class DeleteGameTests
     [TestMethod]
     public void Handle_ReturnsOk_WhenServiceStartNewGameReturnsTrue()
     {
-        var gameId = CommonMethods.GetRandomStringId();
+        var gameId = CommonMethods.GetRandomString();
         MockResponse(true);
 
         var result = DeleteGame.Handle(gameId, _mockGameStateService.Object);

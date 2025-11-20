@@ -1,4 +1,5 @@
 ﻿using Clocktower.Server.Data.Extensions;
+using Discord;
 using Discord.WebSocket;
 
 namespace Clocktower.Server.Common.Api.Extensions;
@@ -51,7 +52,7 @@ public static class DiscordGuildExtensions
         return result;
     }
 
-    public static GameUser AsGameUser(this SocketUser user)
+    public static GameUser AsGameUser(this IUser user)
     {
         return new GameUser(user.Id.ToString(), user.GlobalName, user.GetDisplayAvatarUrl());
     }

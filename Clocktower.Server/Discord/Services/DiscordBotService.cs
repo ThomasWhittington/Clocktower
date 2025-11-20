@@ -16,6 +16,11 @@ public class DiscordBotService(IOptions<Secrets> secretsOptions, IGameStateStore
         GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.All
     });
 
+    public IUser GetUser(ulong userId)
+    {
+        return Client.GetUser(userId);
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         Client.Log += LogAsync;

@@ -1,9 +1,10 @@
-﻿using System.Text.Json;
+﻿using System.IO.Abstractions;
+using System.Text.Json;
 using Clocktower.Server.Discord.Services;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GameStateService(IDiscordBotService bot, IGameStateStore gameStateStore) : IGameStateService
+public class GameStateService(IDiscordBotService bot, IGameStateStore gameStateStore, IFileSystem fileSystem) : IGameStateService
 {
     public IEnumerable<GameState> GetGames() =>
         gameStateStore.GetAll();
@@ -18,22 +19,37 @@ public class GameStateService(IDiscordBotService bot, IGameStateStore gameStateS
         return miniGameStates;
     }
 
-    public (bool success, string message) LoadDummyData()
+    public (bool success, string message) LoadDummyData(string filePath = "dummyState.json")
     {
-        var json = File.ReadAllText("dummyState.json");
-        var games = JsonSerializer.Deserialize<GameState[]>(json);
-        if (games == null)
+        try
+        {
+            var json = fileSystem.File.ReadAllText(filePath);
+            var games = JsonSerializer.Deserialize<GameState[]>(json);
+            if (games == null)
+            {
+                return (false, "Failed to deserialize json");
+            }
+
+            gameStateStore.Clear();
+            foreach (var gameState in games)
+            {
+                gameStateStore.Set(gameState.Id, gameState);
+            }
+
+            return (true, "Loaded dummy data");
+        }
+        catch (JsonException)
         {
             return (false, "Failed to deserialize json");
         }
-
-        gameStateStore.Clear();
-        foreach (var gameState in games)
+        catch (FileNotFoundException)
         {
-            gameStateStore.Set(gameState.Id, gameState);
+            return (false, "File not found");
         }
-
-        return (true, "Loaded dummy data");
+        catch (Exception ex)
+        {
+            return (false, $"Error loading dummy data: {ex.Message}");
+        }
     }
 
     public (bool success, GameState? gameState, string message) GetGame(string gameId)
@@ -57,7 +73,7 @@ public class GameStateService(IDiscordBotService bot, IGameStateStore gameStateS
 
     public (bool success, GameState? gameState, string message) StartNewGame(string guildId, string gameId, ulong userId)
     {
-        var user = bot.Client.GetUser(userId);
+        var user = bot.GetUser(userId);
         if (user is null) return (false, null, "Couldn't find user");
         var gameUser = user.AsGameUser();
         gameUser.UserType = UserType.StoryTeller;

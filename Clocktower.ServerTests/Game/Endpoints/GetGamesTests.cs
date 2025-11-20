@@ -41,13 +41,13 @@ public class GetGamesTests
         const string guildId = null!;
         var allGames = new GameState[]
         {
-            new() { Id = CommonMethods.GetRandomStringId() },
-            new() { Id = CommonMethods.GetRandomStringId() },
+            new() { Id = CommonMethods.GetRandomString() },
+            new() { Id = CommonMethods.GetRandomString() },
         };
 
         var guildGames = new GameState[]
         {
-            new() { Id = CommonMethods.GetRandomStringId() }
+            new() { Id = CommonMethods.GetRandomString() }
         };
 
         MockResponse(allGames, guildGames);
@@ -65,16 +65,16 @@ public class GetGamesTests
     [TestMethod]
     public void Handle_ReturnsOkGuildGames_WhenGuildIdProvided()
     {
-        var guildId = CommonMethods.GetRandomStringId();
+        var guildId = CommonMethods.GetRandomString();
         var allGames = new GameState[]
         {
-            new() { Id = CommonMethods.GetRandomStringId() },
-            new() { Id = CommonMethods.GetRandomStringId() },
+            new() { Id = CommonMethods.GetRandomString() },
+            new() { Id = CommonMethods.GetRandomString() },
         };
 
         var guildGames = new GameState[]
         {
-            new() { Id = CommonMethods.GetRandomStringId() }
+            new() { Id = CommonMethods.GetRandomString() }
         };
 
         MockResponse(allGames, guildGames);

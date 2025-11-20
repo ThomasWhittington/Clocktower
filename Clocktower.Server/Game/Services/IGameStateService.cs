@@ -8,5 +8,5 @@ public interface IGameStateService
     IEnumerable<GameState> GetGames();
     IEnumerable<GameState> GetGuildGames(string guildId);
     IEnumerable<MiniGameState> GetPlayerGames(string userId);
-    (bool success, string message) LoadDummyData();
+    (bool success, string message) LoadDummyData(string filePath = "dummyState.json");
 }

@@ -40,7 +40,7 @@ public class GetGameTests
     [TestMethod]
     public void Handle_ReturnsNotFound_WhenServiceGetGameReturnsFalse()
     {
-        var gameId = CommonMethods.GetRandomStringId();
+        var gameId = CommonMethods.GetRandomString();
         MockResponse(false, null);
 
         var result = GetGame.Handle(gameId, _mockGameStateService.Object);
@@ -55,10 +55,10 @@ public class GetGameTests
     [TestMethod]
     public void Handle_ReturnsOk_WhenServiceGetGameReturnsTrue()
     {
-        var gameId = CommonMethods.GetRandomStringId();
+        var gameId = CommonMethods.GetRandomString();
         var gameState = new GameState
         {
-            Id = CommonMethods.GetRandomStringId()
+            Id = CommonMethods.GetRandomString()
         };
         MockResponse(true, gameState);
 

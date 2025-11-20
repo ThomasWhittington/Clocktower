@@ -303,7 +303,7 @@
     "tags": [],
     "title": "Unit test coverage of server",
     "description": "I need to add decent coverage of the server code before it gets out of hand",
-    "status": "TODO",
+    "status": "IN_PROGRESS",
     "date": {
       "date": {
         "year": 2025,
