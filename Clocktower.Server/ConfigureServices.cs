@@ -1,9 +1,11 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.IO.Abstractions;
+using System.Text.Json.Serialization;
 using Clocktower.Server.Common.Api.Auth;
 using Clocktower.Server.Common.Services;
 using Clocktower.Server.Discord.Auth.Services;
 using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Discord.Town.Services;
+using Clocktower.Server.Roles.Services;
 using Clocktower.Server.Socket;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -55,9 +57,11 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IDiscordBotService, DiscordBotService>();
             builder.Services.AddSingleton<IDiscordService, DiscordService>();
             builder.Services.AddSingleton<IDiscordTownService, DiscordTownService>();
-
+            builder.Services.AddSingleton<IFileSystem, FileSystem>();
+            
             builder.Services.AddScoped<IDiscordAuthService, DiscordAuthService>();
             builder.Services.AddScoped<IGameStateService, GameStateService>();
+            builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddScoped<IGameAuthorizationService, GameAuthorizationService>();
             builder.Services.AddScoped<IAuthorizationHandler, StoryTellerForGameHandler>();
            
