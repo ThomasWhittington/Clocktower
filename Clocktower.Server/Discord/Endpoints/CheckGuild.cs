@@ -13,7 +13,7 @@ public class CheckGuild : IEndpoint
         .WithDescription("Checks if bot has access to the guild")
         .WithRequestValidation<GuildIdRequest>();
 
-    internal static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] GuildIdRequest request,[FromServices] IDiscordService discordService)
+    internal static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] GuildIdRequest request, [FromServices] IDiscordService discordService)
     {
         var guildId = ulong.Parse(request.GuildId);
 

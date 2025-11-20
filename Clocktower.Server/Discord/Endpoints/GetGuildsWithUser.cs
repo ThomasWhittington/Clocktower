@@ -12,7 +12,7 @@ public class GetGuildsWithUser : IEndpoint
         .WithDescription("Gets all guilds the bot is in that the player is also an administrator")
         .WithRequestValidation<Request>();
 
-    private static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] Request request, IDiscordService discordService)
+    internal static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] Request request, [FromServices] IDiscordService discordService)
     {
         var userId = ulong.Parse(request.UserId);
 
