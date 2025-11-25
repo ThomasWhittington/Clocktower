@@ -14,7 +14,7 @@ public class AddBot : IEndpoint
             .WithDescription("Allows user to add bot to their server");
     }
 
-    private static Results<RedirectHttpResult, BadRequest<string>> Handle(IDiscordAuthService discordAuthService)
+    internal static Results<RedirectHttpResult, BadRequest<string>> Handle([FromServices] IDiscordAuthService discordAuthService)
     {
         var (success, url, message) = discordAuthService.GetAddBotUrl();
         return success ? TypedResults.Redirect(url) : TypedResults.BadRequest(message);

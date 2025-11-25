@@ -1,6 +1,6 @@
 ﻿using Clocktower.Server.Data.Wrappers;
 
-namespace Clocktower.Server.Common.Api.Extensions;
+namespace Clocktower.Server.Data.Extensions;
 
 public static class DiscordChannelExtensions
 {

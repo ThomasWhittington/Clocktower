@@ -13,7 +13,7 @@ public class GetAuthData : IEndpoint
             .WithDescription("Retrieves temporary authentication data by key");
     }
 
-    private static Results<Ok<UserAuthData>, NotFound> Handle(
+    internal static Results<Ok<UserAuthData>, NotFound> Handle(
         string key,
         [FromServices] IDiscordAuthService discordAuthService)
     {

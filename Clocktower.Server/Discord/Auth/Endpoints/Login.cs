@@ -14,7 +14,7 @@ public class Login : IEndpoint
             .WithDescription("Redirects user to Discord for OAuth authentication");
     }
 
-    private static Results<RedirectHttpResult, BadRequest<string>> Handle(IDiscordAuthService discordAuthService)
+    internal static Results<RedirectHttpResult, BadRequest<string>> Handle([FromServices] IDiscordAuthService discordAuthService)
     {
         var (success, authorizationUrl, message) = discordAuthService.GetAuthorizationUrl();
         return success ? TypedResults.Redirect(authorizationUrl) : TypedResults.BadRequest(message);

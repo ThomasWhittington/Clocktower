@@ -1,8 +1,6 @@
-﻿using Clocktower.Server.Data.Extensions;
-using Clocktower.Server.Data.Wrappers;
-using DiscordUser = Clocktower.Server.Data.DiscordUser;
+﻿using Clocktower.Server.Data.Wrappers;
 
-namespace Clocktower.Server.Common.Api.Extensions;
+namespace Clocktower.Server.Data.Extensions;
 
 public static class DiscordGuildExtensions
 {
