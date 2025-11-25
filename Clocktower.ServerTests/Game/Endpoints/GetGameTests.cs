@@ -30,11 +30,10 @@ public class GetGameTests
 
         GetGame.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/{gameId}");
-        
-        endpoint.ShouldHaveMethod(HttpMethod.Get);
-        endpoint.ShouldHaveOperationId("getGameApi");
-        endpoint.ShouldHaveSummaryAndDescription("Get the game state by id");
+        builder.GetEndpoint("/{gameId}")
+            .ShouldHaveMethod(HttpMethod.Get)
+            .ShouldHaveOperationId("getGameApi")
+            .ShouldHaveSummaryAndDescription("Get the game state by id");
     }
 
     [TestMethod]
@@ -44,14 +43,14 @@ public class GetGameTests
         MockResponse(false, null);
 
         var result = GetGame.Handle(gameId, _mockGameStateService.Object);
-        
-        _mockGameStateService.Verify(o=>o.GetGame(gameId.Trim()), Times.Once);
+
+        _mockGameStateService.Verify(o => o.GetGame(gameId.Trim()), Times.Once);
 
         var response = result.Result.Should().BeOfType<NotFound<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
         response.Value.Should().Be(ResponseMessage);
     }
-    
+
     [TestMethod]
     public void Handle_ReturnsOk_WhenServiceGetGameReturnsTrue()
     {
@@ -63,8 +62,8 @@ public class GetGameTests
         MockResponse(true, gameState);
 
         var result = GetGame.Handle(gameId, _mockGameStateService.Object);
-        
-        _mockGameStateService.Verify(o=>o.GetGame(gameId.Trim()), Times.Once);
+
+        _mockGameStateService.Verify(o => o.GetGame(gameId.Trim()), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<GameState>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);

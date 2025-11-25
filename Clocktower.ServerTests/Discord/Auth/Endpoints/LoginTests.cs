@@ -21,11 +21,11 @@ public class LoginTests
 
         Login.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/");
-        endpoint.ShouldHaveMethod(HttpMethod.Get);
-        endpoint.ShouldHaveOperationId("loginApi");
-        endpoint.ShouldHaveSummary("Initiate Discord OAuth");
-        endpoint.ShouldHaveDescription("Redirects user to Discord for OAuth authentication");
+        builder.GetEndpoint("/")
+            .ShouldHaveMethod(HttpMethod.Get)
+            .ShouldHaveOperationId("loginApi")
+            .ShouldHaveSummary("Initiate Discord OAuth")
+            .ShouldHaveDescription("Redirects user to Discord for OAuth authentication");
     }
 
     [TestMethod]

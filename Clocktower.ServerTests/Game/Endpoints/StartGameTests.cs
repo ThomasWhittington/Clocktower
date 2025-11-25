@@ -36,12 +36,11 @@ public class StartGameTests
 
         StartGame.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/{gameId}/start/{guildId}/{userId}");
-
-        endpoint.ShouldHaveMethod(HttpMethod.Post);
-        endpoint.ShouldHaveOperationId("startGameApi");
-        endpoint.ShouldHaveSummaryAndDescription("Starts new game state for id");
-        endpoint.ShouldHaveValidation();
+        builder.GetEndpoint("/{gameId}/start/{guildId}/{userId}")
+            .ShouldHaveMethod(HttpMethod.Post)
+            .ShouldHaveOperationId("startGameApi")
+            .ShouldHaveSummaryAndDescription("Starts new game state for id")
+            .ShouldHaveValidation();
     }
 
     [TestMethod]
@@ -52,12 +51,11 @@ public class StartGameTests
 
         var result = StartGame.Handle(request, _mockGameStateService.Object);
 
-        _mockGameStateService.Verify(o=>o.StartNewGame(request.GuildId, request.GameId.Trim(), ulong.Parse(request.UserId)),Times.Once);
-        
+        _mockGameStateService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), ulong.Parse(request.UserId)), Times.Once);
+
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
         response.Value.Should().Be(ResponseMessage);
-        
     }
 
     [TestMethod]
@@ -72,8 +70,8 @@ public class StartGameTests
 
         var result = StartGame.Handle(request, _mockGameStateService.Object);
 
-        _mockGameStateService.Verify(o=>o.StartNewGame(request.GuildId, request.GameId.Trim(), ulong.Parse(request.UserId)),Times.Once);
-        
+        _mockGameStateService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), ulong.Parse(request.UserId)), Times.Once);
+
         var response = result.Result.Should().BeOfType<Created<GameState>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.Created);
         response.Location.Should().Be($"/games/{gameState.Id}");

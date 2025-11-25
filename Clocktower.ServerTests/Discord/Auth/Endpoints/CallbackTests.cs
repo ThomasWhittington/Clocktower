@@ -21,10 +21,10 @@ public class CallbackTests
 
         Callback.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/callback");
-        endpoint.ShouldHaveMethod(HttpMethod.Get);
-        endpoint.ShouldHaveOperationId("callbackApi");
-        endpoint.ShouldHaveSummaryAndDescription("Handle Discord OAuth callback");
+        builder.GetEndpoint("/callback")
+            .ShouldHaveMethod(HttpMethod.Get)
+            .ShouldHaveOperationId("callbackApi")
+            .ShouldHaveSummaryAndDescription("Handle Discord OAuth callback");
     }
 
     [TestMethod]
@@ -35,7 +35,7 @@ public class CallbackTests
         const string url = "https://dummy.url";
         _mockDiscordAuthService.Setup(o => o.HandleCallback(error, code)).ReturnsAsync(url);
 
-        var result =await Callback.Handle(code, error, _mockDiscordAuthService.Object);
+        var result = await Callback.Handle(code, error, _mockDiscordAuthService.Object);
 
         _mockDiscordAuthService.Verify(o => o.HandleCallback(error, code), Times.Once);
         var response = result.Should().BeOfType<RedirectHttpResult>().Subject;

@@ -1,5 +1,4 @@
-﻿using Clocktower.Server.Discord.Town.Endpoints.Validation;
-using Clocktower.Server.Discord.Town.Services;
+﻿using Clocktower.Server.Discord.Town.Services;
 
 namespace Clocktower.Server.Discord.Town.Endpoints;
 
@@ -13,10 +12,10 @@ public class CreateTown : IEndpoint
         .WithDescription("Creates the roles, categories and channels required for clocktower")
         .WithRequestValidation<GuildIdRequest>();
 
-    private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, IDiscordTownService discordTownService)
+    internal static async Task<Results<Ok<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, [FromServices] IDiscordTownService discordTownService)
     {
         var guildId = ulong.Parse(request.GuildId);
-        
+
         var (success, message) = await discordTownService.CreateTown(guildId);
         return success ? TypedResults.Ok(message) : TypedResults.BadRequest(message);
     }

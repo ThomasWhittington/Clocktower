@@ -14,7 +14,12 @@ public static class RouteHandlerBuilderExtensions
                 return operation;
             });
         }
-        
+
+        public RouteHandlerBuilder WithSummaryAndDescription(string summary)
+        {
+            return builder.WithSummary(summary).WithDescription(summary);
+        }
+
         public RouteHandlerBuilder WithRequestValidation<TRequest>()
         {
             return builder

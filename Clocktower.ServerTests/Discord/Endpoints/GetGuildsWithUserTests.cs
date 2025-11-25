@@ -1,6 +1,7 @@
 ﻿using Clocktower.Server.Data;
 using Clocktower.Server.Discord.Endpoints;
 using Clocktower.Server.Discord.Services;
+using Clocktower.Server.Discord.Town.Endpoints.Validation;
 
 namespace Clocktower.ServerTests.Discord.Endpoints;
 
@@ -8,7 +9,6 @@ namespace Clocktower.ServerTests.Discord.Endpoints;
 public class GetGuildsWithUserTests
 {
     private Mock<IDiscordService> _mockDiscordService = null!;
-    private const string ResponseName = "Name";
     private const string ResponseMessage = "Response";
 
 
@@ -25,20 +25,19 @@ public class GetGuildsWithUserTests
 
         GetGuildsWithUser.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/{userId}/guilds");
-
-        endpoint.ShouldHaveMethod(HttpMethod.Get);
-        endpoint.ShouldHaveOperationId("getGuildsWithUserApi");
-        endpoint.ShouldHaveSummary("Gets guilds that contain user");
-        endpoint.ShouldHaveDescription("Gets all guilds the bot is in that the player is also an administrator");
-        endpoint.ShouldHaveValidation();
+        builder.GetEndpoint("/{userId}/guilds")
+            .ShouldHaveMethod(HttpMethod.Get)
+            .ShouldHaveOperationId("getGuildsWithUserApi")
+            .ShouldHaveSummary("Gets guilds that contain user")
+            .ShouldHaveDescription("Gets all guilds the bot is in that the player is also an administrator")
+            .ShouldHaveValidation();
     }
 
     [TestMethod]
     public void Handle_ReturnsBadRequest_WhenServiceGetGuildsWithUserReturnsFalse()
     {
         var userId = CommonMethods.GetRandomSnowflakeNumberId();
-        var request = new GetGuildsWithUser.Request(userId.ToString());
+        var request = new UserIdRequest(userId.ToString());
 
         var guilds = new List<MiniGuild>
         {
@@ -61,7 +60,7 @@ public class GetGuildsWithUserTests
     public void Handle_ReturnsOk_WhenServiceGetGuildsWithUserReturnsTrue()
     {
         var userId = CommonMethods.GetRandomSnowflakeNumberId();
-        var request = new GetGuildsWithUser.Request(userId.ToString());
+        var request = new UserIdRequest(userId.ToString());
 
         var guilds = new List<MiniGuild>
         {

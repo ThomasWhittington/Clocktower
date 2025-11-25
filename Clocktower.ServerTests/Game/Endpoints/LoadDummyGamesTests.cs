@@ -29,11 +29,10 @@ public class LoadDummyGamesTests
 
         LoadDummyGames.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/load");
-
-        endpoint.ShouldHaveMethod(HttpMethod.Post);
-        endpoint.ShouldHaveOperationId("loadDummyGamesApi");
-        endpoint.ShouldHaveSummaryAndDescription("Loads dummy data from saved json file");
+        builder.GetEndpoint("/load")
+            .ShouldHaveMethod(HttpMethod.Post)
+            .ShouldHaveOperationId("loadDummyGamesApi")
+            .ShouldHaveSummaryAndDescription("Loads dummy data from saved json file");
     }
 
     [TestMethod]

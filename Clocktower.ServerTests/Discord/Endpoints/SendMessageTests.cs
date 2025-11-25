@@ -22,12 +22,11 @@ public class SendMessageTests
 
         SendMessage.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/message");
-
-        endpoint.ShouldHaveMethod(HttpMethod.Post);
-        endpoint.ShouldHaveOperationId("sendMessageApi");
-        endpoint.ShouldHaveSummaryAndDescription("Sends message to the user");
-        endpoint.ShouldHaveValidation();
+        builder.GetEndpoint("/message")
+            .ShouldHaveMethod(HttpMethod.Post)
+            .ShouldHaveOperationId("sendMessageApi")
+            .ShouldHaveSummaryAndDescription("Sends message to the user")
+            .ShouldHaveValidation();
     }
 
     [TestMethod]
@@ -46,7 +45,7 @@ public class SendMessageTests
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
         response.Value.Should().Be(ResponseMessage);
     }
-    
+
     [TestMethod]
     public async Task Handle_ReturnsOk_WhenServiceSendMessageReturnsTrue()
     {

@@ -9,7 +9,7 @@ public class Callback : IEndpoint
     {
         app.MapGet("/callback", Handle)
             .SetOpenApiOperationId<Callback>()
-            .WithSummary("Handle Discord OAuth callback");
+            .WithSummaryAndDescription("Handle Discord OAuth callback");
     }
 
     internal static async Task<RedirectHttpResult> Handle(

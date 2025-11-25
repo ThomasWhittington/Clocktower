@@ -1,5 +1,4 @@
-﻿using Clocktower.Server.Discord.Town.Endpoints.Validation;
-using Clocktower.Server.Discord.Town.Services;
+﻿using Clocktower.Server.Discord.Town.Services;
 
 namespace Clocktower.Server.Discord.Town.Endpoints;
 
@@ -13,7 +12,7 @@ public class GetTownStatus : IEndpoint
         .WithDescription("Gets if the town exists in a valid state")
         .WithRequestValidation<GuildIdRequest>();
 
-    private static Results<Ok<Response>, NotFound<string>, BadRequest<string>> Handle([AsParameters] GuildIdRequest request, IDiscordTownService discordTownService)
+    internal static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] GuildIdRequest request, [FromServices] IDiscordTownService discordTownService)
     {
         var guildId = ulong.Parse(request.GuildId);
 

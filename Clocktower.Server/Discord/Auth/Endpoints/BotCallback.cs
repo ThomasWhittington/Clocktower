@@ -9,7 +9,7 @@ public class BotCallback : IEndpoint
     {
         app.MapGet("/bot-callback", Handle)
             .SetOpenApiOperationId<BotCallback>()
-            .WithSummary("Handle Discord bot OAuth callback");
+            .WithSummaryAndDescription("Handle Discord bot OAuth callback");
     }
 
     internal static RedirectHttpResult Handle(

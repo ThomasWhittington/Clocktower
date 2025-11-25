@@ -2,8 +2,6 @@
 
 namespace Clocktower.ServerTests.Admin.Endpoints;
 
-using Health = Health;
-
 [TestClass]
 public class HealthTests
 {
@@ -14,13 +12,10 @@ public class HealthTests
 
         Health.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/health");
-
-        endpoint.ShouldHaveMethod(HttpMethod.Get);
-        endpoint.ShouldHaveOperationId("healthApi");
-        endpoint.ShouldHaveSummary("Checks the health of the server");
-        endpoint.ShouldHaveDescription("Checks the health of the server");
-        endpoint.ShouldHaveEndpointName("Clocktower.Server.Admin.Endpoints.Health");
+        builder.GetEndpoint("/health")
+            .ShouldHaveMethod(HttpMethod.Get)
+            .ShouldHaveOperationId("healthApi")
+            .ShouldHaveSummaryAndDescription("Checks the health of the server");
     }
 
     [TestMethod]

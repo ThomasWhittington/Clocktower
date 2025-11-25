@@ -22,12 +22,11 @@ public class GetRolesTests
 
         GetRoles.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/");
-
-        endpoint.ShouldHaveMethod(HttpMethod.Get);
-        endpoint.ShouldHaveOperationId("getRolesApi");
-        endpoint.ShouldHaveSummary("Return all roles");
-        endpoint.ShouldHaveDescription("Filter roles by edition and/or role type");
+        builder.GetEndpoint("/")
+            .ShouldHaveMethod(HttpMethod.Get)
+            .ShouldHaveOperationId("getRolesApi")
+            .ShouldHaveSummary("Return all roles")
+            .ShouldHaveDescription("Filter roles by edition and/or role type");
     }
 
     [TestMethod]

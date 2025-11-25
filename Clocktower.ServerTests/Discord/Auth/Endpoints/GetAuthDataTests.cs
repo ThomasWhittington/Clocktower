@@ -22,11 +22,11 @@ public class GetAuthDataTests
 
         GetAuthData.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/data/{key}");
-        endpoint.ShouldHaveMethod(HttpMethod.Get);
-        endpoint.ShouldHaveOperationId("getAuthDataApi");
-        endpoint.ShouldHaveSummary("Get temporary auth data");
-        endpoint.ShouldHaveDescription("Retrieves temporary authentication data by key");
+        builder.GetEndpoint("/data/{key}")
+            .ShouldHaveMethod(HttpMethod.Get)
+            .ShouldHaveOperationId("getAuthDataApi")
+            .ShouldHaveSummary("Get temporary auth data")
+            .ShouldHaveDescription("Retrieves temporary authentication data by key");
     }
 
     [TestMethod]

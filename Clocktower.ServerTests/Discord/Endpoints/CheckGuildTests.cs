@@ -25,12 +25,11 @@ public class CheckGuildTests
 
         CheckGuild.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/{guildId}/check");
-
-        endpoint.ShouldHaveMethod(HttpMethod.Get);
-        endpoint.ShouldHaveOperationId("checkGuildApi");
-        endpoint.ShouldHaveSummary("Checks access to guild");
-        endpoint.ShouldHaveDescription("Checks if bot has access to the guild");
+        builder.GetEndpoint("/{guildId}/check")
+            .ShouldHaveMethod(HttpMethod.Get)
+            .ShouldHaveOperationId("checkGuildApi")
+            .ShouldHaveSummary("Checks access to guild")
+            .ShouldHaveDescription("Checks if bot has access to the guild");
     }
 
     [TestMethod]

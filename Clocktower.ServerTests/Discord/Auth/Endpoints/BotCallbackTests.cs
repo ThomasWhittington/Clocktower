@@ -21,10 +21,10 @@ public class BotCallbackTests
 
         BotCallback.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/bot-callback");
-        endpoint.ShouldHaveMethod(HttpMethod.Get);
-        endpoint.ShouldHaveOperationId("botCallbackApi");
-        endpoint.ShouldHaveSummaryAndDescription("Handle Discord bot OAuth callback");
+        builder.GetEndpoint("/bot-callback")
+            .ShouldHaveMethod(HttpMethod.Get)
+            .ShouldHaveOperationId("botCallbackApi")
+            .ShouldHaveSummaryAndDescription("Handle Discord bot OAuth callback");
     }
 
     [TestMethod]
@@ -34,11 +34,11 @@ public class BotCallbackTests
         var error = CommonMethods.GetRandomString();
         var guildId = CommonMethods.GetRandomSnowflakeStringId();
         const string url = "https://dummy.url";
-        _mockDiscordAuthService.Setup(o => o.HandleBotCallback(error, code,guildId)).Returns(url);
+        _mockDiscordAuthService.Setup(o => o.HandleBotCallback(error, code, guildId)).Returns(url);
 
-        var result = BotCallback.Handle(code, error,guildId,_mockDiscordAuthService.Object);
+        var result = BotCallback.Handle(code, error, guildId, _mockDiscordAuthService.Object);
 
-        _mockDiscordAuthService.Verify(o => o.HandleBotCallback(error, code,guildId), Times.Once);
+        _mockDiscordAuthService.Verify(o => o.HandleBotCallback(error, code, guildId), Times.Once);
         var response = result.Should().BeOfType<RedirectHttpResult>().Subject;
         response.Url.Should().Be(url);
     }

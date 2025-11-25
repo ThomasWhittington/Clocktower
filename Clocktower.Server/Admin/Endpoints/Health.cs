@@ -6,8 +6,7 @@ public class Health : IEndpoint
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/health", Handle)
         .SetOpenApiOperationId<Health>()
-        .WithSummary("Checks the health of the server")
-        .WithDescription("Checks the health of the server");
+        .WithSummaryAndDescription("Checks the health of the server");
 
     internal static Ok<Response> Handle()
     {

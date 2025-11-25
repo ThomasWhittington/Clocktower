@@ -1,26 +1,25 @@
-﻿using Clocktower.Server.Discord.Endpoints;
+﻿using Clocktower.Server.Discord.Town.Endpoints.Validation;
 using FluentValidation.TestHelper;
-using Request = Clocktower.Server.Discord.Endpoints.GetGuildsWithUser.Request;
 
-namespace Clocktower.ServerTests.Discord.Endpoints.Validators;
+namespace Clocktower.ServerTests.Discord.Town.Endpoints.Validators;
 
 [TestClass]
-public class GetGuildsWithUserRequestValidatorTests
+public class UserIdRequestValidatorTests
 {
-    private GetGuildsWithUser.RequestValidator _validator = null!;
+    private UserIdRequestValidator _validator = null!;
     private const string ValidSnowflake = "123456789012345678";
 
     [TestInitialize]
     public void Setup()
     {
-        _validator = new GetGuildsWithUser.RequestValidator();
+        _validator = new UserIdRequestValidator();
     }
 
 
     [TestMethod]
     public void UserId_WhenEmpty_ShouldHaveValidationError()
     {
-        var request = new Request("");
+        var request = new UserIdRequest("");
 
         var result = _validator.TestValidate(request);
 
@@ -31,7 +30,7 @@ public class GetGuildsWithUserRequestValidatorTests
     [TestMethod]
     public void UserId_WhenNull_ShouldHaveValidationError()
     {
-        var request = new Request(null!);
+        var request = new UserIdRequest(null!);
 
         var result = _validator.TestValidate(request);
 
@@ -42,7 +41,7 @@ public class GetGuildsWithUserRequestValidatorTests
     [TestMethod]
     public void UserId_WhenWhitespace_ShouldHaveValidationError()
     {
-        var request = new Request("   ");
+        var request = new UserIdRequest("   ");
 
         var result = _validator.TestValidate(request);
 
@@ -53,7 +52,7 @@ public class GetGuildsWithUserRequestValidatorTests
     [TestMethod]
     public void UserId_WhenInvalidSnowflake_ShouldHaveValidationError()
     {
-        var request = new Request("invalid_snowflake");
+        var request = new UserIdRequest("invalid_snowflake");
 
         var result = _validator.TestValidate(request);
 
@@ -64,7 +63,7 @@ public class GetGuildsWithUserRequestValidatorTests
     [TestMethod]
     public void UserId_WhenValidSnowflake_ShouldNotHaveValidationError()
     {
-        var request = new Request(ValidSnowflake);
+        var request = new UserIdRequest(ValidSnowflake);
 
         var result = _validator.TestValidate(request);
 
@@ -74,7 +73,7 @@ public class GetGuildsWithUserRequestValidatorTests
     [TestMethod]
     public void Validate_WhenAllFieldsValid_ShouldPassValidation()
     {
-        var request = new Request("123456789012345678");
+        var request = new UserIdRequest("123456789012345678");
 
         var result = _validator.TestValidate(request);
 

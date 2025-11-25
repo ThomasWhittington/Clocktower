@@ -27,11 +27,10 @@ public class GetPlayerGamesTests
 
         GetPlayerGames.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/player/{userId}");
-
-        endpoint.ShouldHaveMethod(HttpMethod.Get);
-        endpoint.ShouldHaveOperationId("getPlayerGamesApi");
-        endpoint.ShouldHaveSummaryAndDescription("Gets games the player is in");
+        builder.GetEndpoint("/player/{userId}")
+            .ShouldHaveMethod(HttpMethod.Get)
+            .ShouldHaveOperationId("getPlayerGamesApi")
+            .ShouldHaveSummaryAndDescription("Gets games the player is in");
     }
 
     [TestMethod]

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Routing;
@@ -25,49 +26,57 @@ public static class EndpointAssertions
 
     extension(RouteEndpoint endpoint)
     {
-        public void ShouldHaveMethod(HttpMethod method)
+        public RouteEndpoint ShouldHaveMethod(HttpMethod method)
         {
-            var metadata = endpoint.Metadata.GetMetadata<HttpMethodMetadata>();
-            metadata.Should().NotBeNull("HTTP Method metadata is missing");
-            metadata!.HttpMethods.Should().Contain(method.ToString());
+            endpoint.GetMetadata<HttpMethodMetadata>().HttpMethods.Should().Contain(method.ToString());
+            return endpoint;
         }
 
-        public void ShouldHaveSummaryAndDescription(string summaryDescription)
+        public RouteEndpoint ShouldHaveSummaryAndDescription(string summaryDescription)
         {
             ShouldHaveSummary(endpoint, summaryDescription);
             ShouldHaveDescription(endpoint, summaryDescription);
+            return endpoint;
         }
 
-        public void ShouldHaveSummary(string summary)
+        public RouteEndpoint ShouldHaveSummary(string summary)
         {
-            endpoint.Metadata.GetMetadata<IEndpointSummaryMetadata>()
-                ?.Summary.Should().Be(summary);
+            endpoint.GetMetadata<IEndpointSummaryMetadata>().Summary.Should().Be(summary);
+            return endpoint;
         }
 
-        public void ShouldHaveDescription(string description)
+        public RouteEndpoint ShouldHaveDescription(string description)
         {
-            endpoint.Metadata.GetMetadata<IEndpointDescriptionMetadata>()
-                ?.Description.Should().Be(description);
+            endpoint.GetMetadata<IEndpointDescriptionMetadata>().Description.Should().Be(description);
+            return endpoint;
         }
 
-        public void ShouldHaveEndpointName(string name)
+        public RouteEndpoint ShouldHaveOperationId(string operationId)
         {
-            endpoint.Metadata.GetMetadata<IEndpointNameMetadata>()
-                ?.EndpointName.Should().Be(name);
+            endpoint.GetMetadata<OpenApiOperation>().OperationId.Should().Be(operationId);
+            return endpoint;
         }
 
-        public void ShouldHaveOperationId(string operationId)
+        public RouteEndpoint ShouldHaveStorytellerAuthorization()
         {
-            endpoint.Metadata.GetMetadata<OpenApiOperation>()
-                ?.OperationId.Should().Be(operationId);
+            endpoint.GetMetadata<AuthorizeAttribute>().Policy.Should().Be("StoryTellerForGame");
+            return endpoint;
         }
 
-        public void ShouldHaveValidation()
+        public RouteEndpoint ShouldHaveValidation()
         {
             var producesMetadata = endpoint.Metadata.GetOrderedMetadata<IProducesResponseTypeMetadata>()
                 .Where(o => o.StatusCode == 400);
             producesMetadata.Should()
                 .Contain(o => o.Type == typeof(HttpValidationProblemDetails), "Endpoints with validation should document a 400 Bad Request response with return of HttpValidationProblemDetails");
+            return endpoint;
+        }
+
+        public T GetMetadata<T>() where T : class
+        {
+            var metaData = endpoint.Metadata.GetMetadata<T>();
+            metaData.Should().NotBeNull();
+            return metaData;
         }
     }
 }

@@ -29,11 +29,10 @@ public class DeleteGameTests
 
         DeleteGame.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/{gameId}/delete");
-
-        endpoint.ShouldHaveMethod(HttpMethod.Delete);
-        endpoint.ShouldHaveOperationId("deleteGameApi");
-        endpoint.ShouldHaveSummaryAndDescription("Deletes a game by id");
+        builder.GetEndpoint("/{gameId}/delete")
+            .ShouldHaveMethod(HttpMethod.Delete)
+            .ShouldHaveOperationId("deleteGameApi")
+            .ShouldHaveSummaryAndDescription("Deletes a game by id");
     }
 
     [TestMethod]

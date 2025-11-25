@@ -28,11 +28,10 @@ public class GetGamesTests
 
         GetGames.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/");
-
-        endpoint.ShouldHaveMethod(HttpMethod.Get);
-        endpoint.ShouldHaveOperationId("getGamesApi");
-        endpoint.ShouldHaveSummaryAndDescription("Gets all games, optionally filtered by guildId");
+        builder.GetEndpoint("/")
+            .ShouldHaveMethod(HttpMethod.Get)
+            .ShouldHaveOperationId("getGamesApi")
+            .ShouldHaveSummaryAndDescription("Gets all games, optionally filtered by guildId");
     }
 
     [TestMethod]

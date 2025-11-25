@@ -1,3 +1,4 @@
+global using Clocktower.Server.Discord.Town.Endpoints.Validation;
 global using Microsoft.AspNetCore.Http.HttpResults;
 global using Clocktower.Server.Common.Api;
 global using FluentValidation;

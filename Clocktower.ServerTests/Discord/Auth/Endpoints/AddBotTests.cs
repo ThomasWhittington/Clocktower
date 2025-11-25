@@ -21,11 +21,11 @@ public class AddBotTests
 
         AddBot.Map(builder);
 
-        var endpoint = builder.GetEndpoint("/addBot");
-        endpoint.ShouldHaveMethod(HttpMethod.Get);
-        endpoint.ShouldHaveOperationId("addBotApi");
-        endpoint.ShouldHaveSummary("Add bot to server");
-        endpoint.ShouldHaveDescription("Allows user to add bot to their server");
+        builder.GetEndpoint("/addBot")
+            .ShouldHaveMethod(HttpMethod.Get)
+            .ShouldHaveOperationId("addBotApi")
+            .ShouldHaveSummary("Add bot to server")
+            .ShouldHaveDescription("Allows user to add bot to their server");
     }
 
     [TestMethod]

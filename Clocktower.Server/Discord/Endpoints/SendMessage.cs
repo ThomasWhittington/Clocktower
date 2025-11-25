@@ -8,7 +8,7 @@ public class SendMessage : IEndpoint
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/message", Handle)
         .SetOpenApiOperationId<SendMessage>()
-        .WithSummary("Sends message to the user")
+        .WithSummaryAndDescription("Sends message to the user")
         .WithRequestValidation<Request>();
 
 
