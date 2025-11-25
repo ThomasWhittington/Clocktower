@@ -56,7 +56,7 @@ public static class ConfigureServices
             builder.Services.AddSingleton<ITownOccupancyStore, TownOccupancyStore>();
             builder.Services.AddSingleton<INotificationService, NotificationService>();
             builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
-            builder.Services.AddSingleton<IDiscordBotService, DiscordBotService>();
+            builder.Services.AddSingleton<IDiscordBot, DiscordBot>();
             builder.Services.AddSingleton<IDiscordService, DiscordService>();
             builder.Services.AddSingleton<IDiscordTownService, DiscordTownService>();
             builder.Services.AddSingleton<IFileSystem, FileSystem>();
@@ -67,7 +67,7 @@ public static class ConfigureServices
             builder.Services.AddScoped<IGameAuthorizationService, GameAuthorizationService>();
             builder.Services.AddScoped<IAuthorizationHandler, StoryTellerForGameHandler>();
 
-            builder.Services.AddHostedService(provider => provider.GetRequiredService<IDiscordBotService>());
+            builder.Services.AddHostedService(provider => provider.GetRequiredService<IDiscordBot>());
         }
 
         private void ConfigureJson()

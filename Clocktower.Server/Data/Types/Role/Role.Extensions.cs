@@ -22,16 +22,9 @@ public partial record Role
 
         foreach (var method in roleMethods)
         {
-            try
+            if (method.Invoke(null, null) is Role role)
             {
-                if (method.Invoke(null, null) is Role role)
-                {
-                    roles.Add(role);
-                }
-            }
-            catch
-            {
-                // ignored
+                roles.Add(role);
             }
         }
 

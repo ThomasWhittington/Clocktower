@@ -1,10 +1,10 @@
-﻿using Discord.WebSocket;
+﻿using Clocktower.Server.Data.Wrappers;
 
 namespace Clocktower.Server.Common.Api.Extensions;
 
 public static class DiscordChannelExtensions
 {
-    extension(SocketCategoryChannel categoryChannel)
+    extension(IDiscordCategoryChannel categoryChannel)
     {
         public async Task DeleteCategoryAsync()
         {
@@ -20,7 +20,7 @@ public static class DiscordChannelExtensions
 
         public bool VerifyCategoryChannels(string[] channelNames)
         {
-            if (categoryChannel.Channels.Count != channelNames.Length) return false;
+            if (categoryChannel.Channels.Count() != channelNames.Length) return false;
             return channelNames.All(channelName => categoryChannel.Channels.Any(o => o.Name == channelName));
         }
     }

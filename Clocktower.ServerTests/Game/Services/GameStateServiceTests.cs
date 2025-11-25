@@ -1,25 +1,25 @@
 ﻿using System.IO.Abstractions;
 using System.Text.Json;
+using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data;
 using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
-using Clocktower.Server.Discord.Services;
+using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Game.Services;
-using Discord.WebSocket;
 
 namespace Clocktower.ServerTests.Game.Services;
 
 [TestClass]
 public class GameStateServiceTests
 {
-    private Mock<IDiscordBotService> _mockBot = null!;
+    private Mock<IDiscordBot> _mockBot = null!;
     private Mock<IGameStateStore> _mockGameStateStore = null!;
     private Mock<IFileSystem> _mockFileSystem = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _mockBot = new Mock<IDiscordBotService>();
+        _mockBot = new Mock<IDiscordBot>();
         _mockGameStateStore = new Mock<IGameStateStore>();
         _mockFileSystem = new Mock<IFileSystem>();
     }
@@ -168,7 +168,7 @@ public class GameStateServiceTests
         var gameId = CommonMethods.GetRandomString();
         var userId = CommonMethods.GetRandomSnowflakeNumberId();
 
-        _mockBot.Setup(o => o.Client.GetUser(userId)).Returns((SocketUser)null!);
+        _mockBot.Setup(o => o.GetUser(userId)).Returns((IDiscordUser)null!);
 
         var result = Sut.StartNewGame(guildId, gameId, userId);
 

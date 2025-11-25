@@ -1,15 +1,31 @@
-﻿using Discord;
+﻿using Clocktower.Server.Data.Wrappers;
 
 namespace Clocktower.ServerTests.TestHelpers;
 
 public static class MockMaker
 {
-    public static IUser CreateMockDiscordUser(ulong id, string globalName, string avatarUrl)
+    public static IDiscordUser CreateMockDiscordUser(ulong id, string globalName, string avatarUrl)
     {
-        return Mock.Of<IUser>(u => 
-            u.Id == id && 
-            u.GlobalName == globalName && 
-            u.GetDisplayAvatarUrl() == avatarUrl);
+        return Mock.Of<IDiscordUser>(u =>
+            u.Id == id &&
+            u.GlobalName == globalName &&
+            u.DisplayAvatarUrl == avatarUrl);
     }
 
+    public static IDiscordGuildUser CreateMockDiscordGuildUser(ulong id, bool isAdmin = false)
+    {
+        return Mock.Of<IDiscordGuildUser>(u =>
+            u.Id == id &&
+            u.IsAdministrator() == isAdmin
+        );
+    }
+
+    public static IDiscordGuild CreateMockDiscordGuild(ulong id, string name, IEnumerable<IDiscordGuildUser>? users = null)
+    {
+        users ??= [];
+        return Mock.Of<IDiscordGuild>(g =>
+            g.Id == id &&
+            g.Name == name &&
+            g.Users == users);
+    }
 }

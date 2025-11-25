@@ -1,9 +1,8 @@
 using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data.Extensions;
-using Clocktower.Server.Discord.Services;
+using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Socket;
 using Discord;
-using Discord.WebSocket;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -11,7 +10,7 @@ namespace Clocktower.Server.Discord.Town.Services;
 
 [UsedImplicitly]
 public class DiscordTownService(
-    IDiscordBotService bot,
+    IDiscordBot bot,
     INotificationService notificationService,
     IGameStateStore gameStateStore,
     ITownOccupancyStore townOccupancyStore,
@@ -43,13 +42,15 @@ public class DiscordTownService(
         ConsultationName
     ];
 
+    private const string GuildNotFoundMessage = "Guild not found";
+
     public async Task<(bool success, string message)> MoveUser(ulong guildId, ulong userId, ulong channelId)
     {
         try
         {
-            var guild = bot.Client.GetGuild(guildId);
+            var guild = bot.GetGuild(guildId);
             if (guild == null)
-                return (false, "Guild not found");
+                return (false, GuildNotFoundMessage);
 
             var channel = guild.GetVoiceChannel(channelId);
             if (channel == null)
@@ -62,7 +63,7 @@ public class DiscordTownService(
             if (member.VoiceState == null)
                 return (false, "User is not connected to voice");
 
-            await guild.MoveAsync(member, channel);
+            await member.MoveAsync(channel);
             return (true, $"User {member.DisplayName} moved to {channel.Name}");
         }
         catch (Exception ex)
@@ -99,7 +100,8 @@ public class DiscordTownService(
     {
         try
         {
-            var guild = bot.Client.GetGuild(guildId);
+            var guild = bot.GetGuild(guildId);
+            if (guild is null) return (false, false, GuildNotFoundMessage);
 
             var role = guild.Roles.FirstOrDefault(o => o.Name == StoryTellerRoleName);
             if (role == null) return (true, false, $"{StoryTellerRoleName} role does not exist. Recommend rebuild");
@@ -115,7 +117,7 @@ public class DiscordTownService(
             var nightCategory = guild.GetCategoryChannelByName(name: NightCategoryName);
             if (nightCategory == null) return (true, false, "Missing night category, Recommend rebuild");
 
-            if (nightCategory.Channels.Count < CottageCount)
+            if (nightCategory.Channels.Count() < CottageCount)
             {
                 return (true, false, "Not enough cottages, Recommend rebuild");
             }
@@ -132,7 +134,8 @@ public class DiscordTownService(
     {
         try
         {
-            var guild = bot.Client.GetGuild(guildId);
+            var guild = bot.GetGuild(guildId);
+            if (guild is null) return (false, GuildNotFoundMessage);
             var dayCategory = guild.GetCategoryChannelByName(name: DayCategoryName);
             if (dayCategory != null) await dayCategory.DeleteCategoryAsync();
             var nightCategory = guild.GetCategoryChannelByName(name: NightCategoryName);
@@ -151,7 +154,8 @@ public class DiscordTownService(
     {
         try
         {
-            var guild = bot.Client.GetGuild(guildId);
+            var guild = bot.GetGuild(guildId);
+            if (guild is null) return (false, GuildNotFoundMessage);
             var roleCreated = await CreateRoles(guild);
             if (!roleCreated) return (false, "Failed to generate roles");
             var dayCreated = await CreateDayVoiceChannels(guild);
@@ -173,7 +177,8 @@ public class DiscordTownService(
             var gameState = gameStateStore.Get(gameId);
             if (gameState is null) return (false, $"Couldn't find game with id: {gameId}");
             if (!ulong.TryParse(gameState.GuildId, out var guildId)) return (false, "GameState contained a guildId that could not be found");
-            var guild = bot.Client.GetGuild(guildId);
+            var guild = bot.GetGuild(guildId);
+            if (guild is null) return (false, GuildNotFoundMessage);
             var role = guild.GetRole(StoryTellerRoleName);
             if (role is null) return (false, $"{StoryTellerRoleName} role does not exist");
             var user = guild.GetUser(userId);
@@ -228,7 +233,8 @@ public class DiscordTownService(
             var gameState = gameStateStore.GetGuildGames(guildId).FirstOrDefault();
             if (gameState is null) return (false, null, "Failed to find gameState");
 
-            var guild = bot.Client.GetGuild(guildId);
+            var guild = bot.GetGuild(guildId);
+            if (guild is null) return (false, null, GuildNotFoundMessage);
 
             var channelCategories = new List<MiniCategory>();
             var dayCategory = guild.GetMiniCategory(DayCategoryName);
@@ -269,8 +275,8 @@ public class DiscordTownService(
     {
         var gameState = gameStateStore.Get(gameId);
         if (gameState is null) return (false, "Game not found");
-        var guild = bot.Client.GetGuild(ulong.Parse(gameState.GuildId));
-        if (guild is null) return (false, "Guild not found");
+        var guild = bot.GetGuild(ulong.Parse(gameState.GuildId));
+        if (guild is null) return (false, GuildNotFoundMessage);
         await notificationService.BroadcastTownTime(gameId, gameTime);
         gameStateStore.TryUpdate(gameId, state =>
         {
@@ -281,7 +287,7 @@ public class DiscordTownService(
     }
 
 
-    private static async Task<bool> CreateNightVoiceChannels(SocketGuild guild)
+    private static async Task<bool> CreateNightVoiceChannels(IDiscordGuild guild)
     {
         try
         {
@@ -316,14 +322,14 @@ public class DiscordTownService(
     }
 
 
-    private static async Task<bool> CreateRoles(SocketGuild guild)
+    private static async Task<bool> CreateRoles(IDiscordGuild guild)
     {
         try
         {
             var role = guild.GetRole(StoryTellerRoleName);
             if (role is null)
             {
-                var newRole = await guild.CreateRoleAsync(StoryTellerRoleName, color: Color.Gold);
+                var newRole = await guild.CreateRoleAsync(StoryTellerRoleName, Color.Gold);
                 if (newRole is null) return false;
             }
 
@@ -335,7 +341,7 @@ public class DiscordTownService(
         }
     }
 
-    private static async Task DeleteRoles(SocketGuild guild)
+    private static async Task DeleteRoles(IDiscordGuild guild)
     {
         var role = guild.GetRole(StoryTellerRoleName);
         if (role != null)
@@ -344,7 +350,7 @@ public class DiscordTownService(
         }
     }
 
-    private async Task<bool> CreateDayVoiceChannels(SocketGuild guild)
+    private async Task<bool> CreateDayVoiceChannels(IDiscordGuild guild)
     {
         try
         {
@@ -386,7 +392,7 @@ public class DiscordTownService(
             var gameState = gameStateStore.Get(gameId);
             if (gameState is null) return (InviteUserOutcome.GameDoesNotExistError, $"Couldn't find game with id: {gameId}");
             if (!ulong.TryParse(gameState.GuildId, out var guildId)) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
-            var guild = bot.Client.GetGuild(guildId);
+            var guild = bot.GetGuild(guildId);
             if (guild is null) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
             var user = guild.GetUser(userId);
             if (user is null) return (InviteUserOutcome.UserNotFoundError, $"Couldn't find user: {userId}");
@@ -398,9 +404,10 @@ public class DiscordTownService(
             cache.Set($"join_data_{tempKey}", response, TimeSpan.FromMinutes(5));
             var url = _secrets.FeUri + $"/join?key={tempKey}";
 
-            var dmChannel = await user.CreateDMChannelAsync();
-            await dmChannel.SendMessageAsync($"[Join here]({url})");
+            var dmChannel = await user.CreateDmChannelAsync();
+            if (dmChannel is null) return (InviteUserOutcome.DmChannelFailed, $"Couldn't open dm channel with user");
 
+            await dmChannel.SendMessageAsync($"[Join here]({url})");
 
             gameStateStore.TryUpdate(gameId, state =>
             {

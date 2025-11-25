@@ -1,22 +1,24 @@
-﻿namespace Clocktower.Server.Discord.Services;
+﻿using Clocktower.Server.Common.Services;
 
-public class DiscordService(IDiscordBotService bot) : IDiscordService
+namespace Clocktower.Server.Discord.Services;
+
+public class DiscordService(IDiscordBot bot) : IDiscordService
 {
-    public (bool success, bool valid, string guildName, string message) CheckGuildId(ulong guildId)
+    public (bool success, string guildName, string message) CheckGuildId(ulong guildId)
     {
         try
         {
-            var guild = bot.Client.GetGuild(guildId);
+            var guild = bot.GetGuild(guildId);
             if (guild is not null)
             {
-                return (true, true, guild.Name, "Bot has access to guild");
+                return (true, guild.Name, "Bot has access to guild");
             }
 
-            return (false, false, string.Empty, "Bot does not have access to guild");
+            return (false, string.Empty, "Bot does not have access to guild");
         }
         catch (Exception)
         {
-            return (false, false, string.Empty, $"Bot does not have access to guild: {guildId}");
+            return (false, string.Empty, $"Bot does not have access to guild: {guildId}");
         }
     }
 
@@ -25,14 +27,14 @@ public class DiscordService(IDiscordBotService bot) : IDiscordService
         try
         {
             List<MiniGuild> miniGuilds = [];
-            var guilds = bot.Client.Guilds;
-            if (guilds == null || guilds.Count == 0) return (true, [], "Bot is not in any guilds");
+            var guilds = bot.GetGuilds().ToArray();
+            if (!guilds.Any()) return (true, [], "Bot is not in any guilds");
 
             foreach (var discordGuild in guilds)
             {
                 var member = discordGuild.Users.FirstOrDefault(o => o.Id == userId);
                 if (member == null) continue;
-                if (member.GuildPermissions.Administrator)
+                if (member.IsAdministrator())
                 {
                     miniGuilds.Add(new MiniGuild(discordGuild.Id.ToString(), discordGuild.Name));
                 }
@@ -50,9 +52,10 @@ public class DiscordService(IDiscordBotService bot) : IDiscordService
     {
         try
         {
-            var user = await bot.Client.GetUserAsync(userId);
+            var user = await bot.GetUserAsync(userId);
             if (user is null) return (false, $"Couldn't find user: {userId}");
-            var dmChannel = await user.CreateDMChannelAsync();
+            var dmChannel = await user.CreateDmChannelAsync();
+            if (dmChannel is null) return (false, $"Failed to create dm channel for user: {userId}");
             await dmChannel.SendMessageAsync(message);
             return (true, "Sent message to user");
         }

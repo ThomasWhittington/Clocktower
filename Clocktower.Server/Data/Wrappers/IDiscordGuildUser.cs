@@ -1,0 +1,15 @@
+﻿namespace Clocktower.Server.Data.Wrappers;
+
+public interface IDiscordGuildUser
+{
+    ulong Id { get; }
+    string DisplayName { get; }
+    string DisplayAvatarUrl { get; }
+    IDiscordVoiceState? VoiceState { get; }
+    IEnumerable<IDiscordRole> Roles { get; }
+    bool IsAdministrator();
+    Task<IDiscordDmChannel?> CreateDmChannelAsync();
+    Task MoveAsync(IDiscordVoiceChannel channel);
+    Task RemoveRoleAsync(IDiscordRole role);
+    Task AddRoleAsync(IDiscordRole role);
+}

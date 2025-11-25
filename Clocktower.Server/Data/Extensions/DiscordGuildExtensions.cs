@@ -1,12 +1,12 @@
 ﻿using Clocktower.Server.Data.Extensions;
-using Discord;
-using Discord.WebSocket;
+using Clocktower.Server.Data.Wrappers;
+using DiscordUser = Clocktower.Server.Data.DiscordUser;
 
 namespace Clocktower.Server.Common.Api.Extensions;
 
 public static class DiscordGuildExtensions
 {
-    extension(SocketGuild guild)
+    extension(IDiscordGuild guild)
     {
         public MiniCategory? GetMiniCategory(string categoryName)
         {
@@ -19,7 +19,7 @@ public static class DiscordGuildExtensions
             return miniCategory;
         }
 
-        public IEnumerable<ChannelOccupants> GetChannelOccupancy(SocketCategoryChannel categoryChannel)
+        public IEnumerable<ChannelOccupants> GetChannelOccupancy(IDiscordCategoryChannel categoryChannel)
         {
             var channels = guild.VoiceChannels.Where(o => o.CategoryId == categoryChannel.Id)
                 .OrderBy(o => o.Position);
@@ -30,20 +30,20 @@ public static class DiscordGuildExtensions
                 select new ChannelOccupants(miniChannel, occupants)).ToList();
         }
 
-        public SocketCategoryChannel? GetCategoryChannelByName(string name)
+        public IDiscordCategoryChannel? GetCategoryChannelByName(string name)
         {
             return guild.CategoryChannels.FirstOrDefault(o => o.Name == name);
         }
 
-        public SocketRole? GetRole(string roleName)
+        public IDiscordRole? GetRole(string roleName)
         {
             return guild.Roles.FirstOrDefault(o => o.Name == roleName);
         }
     }
 
-    public static GameUser AsGameUser(this SocketGuildUser user, GameState? gameState = null)
+    public static GameUser AsGameUser(this IDiscordGuildUser user, GameState? gameState = null)
     {
-        var result = new GameUser(user.Id.ToString(), user.DisplayName, user.GetDisplayAvatarUrl());
+        var result = new GameUser(user.Id.ToString(), user.DisplayName, user.DisplayAvatarUrl);
         if (gameState is not null)
         {
             result.UserType = gameState.GetUserType(user.Id.ToString());
@@ -52,9 +52,9 @@ public static class DiscordGuildExtensions
         return result;
     }
 
-    public static GameUser AsGameUser(this IUser user)
+    public static GameUser AsGameUser(this IDiscordUser user)
     {
-        return new GameUser(user.Id.ToString(), user.GlobalName, user.GetDisplayAvatarUrl());
+        return new GameUser(user.Id.ToString(), user.GlobalName, user.DisplayAvatarUrl);
     }
 
     public static GameUser AsGameUser(this DiscordUser user)

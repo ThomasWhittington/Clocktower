@@ -17,8 +17,8 @@ public class CheckGuild : IEndpoint
     {
         var guildId = ulong.Parse(request.GuildId);
 
-        var (success, valid, name, message) = discordService.CheckGuildId(guildId);
-        return success ? TypedResults.Ok(new Response(valid, name, message)) : TypedResults.BadRequest(message);
+        var (success, name, message) = discordService.CheckGuildId(guildId);
+        return success ? TypedResults.Ok(new Response(success, name, message)) : TypedResults.BadRequest(message);
     }
 
     [UsedImplicitly]

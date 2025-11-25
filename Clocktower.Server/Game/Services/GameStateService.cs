@@ -1,10 +1,10 @@
 ﻿using System.IO.Abstractions;
 using System.Text.Json;
-using Clocktower.Server.Discord.Services;
+using Clocktower.Server.Common.Services;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GameStateService(IDiscordBotService bot, IGameStateStore gameStateStore, IFileSystem fileSystem) : IGameStateService
+public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, IFileSystem fileSystem) : IGameStateService
 {
     public IEnumerable<GameState> GetGames() =>
         gameStateStore.GetAll();
