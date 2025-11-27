@@ -45,6 +45,7 @@ public static class ConfigureServices
             builder.AddSwagger();
             builder.AddSignalR();
             builder.ConfigureJson();
+            builder.Services.AddHttpClient();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddValidatorsFromAssembly(typeof(ConfigureServices).Assembly);
 
@@ -60,6 +61,7 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IDiscordService, DiscordService>();
             builder.Services.AddSingleton<IDiscordTownService, DiscordTownService>();
             builder.Services.AddSingleton<IFileSystem, FileSystem>();
+            builder.Services.AddSingleton<IDiscordAuthApiService, DiscordAuthApiService>();
 
             builder.Services.AddScoped<IDiscordAuthService, DiscordAuthService>();
             builder.Services.AddScoped<IGameStateService, GameStateService>();
