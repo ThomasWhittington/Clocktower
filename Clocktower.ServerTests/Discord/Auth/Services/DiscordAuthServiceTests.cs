@@ -253,13 +253,14 @@ public class DiscordAuthServiceTests
         const string error = null!;
         const string code = "this-code";
 
-        var tokenResponse = new TokenResponse(
-            CommonMethods.GetRandomString(),
-            CommonMethods.GetRandomString(),
-            0,
-            CommonMethods.GetRandomString(),
-            CommonMethods.GetRandomString()
-        );
+        var tokenResponse = new TokenResponse
+        {
+            AccessToken = CommonMethods.GetRandomString(),
+            TokenType = CommonMethods.GetRandomString(),
+            ExpiresIn = 0,
+            RefreshToken = CommonMethods.GetRandomString(),
+            Scope = CommonMethods.GetRandomString()
+        };
 
         _mockHttpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>()))
             .Returns(_testHttpClient);
@@ -286,13 +287,14 @@ public class DiscordAuthServiceTests
         const string error = null!;
         const string code = "this-code";
 
-        var tokenResponse = new TokenResponse(
-            CommonMethods.GetRandomString(),
-            CommonMethods.GetRandomString(),
-            0,
-            CommonMethods.GetRandomString(),
-            CommonMethods.GetRandomString()
-        );
+        var tokenResponse = new TokenResponse
+        {
+            AccessToken = CommonMethods.GetRandomString(),
+            TokenType = CommonMethods.GetRandomString(),
+            ExpiresIn = 0,
+            RefreshToken = CommonMethods.GetRandomString(),
+            Scope = CommonMethods.GetRandomString()
+        };
         var userInfo = new DiscordUser(
             CommonMethods.GetRandomString(),
             CommonMethods.GetRandomString(),
@@ -324,13 +326,14 @@ public class DiscordAuthServiceTests
         const string code = "this-code";
         const string jwt = "this-jwt";
 
-        var tokenResponse = new TokenResponse(
-            CommonMethods.GetRandomString(),
-            CommonMethods.GetRandomString(),
-            0,
-            CommonMethods.GetRandomString(),
-            CommonMethods.GetRandomString()
-        );
+        var tokenResponse = new TokenResponse
+        {
+            AccessToken = CommonMethods.GetRandomString(),
+            TokenType = CommonMethods.GetRandomString(),
+            ExpiresIn = 0,
+            RefreshToken = CommonMethods.GetRandomString(),
+            Scope = CommonMethods.GetRandomString()
+        };
         var userInfo = new DiscordUser(
             CommonMethods.GetRandomString(),
             CommonMethods.GetRandomString(),

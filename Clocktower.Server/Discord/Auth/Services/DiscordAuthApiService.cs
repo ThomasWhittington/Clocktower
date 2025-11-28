@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 
@@ -27,14 +26,17 @@ public class DiscordAuthApiService(IOptions<Secrets> secretsOptions) : IDiscordA
 
         var response = await httpClient.PostAsync("https://discord.com/api/oauth2/token", tokenRequest);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            Debugger.Break();
-            return null;
-        }
+        if (!response.IsSuccessStatusCode) return null;
 
         var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<TokenResponse>(json, _deserializationOptions);
+        try
+        {
+            return JsonSerializer.Deserialize<TokenResponse>(json, _deserializationOptions);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 
     public async Task<DiscordUser?> GetDiscordUserInfo(string accessToken, HttpClient httpClient)
@@ -46,6 +48,13 @@ public class DiscordAuthApiService(IOptions<Secrets> secretsOptions) : IDiscordA
         if (!response.IsSuccessStatusCode) return null;
 
         var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<DiscordUser>(json, _deserializationOptions);
+        try
+        {
+            return JsonSerializer.Deserialize<DiscordUser>(json, _deserializationOptions);
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 }

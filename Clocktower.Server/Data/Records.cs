@@ -14,13 +14,14 @@ public record MiniChannel(string Id, string Name);
 [UsedImplicitly]
 public record MiniCategory(string Id, string Name, IEnumerable<ChannelOccupants> Channels);
 
-public sealed record TokenResponse(
-    string AccessToken,
-    string TokenType,
-    int ExpiresIn,
-    string RefreshToken,
-    string Scope
-);
+public sealed class TokenResponse
+{
+    public string AccessToken { get; init; }
+    public string TokenType { get; init; }
+    public int ExpiresIn { get; init; }
+    public string RefreshToken { get; init; }
+    public string Scope { get; init; }
+}
 
 public sealed record DiscordUser(
     string Id,
