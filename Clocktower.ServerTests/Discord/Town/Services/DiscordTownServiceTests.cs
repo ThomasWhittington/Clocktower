@@ -61,32 +61,6 @@ public class DiscordTownServiceTests
     }
 
 
-    private void SetUpSecrets(
-        string? discordBotToken = null,
-        string? discordClientId = null,
-        string? discordClientSecret = null,
-        string? serverUri = null,
-        string? feUri = null,
-        string? jwtSigningKey = null,
-        string? jwtAudience = null
-    )
-    {
-        var secrets = new Secrets
-        {
-            DiscordBotToken = discordBotToken!,
-            DiscordClientId = discordClientId!,
-            DiscordClientSecret = discordClientSecret!,
-            ServerUri = serverUri!,
-            FeUri = feUri!,
-            Jwt = new JwtSecrets
-            {
-                SigningKey = jwtSigningKey!,
-                Audience = jwtAudience!
-            }
-        };
-        _mockSecrets.Setup(o => o.Value).Returns(secrets);
-    }
-
     #region MoveUser
 
     [TestMethod]
@@ -1195,7 +1169,7 @@ public class DiscordTownServiceTests
         const string jwt = "jwt-token";
         const string key = "this-key";
         const string feUri = "fe-uri";
-        SetUpSecrets(feUri: feUri);
+        CommonMethods.SetUpMockSecrets(_mockSecrets, feUri: feUri);
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();

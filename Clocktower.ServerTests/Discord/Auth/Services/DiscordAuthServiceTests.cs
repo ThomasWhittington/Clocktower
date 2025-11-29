@@ -41,38 +41,12 @@ public class DiscordAuthServiceTests
         _testHttpClient = new HttpClient();
     }
 
-    private void SetUpSecrets(
-        string? discordBotToken = null,
-        string? discordClientId = null,
-        string? discordClientSecret = null,
-        string? serverUri = null,
-        string? feUri = null,
-        string? jwtSigningKey = null,
-        string? jwtAudience = null
-    )
-    {
-        var secrets = new Secrets
-        {
-            DiscordBotToken = discordBotToken!,
-            DiscordClientId = discordClientId!,
-            DiscordClientSecret = discordClientSecret!,
-            ServerUri = serverUri!,
-            FeUri = feUri!,
-            Jwt = new JwtSecrets
-            {
-                SigningKey = jwtSigningKey!,
-                Audience = jwtAudience!
-            }
-        };
-        _mockSecrets.Setup(o => o.Value).Returns(secrets);
-    }
-
     #region GetAuthorizationUrl
 
     [TestMethod]
     public void GetAuthorizationUrl_ReturnsFalse_WhenDiscordAuthNotConfigured()
     {
-        SetUpSecrets();
+        CommonMethods.SetUpMockSecrets(_mockSecrets);
 
         var (success, url, message) = Sut.GetAuthorizationUrl();
 
@@ -86,7 +60,7 @@ public class DiscordAuthServiceTests
     {
         const string discordClientId = "discordClientId";
         const string serverUri = "serverUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             discordClientId: discordClientId,
             serverUri: serverUri
         );
@@ -111,7 +85,7 @@ public class DiscordAuthServiceTests
     [TestMethod]
     public void GetAddBotUrl_ReturnsFalse_WhenDiscordAuthNotConfigured()
     {
-        SetUpSecrets();
+        CommonMethods.SetUpMockSecrets(_mockSecrets);
 
         var (success, url, message) = Sut.GetAddBotUrl();
 
@@ -126,7 +100,7 @@ public class DiscordAuthServiceTests
         const int permissionsInt = 8;
         const string discordClientId = "discordClientId";
         const string serverUri = "serverUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             discordClientId: discordClientId,
             serverUri: serverUri
         );
@@ -196,7 +170,7 @@ public class DiscordAuthServiceTests
     public async Task HandleCallback_ReturnsErrorUrl_WhenErrorProvided()
     {
         const string feUri = "feUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             feUri: feUri
         );
 
@@ -212,7 +186,7 @@ public class DiscordAuthServiceTests
     public async Task HandleCallback_ReturnsErrorUrl_WhenCodeNotProvided()
     {
         const string feUri = "feUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             feUri: feUri
         );
 
@@ -228,7 +202,7 @@ public class DiscordAuthServiceTests
     public async Task HandleCallback_ReturnsErrorUrl_WhenFailedToGetToken()
     {
         const string feUri = "feUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             feUri: feUri
         );
         const string error = null!;
@@ -250,7 +224,7 @@ public class DiscordAuthServiceTests
     public async Task HandleCallback_ReturnsErrorUrl_WhenFailedToGetUserInfo()
     {
         const string feUri = "feUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             feUri: feUri
         );
         const string error = null!;
@@ -284,7 +258,7 @@ public class DiscordAuthServiceTests
     public async Task HandleCallback_CallsGetJwtToken_WhenDataIsGood()
     {
         const string feUri = "feUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             feUri: feUri
         );
         const string error = null!;
@@ -323,7 +297,7 @@ public class DiscordAuthServiceTests
     public async Task HandleCallback_GeneratesId_WhenDataIsGood()
     {
         const string feUri = "feUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             feUri: feUri
         );
         const string error = null!;
@@ -360,7 +334,7 @@ public class DiscordAuthServiceTests
     public async Task HandleCallback_SetsCacheAndReturnsUrl_WhenGotId()
     {
         const string feUri = "feUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             feUri: feUri
         );
         const string error = null!;
@@ -412,7 +386,7 @@ public class DiscordAuthServiceTests
     public void HandleBotCallback_ReturnsErrorUrl_WhenErrorProvided()
     {
         const string feUri = "feUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             feUri: feUri
         );
         const string error = "this-error";
@@ -428,7 +402,7 @@ public class DiscordAuthServiceTests
     public void HandleBotCallback_ReturnsErrorUrl_WhenCodeNotProvided()
     {
         const string feUri = "feUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             feUri: feUri
         );
         const string error = null!;
@@ -444,7 +418,7 @@ public class DiscordAuthServiceTests
     public void HandleBotCallback_ReturnsErrorUrl_WhenGuildIdNotProvided()
     {
         const string feUri = "feUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             feUri: feUri
         );
         const string error = null!;
@@ -460,7 +434,7 @@ public class DiscordAuthServiceTests
     public void HandleBotCallback_ReturnsUrl_WhenDataIsGood()
     {
         const string feUri = "feUri";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             feUri: feUri
         );
         const string error = null!;

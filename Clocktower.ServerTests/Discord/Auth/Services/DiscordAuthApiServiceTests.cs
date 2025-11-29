@@ -26,32 +26,6 @@ public class DiscordAuthApiServiceTests
         _httpClient = new HttpClient(_mockHttpMessageHandler.Object);
     }
 
-    private void SetUpSecrets(
-        string? discordBotToken = null,
-        string? discordClientId = null,
-        string? discordClientSecret = null,
-        string? serverUri = null,
-        string? feUri = null,
-        string? jwtSigningKey = null,
-        string? jwtAudience = null
-    )
-    {
-        var secrets = new Secrets
-        {
-            DiscordBotToken = discordBotToken!,
-            DiscordClientId = discordClientId!,
-            DiscordClientSecret = discordClientSecret!,
-            ServerUri = serverUri!,
-            FeUri = feUri!,
-            Jwt = new JwtSecrets
-            {
-                SigningKey = jwtSigningKey!,
-                Audience = jwtAudience!
-            }
-        };
-        _mockSecrets.Setup(o => o.Value).Returns(secrets);
-    }
-
     #region GetDiscordUserInfo
 
     [TestMethod]
@@ -156,7 +130,7 @@ public class DiscordAuthApiServiceTests
     {
         const string code = "test-auth-code";
         const string serverUri = "https://test-server.com";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             discordClientId: "test-client-id",
             discordClientSecret: "test-client-secret",
             serverUri: serverUri
@@ -209,7 +183,7 @@ public class DiscordAuthApiServiceTests
     public async Task ExchangeCodeForToken_ReturnsNull_WhenDiscordReturnsError()
     {
         const string code = "invalid-code";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             discordClientId: "test-client-id",
             discordClientSecret: "test-client-secret",
             serverUri: "https://test-server.com"
@@ -236,7 +210,7 @@ public class DiscordAuthApiServiceTests
         const string clientId = "my-client-id";
         const string clientSecret = "my-client-secret";
 
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             discordClientId: clientId,
             discordClientSecret: clientSecret,
             serverUri: serverUri
@@ -271,7 +245,7 @@ public class DiscordAuthApiServiceTests
     public async Task ExchangeCodeForToken_HandlesJsonDeserializationError_ReturnsNull()
     {
         const string code = "test-code";
-        SetUpSecrets(
+        CommonMethods.SetUpMockSecrets(_mockSecrets,
             discordClientId: "test-client-id",
             discordClientSecret: "test-client-secret",
             serverUri: "https://test-server.com"
@@ -297,7 +271,7 @@ public class DiscordAuthApiServiceTests
     {
         const string code = "test-code";
         const string serverUri = "https://custom-server.com";
-        SetUpSecrets(serverUri: serverUri);
+        CommonMethods.SetUpMockSecrets(_mockSecrets, serverUri: serverUri);
 
         _mockHttpMessageHandler
             .Protected()
