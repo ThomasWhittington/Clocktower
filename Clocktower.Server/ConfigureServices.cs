@@ -3,6 +3,7 @@ using System.IO.Abstractions;
 using System.Text.Json.Serialization;
 using Clocktower.Server.Common.Api.Auth;
 using Clocktower.Server.Common.Services;
+using Clocktower.Server.Discord;
 using Clocktower.Server.Discord.Auth.Services;
 using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Discord.Town.Services;
@@ -55,13 +56,16 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
             builder.Services.AddSingleton<IGameStateStore, GameStateStore>();
             builder.Services.AddSingleton<ITownOccupancyStore, TownOccupancyStore>();
+            builder.Services.AddSingleton<ITownOccupantManager, TownOccupantManager>();
             builder.Services.AddSingleton<INotificationService, NotificationService>();
+            builder.Services.AddSingleton<IDiscordBotHandler, DiscordBotHandler>();
             builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
             builder.Services.AddSingleton<IDiscordBot, DiscordBot>();
             builder.Services.AddSingleton<IDiscordService, DiscordService>();
             builder.Services.AddSingleton<IDiscordTownService, DiscordTownService>();
             builder.Services.AddSingleton<IFileSystem, FileSystem>();
             builder.Services.AddSingleton<IDiscordAuthApiService, DiscordAuthApiService>();
+            builder.Services.AddSingleton<IDiscordConstantsService, DiscordConstantsService>();
 
             builder.Services.AddScoped<IDiscordAuthService, DiscordAuthService>();
             builder.Services.AddScoped<IGameStateService, GameStateService>();

@@ -16,55 +16,22 @@ public class DiscordTownService(
     ITownOccupancyStore townOccupancyStore,
     IJwtWriter jwtWriter,
     IMemoryCache cache,
-    IOptions<Secrets> secretsOptions) : IDiscordTownService
+    IOptions<Secrets> secretsOptions,
+    IDiscordConstantsService discordConstants,
+    IIdGenerator idGenerator) : IDiscordTownService
 {
     private readonly Secrets _secrets = secretsOptions.Value;
-    private const string TownSquareName = "⛲ Town Square";
-    private const string ConsultationName = "📖 Storyteller's Consultation";
-    private const string DayCategoryName = "🌞 Day BOTC";
-    private const string NightCategoryName = "🌙 Night BOTC ✨";
-    private const string CottageName = "🛌 Cottage";
-    private const string StoryTellerRoleName = "StoryTeller";
-    private const int CottageCount = 15;
-
-    private readonly string[] _dayRoomNames =
-    [
-        TownSquareName,
-        "🍻 Inn",
-        "🏫 School",
-        "⛪ Church",
-        "🔱 Devil's Lair",
-        "🌳 Forbidden Forest",
-        "🏰 Lost Castle",
-        "🗡 Village Smithy",
-        "🕍 Sacred Temple",
-        "💀 Haunted Cemetery",
-        ConsultationName
-    ];
-
     private const string GuildNotFoundMessage = "Guild not found";
 
     public async Task<(bool success, string message)> MoveUser(ulong guildId, ulong userId, ulong channelId)
     {
         try
         {
-            var guild = bot.GetGuild(guildId);
-            if (guild == null)
-                return (false, GuildNotFoundMessage);
-
-            var channel = guild.GetVoiceChannel(channelId);
-            if (channel == null)
-                return (false, "Channel not found in guild");
-
-            var member = guild.GetUser(userId);
-            if (member == null)
-                return (false, "User not found in guild");
-
-            if (member.VoiceState == null)
-                return (false, "User is not connected to voice");
-
-            await member.MoveAsync(channel);
-            return (true, $"User {member.DisplayName} moved to {channel.Name}");
+            var validationResult = ValidateMoveUserRequest(guildId, userId, channelId);
+            if (!validationResult.status.success) return validationResult.status;
+            var (user, channel) = validationResult.data;
+            await user.MoveAsync(channel);
+            return (true, $"User {user.DisplayName} moved to {channel.Name}");
         }
         catch (Exception ex)
         {
@@ -72,57 +39,25 @@ public class DiscordTownService(
         }
     }
 
-    public async Task<(bool success, string message)> RebuildTown(ulong guildId)
-    {
-        try
-        {
-            var gameState = gameStateStore.GetGuildGames(guildId).FirstOrDefault();
-            if (gameState is null) return (false, "Failed to find gameState");
-            await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, new TownOccupants([]));
-            var delete = await DeleteTown(guildId);
-            if (!delete.success) return delete;
-            var create = await CreateTown(guildId);
-            if (create.success)
-            {
-                townOccupancyStore.Clear();
-                await GetTownOccupancy(guildId);
-            }
-
-            return create;
-        }
-        catch (Exception ex)
-        {
-            return (false, ex.Message);
-        }
-    }
-
-    public (bool success, bool exists, string message) TownExists(ulong guildId)
+    public (bool success, bool exists, string message) GetTownStatus(ulong guildId)
     {
         try
         {
             var guild = bot.GetGuild(guildId);
             if (guild is null) return (false, false, GuildNotFoundMessage);
 
-            var role = guild.Roles.FirstOrDefault(o => o.Name == StoryTellerRoleName);
-            if (role == null) return (true, false, $"{StoryTellerRoleName} role does not exist. Recommend rebuild");
+            var role = guild.GetRole(discordConstants.StoryTellerRoleName);
+            if (role == null) return (true, false, $"{discordConstants.StoryTellerRoleName} role does not exist");
 
-            var dayCategory = guild.GetCategoryChannelByName(name: DayCategoryName);
-            if (dayCategory == null) return (true, false, "Missing day category, Recommend rebuild");
+            var dayCategory = guild.GetCategoryChannelByName(name: discordConstants.DayCategoryName);
+            if (dayCategory == null) return (true, false, "Missing day category");
+            if (!dayCategory.VerifyCategoryChannels(discordConstants.DayRoomNames)) return (true, false, "Missing day channels");
 
-            if (!dayCategory.VerifyCategoryChannels(_dayRoomNames))
-            {
-                return (true, false, "Missing day channels. Recommend rebuild");
-            }
+            var nightCategory = guild.GetCategoryChannelByName(name: discordConstants.NightCategoryName);
+            if (nightCategory == null) return (true, false, "Missing night category");
+            if (!nightCategory.VerifyCategoryChannels(discordConstants.GetNightRoomNames())) return (true, false, "Not enough cottages");
 
-            var nightCategory = guild.GetCategoryChannelByName(name: NightCategoryName);
-            if (nightCategory == null) return (true, false, "Missing night category, Recommend rebuild");
-
-            if (nightCategory.Channels.Count() < CottageCount)
-            {
-                return (true, false, "Not enough cottages, Recommend rebuild");
-            }
-
-            return (true, true, "Town exists");
+            return (true, true, "Town structure is correct");
         }
         catch (Exception ex)
         {
@@ -136,11 +71,11 @@ public class DiscordTownService(
         {
             var guild = bot.GetGuild(guildId);
             if (guild is null) return (false, GuildNotFoundMessage);
-            var dayCategory = guild.GetCategoryChannelByName(name: DayCategoryName);
-            if (dayCategory != null) await dayCategory.DeleteCategoryAsync();
-            var nightCategory = guild.GetCategoryChannelByName(name: NightCategoryName);
-            if (nightCategory != null) await nightCategory.DeleteCategoryAsync();
-            await DeleteRoles(guild);
+            var dayCategory = guild.GetCategoryChannelByName(name: discordConstants.DayCategoryName);
+            if (dayCategory != null) await dayCategory.DeleteAsync();
+            var nightCategory = guild.GetCategoryChannelByName(name: discordConstants.NightCategoryName);
+            if (nightCategory != null) await nightCategory.DeleteAsync();
+            await guild.DeleteRoleAsync(discordConstants.StoryTellerRoleName);
 
             return (true, "Town deleted");
         }
@@ -156,12 +91,21 @@ public class DiscordTownService(
         {
             var guild = bot.GetGuild(guildId);
             if (guild is null) return (false, GuildNotFoundMessage);
-            var roleCreated = await CreateRoles(guild);
-            if (!roleCreated) return (false, "Failed to generate roles");
-            var dayCreated = await CreateDayVoiceChannels(guild);
+            var storyTellerRole = await guild.CreateRoleAsync(discordConstants.StoryTellerRoleName, Color.Gold);
+            if (storyTellerRole is null) return (false, "Failed to create role");
+
+            var dayCategory = await guild.CreateCategoryAsync(discordConstants.DayCategoryName, true);
+            var dayCreated = await guild.CreateVoiceChannelsForCategoryAsync(discordConstants.DayRoomNames, dayCategory.Id);
             if (!dayCreated) return (false, "Failed to generate day channels");
-            var nightCreated = await CreateNightVoiceChannels(guild);
-            if (!nightCreated) return (false, "Failed to generate night channels");
+
+
+            var nightCategory = await guild.CreateCategoryAsync(discordConstants.NightCategoryName, false, storyTellerRole);
+            var nightCreated = await guild.CreateVoiceChannelsForCategoryAsync(discordConstants.GetNightRoomNames(), nightCategory.Id);
+            if (!nightCreated)
+            {
+                return (false, "Failed to generate night channels");
+            }
+
             return (true, "Town created");
         }
         catch (Exception ex)
@@ -174,49 +118,18 @@ public class DiscordTownService(
     {
         try
         {
-            var gameState = gameStateStore.Get(gameId);
-            if (gameState is null) return (false, $"Couldn't find game with id: {gameId}");
-            if (!ulong.TryParse(gameState.GuildId, out var guildId)) return (false, "GameState contained a guildId that could not be found");
-            var guild = bot.GetGuild(guildId);
-            if (guild is null) return (false, GuildNotFoundMessage);
-            var role = guild.GetRole(StoryTellerRoleName);
-            if (role is null) return (false, $"{StoryTellerRoleName} role does not exist");
-            var user = guild.GetUser(userId);
-            if (user is null) return (false, "User not found");
+            var validationResult = ValidateToggleStoryTellerRequest(gameId, userId);
+            if (!validationResult.status.success) return validationResult.status;
+            var (role, user) = validationResult.data;
 
-            bool isStoryTellerAlready = user.Roles.Any(r => r.Id == role.Id);
+            bool isStoryTellerAlready = user.DoesUserHaveRole(role.Id);
 
-            var thisUser = gameState.Users.GetById(userId);
-            if (thisUser is null)
-            {
-                gameStateStore.TryUpdate(gameId, state =>
-                {
-                    state.Users.Add(user.AsGameUser());
-                    return state;
-                });
-            }
+            EnsureUserExistsInGameState(gameId, user);
 
             if (isStoryTellerAlready)
-            {
-                await user.RemoveRoleAsync(role);
-                gameStateStore.TryUpdate(gameId, state =>
-                {
-                    state.Users.GetById(userId)!.UserType = UserType.Spectator;
-                    return state;
-                });
+                return await RemoveStoryTellerRole(gameId, user, role);
 
-                return (true, $"User {user.DisplayName} is no longer a {StoryTellerRoleName}");
-            }
-            else
-            {
-                await user.AddRoleAsync(role);
-                gameStateStore.TryUpdate(gameId, state =>
-                {
-                    state.Users.GetById(userId)!.UserType = UserType.StoryTeller;
-                    return state;
-                });
-                return (true, $"User {user.DisplayName} is now a {StoryTellerRoleName}");
-            }
+            return await AddStoryTellerRole(gameId, user, role);
         }
         catch (Exception ex)
         {
@@ -229,23 +142,23 @@ public class DiscordTownService(
         try
         {
             var thisTownOccupancy = townOccupancyStore.Get(guildId);
-            if (thisTownOccupancy != null) return (true, thisTownOccupancy, "Got from cache");
-            var gameState = gameStateStore.GetGuildGames(guildId).FirstOrDefault();
-            if (gameState is null) return (false, null, "Failed to find gameState");
+            if (thisTownOccupancy != null) return (true, thisTownOccupancy, "Got from store");
 
             var guild = bot.GetGuild(guildId);
             if (guild is null) return (false, null, GuildNotFoundMessage);
 
             var channelCategories = new List<MiniCategory>();
-            var dayCategory = guild.GetMiniCategory(DayCategoryName);
+            var dayCategory = guild.GetMiniCategory(discordConstants.DayCategoryName);
             if (dayCategory != null) channelCategories.Add(dayCategory);
-            var nightCategory = guild.GetMiniCategory(NightCategoryName);
+            var nightCategory = guild.GetMiniCategory(discordConstants.NightCategoryName);
             if (nightCategory != null) channelCategories.Add(nightCategory);
 
             var townOccupants = new TownOccupants(channelCategories);
 
             townOccupancyStore.Set(guildId, townOccupants);
-            await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, townOccupants);
+
+            var gameState = gameStateStore.GetGuildGames(guildId).FirstOrDefault();
+            if (gameState is not null) await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, townOccupants);
             return (true, townOccupants, $"Town occupancy {townOccupants.UserCount}");
         }
         catch (Exception ex)
@@ -258,12 +171,7 @@ public class DiscordTownService(
     {
         if (cache.TryGetValue($"join_data_{key}", out var joinData) && joinData is JoinData response)
         {
-            gameStateStore.TryUpdate(response.GameId, state =>
-            {
-                state.Players.First(o => o.Id == response.User.Id).IsPlaying = true;
-                return state;
-            });
-
+            gameStateStore.UpdateUser(response.GameId, ulong.Parse(response.User.Id), isPlaying: true);
             cache.Remove($"join_data_{key}");
             return response;
         }
@@ -273,110 +181,18 @@ public class DiscordTownService(
 
     public async Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime)
     {
-        var gameState = gameStateStore.Get(gameId);
-        if (gameState is null) return (false, "Game not found");
-        var guild = bot.GetGuild(ulong.Parse(gameState.GuildId));
-        if (guild is null) return (false, GuildNotFoundMessage);
-        await notificationService.BroadcastTownTime(gameId, gameTime);
-        gameStateStore.TryUpdate(gameId, state =>
-        {
-            state.GameTime = gameTime;
-            return state;
-        });
-        return (true, $"Time set to {gameTime}");
-    }
-
-
-    private static async Task<bool> CreateNightVoiceChannels(IDiscordGuild guild)
-    {
         try
         {
-            var storytellerRole = guild.GetRole(StoryTellerRoleName);
-            if (storytellerRole == null) return false;
+            var gameState = gameStateStore.Get(gameId);
+            if (gameState is null) return (false, "Game not found");
 
-            var category = await guild.CreateCategoryChannelAsync(NightCategoryName, properties =>
-            {
-                properties.PermissionOverwrites = new[]
-                {
-                    new Overwrite(guild.EveryoneRole.Id, PermissionTarget.Role,
-                        new OverwritePermissions(viewChannel: PermValue.Deny)
-                    ),
-                    new Overwrite(storytellerRole.Id, PermissionTarget.Role,
-                        new OverwritePermissions(viewChannel: PermValue.Allow)
-                    ),
-                };
-            });
-
-            for (int i = 0; i < CottageCount; i++)
-            {
-                var result = await guild.CreateVoiceChannelAsync(CottageName, properties => properties.CategoryId = category.Id);
-                if (result is null) return false;
-            }
-
-            return true;
+            gameStateStore.SetTime(gameId, gameTime);
+            await notificationService.BroadcastTownTime(gameId, gameTime);
+            return (true, $"Time set to {gameTime}");
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return false;
-        }
-    }
-
-
-    private static async Task<bool> CreateRoles(IDiscordGuild guild)
-    {
-        try
-        {
-            var role = guild.GetRole(StoryTellerRoleName);
-            if (role is null)
-            {
-                var newRole = await guild.CreateRoleAsync(StoryTellerRoleName, Color.Gold);
-                if (newRole is null) return false;
-            }
-
-            return true;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
-
-    private static async Task DeleteRoles(IDiscordGuild guild)
-    {
-        var role = guild.GetRole(StoryTellerRoleName);
-        if (role != null)
-        {
-            await role.DeleteAsync();
-        }
-    }
-
-    private async Task<bool> CreateDayVoiceChannels(IDiscordGuild guild)
-    {
-        try
-        {
-            var category = await guild.CreateCategoryChannelAsync(DayCategoryName, properties =>
-            {
-                properties.PermissionOverwrites = new[]
-                {
-                    new Overwrite(guild.EveryoneRole.Id, PermissionTarget.Role,
-                        new OverwritePermissions(viewChannel: PermValue.Allow)
-                    )
-                };
-            });
-
-
-            foreach (var dayRoomName in _dayRoomNames)
-            {
-                var result = await guild.CreateVoiceChannelAsync(dayRoomName, properties => properties.CategoryId = category.Id);
-                if (result is null) return false;
-            }
-
-
-            return true;
-        }
-        catch (Exception)
-        {
-            return false;
+            return (false, ex.Message);
         }
     }
 
@@ -385,7 +201,7 @@ public class DiscordTownService(
         await notificationService.PingUser(userId, "Ping!");
     }
 
-    public async Task<(InviteUserOutcome outcome, string message )> InviteUser(string gameId, ulong userId)
+    public async Task<(InviteUserOutcome outcome, string message)> InviteUser(string gameId, ulong userId)
     {
         try
         {
@@ -396,30 +212,80 @@ public class DiscordTownService(
             if (guild is null) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
             var user = guild.GetUser(userId);
             if (user is null) return (InviteUserOutcome.UserNotFoundError, $"Couldn't find user: {userId}");
+            var dmChannel = await user.CreateDmChannelAsync();
+            if (dmChannel is null) return (InviteUserOutcome.DmChannelError, "Couldn't open dm channel with user");
+
             var thisGameUser = user.AsGameUser(gameState);
             thisGameUser.UserType = UserType.Player;
             var jwt = jwtWriter.GetJwtToken(thisGameUser);
             var response = new JoinData(guildId.ToString(), thisGameUser, gameId, jwt);
-            var tempKey = Guid.NewGuid().ToString();
+            var tempKey = idGenerator.GenerateId();
             cache.Set($"join_data_{tempKey}", response, TimeSpan.FromMinutes(5));
             var url = _secrets.FeUri + $"/join?key={tempKey}";
 
-            var dmChannel = await user.CreateDmChannelAsync();
-            if (dmChannel is null) return (InviteUserOutcome.DmChannelFailed, $"Couldn't open dm channel with user");
-
             await dmChannel.SendMessageAsync($"[Join here]({url})");
-
-            gameStateStore.TryUpdate(gameId, state =>
-            {
-                state.Users.Add(thisGameUser);
-                return state;
-            });
-
+            
+            gameStateStore.AddUserToGame(gameId,thisGameUser);
             return (InviteUserOutcome.InviteSent, "Sent message to user");
         }
         catch (Exception)
         {
             return (InviteUserOutcome.UnknownError, "Failed to send message to user");
         }
+    }
+
+    private ((bool success, string message) status, (IDiscordRole role, IDiscordGuildUser user) data) ValidateToggleStoryTellerRequest(string gameId, ulong userId)
+    {
+        var gameState = gameStateStore.Get(gameId);
+        if (gameState is null) return ((false, $"Couldn't find game with id: {gameId}"), default);
+
+        if (!ulong.TryParse(gameState.GuildId, out var guildId)) return ((false, "GameState contained a guildId that is not valid"), default);
+
+        var guild = bot.GetGuild(guildId);
+        if (guild is null) return ((false, GuildNotFoundMessage), default);
+
+        var role = guild.GetRole(discordConstants.StoryTellerRoleName);
+        if (role is null) return ((false, $"{discordConstants.StoryTellerRoleName} role does not exist"), default);
+
+        var user = guild.GetUser(userId);
+        if (user is null) return ((false, "User not found"), default);
+
+        return ((true, string.Empty), (role, user));
+    }
+
+
+    private void EnsureUserExistsInGameState(string gameId, IDiscordGuildUser user)
+    {
+        var thisUser = gameStateStore.Get(gameId)?.Users.GetById(user.Id);
+        if (thisUser is null) gameStateStore.AddUserToGame(gameId, user.AsGameUser());
+    }
+
+    private async Task<(bool success, string message)> RemoveStoryTellerRole(string gameId, IDiscordGuildUser user, IDiscordRole role)
+    {
+        await user.RemoveRoleAsync(role);
+        gameStateStore.UpdateUser(gameId, user.Id, UserType.Spectator);
+        return (true, $"User {user.DisplayName} is no longer a {discordConstants.StoryTellerRoleName}");
+    }
+
+    private async Task<(bool success, string message)> AddStoryTellerRole(string gameId, IDiscordGuildUser user, IDiscordRole role)
+    {
+        await user.AddRoleAsync(role);
+        gameStateStore.UpdateUser(gameId, user.Id, UserType.StoryTeller);
+        return (true, $"User {user.DisplayName} is now a {discordConstants.StoryTellerRoleName}");
+    }
+
+    private ((bool success, string message) status, (IDiscordGuildUser user, IDiscordVoiceChannel channel) data) ValidateMoveUserRequest(ulong guildId, ulong userId, ulong channelId)
+    {
+        var guild = bot.GetGuild(guildId);
+        if (guild == null) return ((false, GuildNotFoundMessage), default);
+
+        var user = guild.GetUser(userId);
+        if (user == null) return ((false, "User not found in guild"), default);
+
+        if (user.VoiceState == null) return ((false, "User is not connected to voice"), default);
+
+        var channel = guild.GetVoiceChannel(channelId);
+        if (channel == null) return ((false, "Channel not found in guild"), default);
+        return ((true, string.Empty), (user, channel));
     }
 }

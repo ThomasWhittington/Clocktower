@@ -12,4 +12,5 @@ public interface IDiscordGuildUser
     Task MoveAsync(IDiscordVoiceChannel channel);
     Task RemoveRoleAsync(IDiscordRole role);
     Task AddRoleAsync(IDiscordRole role);
+    bool DoesUserHaveRole(ulong roleId);
 }

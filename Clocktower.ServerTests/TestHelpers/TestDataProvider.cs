@@ -5,6 +5,11 @@ namespace Clocktower.ServerTests.TestHelpers;
 
 public static class TestDataProvider
 {
+    public static IEnumerable<object[]> GetAllEnumValues<T>() where T : struct, Enum
+    {
+        return Enum.GetValues<T>().Select(enumValue => new object[] { enumValue });
+    }
+
     public static IEnumerable<Role> GetDummyRoles()
     {
         return

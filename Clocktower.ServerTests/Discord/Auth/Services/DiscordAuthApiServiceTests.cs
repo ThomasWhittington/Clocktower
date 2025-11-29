@@ -324,9 +324,7 @@ public class DiscordAuthApiServiceTests
 
     private static bool ValidateTokenRequestContent(HttpRequestMessage request, string expectedCode, string serverUri)
     {
-        if (request.Content is not FormUrlEncodedContent) return false;
-
-        var contentTask = request.Content.ReadAsStringAsync();
+        var contentTask = request.Content!.ReadAsStringAsync();
         contentTask.Wait();
         var content = contentTask.Result;
 
@@ -337,9 +335,7 @@ public class DiscordAuthApiServiceTests
 
     private static bool ValidateRedirectUri(HttpRequestMessage request, string expectedRedirectUri)
     {
-        if (request.Content is not FormUrlEncodedContent) return false;
-
-        var contentTask = request.Content.ReadAsStringAsync();
+        var contentTask = request.Content!.ReadAsStringAsync();
         contentTask.Wait();
         var content = contentTask.Result;
 

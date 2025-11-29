@@ -33,7 +33,7 @@ public class InviteUserTests
 
     [TestMethod]
     [DataRow(InviteUserOutcome.InvalidGuildError)]
-    [DataRow(InviteUserOutcome.DmChannelFailed)]
+    [DataRow(InviteUserOutcome.DmChannelError)]
     [DataRow(InviteUserOutcome.UnknownError)]
     public async Task Handle_ReturnsBadRequest_WhenServiceReturnsBadRequestError(InviteUserOutcome inviteUserOutcome)
     {

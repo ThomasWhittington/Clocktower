@@ -11,4 +11,8 @@ public interface IGameStateStore
     IEnumerable<GameState> GetGuildGames(ulong guildId);
     IEnumerable<GameState> GetUserGames(string userId);
     IEnumerable<GameState> GetAll();
+
+    void AddUserToGame(string gameId, GameUser gameUser);
+    void SetTime(string gameId, GameTime gameTime);
+    void UpdateUser(string gameId, ulong userId, UserType? userType = null, bool? isPlaying = null);
 }

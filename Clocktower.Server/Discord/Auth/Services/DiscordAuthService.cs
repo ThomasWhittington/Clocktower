@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace Clocktower.Server.Discord.Auth.Services;
 
-public class DiscordAuthService(IOptions<Secrets> secretsOptions, IJwtWriter jwtWriter, IMemoryCache cache, IHttpClientFactory httpClientFactory, IDiscordAuthApiService discordAuthApiService) : IDiscordAuthService
+public class DiscordAuthService(IOptions<Secrets> secretsOptions, IJwtWriter jwtWriter, IMemoryCache cache, IHttpClientFactory httpClientFactory, IDiscordAuthApiService discordAuthApiService, IIdGenerator idGenerator) : IDiscordAuthService
 {
     private readonly Secrets _secrets = secretsOptions.Value;
 
@@ -51,7 +51,7 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IJwtWriter jwt
             var response = userInfo.AsGameUser();
             var jwt = jwtWriter.GetJwtToken(response);
             var userAuthData = new UserAuthData(response, jwt);
-            var tempKey = Guid.NewGuid().ToString();
+            var tempKey = idGenerator.GenerateId();
             cache.Set($"auth_data_{tempKey}", userAuthData, TimeSpan.FromMinutes(5));
 
             return frontendUrl + tempKey;

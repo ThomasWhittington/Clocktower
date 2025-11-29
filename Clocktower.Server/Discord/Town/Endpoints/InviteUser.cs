@@ -29,7 +29,7 @@ public class InviteUser : IEndpoint
             case InviteUserOutcome.UserNotFoundError:
                 return TypedResults.NotFound(message);
             case InviteUserOutcome.InvalidGuildError:
-            case InviteUserOutcome.DmChannelFailed:
+            case InviteUserOutcome.DmChannelError:
             case InviteUserOutcome.UnknownError:
             default:
                 return TypedResults.BadRequest(message);

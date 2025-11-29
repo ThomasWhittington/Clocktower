@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Clocktower.Server.Data.Wrappers;
-using Clocktower.Server.Discord.Town.Services;
-using Clocktower.Server.Socket;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Options;
@@ -10,7 +8,10 @@ using DiscordUser = Clocktower.Server.Data.Wrappers.DiscordUser;
 namespace Clocktower.Server.Common.Services;
 
 [ExcludeFromCodeCoverage(Justification = "Discord.NET wrapper")]
-public class DiscordBot(IOptions<Secrets> secretsOptions, IGameStateStore gameStateStore, IServiceProvider serviceProvider, INotificationService notificationService)
+public class DiscordBot(
+    IOptions<Secrets> secretsOptions,
+    IDiscordBotHandler botHandler
+)
     : BackgroundService, IDiscordBot
 {
     private readonly Secrets _secrets = secretsOptions.Value;
@@ -25,36 +26,19 @@ public class DiscordBot(IOptions<Secrets> secretsOptions, IGameStateStore gameSt
         _client.Log += LogAsync;
         _client.Ready += ReadyAsync;
 
-        _client.UserVoiceStateUpdated += ClientOnUserVoiceStateUpdated;
+        _client.UserVoiceStateUpdated += async (user, before, after) =>
+            await botHandler.HandleUserVoiceStateUpdate(
+                new DiscordUser(user),
+                new DiscordVoiceState(before),
+                new DiscordVoiceState(after)
+            );
+
 
         string token = _secrets.DiscordBotToken;
         await _client.LoginAsync(TokenType.Bot, token);
         await _client.StartAsync();
 
         await Task.Delay(Timeout.Infinite, stoppingToken);
-    }
-
-    private async Task ClientOnUserVoiceStateUpdated(SocketUser user, SocketVoiceState before, SocketVoiceState after)
-    {
-        await HandleUserVoiceStateUpdate(new DiscordUser(user), new DiscordVoiceState(before), new DiscordVoiceState(after));
-    }
-
-    internal async Task HandleUserVoiceStateUpdate(IDiscordUser user, IDiscordVoiceState before, IDiscordVoiceState after)
-    {
-        var guildId = after.VoiceChannel?.Guild.Id ?? before.VoiceChannel?.Guild.Id;
-        var channelsAreSame = before.VoiceChannel?.Id == after.VoiceChannel?.Id;
-        if (!guildId.HasValue || channelsAreSame) return;
-
-        var gameState = gameStateStore.GetGuildGames(guildId.Value).FirstOrDefault();
-        if (gameState is null) return;
-
-        using var scope = serviceProvider.CreateScope();
-        var townService = scope.ServiceProvider.GetRequiredService<IDiscordTownService>();
-        var (success, thisTownOccupancy, _) = await townService.GetTownOccupancy(guildId.Value);
-        if (!success || thisTownOccupancy is null) return;
-        thisTownOccupancy!.MoveUser(user, after.VoiceChannel);
-        await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, thisTownOccupancy);
-        await notificationService.BroadcastUserVoiceStateChanged(gameState.Id, user.Id.ToString(), after.VoiceChannel != null);
     }
 
     public IDiscordGuild? GetGuild(ulong guildId)

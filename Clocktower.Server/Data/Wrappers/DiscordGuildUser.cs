@@ -37,4 +37,9 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
     {
         await user.AddRoleAsync(role.Id);
     }
+
+    public bool DoesUserHaveRole(ulong roleId)
+    {
+       return Roles.Any(o => o.Id == roleId);
+    }
 }

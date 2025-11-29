@@ -14,7 +14,13 @@ public interface IDiscordGuild
     Task<IDiscordRestCategoryChannel> CreateCategoryChannelAsync(string categoryName, Action<GuildChannelProperties> func);
     Task<IDiscordRestVoiceChannel> CreateVoiceChannelAsync(string channelName, Action<VoiceChannelProperties> func);
     Task<IDiscordRole> CreateRoleAsync(string roleName, Color color);
-    IDiscordGuildUser GetUser(ulong userId);
+    Task DeleteRoleAsync(string roleName);
+    IDiscordGuildUser? GetUser(ulong userId);
     Task MoveAsync(IDiscordGuildUser member, IDiscordVoiceChannel channel);
     IDiscordVoiceChannel GetVoiceChannel(ulong channelId);
+    IDiscordRole? GetRole(string roleName);
+    Task<bool> CreateVoiceChannelsForCategoryAsync(string[] channelNames, ulong categoryId);
+    Task<IDiscordRestCategoryChannel> CreateCategoryAsync(string categoryName, bool everyoneCanSee, IDiscordRole? roleToSeeChannel = null);
+    IDiscordCategoryChannel? GetCategoryChannelByName(string name);
+    MiniCategory? GetMiniCategory(string categoryName);
 }

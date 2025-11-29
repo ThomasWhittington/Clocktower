@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Clocktower.Server.Data.Extensions;
 
 namespace Clocktower.Server.Data.Stores;
 
@@ -43,4 +44,43 @@ public class GameStateStore : IGameStateStore
     }
 
     public IEnumerable<GameState> GetAll() => _store.Values;
+
+    public void AddUserToGame(string gameId, GameUser gameUser)
+    {
+        TryUpdate(gameId, state =>
+        {
+            state.Users.Add(gameUser);
+            return state;
+        });
+    }
+
+    public void SetTime(string gameId, GameTime gameTime)
+    {
+        TryUpdate(gameId, state =>
+        {
+            state.GameTime = gameTime;
+            return state;
+        });
+    }
+
+    public void UpdateUser(string gameId, ulong userId, UserType? userType = null, bool? isPlaying = null)
+    {
+        TryUpdate(gameId, state =>
+        {
+            var user = state.Users.GetById(userId);
+            if (user is null) return state;
+
+            if (userType.HasValue)
+            {
+                user.UserType = userType.Value;
+            }
+
+            if (isPlaying.HasValue)
+            {
+                user.IsPlaying = isPlaying.Value;
+            }
+
+            return state;
+        });
+    }
 }

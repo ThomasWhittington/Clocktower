@@ -15,6 +15,7 @@ public class DiscordAuthServiceTests
     private Mock<IMemoryCache> _mockCache = null!;
     private Mock<IHttpClientFactory> _mockHttpClientFactory = null!;
     private Mock<IDiscordAuthApiService> _mockDiscordAuthApiService = null!;
+    private Mock<IIdGenerator> _mockIdGenerator = null!;
 
     private HttpClient _testHttpClient = null!;
 
@@ -23,7 +24,8 @@ public class DiscordAuthServiceTests
         _mockJwtWriter.Object,
         _mockCache.Object,
         _mockHttpClientFactory.Object,
-        _mockDiscordAuthApiService.Object
+        _mockDiscordAuthApiService.Object,
+        _mockIdGenerator.Object
     );
 
     [TestInitialize]
@@ -34,6 +36,7 @@ public class DiscordAuthServiceTests
         _mockCache = new Mock<IMemoryCache>();
         _mockHttpClientFactory = new Mock<IHttpClientFactory>();
         _mockDiscordAuthApiService = new Mock<IDiscordAuthApiService>();
+        _mockIdGenerator = new Mock<IIdGenerator>();
 
         _testHttpClient = new HttpClient();
     }
@@ -315,8 +318,46 @@ public class DiscordAuthServiceTests
         _mockJwtWriter.Verify(o => o.GetJwtToken(It.IsAny<GameUser>()), Times.Once);
     }
 
+
     [TestMethod]
-    public async Task HandleCallback_SetsCacheAndReturnsUrl_WhenDataIsGood()
+    public async Task HandleCallback_GeneratesId_WhenDataIsGood()
+    {
+        const string feUri = "feUri";
+        SetUpSecrets(
+            feUri: feUri
+        );
+        const string error = null!;
+        const string code = "this-code";
+        const string key = "this-key";
+
+        var tokenResponse = new TokenResponse
+        {
+            AccessToken = CommonMethods.GetRandomString(),
+            TokenType = CommonMethods.GetRandomString(),
+            ExpiresIn = 0,
+            RefreshToken = CommonMethods.GetRandomString(),
+            Scope = CommonMethods.GetRandomString()
+        };
+        var userInfo = new DiscordUser(
+            CommonMethods.GetRandomString(),
+            CommonMethods.GetRandomString(),
+            CommonMethods.GetRandomString(),
+            CommonMethods.GetRandomString(),
+            false,
+            CommonMethods.GetRandomString()
+        );
+        _mockHttpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(_testHttpClient);
+        _mockDiscordAuthApiService.Setup(o => o.ExchangeCodeForToken(code, _testHttpClient)).ReturnsAsync(tokenResponse);
+        _mockDiscordAuthApiService.Setup(x => x.GetDiscordUserInfo(tokenResponse.AccessToken, _testHttpClient)).ReturnsAsync(userInfo);
+        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(key);
+
+        _ = await Sut.HandleCallback(error, code);
+
+        _mockIdGenerator.Verify(o => o.GenerateId(), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task HandleCallback_SetsCacheAndReturnsUrl_WhenGotId()
     {
         const string feUri = "feUri";
         SetUpSecrets(
@@ -325,6 +366,7 @@ public class DiscordAuthServiceTests
         const string error = null!;
         const string code = "this-code";
         const string jwt = "this-jwt";
+        const string key = "this-key";
 
         var tokenResponse = new TokenResponse
         {
@@ -349,6 +391,7 @@ public class DiscordAuthServiceTests
         _mockDiscordAuthApiService.Setup(x => x.GetDiscordUserInfo(tokenResponse.AccessToken, _testHttpClient))
             .ReturnsAsync(userInfo);
         _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == userInfo.Id))).Returns(jwt);
+        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(key);
         var mockCacheEntry = new Mock<ICacheEntry>();
         _mockCache.Setup(o => o.CreateEntry(It.IsAny<object>()))
             .Returns(mockCacheEntry.Object);
@@ -356,11 +399,8 @@ public class DiscordAuthServiceTests
         var result = await Sut.HandleCallback(error, code);
 
         result.Should().Contain(feUri);
-        var returnedKey = result.Replace(feUri + "/auth/callback?key=", string.Empty);
-        _mockCache.Verify(o => o.CreateEntry(It.Is<object>(key =>
-            key.ToString()!.Equals($"auth_data_{returnedKey}"))), Times.Once);
-        mockCacheEntry.VerifySet(entry => entry.Value = It.Is<UserAuthData>(u =>
-            u.Jwt == jwt && u.GameUser.Id == userInfo.Id), Times.Once);
+        _mockCache.Verify(o => o.CreateEntry(It.Is<object>(e => e.ToString()!.Equals($"auth_data_{key}"))), Times.Once);
+        mockCacheEntry.VerifySet(entry => entry.Value = It.Is<UserAuthData>(u => u.Jwt == jwt && u.GameUser.Id == userInfo.Id), Times.Once);
         mockCacheEntry.VerifySet(entry => entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5), Times.Once);
     }
 

@@ -35,11 +35,11 @@ public class GetTownStatusTests
     {
         const string responseMessage = "response message";
         var request = new GuildIdRequest(CommonMethods.GetRandomSnowflakeStringId());
-        _mockDiscordTownService.Setup(o => o.TownExists(ulong.Parse(request.GuildId))).Returns((false, false, responseMessage));
+        _mockDiscordTownService.Setup(o => o.GetTownStatus(ulong.Parse(request.GuildId))).Returns((false, false, responseMessage));
 
         var result =  GetTownStatus.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.TownExists(ulong.Parse(request.GuildId)), Times.Once);
+        _mockDiscordTownService.Verify(o => o.GetTownStatus(ulong.Parse(request.GuildId)), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
@@ -52,11 +52,11 @@ public class GetTownStatusTests
         const string responseMessage = "response message";
         var request = new GuildIdRequest(CommonMethods.GetRandomSnowflakeStringId());
 
-        _mockDiscordTownService.Setup(o => o.TownExists(ulong.Parse(request.GuildId))).Returns((true, true, responseMessage));
+        _mockDiscordTownService.Setup(o => o.GetTownStatus(ulong.Parse(request.GuildId))).Returns((true, true, responseMessage));
 
         var result =  GetTownStatus.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.TownExists(ulong.Parse(request.GuildId)), Times.Once);
+        _mockDiscordTownService.Verify(o => o.GetTownStatus(ulong.Parse(request.GuildId)), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<GetTownStatus.Response>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);
