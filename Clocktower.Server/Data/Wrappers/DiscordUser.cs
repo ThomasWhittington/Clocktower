@@ -15,4 +15,6 @@ public class DiscordUser(IUser user) : IDiscordUser
         var dmChannel = await user.CreateDMChannelAsync();
         return dmChannel != null ? new DiscordDmChannel(dmChannel) : null;
     }
+
+    public GameUser AsGameUser() => new(Id.ToString(), GlobalName, DisplayAvatarUrl);
 }

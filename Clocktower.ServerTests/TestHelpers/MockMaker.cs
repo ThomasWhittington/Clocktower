@@ -1,4 +1,5 @@
-﻿using Clocktower.Server.Data.Wrappers;
+﻿using Clocktower.Server.Data;
+using Clocktower.Server.Data.Wrappers;
 
 namespace Clocktower.ServerTests.TestHelpers;
 
@@ -6,10 +7,12 @@ public static class MockMaker
 {
     public static IDiscordUser CreateMockDiscordUser(ulong id, string globalName, string avatarUrl)
     {
-        return Mock.Of<IDiscordUser>(u =>
+        var mockUser = Mock.Of<IDiscordUser>(u =>
             u.Id == id &&
             u.GlobalName == globalName &&
-            u.DisplayAvatarUrl == avatarUrl);
+            u.DisplayAvatarUrl == avatarUrl &&
+            u.AsGameUser() == new GameUser(id.ToString(), globalName, avatarUrl));
+        return mockUser;
     }
 
     public static IDiscordGuildUser CreateMockDiscordGuildUser(ulong id, bool isAdmin = false)

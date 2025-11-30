@@ -1,7 +1,6 @@
 ﻿using System.IO.Abstractions;
 using System.Text.Json;
 using Clocktower.Server.Common.Services;
-using Clocktower.Server.Data.Extensions;
 
 namespace Clocktower.Server.Game.Services;
 
@@ -34,7 +33,7 @@ public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, I
             gameStateStore.Clear();
             foreach (var gameState in games)
             {
-                gameStateStore.Set(gameState.Id, gameState);
+                gameStateStore.Set(gameState);
             }
 
             return (true, "Loaded dummy data");
@@ -87,7 +86,7 @@ public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, I
             Users = [gameUser]
         };
 
-        bool addSuccessful = gameStateStore.Set(gameId, newGameState);
+        bool addSuccessful = gameStateStore.Set(newGameState);
 
         return addSuccessful
             ? (true, newGameState, "Game started successfully")

@@ -201,7 +201,7 @@ public class GameStateServiceTests
 
         var mockedUser = MockMaker.CreateMockDiscordUser(userId, userName, userAvatarUrl);
         _mockBot.Setup(o => o.GetUser(userId)).Returns(mockedUser);
-        _mockGameStateStore.Setup(o => o.Set(gameId, It.IsAny<GameState>())).Returns(true);
+        _mockGameStateStore.Setup(o => o.Set(It.Is<GameState>(g => g.Id == gameId))).Returns(true);
 
         var result = Sut.StartNewGame(guildId, gameId, userId);
 
@@ -223,7 +223,7 @@ public class GameStateServiceTests
 
         var mockedUser = MockMaker.CreateMockDiscordUser(userId, userName, userAvatarUrl);
         _mockBot.Setup(o => o.GetUser(userId)).Returns(mockedUser);
-        _mockGameStateStore.Setup(o => o.Set(gameId, It.IsAny<GameState>())).Returns(false);
+        _mockGameStateStore.Setup(o => o.Set(It.Is<GameState>(g => g.Id == gameId))).Returns(false);
 
         var result = Sut.StartNewGame(guildId, gameId, userId);
 
@@ -252,8 +252,8 @@ public class GameStateServiceTests
         result.success.Should().BeTrue();
         result.message.Should().Be("Loaded dummy data");
         _mockGameStateStore.Verify(s => s.Clear(), Times.Once);
-        _mockGameStateStore.Verify(s => s.Set("game1", It.IsAny<GameState>()), Times.Once);
-        _mockGameStateStore.Verify(s => s.Set("game2", It.IsAny<GameState>()), Times.Once);
+        _mockGameStateStore.Verify(s => s.Set(It.Is<GameState>(o => o.Id == "game1")), Times.Once);
+        _mockGameStateStore.Verify(s => s.Set(It.Is<GameState>(o => o.Id == "game2")), Times.Once);
     }
 
     [TestMethod]
@@ -267,7 +267,7 @@ public class GameStateServiceTests
         result.success.Should().BeFalse();
         result.message.Should().Be("Failed to deserialize json");
         _mockGameStateStore.Verify(s => s.Clear(), Times.Never);
-        _mockGameStateStore.Verify(s => s.Set(It.IsAny<string>(), It.IsAny<GameState>()), Times.Never);
+        _mockGameStateStore.Verify(s => s.Set(It.IsAny<GameState>()), Times.Never);
     }
 
     [TestMethod]
@@ -307,7 +307,7 @@ public class GameStateServiceTests
         result.success.Should().BeTrue();
         result.message.Should().Be("Loaded dummy data");
         _mockGameStateStore.Verify(s => s.Clear(), Times.Once);
-        _mockGameStateStore.Verify(s => s.Set(It.IsAny<string>(), It.IsAny<GameState>()), Times.Never);
+        _mockGameStateStore.Verify(s => s.Set(It.IsAny<GameState>()), Times.Never);
     }
 
     [TestMethod]
@@ -322,7 +322,7 @@ public class GameStateServiceTests
         result.message.Should().Be("File not found");
         _mockGameStateStore.Verify(s => s.Clear(), Times.Never);
     }
-    
+
     [TestMethod]
     public void LoadDummyData_ReturnsFalse_WhenUnknownException()
     {
@@ -351,9 +351,9 @@ public class GameStateServiceTests
         var result = Sut.LoadDummyData();
 
         result.success.Should().BeTrue();
-        _mockGameStateStore.Verify(s => s.Set("first", It.Is<GameState>(g => g.Id == "first")), Times.Once);
-        _mockGameStateStore.Verify(s => s.Set("second", It.Is<GameState>(g => g.Id == "second")), Times.Once);
-        _mockGameStateStore.Verify(s => s.Set("third", It.Is<GameState>(g => g.Id == "third")), Times.Once);
+        _mockGameStateStore.Verify(s => s.Set(It.Is<GameState>(g => g.Id == "first")), Times.Once);
+        _mockGameStateStore.Verify(s => s.Set(It.Is<GameState>(g => g.Id == "second")), Times.Once);
+        _mockGameStateStore.Verify(s => s.Set(It.Is<GameState>(g => g.Id == "third")), Times.Once);
     }
 
     #endregion

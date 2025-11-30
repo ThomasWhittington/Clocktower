@@ -1,8 +1,10 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Clocktower.Server.Common.Api;
 
+[ExcludeFromCodeCoverage(Justification = "Standard ULongToString")]
 public class ULongToStringConverter : JsonConverter<ulong>
 {
     public override ulong Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

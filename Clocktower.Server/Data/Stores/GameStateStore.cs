@@ -14,11 +14,11 @@ public class GameStateStore : IGameStateStore
 
     public bool Remove(string gameId) => _store.TryRemove(gameId, out _);
 
-    public bool Set(string gameId, GameState state)
+    public bool Set(GameState state)
     {
-        var currentValue = Get(gameId);
+        var currentValue = Get(state.Id);
         if (currentValue is not null) return false;
-        _store[gameId] = state;
+        _store[state.Id] = state;
         return true;
     }
 
@@ -63,9 +63,12 @@ public class GameStateStore : IGameStateStore
         });
     }
 
-    public void UpdateUser(string gameId, ulong userId, UserType? userType = null, bool? isPlaying = null)
+    public GameState? UpdateUser(string gameId, ulong userId, UserType? userType = null, bool? isPlaying = null)
     {
-        TryUpdate(gameId, state =>
+        TryUpdate(gameId, UpdateFunction);
+        return Get(gameId);
+
+        GameState UpdateFunction(GameState state)
         {
             var user = state.Users.GetById(userId);
             if (user is null) return state;
@@ -81,6 +84,6 @@ public class GameStateStore : IGameStateStore
             }
 
             return state;
-        });
+        }
     }
 }

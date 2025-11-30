@@ -52,6 +52,7 @@ public static class ConfigureServices
 
             builder.Services.Configure<Secrets>(builder.Configuration.GetSection(nameof(Secrets)));
 
+            builder.Services.AddSingleton<IIdGenerator, GuidIdGenerator>();
             builder.Services.AddSingleton<IJwtWriter, JwtWriter>();
             builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
             builder.Services.AddSingleton<IGameStateStore, GameStateStore>();

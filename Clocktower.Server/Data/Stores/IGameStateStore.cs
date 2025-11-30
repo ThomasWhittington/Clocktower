@@ -4,7 +4,7 @@ public interface IGameStateStore
 {
     void Clear();
     GameState? Get(string gameId);
-    bool Set(string gameId, GameState state);
+    bool Set( GameState state);
     bool Remove(string gameId);
     bool TryUpdate(string gameId, Func<GameState, GameState> updateFunction);
     IEnumerable<GameState> GetGuildGames(string guildId);
@@ -14,5 +14,5 @@ public interface IGameStateStore
 
     void AddUserToGame(string gameId, GameUser gameUser);
     void SetTime(string gameId, GameTime gameTime);
-    void UpdateUser(string gameId, ulong userId, UserType? userType = null, bool? isPlaying = null);
+    GameState? UpdateUser(string gameId, ulong userId, UserType? userType = null, bool? isPlaying = null);
 }

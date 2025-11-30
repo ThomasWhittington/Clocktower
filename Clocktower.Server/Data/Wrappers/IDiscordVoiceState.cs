@@ -3,4 +3,5 @@
 public interface IDiscordVoiceState
 {
     IDiscordVoiceChannel? VoiceChannel { get; }
+    ulong? GuildId { get; }
 }

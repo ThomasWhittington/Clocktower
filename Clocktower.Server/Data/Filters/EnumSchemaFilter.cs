@@ -1,10 +1,12 @@
-﻿using Microsoft.OpenApi.Any;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Clocktower.Server.Data.Filters;
 
 [UsedImplicitly]
+[ExcludeFromCodeCoverage(Justification = "Used for swagger, implicitly tested")]
 public class EnumSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)

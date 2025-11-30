@@ -7,4 +7,5 @@ public interface IDiscordUser
     string DisplayAvatarUrl { get; }
 
     Task<IDiscordDmChannel?> CreateDmChannelAsync();
+    GameUser AsGameUser();
 }

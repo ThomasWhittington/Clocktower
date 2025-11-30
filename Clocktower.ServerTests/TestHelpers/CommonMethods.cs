@@ -1,6 +1,5 @@
 ﻿using Clocktower.Server.Common;
 using Clocktower.Server.Data;
-using Discord.WebSocket;
 using Microsoft.Extensions.Options;
 
 namespace Clocktower.ServerTests.TestHelpers;
@@ -10,10 +9,10 @@ public static class CommonMethods
     public static string GetRandomString() => Guid.NewGuid().ToString();
     public static string GetRandomSnowflakeStringId() => GetRandomSnowflakeNumberId().ToString();
     public static ulong GetRandomSnowflakeNumberId() => (ulong)new Random((int)DateTime.Now.Ticks).NextInt64();
-    public static GameUser GetRandomGameUser() => new(GetRandomSnowflakeStringId(), GetRandomString(), GetRandomString());
+    public static GameUser GetRandomGameUser(string? id = null) => new(id?? GetRandomSnowflakeStringId(), GetRandomString(), GetRandomString());
 
 
-    public static void SetUpMockSecrets(
+    public static Secrets SetUpMockSecrets(
         Mock<IOptions<Secrets>> mockSecrets,
         string? discordBotToken = null,
         string? discordClientId = null,
@@ -34,6 +33,7 @@ public static class CommonMethods
             jwtAudience
         );
         mockSecrets.Setup(o => o.Value).Returns(secrets);
+        return secrets;
     }
 
     public static Secrets GetSecrets(
@@ -71,5 +71,11 @@ public static class CommonMethods
             SigningKey = signingKey!,
             Audience = audience!
         };
+    }
+
+    public static DateTime TruncateToSeconds(this DateTime dateTime)
+    {
+        return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day,
+            dateTime.Hour, dateTime.Minute, dateTime.Second, DateTimeKind.Utc);
     }
 }

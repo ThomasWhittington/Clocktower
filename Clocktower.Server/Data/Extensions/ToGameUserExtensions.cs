@@ -16,11 +16,6 @@ public static class ToGameUserExtensions
         return result;
     }
 
-    public static GameUser AsGameUser(this IDiscordUser user)
-    {
-        return new GameUser(user.Id.ToString(), user.GlobalName, user.DisplayAvatarUrl);
-    }
-
     public static GameUser AsGameUser(this DiscordUser user)
     {
         var avatarUrl = user.Avatar != null
