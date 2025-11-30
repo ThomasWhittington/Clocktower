@@ -303,7 +303,7 @@
     "tags": [],
     "title": "Unit test coverage of server",
     "description": "I need to add decent coverage of the server code before it gets out of hand",
-    "status": "IN_PROGRESS",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,
@@ -315,6 +315,19 @@
         "minute": 6,
         "second": 40,
         "nano": 915808900
+      }
+    },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 30
+      },
+      "time": {
+        "hour": 23,
+        "minute": 11,
+        "second": 55,
+        "nano": 882735000
       }
     },
     "isImported": false
@@ -384,7 +397,7 @@
     ],
     "title": "",
     "description": "[TODO] should update user status in game state. Also take in gameId rather than guildId",
-    "status": "TODO",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,

@@ -12,9 +12,9 @@ import type {
     AddBotApiData,
     AddBotApiErrors,
     BotCallbackApiData,
-    BotCallbackApiErrors,
+    BotCallbackApiResponses,
     CallbackApiData,
-    CallbackApiErrors,
+    CallbackApiResponses,
     CheckGuildApiData,
     CheckGuildApiErrors,
     CheckGuildApiResponses,
@@ -67,9 +67,6 @@ import type {
     PingUserApiData,
     PingUserApiErrors,
     PingUserApiResponses,
-    RebuildTownApiData,
-    RebuildTownApiErrors,
-    RebuildTownApiResponses,
     SendMessageApiData,
     SendMessageApiErrors,
     SendMessageApiResponses,
@@ -163,12 +160,12 @@ export const addBotApi = <ThrowOnError extends boolean = false>(options?: Option
 };
 
 /**
- * Handle Discord OAuth callback
+ * Handle Discord bot OAuth callback
  *
- * Handles the callback from Discord OAuth
+ * Handle Discord bot OAuth callback
  */
 export const botCallbackApi = <ThrowOnError extends boolean = false>(options?: Options<BotCallbackApiData, ThrowOnError>) => {
-    return (options?.client ?? client).get<unknown, BotCallbackApiErrors, ThrowOnError>({
+    return (options?.client ?? client).get<BotCallbackApiResponses, unknown, ThrowOnError>({
         url: '/api/discord/auth/bot-callback',
         ...options
     });
@@ -177,10 +174,10 @@ export const botCallbackApi = <ThrowOnError extends boolean = false>(options?: O
 /**
  * Handle Discord OAuth callback
  *
- * Handles the callback from Discord OAuth
+ * Handle Discord OAuth callback
  */
 export const callbackApi = <ThrowOnError extends boolean = false>(options?: Options<CallbackApiData, ThrowOnError>) => {
-    return (options?.client ?? client).get<unknown, CallbackApiErrors, ThrowOnError>({
+    return (options?.client ?? client).get<CallbackApiResponses, unknown, ThrowOnError>({
         url: '/api/discord/auth/callback',
         ...options
     });
@@ -211,18 +208,6 @@ export const loginApi = <ThrowOnError extends boolean = false>(options?: Options
 };
 
 /**
- * Get temporary join data
- *
- * Retrieves temporary join data by key
- */
-export const getJoinDataApi = <ThrowOnError extends boolean = false>(options: Options<GetJoinDataApiData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetJoinDataApiResponses, GetJoinDataApiErrors, ThrowOnError>({
-        url: '/api/discord/auth/join/{key}',
-        ...options
-    });
-};
-
-/**
  * Deletes the town in the provided server
  *
  * Removes all roles, channels and categories associated with clocktower
@@ -242,6 +227,18 @@ export const deleteTownApi = <ThrowOnError extends boolean = false>(options: Opt
 export const createTownApi = <ThrowOnError extends boolean = false>(options: Options<CreateTownApiData, ThrowOnError>) => {
     return (options.client ?? client).post<CreateTownApiResponses, CreateTownApiErrors, ThrowOnError>({
         url: '/api/discord/town/{guildId}',
+        ...options
+    });
+};
+
+/**
+ * Get temporary join data
+ *
+ * Retrieves temporary join data by key
+ */
+export const getJoinDataApi = <ThrowOnError extends boolean = false>(options: Options<GetJoinDataApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetJoinDataApiResponses, GetJoinDataApiErrors, ThrowOnError>({
+        url: '/api/discord/town/join/{key}',
         ...options
     });
 };
@@ -307,18 +304,6 @@ export const pingUserApi = <ThrowOnError extends boolean = false>(options: Optio
 };
 
 /**
- * Rebuild town
- *
- * Rebuilds the town including roles, categories and channels
- */
-export const rebuildTownApi = <ThrowOnError extends boolean = false>(options: Options<RebuildTownApiData, ThrowOnError>) => {
-    return (options.client ?? client).post<RebuildTownApiResponses, RebuildTownApiErrors, ThrowOnError>({
-        url: '/api/discord/town/{guildId}/rebuild',
-        ...options
-    });
-};
-
-/**
  * Sets the time of the town
  *
  * Sets the game state of the town based on the day time
@@ -333,16 +318,18 @@ export const setTimeApi = <ThrowOnError extends boolean = false>(options: Option
 /**
  * Toggles the storyteller role for a user
  *
- * Adds or removes the storyteller role from the specified user
+ * Adds or removes the storyteller role for the specified user
  */
 export const toggleStoryTellerApi = <ThrowOnError extends boolean = false>(options: Options<ToggleStoryTellerApiData, ThrowOnError>) => {
     return (options.client ?? client).post<ToggleStoryTellerApiResponses, ToggleStoryTellerApiErrors, ThrowOnError>({
-        url: '/api/discord/town/{guildId}/{userId}',
+        url: '/api/discord/town/{gameId}/{userId}',
         ...options
     });
 };
 
 /**
+ * Deletes a game by id
+ *
  * Deletes a game by id
  */
 export const deleteGameApi = <ThrowOnError extends boolean = false>(options: Options<DeleteGameApiData, ThrowOnError>) => {
@@ -354,6 +341,8 @@ export const deleteGameApi = <ThrowOnError extends boolean = false>(options: Opt
 
 /**
  * Get the game state by id
+ *
+ * Get the game state by id
  */
 export const getGameApi = <ThrowOnError extends boolean = false>(options: Options<GetGameApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetGameApiResponses, GetGameApiErrors, ThrowOnError>({
@@ -363,6 +352,8 @@ export const getGameApi = <ThrowOnError extends boolean = false>(options: Option
 };
 
 /**
+ * Gets all games, optionally filtered by guildId
+ *
  * Gets all games, optionally filtered by guildId
  */
 export const getGamesApi = <ThrowOnError extends boolean = false>(options?: Options<GetGamesApiData, ThrowOnError>) => {
@@ -374,6 +365,8 @@ export const getGamesApi = <ThrowOnError extends boolean = false>(options?: Opti
 
 /**
  * Gets games the player is in
+ *
+ * Gets games the player is in
  */
 export const getPlayerGamesApi = <ThrowOnError extends boolean = false>(options: Options<GetPlayerGamesApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetPlayerGamesApiResponses, unknown, ThrowOnError>({
@@ -384,6 +377,8 @@ export const getPlayerGamesApi = <ThrowOnError extends boolean = false>(options:
 
 /**
  * Loads dummy data from saved json file
+ *
+ * Loads dummy data from saved json file
  */
 export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?: Options<LoadDummyGamesApiData, ThrowOnError>) => {
     return (options?.client ?? client).post<LoadDummyGamesApiResponses, LoadDummyGamesApiErrors, ThrowOnError>({
@@ -393,6 +388,8 @@ export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?
 };
 
 /**
+ * Starts new game state for id
+ *
  * Starts new game state for id
  */
 export const startGameApi = <ThrowOnError extends boolean = false>(options: Options<StartGameApiData, ThrowOnError>) => {

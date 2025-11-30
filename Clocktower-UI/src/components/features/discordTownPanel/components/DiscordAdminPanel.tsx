@@ -22,7 +22,6 @@ function DiscordAdminPanel() {
     const [isLoading, setIsLoading] = useState(false);
     const guildId = useAppStore((state) => state.guildId);
     const [error, setError] = useState<string>("");
-    const [message, setMessage] = useState<string>("");
     const [townStatus, setTownStatus] = useState<GetTownStatusApiResponse>();
 
     const handleGetStatus = async () => {
@@ -37,23 +36,6 @@ function DiscordAdminPanel() {
             .finally(() => setIsLoading(false));
     }
 
-
-    const handleRebuildTown = async () => {
-        if (!ValidationUtils.isValidDiscordId(guildId)) {
-            console.error('guildId was not valid');
-            return;
-        }
-
-        setIsLoading(true);
-        await discordService.rebuildTown(guildId)
-            .then((data) => setMessage(data))
-            .catch((err) => setError(err.message))
-            .finally(() => setIsLoading(false));
-    }
-
-    return (
-        <></>
-    );
     return (
         <div
             className="flex flex-col space-y-2">
@@ -61,8 +43,6 @@ function DiscordAdminPanel() {
                 <Spinner/>}
             {error &&
                 <p className="text-red-500 text-sm">{error}</p>}
-            {message &&
-                <p className="text-purple-700 text-sm">{message}</p>}
             {(guildId != '') &&
                 <div>
                     <h2 className="text-2xl">{guildId}</h2>
@@ -74,12 +54,6 @@ function DiscordAdminPanel() {
                         className="btn-primary"
                         onClick={handleGetStatus}>
                         Get Status
-                    </button>
-
-                    <button
-                        className="btn-primary"
-                        onClick={handleRebuildTown}>
-                        Rebuild Town
                     </button>
                 </div>
             }
