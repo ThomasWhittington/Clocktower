@@ -1,0 +1,1 @@
+[![Build and Test Server](https://github.com/ThomasWhittington/Clocktower/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/ThomasWhittington/Clocktower/actions/workflows/build-and-test.yml)
