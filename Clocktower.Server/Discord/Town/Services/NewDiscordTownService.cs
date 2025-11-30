@@ -178,24 +178,7 @@ public class DiscordTownService(
 
         return null;
     }
-
-    public async Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime)
-    {
-        try
-        {
-            var gameState = gameStateStore.Get(gameId);
-            if (gameState is null) return (false, "Game not found");
-
-            gameStateStore.SetTime(gameId, gameTime);
-            await notificationService.BroadcastTownTime(gameId, gameTime);
-            return (true, $"Time set to {gameTime}");
-        }
-        catch (Exception ex)
-        {
-            return (false, ex.Message);
-        }
-    }
-
+    
     public async Task PingUser(string userId)
     {
         await notificationService.PingUser(userId, "Ping!");

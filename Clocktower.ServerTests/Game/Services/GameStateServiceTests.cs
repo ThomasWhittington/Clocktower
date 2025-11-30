@@ -6,15 +6,19 @@ using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Game.Services;
+using Clocktower.Server.Socket;
 
 namespace Clocktower.ServerTests.Game.Services;
 
 [TestClass]
 public class GameStateServiceTests
 {
+    private const string  DummyJsonFile  = "dummyState.json";
+
     private Mock<IDiscordBot> _mockBot = null!;
     private Mock<IGameStateStore> _mockGameStateStore = null!;
     private Mock<IFileSystem> _mockFileSystem = null!;
+    private Mock<INotificationService> _mockNotificationService = null!;
 
     [TestInitialize]
     public void Setup()
@@ -22,9 +26,10 @@ public class GameStateServiceTests
         _mockBot = new Mock<IDiscordBot>();
         _mockGameStateStore = new Mock<IGameStateStore>();
         _mockFileSystem = new Mock<IFileSystem>();
+        _mockNotificationService = new Mock<INotificationService>();
     }
 
-    private IGameStateService Sut => new GameStateService(_mockBot.Object, _mockGameStateStore.Object, _mockFileSystem.Object);
+    private IGameStateService Sut => new GameStateService(_mockBot.Object, _mockGameStateStore.Object, _mockFileSystem.Object, _mockNotificationService.Object);
 
     #region GetGames
 
@@ -245,7 +250,7 @@ public class GameStateServiceTests
             new GameState { Id = "game2", GuildId = "guild2" }
         });
 
-        _mockFileSystem.Setup(f => f.File.ReadAllText("dummyState.json")).Returns(validJson);
+        _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(validJson);
 
         var result = Sut.LoadDummyData();
 
@@ -260,7 +265,7 @@ public class GameStateServiceTests
     public void LoadDummyData_ReturnsFalse_WhenJsonDeserializationFails()
     {
         const string invalidJson = "{ invalid json }";
-        _mockFileSystem.Setup(f => f.File.ReadAllText("dummyState.json")).Returns(invalidJson);
+        _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(invalidJson);
 
         var result = Sut.LoadDummyData();
 
@@ -274,7 +279,7 @@ public class GameStateServiceTests
     public void LoadDummyData_ReturnsFalse_WhenJsonDeserializesToNull()
     {
         const string nullJson = "null";
-        _mockFileSystem.Setup(f => f.File.ReadAllText("dummyState.json")).Returns(nullJson);
+        _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(nullJson);
 
         var result = Sut.LoadDummyData();
 
@@ -287,7 +292,7 @@ public class GameStateServiceTests
     public void LoadDummyData_ClearsStoreBeforeLoading()
     {
         var validJson = JsonSerializer.Serialize(new[] { new GameState { Id = "game1" } });
-        _mockFileSystem.Setup(f => f.File.ReadAllText("dummyState.json")).Returns(validJson);
+        _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(validJson);
 
         Sut.LoadDummyData();
 
@@ -300,7 +305,7 @@ public class GameStateServiceTests
     public void LoadDummyData_LoadsEmptyArray_Successfully()
     {
         const string emptyArrayJson = "[]";
-        _mockFileSystem.Setup(f => f.File.ReadAllText("dummyState.json")).Returns(emptyArrayJson);
+        _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(emptyArrayJson);
 
         var result = Sut.LoadDummyData();
 
@@ -313,7 +318,7 @@ public class GameStateServiceTests
     [TestMethod]
     public void LoadDummyData_ReturnsFalse_WhenFileDoesNotExist()
     {
-        _mockFileSystem.Setup(f => f.File.ReadAllText("dummyState.json"))
+        _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile))
             .Throws<FileNotFoundException>();
 
         var result = Sut.LoadDummyData();
@@ -326,7 +331,7 @@ public class GameStateServiceTests
     [TestMethod]
     public void LoadDummyData_ReturnsFalse_WhenUnknownException()
     {
-        _mockFileSystem.Setup(f => f.File.ReadAllText("dummyState.json"))
+        _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile))
             .Throws(new Exception("Custom error message"));
 
         var result = Sut.LoadDummyData();
@@ -346,7 +351,7 @@ public class GameStateServiceTests
             new GameState { Id = "third" }
         };
         var validJson = JsonSerializer.Serialize(games);
-        _mockFileSystem.Setup(f => f.File.ReadAllText("dummyState.json")).Returns(validJson);
+        _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(validJson);
 
         var result = Sut.LoadDummyData();
 
@@ -357,4 +362,51 @@ public class GameStateServiceTests
     }
 
     #endregion
+
+
+    #region SetTime
+
+    [TestMethod]
+    public async Task SetTime_ReturnsFalse_WhenGameNotFound()
+    {
+        const string gameId = "game-id";
+        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns((GameState?)null);
+
+        var result = await Sut.SetTime(gameId, GameTime.Evening);
+
+        result.success.Should().BeFalse();
+        result.message.Should().Be("Game not found");
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(GetGameTimeValues))]
+    public async Task SetTime_SetsTime_NotifyClients_WhenDataGood(GameTime gameTime)
+    {
+        const string gameId = "game-id";
+        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = "12345" });
+
+        var result = await Sut.SetTime(gameId, gameTime);
+
+        _mockGameStateStore.Verify(o => o.SetTime(gameId, gameTime), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastTownTime(gameId, gameTime), Times.Once);
+        result.success.Should().BeTrue();
+        result.message.Should().Be($"Time set to {gameTime}");
+    }
+
+    [TestMethod]
+    public async Task SetTime_ReturnsFalse_WhenExceptionThrown()
+    {
+        const string gameId = "game-id";
+        const string message = "message";
+        _mockGameStateStore.Setup(o => o.Get(gameId)).Throws(new Exception(message));
+
+        var result = await Sut.SetTime(gameId, GameTime.Evening);
+
+        result.success.Should().BeFalse();
+        result.message.Should().Be(message);
+    }
+
+    #endregion
+
+    private static IEnumerable<object[]> GetGameTimeValues() => TestDataProvider.GetAllEnumValues<GameTime>();
 }

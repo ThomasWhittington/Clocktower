@@ -1,18 +1,18 @@
 ﻿using Clocktower.Server.Data.Types.Enum;
-using Clocktower.Server.Discord.Town.Endpoints;
-using Clocktower.Server.Discord.Town.Services;
+using Clocktower.Server.Game.Endpoints;
+using Clocktower.Server.Game.Services;
 
 namespace Clocktower.ServerTests.Discord.Town.Endpoints;
 
 [TestClass]
 public class SetTimeTests
 {
-    private Mock<IDiscordTownService> _mockDiscordTownService = null!;
+    private Mock<IGameStateService> _mockGameStateService = null!;
 
     [TestInitialize]
     public void SetUp()
     {
-        _mockDiscordTownService = new Mock<IDiscordTownService>();
+        _mockGameStateService = new Mock<IGameStateService>();
     }
 
     [TestMethod]
@@ -35,11 +35,11 @@ public class SetTimeTests
         const string responseMessage = "response message";
         var request = new SetTime.Request(CommonMethods.GetRandomString(), GameTime.Day);
 
-        _mockDiscordTownService.Setup(o => o.SetTime(request.GameId.Trim(), request.GameTime)).ReturnsAsync((false, responseMessage));
+        _mockGameStateService.Setup(o => o.SetTime(request.GameId.Trim(), request.GameTime)).ReturnsAsync((false, responseMessage));
 
-        var result = await SetTime.Handle(request, _mockDiscordTownService.Object);
+        var result = await SetTime.Handle(request, _mockGameStateService.Object);
 
-        _mockDiscordTownService.Verify(o => o.SetTime(request.GameId.Trim(), request.GameTime), Times.Once);
+        _mockGameStateService.Verify(o => o.SetTime(request.GameId.Trim(), request.GameTime), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
@@ -52,11 +52,11 @@ public class SetTimeTests
         const string responseMessage = "response message";
         var request = new SetTime.Request(CommonMethods.GetRandomString(), GameTime.Day);
 
-        _mockDiscordTownService.Setup(o => o.SetTime(request.GameId.Trim(), request.GameTime)).ReturnsAsync((true, responseMessage));
+        _mockGameStateService.Setup(o => o.SetTime(request.GameId.Trim(), request.GameTime)).ReturnsAsync((true, responseMessage));
 
-        var result = await SetTime.Handle(request, _mockDiscordTownService.Object);
+        var result = await SetTime.Handle(request, _mockGameStateService.Object);
 
-        _mockDiscordTownService.Verify(o => o.SetTime(request.GameId.Trim(), request.GameTime), Times.Once);
+        _mockGameStateService.Verify(o => o.SetTime(request.GameId.Trim(), request.GameTime), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);

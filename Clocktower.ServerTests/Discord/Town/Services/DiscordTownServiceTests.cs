@@ -11,7 +11,6 @@ using Clocktower.Server.Socket;
 using Discord;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using static Clocktower.ServerTests.TestHelpers.TestDataProvider;
 
 namespace Clocktower.ServerTests.Discord.Town.Services;
 
@@ -21,8 +20,16 @@ public class DiscordTownServiceTests
     private const ulong GuildId = 1L;
     private const ulong UserId = 2L;
     private const ulong ChannelId = 3L;
+    private const string GameId = "this-game";
+    private const string Jwt = "jwt-token";
+    private const string Key = "this-key";
+    private const string DayCategoryName = "dayCategoryName";
+    private const string NightCategoryName = "nightCategoryName";
+    private const string ExceptionMessage = "message";
     private const string GuildNotFoundMessage = "Guild not found";
     private const string StoryTellerRoleName = "StoryTellerRoleName";
+    private static readonly string[] DayChannelNames = ["day-1", "day-2", "day-3"];
+    private static readonly string[] NightChannelNames = ["night-1", "night-2", "night-3"];
 
     private Mock<IDiscordBot> _mockBot = null!;
     private Mock<INotificationService> _mockNotificationService = null!;
@@ -167,25 +174,21 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task ToggleStoryTeller_ReturnsFalse_WhenNoGameFound()
     {
-        const string gameId = "this-game";
-        const ulong userId = 1L;
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns((GameState?)null);
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns((GameState?)null);
 
-        var result = await Sut.ToggleStoryTeller(gameId, userId);
+        var result = await Sut.ToggleStoryTeller(GameId, UserId);
 
-        _mockGameStateStore.Verify(o => o.Get(gameId), Times.Once);
+        _mockGameStateStore.Verify(o => o.Get(GameId), Times.Once);
         result.success.Should().BeFalse();
-        result.message.Should().Be($"Couldn't find game with id: {gameId}");
+        result.message.Should().Be($"Couldn't find game with id: {GameId}");
     }
 
     [TestMethod]
     public async Task ToggleStoryTeller_ReturnsFalse_WhenGuildIdInvalid()
     {
-        const string gameId = "this-game";
-        const ulong userId = 1L;
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = "invalid-guild" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "invalid-guild" });
 
-        var result = await Sut.ToggleStoryTeller(gameId, userId);
+        var result = await Sut.ToggleStoryTeller(GameId, UserId);
 
         result.success.Should().BeFalse();
         result.message.Should().Be("GameState contained a guildId that is not valid");
@@ -194,15 +197,12 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task ToggleStoryTeller_ReturnsFalse_WhenGuildNotFound()
     {
-        const string gameId = "this-game";
-        const ulong userId = 1L;
-        const ulong guildId = 2L;
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = guildId.ToString() });
-        _mockBot.Setup(o => o.GetGuild(guildId)).Returns((IDiscordGuild?)null);
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId.ToString() });
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns((IDiscordGuild?)null);
 
-        var result = await Sut.ToggleStoryTeller(gameId, userId);
+        var result = await Sut.ToggleStoryTeller(GameId, UserId);
 
-        _mockBot.Verify(o => o.GetGuild(guildId), Times.Once);
+        _mockBot.Verify(o => o.GetGuild(GuildId), Times.Once);
         result.success.Should().BeFalse();
         result.message.Should().Be(GuildNotFoundMessage);
     }
@@ -210,16 +210,13 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task ToggleStoryTeller_ReturnsFalse_WhenRoleNotFound()
     {
-        const string gameId = "this-game";
-        const ulong userId = 1L;
-        const ulong guildId = 2L;
         var guild = new Mock<IDiscordGuild>();
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = guildId.ToString() });
-        _mockBot.Setup(o => o.GetGuild(guildId)).Returns(guild.Object);
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId.ToString() });
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns((IDiscordRole?)null);
 
-        var result = await Sut.ToggleStoryTeller(gameId, userId);
+        var result = await Sut.ToggleStoryTeller(GameId, UserId);
 
         guild.Verify(o => o.GetRole(StoryTellerRoleName), Times.Once);
         result.success.Should().BeFalse();
@@ -229,20 +226,17 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task ToggleStoryTeller_ReturnsFalse_WhenUserNotFound()
     {
-        const string gameId = "this-game";
-        const ulong userId = 1L;
-        const ulong guildId = 2L;
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = guildId.ToString() });
-        _mockBot.Setup(o => o.GetGuild(guildId)).Returns(guild.Object);
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId.ToString() });
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
-        guild.Setup(o => o.GetUser(userId)).Returns((IDiscordGuildUser?)null);
+        guild.Setup(o => o.GetUser(UserId)).Returns((IDiscordGuildUser?)null);
 
-        var result = await Sut.ToggleStoryTeller(gameId, userId);
+        var result = await Sut.ToggleStoryTeller(GameId, UserId);
 
-        guild.Verify(o => o.GetUser(userId), Times.Once);
+        guild.Verify(o => o.GetUser(UserId), Times.Once);
         result.success.Should().BeFalse();
         result.message.Should().Be("User not found");
     }
@@ -250,22 +244,19 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task ToggleStoryTeller_CallsDoesUserHaveRole_WhenDataGood()
     {
-        const string gameId = "this-game";
-        const ulong userId = 1L;
-        const ulong guildId = 2L;
         const ulong roleId = 3L;
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = guildId.ToString() });
-        _mockBot.Setup(o => o.GetGuild(guildId)).Returns(guild.Object);
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId.ToString() });
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
-        guild.Setup(o => o.GetUser(userId)).Returns(user.Object);
+        guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         role.Setup(o => o.Id).Returns(roleId);
         user.Setup(o => o.Roles).Returns([]);
 
-        _ = await Sut.ToggleStoryTeller(gameId, userId);
+        _ = await Sut.ToggleStoryTeller(GameId, UserId);
 
         user.Verify(o => o.DoesUserHaveRole(roleId), Times.Once);
     }
@@ -273,63 +264,57 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task ToggleStoryTeller_AddsUserToGame_WhenUserNotInGameState()
     {
-        const string gameId = "this-game";
-        const ulong userId = 1L;
-        const ulong guildId = 2L;
         const ulong roleId = 3L;
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
         var gameState = new GameState
         {
-            GuildId = guildId.ToString(),
+            GuildId = GuildId.ToString(),
             Users = []
         };
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(gameState);
-        _mockBot.Setup(o => o.GetGuild(guildId)).Returns(guild.Object);
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
-        guild.Setup(o => o.GetUser(userId)).Returns(user.Object);
+        guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         role.Setup(o => o.Id).Returns(roleId);
-        user.Setup(o => o.Id).Returns(userId);
+        user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.Roles).Returns([]);
 
-        _ = await Sut.ToggleStoryTeller(gameId, userId);
+        _ = await Sut.ToggleStoryTeller(GameId, UserId);
 
-        _mockGameStateStore.Verify(o => o.Get(gameId), Times.Exactly(2));
-        _mockGameStateStore.Verify(o => o.AddUserToGame(gameId, It.Is<GameUser>(g => g.Id == userId.ToString())), Times.Once);
+        _mockGameStateStore.Verify(o => o.Get(GameId), Times.Exactly(2));
+        _mockGameStateStore.Verify(o => o.AddUserToGame(GameId, It.Is<GameUser>(g => g.Id == UserId.ToString())), Times.Once);
     }
 
     [TestMethod]
     public async Task ToggleStoryTeller_DoesNotUserToGame_WhenUserIsInGameState()
     {
-        const string gameId = "this-game";
-        const ulong userId = 1L;
-        const ulong guildId = 2L;
         const ulong roleId = 3L;
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
         var gameState = new GameState
         {
-            GuildId = guildId.ToString(),
+            GuildId = GuildId.ToString(),
             Users =
             [
-                new GameUser(userId.ToString(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString())
+                new GameUser(UserId.ToString(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString())
             ]
         };
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(gameState);
-        _mockBot.Setup(o => o.GetGuild(guildId)).Returns(guild.Object);
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
-        guild.Setup(o => o.GetUser(userId)).Returns(user.Object);
+        guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         role.Setup(o => o.Id).Returns(roleId);
-        user.Setup(o => o.Id).Returns(userId);
+        user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.Roles).Returns([]);
 
-        _ = await Sut.ToggleStoryTeller(gameId, userId);
+        _ = await Sut.ToggleStoryTeller(GameId, UserId);
 
-        _mockGameStateStore.Verify(o => o.Get(gameId), Times.Exactly(2));
+        _mockGameStateStore.Verify(o => o.Get(GameId), Times.Exactly(2));
         _mockGameStateStore.Verify(o => o.AddUserToGame(It.IsAny<string>(), It.IsAny<GameUser>()), Times.Never);
     }
 
@@ -337,36 +322,33 @@ public class DiscordTownServiceTests
     public async Task ToggleStoryTeller_AddsStoryTellerRole_WhenUserIsNotStoryTeller()
     {
         const string displayName = "displayName";
-        const string gameId = "this-game";
-        const ulong userId = 1L;
-        const ulong guildId = 2L;
         const ulong roleId = 3L;
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
         var gameState = new GameState
         {
-            GuildId = guildId.ToString(),
+            GuildId = GuildId.ToString(),
             Users =
             [
-                new GameUser(userId.ToString(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString())
+                new GameUser(UserId.ToString(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString())
             ]
         };
 
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(gameState);
-        _mockBot.Setup(o => o.GetGuild(guildId)).Returns(guild.Object);
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
-        guild.Setup(o => o.GetUser(userId)).Returns(user.Object);
+        guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         role.Setup(o => o.Id).Returns(roleId);
-        user.Setup(o => o.Id).Returns(userId);
+        user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.DisplayName).Returns(displayName);
         user.Setup(o => o.DoesUserHaveRole(roleId)).Returns(false);
 
-        var result = await Sut.ToggleStoryTeller(gameId, userId);
+        var result = await Sut.ToggleStoryTeller(GameId, UserId);
 
         user.Verify(o => o.AddRoleAsync(role.Object), Times.Once);
-        _mockGameStateStore.Verify(o => o.UpdateUser(gameId, userId, UserType.StoryTeller), Times.Once);
+        _mockGameStateStore.Verify(o => o.UpdateUser(GameId, UserId, UserType.StoryTeller), Times.Once);
 
         result.success.Should().BeTrue();
         result.message.Should().Be($"User {displayName} is now a {StoryTellerRoleName}");
@@ -376,36 +358,33 @@ public class DiscordTownServiceTests
     public async Task ToggleStoryTeller_RemovesStoryTellerRole_WhenUserIsStoryTeller()
     {
         const string displayName = "displayName";
-        const string gameId = "this-game";
-        const ulong userId = 1L;
-        const ulong guildId = 2L;
         const ulong roleId = 3L;
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
         var gameState = new GameState
         {
-            GuildId = guildId.ToString(),
+            GuildId = GuildId.ToString(),
             Users =
             [
-                new GameUser(userId.ToString(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString())
+                new GameUser(UserId.ToString(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString())
             ]
         };
 
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(gameState);
-        _mockBot.Setup(o => o.GetGuild(guildId)).Returns(guild.Object);
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
-        guild.Setup(o => o.GetUser(userId)).Returns(user.Object);
+        guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         role.Setup(o => o.Id).Returns(roleId);
-        user.Setup(o => o.Id).Returns(userId);
+        user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.DisplayName).Returns(displayName);
         user.Setup(o => o.DoesUserHaveRole(roleId)).Returns(true);
 
-        var result = await Sut.ToggleStoryTeller(gameId, userId);
+        var result = await Sut.ToggleStoryTeller(GameId, UserId);
 
         user.Verify(o => o.RemoveRoleAsync(role.Object), Times.Once);
-        _mockGameStateStore.Verify(o => o.UpdateUser(gameId, userId, UserType.Spectator), Times.Once);
+        _mockGameStateStore.Verify(o => o.UpdateUser(GameId, UserId, UserType.Spectator), Times.Once);
 
         result.success.Should().BeTrue();
         result.message.Should().Be($"User {displayName} is no longer a {StoryTellerRoleName}");
@@ -415,11 +394,9 @@ public class DiscordTownServiceTests
     public async Task ToggleStoryTeller_ReturnsFalse_WhenExceptionThrown()
     {
         const string exceptionMessage = "exceptionMessage";
-        const string gameId = "this-game";
-        const ulong userId = 1L;
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Throws(new Exception(exceptionMessage));
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Throws(new Exception(exceptionMessage));
 
-        var result = await Sut.ToggleStoryTeller(gameId, userId);
+        var result = await Sut.ToggleStoryTeller(GameId, UserId);
 
         result.success.Should().BeFalse();
         result.message.Should().Be(exceptionMessage);
@@ -432,13 +409,12 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetJoinData_ReturnsNull_WhenKeyNotFound()
     {
-        const string key = "this-key";
         object invalidValue = null!;
-        _mockCache.Setup(o => o.TryGetValue($"join_data_{key}", out invalidValue!)).Returns(false);
+        _mockCache.Setup(o => o.TryGetValue($"join_data_{Key}", out invalidValue!)).Returns(false);
 
-        var result = Sut.GetJoinData(key);
+        var result = Sut.GetJoinData(Key);
 
-        _mockCache.Verify(o => o.TryGetValue($"join_data_{key}", out It.Ref<object?>.IsAny), Times.Once);
+        _mockCache.Verify(o => o.TryGetValue($"join_data_{Key}", out It.Ref<object?>.IsAny), Times.Once);
         result.Should().BeNull();
     }
 
@@ -446,11 +422,10 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetJoinData_ReturnsNull_WhenCacheValueInvalid()
     {
-        const string key = "this-key";
         object invalidValue = "not-a-user-join-data-object";
-        _mockCache.Setup(o => o.TryGetValue($"join_data_{key}", out invalidValue!)).Returns(true);
+        _mockCache.Setup(o => o.TryGetValue($"join_data_{Key}", out invalidValue!)).Returns(true);
 
-        var result = Sut.GetJoinData(key);
+        var result = Sut.GetJoinData(Key);
 
         result.Should().BeNull();
     }
@@ -458,15 +433,14 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetJoinData_CallsCacheRemove_UpdatesGame_ReturnsData_WhenCacheValueFound()
     {
-        const string key = "this-key";
         var joinData = new JoinData(CommonMethods.GetRandomString(), CommonMethods.GetRandomGameUser(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString());
         object joinDataObj = joinData;
-        _mockCache.Setup(o => o.TryGetValue($"join_data_{key}", out joinDataObj!)).Returns(true);
+        _mockCache.Setup(o => o.TryGetValue($"join_data_{Key}", out joinDataObj!)).Returns(true);
 
-        var result = Sut.GetJoinData(key);
+        var result = Sut.GetJoinData(Key);
 
         _mockGameStateStore.Verify(o => o.UpdateUser(joinData.GameId, ulong.Parse(joinData.User.Id), null, true), Times.Once());
-        _mockCache.Verify(o => o.Remove($"join_data_{key}"), Times.Once);
+        _mockCache.Verify(o => o.Remove($"join_data_{Key}"), Times.Once);
         result.Should().Be(joinData);
     }
 
@@ -484,50 +458,6 @@ public class DiscordTownServiceTests
 
     #endregion
 
-    #region SetTime
-
-    [TestMethod]
-    public async Task SetTime_ReturnsFalse_WhenGameNotFound()
-    {
-        const string gameId = "game-id";
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns((GameState?)null);
-
-        var result = await Sut.SetTime(gameId, GameTime.Evening);
-
-        result.success.Should().BeFalse();
-        result.message.Should().Be("Game not found");
-    }
-
-    [TestMethod]
-    [DynamicData(nameof(GetGameTimeValues))]
-    public async Task SetTime_SetsTime_NotifyClients_WhenDataGood(GameTime gameTime)
-    {
-        const string gameId = "game-id";
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = GuildId.ToString() });
-
-        var result = await Sut.SetTime(gameId, gameTime);
-
-        _mockGameStateStore.Verify(o => o.SetTime(gameId, gameTime), Times.Once);
-        _mockNotificationService.Verify(o => o.BroadcastTownTime(gameId, gameTime), Times.Once);
-        result.success.Should().BeTrue();
-        result.message.Should().Be($"Time set to {gameTime}");
-    }
-
-    [TestMethod]
-    public async Task SetTime_ReturnsFalse_WhenExceptionThrown()
-    {
-        const string gameId = "game-id";
-        const string message = "message";
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Throws(new Exception(message));
-
-        var result = await Sut.SetTime(gameId, GameTime.Evening);
-
-        result.success.Should().BeFalse();
-        result.message.Should().Be(message);
-    }
-
-    #endregion
-
     #region DeleteTown
 
     [TestMethod]
@@ -538,29 +468,27 @@ public class DiscordTownServiceTests
         var result = await Sut.DeleteTown(GuildId);
 
         result.success.Should().BeFalse();
-        result.message.Should().Be("Guild not found");
+        result.message.Should().Be(GuildNotFoundMessage);
     }
 
     [TestMethod]
     public async Task DeleteTown_ReturnsTrue_WhenGuildFound()
     {
-        const string dayCategoryName = "dayCategoryName";
-        const string nightCategoryName = "nightCategoryName";
         var guild = new Mock<IDiscordGuild>();
         var dayCategory = new Mock<IDiscordCategoryChannel>();
         var nightCategory = new Mock<IDiscordCategoryChannel>();
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
-        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(dayCategoryName);
-        _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(nightCategoryName);
+        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategoryName);
+        _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategoryName);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
-        guild.Setup(o => o.GetCategoryChannelByName(dayCategoryName)).Returns(dayCategory.Object);
-        guild.Setup(o => o.GetCategoryChannelByName(nightCategoryName)).Returns(nightCategory.Object);
+        guild.Setup(o => o.GetCategoryChannelByName(DayCategoryName)).Returns(dayCategory.Object);
+        guild.Setup(o => o.GetCategoryChannelByName(NightCategoryName)).Returns(nightCategory.Object);
 
         var result = await Sut.DeleteTown(GuildId);
 
-        guild.Verify(o => o.GetCategoryChannelByName(dayCategoryName), Times.Once);
+        guild.Verify(o => o.GetCategoryChannelByName(DayCategoryName), Times.Once);
         dayCategory.Verify(o => o.DeleteAsync(), Times.Once);
-        guild.Verify(o => o.GetCategoryChannelByName(nightCategoryName), Times.Once);
+        guild.Verify(o => o.GetCategoryChannelByName(NightCategoryName), Times.Once);
         nightCategory.Verify(o => o.DeleteAsync(), Times.Once);
         guild.Verify(o => o.DeleteRoleAsync(StoryTellerRoleName), Times.Once);
         result.success.Should().BeTrue();
@@ -570,13 +498,12 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task DeleteTown_ReturnsFalse_WhenExceptionThrown()
     {
-        const string message = "message";
-        _mockBot.Setup(o => o.GetGuild(GuildId)).Throws(new Exception(message));
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Throws(new Exception(ExceptionMessage));
 
         var result = await Sut.DeleteTown(GuildId);
 
         result.success.Should().BeFalse();
-        result.message.Should().Be(message);
+        result.message.Should().Be(ExceptionMessage);
     }
 
     #endregion
@@ -591,19 +518,18 @@ public class DiscordTownServiceTests
         var result = await Sut.CreateTown(GuildId);
 
         result.success.Should().BeFalse();
-        result.message.Should().Be("Guild not found");
+        result.message.Should().Be(GuildNotFoundMessage);
     }
 
     [TestMethod]
     public async Task CreateTown_ReturnsFalse_WhenExceptionThrown()
     {
-        const string message = "message";
-        _mockBot.Setup(o => o.GetGuild(GuildId)).Throws(new Exception(message));
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Throws(new Exception(ExceptionMessage));
 
         var result = await Sut.CreateTown(GuildId);
 
         result.success.Should().BeFalse();
-        result.message.Should().Be(message);
+        result.message.Should().Be(ExceptionMessage);
     }
 
     [TestMethod]
@@ -626,25 +552,23 @@ public class DiscordTownServiceTests
     public async Task CreateTown_ReturnsFalse_WhenDayChannelsNotCreated()
     {
         var roleColor = Color.Gold;
-        const string dayCategoryName = "dayCategoryName";
-        var dayChannelNames = new[] { "day-1", "day-2", "day-3" };
         const ulong dayCategoryId = 10L;
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var dayCategory = new Mock<IDiscordRestCategoryChannel>();
         dayCategory.Setup(o => o.Id).Returns(dayCategoryId);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
-        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(dayCategoryName);
-        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(dayChannelNames);
+        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategoryName);
+        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(DayChannelNames);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.CreateRoleAsync(StoryTellerRoleName, roleColor)).ReturnsAsync(role.Object);
-        guild.Setup(o => o.CreateCategoryAsync(dayCategoryName, everyoneCanSee: true)).ReturnsAsync(dayCategory.Object);
-        guild.Setup(o => o.CreateVoiceChannelsForCategoryAsync(dayChannelNames, dayCategoryId)).ReturnsAsync(false);
+        guild.Setup(o => o.CreateCategoryAsync(DayCategoryName, everyoneCanSee: true)).ReturnsAsync(dayCategory.Object);
+        guild.Setup(o => o.CreateVoiceChannelsForCategoryAsync(DayChannelNames, dayCategoryId)).ReturnsAsync(false);
 
         var result = await Sut.CreateTown(GuildId);
 
-        guild.Verify(o => o.CreateCategoryAsync(dayCategoryName, everyoneCanSee: true), Times.Once);
-        guild.Verify(o => o.CreateVoiceChannelsForCategoryAsync(dayChannelNames, dayCategoryId), Times.Once);
+        guild.Verify(o => o.CreateCategoryAsync(DayCategoryName, everyoneCanSee: true), Times.Once);
+        guild.Verify(o => o.CreateVoiceChannelsForCategoryAsync(DayChannelNames, dayCategoryId), Times.Once);
         result.success.Should().BeFalse();
         result.message.Should().Be("Failed to generate day channels");
     }
@@ -653,10 +577,6 @@ public class DiscordTownServiceTests
     public async Task CreateTown_ReturnsFalse_WhenNightChannelsNotCreated()
     {
         var roleColor = Color.Gold;
-        const string dayCategoryName = "dayCategoryName";
-        const string nightCategoryName = "nightCategoryName";
-        var dayChannelNames = new[] { "day-1", "day-2", "day-3" };
-        var nightChannelNames = new[] { "night-1", "night-2", "night-3" };
         const ulong dayCategoryId = 10L;
         const ulong nightCategoryId = 20L;
         var guild = new Mock<IDiscordGuild>();
@@ -666,21 +586,21 @@ public class DiscordTownServiceTests
         dayCategory.Setup(o => o.Id).Returns(dayCategoryId);
         nightCategory.Setup(o => o.Id).Returns(nightCategoryId);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
-        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(dayCategoryName);
-        _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(nightCategoryName);
-        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(dayChannelNames);
-        _mockDiscordConstants.Setup(o => o.GetNightRoomNames()).Returns(nightChannelNames);
+        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategoryName);
+        _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategoryName);
+        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(DayChannelNames);
+        _mockDiscordConstants.Setup(o => o.GetNightRoomNames()).Returns(NightChannelNames);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.CreateRoleAsync(StoryTellerRoleName, roleColor)).ReturnsAsync(role.Object);
-        guild.Setup(o => o.CreateCategoryAsync(dayCategoryName, everyoneCanSee: true)).ReturnsAsync(dayCategory.Object);
-        guild.Setup(o => o.CreateCategoryAsync(nightCategoryName, everyoneCanSee: false, role.Object)).ReturnsAsync(nightCategory.Object);
-        guild.Setup(o => o.CreateVoiceChannelsForCategoryAsync(dayChannelNames, dayCategoryId)).ReturnsAsync(true);
-        guild.Setup(o => o.CreateVoiceChannelsForCategoryAsync(nightChannelNames, nightCategoryId)).ReturnsAsync(false);
+        guild.Setup(o => o.CreateCategoryAsync(DayCategoryName, everyoneCanSee: true)).ReturnsAsync(dayCategory.Object);
+        guild.Setup(o => o.CreateCategoryAsync(NightCategoryName, everyoneCanSee: false, role.Object)).ReturnsAsync(nightCategory.Object);
+        guild.Setup(o => o.CreateVoiceChannelsForCategoryAsync(DayChannelNames, dayCategoryId)).ReturnsAsync(true);
+        guild.Setup(o => o.CreateVoiceChannelsForCategoryAsync(NightChannelNames, nightCategoryId)).ReturnsAsync(false);
 
         var result = await Sut.CreateTown(GuildId);
 
-        guild.Verify(o => o.CreateCategoryAsync(nightCategoryName, everyoneCanSee: false, role.Object), Times.Once);
-        guild.Verify(o => o.CreateVoiceChannelsForCategoryAsync(nightChannelNames, nightCategoryId), Times.Once);
+        guild.Verify(o => o.CreateCategoryAsync(NightCategoryName, everyoneCanSee: false, role.Object), Times.Once);
+        guild.Verify(o => o.CreateVoiceChannelsForCategoryAsync(NightChannelNames, nightCategoryId), Times.Once);
         result.success.Should().BeFalse();
         result.message.Should().Be("Failed to generate night channels");
     }
@@ -689,10 +609,6 @@ public class DiscordTownServiceTests
     public async Task CreateTown_ReturnsTrue_WhenChannelsCreated()
     {
         var roleColor = Color.Gold;
-        const string dayCategoryName = "dayCategoryName";
-        const string nightCategoryName = "nightCategoryName";
-        var dayChannelNames = new[] { "day-1", "day-2", "day-3" };
-        var nightChannelNames = new[] { "night-1", "night-2", "night-3" };
         const ulong dayCategoryId = 10L;
         const ulong nightCategoryId = 20L;
         var guild = new Mock<IDiscordGuild>();
@@ -702,16 +618,16 @@ public class DiscordTownServiceTests
         dayCategory.Setup(o => o.Id).Returns(dayCategoryId);
         nightCategory.Setup(o => o.Id).Returns(nightCategoryId);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
-        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(dayCategoryName);
-        _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(nightCategoryName);
-        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(dayChannelNames);
-        _mockDiscordConstants.Setup(o => o.GetNightRoomNames()).Returns(nightChannelNames);
+        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategoryName);
+        _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategoryName);
+        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(DayChannelNames);
+        _mockDiscordConstants.Setup(o => o.GetNightRoomNames()).Returns(NightChannelNames);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.CreateRoleAsync(StoryTellerRoleName, roleColor)).ReturnsAsync(role.Object);
-        guild.Setup(o => o.CreateCategoryAsync(dayCategoryName, everyoneCanSee: true)).ReturnsAsync(dayCategory.Object);
-        guild.Setup(o => o.CreateCategoryAsync(nightCategoryName, everyoneCanSee: false, role.Object)).ReturnsAsync(nightCategory.Object);
-        guild.Setup(o => o.CreateVoiceChannelsForCategoryAsync(dayChannelNames, dayCategoryId)).ReturnsAsync(true);
-        guild.Setup(o => o.CreateVoiceChannelsForCategoryAsync(nightChannelNames, nightCategoryId)).ReturnsAsync(true);
+        guild.Setup(o => o.CreateCategoryAsync(DayCategoryName, everyoneCanSee: true)).ReturnsAsync(dayCategory.Object);
+        guild.Setup(o => o.CreateCategoryAsync(NightCategoryName, everyoneCanSee: false, role.Object)).ReturnsAsync(nightCategory.Object);
+        guild.Setup(o => o.CreateVoiceChannelsForCategoryAsync(DayChannelNames, dayCategoryId)).ReturnsAsync(true);
+        guild.Setup(o => o.CreateVoiceChannelsForCategoryAsync(NightChannelNames, nightCategoryId)).ReturnsAsync(true);
 
         var result = await Sut.CreateTown(GuildId);
 
@@ -745,7 +661,7 @@ public class DiscordTownServiceTests
 
         success.Should().BeFalse();
         exists.Should().BeFalse();
-        message.Should().Be("Guild not found");
+        message.Should().Be(GuildNotFoundMessage);
     }
 
     [TestMethod]
@@ -766,16 +682,14 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetTownStatus_ReturnsFalse_WhenDayCategoryMissing()
     {
-        const string dayCategoryName = "dayCategoryName";
-        var dayChannelNames = new[] { "day-1", "day-2", "day-3" };
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
-        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(dayCategoryName);
-        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(dayChannelNames);
+        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategoryName);
+        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(DayChannelNames);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
-        guild.Setup(o => o.GetCategoryChannelByName(dayCategoryName)).Returns((IDiscordCategoryChannel?)null);
+        guild.Setup(o => o.GetCategoryChannelByName(DayCategoryName)).Returns((IDiscordCategoryChannel?)null);
 
         var (success, exists, message) = Sut.GetTownStatus(GuildId);
 
@@ -787,18 +701,16 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetTownStatus_ReturnsFalse_WhenDayChannelsNotMatch()
     {
-        const string dayCategoryName = "dayCategoryName";
-        var dayChannelNames = new[] { "day-1", "day-2", "day-3" };
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var dayCategory = new Mock<IDiscordCategoryChannel>();
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
-        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(dayCategoryName);
-        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(dayChannelNames);
+        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategoryName);
+        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(DayChannelNames);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
-        guild.Setup(o => o.GetCategoryChannelByName(dayCategoryName)).Returns(dayCategory.Object);
-        dayCategory.Setup(o => o.VerifyCategoryChannels(dayChannelNames)).Returns(false);
+        guild.Setup(o => o.GetCategoryChannelByName(DayCategoryName)).Returns(dayCategory.Object);
+        dayCategory.Setup(o => o.VerifyCategoryChannels(DayChannelNames)).Returns(false);
 
         var (success, exists, message) = Sut.GetTownStatus(GuildId);
 
@@ -810,21 +722,18 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetTownStatus_ReturnsFalse_WhenNightCategoryMissing()
     {
-        const string dayCategoryName = "dayCategoryName";
-        const string nightCategoryName = "nightCategoryName";
-        var dayChannelNames = new[] { "day-1", "day-2", "day-3" };
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var dayCategory = new Mock<IDiscordCategoryChannel>();
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
-        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(dayCategoryName);
-        _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(nightCategoryName);
-        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(dayChannelNames);
+        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategoryName);
+        _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategoryName);
+        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(DayChannelNames);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
-        guild.Setup(o => o.GetCategoryChannelByName(dayCategoryName)).Returns(dayCategory.Object);
-        dayCategory.Setup(o => o.VerifyCategoryChannels(dayChannelNames)).Returns(true);
-        guild.Setup(o => o.GetCategoryChannelByName(nightCategoryName)).Returns((IDiscordCategoryChannel?)null);
+        guild.Setup(o => o.GetCategoryChannelByName(DayCategoryName)).Returns(dayCategory.Object);
+        dayCategory.Setup(o => o.VerifyCategoryChannels(DayChannelNames)).Returns(true);
+        guild.Setup(o => o.GetCategoryChannelByName(NightCategoryName)).Returns((IDiscordCategoryChannel?)null);
 
         var (success, exists, message) = Sut.GetTownStatus(GuildId);
 
@@ -836,25 +745,21 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetTownStatus_ReturnsFalse_WhenNightChannelsNotMatch()
     {
-        const string dayCategoryName = "dayCategoryName";
-        const string nightCategoryName = "nightCategoryName";
-        var dayChannelNames = new[] { "day-1", "day-2", "day-3" };
-        var nightChannelNames = new[] { "night-1", "night-2", "night-3" };
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var dayCategory = new Mock<IDiscordCategoryChannel>();
         var nightCategory = new Mock<IDiscordCategoryChannel>();
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
-        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(dayCategoryName);
-        _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(nightCategoryName);
-        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(dayChannelNames);
-        _mockDiscordConstants.Setup(o => o.GetNightRoomNames()).Returns(nightChannelNames);
+        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategoryName);
+        _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategoryName);
+        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(DayChannelNames);
+        _mockDiscordConstants.Setup(o => o.GetNightRoomNames()).Returns(NightChannelNames);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
-        guild.Setup(o => o.GetCategoryChannelByName(dayCategoryName)).Returns(dayCategory.Object);
-        dayCategory.Setup(o => o.VerifyCategoryChannels(dayChannelNames)).Returns(true);
-        guild.Setup(o => o.GetCategoryChannelByName(nightCategoryName)).Returns(nightCategory.Object);
-        nightCategory.Setup(o => o.VerifyCategoryChannels(nightChannelNames)).Returns(false);
+        guild.Setup(o => o.GetCategoryChannelByName(DayCategoryName)).Returns(dayCategory.Object);
+        dayCategory.Setup(o => o.VerifyCategoryChannels(DayChannelNames)).Returns(true);
+        guild.Setup(o => o.GetCategoryChannelByName(NightCategoryName)).Returns(nightCategory.Object);
+        nightCategory.Setup(o => o.VerifyCategoryChannels(NightChannelNames)).Returns(false);
 
         var (success, exists, message) = Sut.GetTownStatus(GuildId);
 
@@ -866,25 +771,21 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetTownStatus_ReturnsTrue_WhenTownStructureCorrect()
     {
-        const string dayCategoryName = "dayCategoryName";
-        const string nightCategoryName = "nightCategoryName";
-        var dayChannelNames = new[] { "day-1", "day-2", "day-3" };
-        var nightChannelNames = new[] { "night-1", "night-2", "night-3" };
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var dayCategory = new Mock<IDiscordCategoryChannel>();
         var nightCategory = new Mock<IDiscordCategoryChannel>();
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
-        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(dayCategoryName);
-        _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(nightCategoryName);
-        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(dayChannelNames);
-        _mockDiscordConstants.Setup(o => o.GetNightRoomNames()).Returns(nightChannelNames);
+        _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategoryName);
+        _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategoryName);
+        _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(DayChannelNames);
+        _mockDiscordConstants.Setup(o => o.GetNightRoomNames()).Returns(NightChannelNames);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
-        guild.Setup(o => o.GetCategoryChannelByName(dayCategoryName)).Returns(dayCategory.Object);
-        dayCategory.Setup(o => o.VerifyCategoryChannels(dayChannelNames)).Returns(true);
-        guild.Setup(o => o.GetCategoryChannelByName(nightCategoryName)).Returns(nightCategory.Object);
-        nightCategory.Setup(o => o.VerifyCategoryChannels(nightChannelNames)).Returns(true);
+        guild.Setup(o => o.GetCategoryChannelByName(DayCategoryName)).Returns(dayCategory.Object);
+        dayCategory.Setup(o => o.VerifyCategoryChannels(DayChannelNames)).Returns(true);
+        guild.Setup(o => o.GetCategoryChannelByName(NightCategoryName)).Returns(nightCategory.Object);
+        nightCategory.Setup(o => o.VerifyCategoryChannels(NightChannelNames)).Returns(true);
 
         var (success, exists, message) = Sut.GetTownStatus(GuildId);
 
@@ -933,7 +834,7 @@ public class DiscordTownServiceTests
 
         success.Should().BeFalse();
         townOccupants.Should().Be(null);
-        message.Should().Be("Guild not found");
+        message.Should().Be(GuildNotFoundMessage);
     }
 
     [TestMethod]
@@ -965,7 +866,6 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task GetTownOccupancy_NotifiesClients_WhenGameFound()
     {
-        const string gameId = "game-id";
         var guild = new Mock<IDiscordGuild>();
         var expectedTownOccupants = GetDummyTownOccupants();
         _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategory.Name);
@@ -974,7 +874,7 @@ public class DiscordTownServiceTests
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetMiniCategory(DayCategory.Name)).Returns(DayCategory);
         guild.Setup(o => o.GetMiniCategory(NightCategory.Name)).Returns(NightCategory);
-        _mockGameStateStore.Setup(o => o.GetGuildGames(GuildId)).Returns([new GameState { Id = gameId }]);
+        _mockGameStateStore.Setup(o => o.GetGuildGames(GuildId)).Returns([new GameState { Id = GameId }]);
 
         TownOccupants? capturedTownOccupants = null;
         _mockNotificationService.Setup(o =>
@@ -983,14 +883,13 @@ public class DiscordTownServiceTests
 
         _ = await Sut.GetTownOccupancy(GuildId);
 
-        _mockNotificationService.Verify(o => o.BroadcastTownOccupancyUpdate(gameId, It.IsAny<TownOccupants>()), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastTownOccupancyUpdate(GameId, It.IsAny<TownOccupants>()), Times.Once);
         capturedTownOccupants.Should().BeEquivalentTo(expectedTownOccupants);
     }
 
     [TestMethod]
     public async Task GetTownOccupancy_DoesNotNotifyClients_WhenNoGameFound()
     {
-        const string gameId = "game-id";
         var guild = new Mock<IDiscordGuild>();
         _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategory.Name);
         _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategory.Name);
@@ -1002,7 +901,7 @@ public class DiscordTownServiceTests
 
         _ = await Sut.GetTownOccupancy(GuildId);
 
-        _mockNotificationService.Verify(o => o.BroadcastTownOccupancyUpdate(gameId, It.IsAny<TownOccupants>()), Times.Never);
+        _mockNotificationService.Verify(o => o.BroadcastTownOccupancyUpdate(GameId, It.IsAny<TownOccupants>()), Times.Never);
     }
 
     #endregion
@@ -1012,10 +911,9 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_ReturnsError_WhenExceptionThrown()
     {
-        const string gameId = "game-id";
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Throws<Exception>();
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Throws<Exception>();
 
-        var (outcome, message) = await Sut.InviteUser(gameId, UserId);
+        var (outcome, message) = await Sut.InviteUser(GameId, UserId);
 
         outcome.Should().Be(InviteUserOutcome.UnknownError);
         message.Should().Be("Failed to send message to user");
@@ -1024,22 +922,20 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_ReturnsError_WhenGameNotFound()
     {
-        const string gameId = "game-id";
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns((GameState?)null);
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns((GameState?)null);
 
-        var (outcome, message) = await Sut.InviteUser(gameId, UserId);
+        var (outcome, message) = await Sut.InviteUser(GameId, UserId);
 
         outcome.Should().Be(InviteUserOutcome.GameDoesNotExistError);
-        message.Should().Be($"Couldn't find game with id: {gameId}");
+        message.Should().Be($"Couldn't find game with id: {GameId}");
     }
 
     [TestMethod]
     public async Task InviteUser_ReturnsError_WhenGuildIdInvalid()
     {
-        const string gameId = "this-game";
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = "invalid-guild" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "invalid-guild" });
 
-        var (outcome, message) = await Sut.InviteUser(gameId, UserId);
+        var (outcome, message) = await Sut.InviteUser(GameId, UserId);
 
         outcome.Should().Be(InviteUserOutcome.InvalidGuildError);
         message.Should().Be("GameState contained a guildId that could not be found");
@@ -1048,11 +944,10 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_ReturnsError_WhenGuildNotFound()
     {
-        const string gameId = "this-game";
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns((IDiscordGuild?)null);
 
-        var (outcome, message) = await Sut.InviteUser(gameId, UserId);
+        var (outcome, message) = await Sut.InviteUser(GameId, UserId);
 
         _mockBot.Verify(o => o.GetGuild(GuildId), Times.Once);
         outcome.Should().Be(InviteUserOutcome.InvalidGuildError);
@@ -1062,13 +957,12 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_ReturnsError_WhenUserNotFound()
     {
-        const string gameId = "this-game";
         var guild = new Mock<IDiscordGuild>();
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(UserId)).Returns((IDiscordGuildUser?)null);
 
-        var (outcome, message) = await Sut.InviteUser(gameId, UserId);
+        var (outcome, message) = await Sut.InviteUser(GameId, UserId);
 
         guild.Verify(o => o.GetUser(UserId), Times.Once);
         outcome.Should().Be(InviteUserOutcome.UserNotFoundError);
@@ -1078,16 +972,15 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_ReturnsError_WhenDmChannelErrors()
     {
-        const string gameId = "this-game";
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.CreateDmChannelAsync()).ReturnsAsync((IDiscordDmChannel?)null);
 
-        var (outcome, message) = await Sut.InviteUser(gameId, UserId);
+        var (outcome, message) = await Sut.InviteUser(GameId, UserId);
 
         user.Verify(o => o.CreateDmChannelAsync(), Times.Once);
         outcome.Should().Be(InviteUserOutcome.DmChannelError);
@@ -1097,19 +990,17 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_GetsJwtToken_WhenDataGood()
     {
-        const string gameId = "this-game";
-        const string jwt = "jwt-token";
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.CreateDmChannelAsync()).ReturnsAsync(dmChannel.Object);
-        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player))).Returns(jwt);
+        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player))).Returns(Jwt);
 
-        _ = await Sut.InviteUser(gameId, UserId);
+        _ = await Sut.InviteUser(GameId, UserId);
 
         _mockJwtWriter.Verify(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player)), Times.Once);
     }
@@ -1117,21 +1008,18 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_GeneratesId_WhenGotJwt()
     {
-        const string gameId = "this-game";
-        const string jwt = "jwt-token";
-        const string key = "this-key";
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.CreateDmChannelAsync()).ReturnsAsync(dmChannel.Object);
-        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player))).Returns(jwt);
-        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(key);
+        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player))).Returns(Jwt);
+        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(Key);
 
-        _ = await Sut.InviteUser(gameId, UserId);
+        _ = await Sut.InviteUser(GameId, UserId);
 
         _mockIdGenerator.Verify(o => o.GenerateId(), Times.Once);
     }
@@ -1139,62 +1027,53 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_SetsCache_WhenGotKey()
     {
-        const string gameId = "this-game";
-        const string jwt = "jwt-token";
-        const string key = "this-key";
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.CreateDmChannelAsync()).ReturnsAsync(dmChannel.Object);
-        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player))).Returns(jwt);
-        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(key);
+        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player))).Returns(Jwt);
+        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(Key);
         var mockCacheEntry = new Mock<ICacheEntry>();
         _mockCache.Setup(o => o.CreateEntry(It.IsAny<object>())).Returns(mockCacheEntry.Object);
 
-        _ = await Sut.InviteUser(gameId, UserId);
+        _ = await Sut.InviteUser(GameId, UserId);
 
-        _mockCache.Verify(o => o.CreateEntry(It.Is<object>(e => e.ToString() == $"join_data_{key}")), Times.Once);
-        mockCacheEntry.VerifySet(entry => entry.Value = It.Is<JoinData>(u => u.Jwt == jwt && u.User.Id == UserId.ToString()), Times.Once);
+        _mockCache.Verify(o => o.CreateEntry(It.Is<object>(e => e.ToString() == $"join_data_{Key}")), Times.Once);
+        mockCacheEntry.VerifySet(entry => entry.Value = It.Is<JoinData>(u => u.Jwt == Jwt && u.User.Id == UserId.ToString()), Times.Once);
         mockCacheEntry.VerifySet(entry => entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5), Times.Once);
     }
 
     [TestMethod]
     public async Task InviteUser_SendsInvite_WhenDataGood()
     {
-        const string gameId = "this-game";
-        const string jwt = "jwt-token";
-        const string key = "this-key";
         const string feUri = "fe-uri";
         CommonMethods.SetUpMockSecrets(_mockSecrets, feUri: feUri);
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.CreateDmChannelAsync()).ReturnsAsync(dmChannel.Object);
-        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player))).Returns(jwt);
-        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(key);
+        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player))).Returns(Jwt);
+        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(Key);
         var mockCacheEntry = new Mock<ICacheEntry>();
         _mockCache.Setup(o => o.CreateEntry(It.IsAny<object>())).Returns(mockCacheEntry.Object);
 
-        var (outcome, message) = await Sut.InviteUser(gameId, UserId);
+        var (outcome, message) = await Sut.InviteUser(GameId, UserId);
 
-        dmChannel.Verify(o => o.SendMessageAsync($"[Join here]({feUri + $"/join?key={key}"})"), Times.Once);
-        _mockGameStateStore.Verify(o => o.AddUserToGame(gameId, It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player)), Times.Once);
+        dmChannel.Verify(o => o.SendMessageAsync($"[Join here]({feUri + $"/join?key={Key}"})"), Times.Once);
+        _mockGameStateStore.Verify(o => o.AddUserToGame(GameId, It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player)), Times.Once);
         outcome.Should().Be(InviteUserOutcome.InviteSent);
         message.Should().Be("Sent message to user");
     }
 
     #endregion
-
-
-    private static IEnumerable<object[]> GetGameTimeValues() => GetAllEnumValues<GameTime>();
 
     private static TownOccupants GetDummyTownOccupants()
     {

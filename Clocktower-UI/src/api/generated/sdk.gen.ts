@@ -304,18 +304,6 @@ export const pingUserApi = <ThrowOnError extends boolean = false>(options: Optio
 };
 
 /**
- * Sets the time of the town
- *
- * Sets the game state of the town based on the day time
- */
-export const setTimeApi = <ThrowOnError extends boolean = false>(options: Options<SetTimeApiData, ThrowOnError>) => {
-    return (options.client ?? client).post<SetTimeApiResponses, SetTimeApiErrors, ThrowOnError>({
-        url: '/api/discord/town/{gameId}/time',
-        ...options
-    });
-};
-
-/**
  * Toggles the storyteller role for a user
  *
  * Adds or removes the storyteller role for the specified user
@@ -383,6 +371,18 @@ export const getPlayerGamesApi = <ThrowOnError extends boolean = false>(options:
 export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?: Options<LoadDummyGamesApiData, ThrowOnError>) => {
     return (options?.client ?? client).post<LoadDummyGamesApiResponses, LoadDummyGamesApiErrors, ThrowOnError>({
         url: '/api/games/load',
+        ...options
+    });
+};
+
+/**
+ * Sets the time of the town
+ *
+ * Sets the game state of the town based on the day time
+ */
+export const setTimeApi = <ThrowOnError extends boolean = false>(options: Options<SetTimeApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetTimeApiResponses, SetTimeApiErrors, ThrowOnError>({
+        url: '/api/games/{gameId}/time',
         ...options
     });
 };

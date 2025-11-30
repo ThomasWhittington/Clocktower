@@ -145,7 +145,7 @@
     "tags": [],
     "title": "Add clocktower bot",
     "description": "Add clocktower bot functionality from the current one (move to town hall, go to bed etc)",
-    "status": "TODO",
+    "status": "IN_PROGRESS",
     "date": {
       "date": {
         "year": 2025,

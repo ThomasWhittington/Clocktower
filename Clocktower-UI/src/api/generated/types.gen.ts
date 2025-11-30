@@ -547,35 +547,6 @@ export type PingUserApiResponses = {
     200: unknown;
 };
 
-export type SetTimeApiData = {
-    body?: never;
-    path: {
-        gameId: string;
-    };
-    query: {
-        GameTime: ClocktowerServerDataTypesEnumGameTime;
-    };
-    url: '/api/discord/town/{gameId}/time';
-};
-
-export type SetTimeApiErrors = {
-    /**
-     * Bad Request
-     */
-    400: string;
-};
-
-export type SetTimeApiError = SetTimeApiErrors[keyof SetTimeApiErrors];
-
-export type SetTimeApiResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type SetTimeApiResponse = SetTimeApiResponses[keyof SetTimeApiResponses];
-
 export type ToggleStoryTellerApiData = {
     body?: never;
     path: {
@@ -716,6 +687,35 @@ export type LoadDummyGamesApiResponses = {
 };
 
 export type LoadDummyGamesApiResponse = LoadDummyGamesApiResponses[keyof LoadDummyGamesApiResponses];
+
+export type SetTimeApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query: {
+        GameTime: ClocktowerServerDataTypesEnumGameTime;
+    };
+    url: '/api/games/{gameId}/time';
+};
+
+export type SetTimeApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: string;
+};
+
+export type SetTimeApiError = SetTimeApiErrors[keyof SetTimeApiErrors];
+
+export type SetTimeApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetTimeApiResponse = SetTimeApiResponses[keyof SetTimeApiResponses];
 
 export type StartGameApiData = {
     body?: never;

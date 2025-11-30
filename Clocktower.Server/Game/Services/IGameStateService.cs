@@ -9,4 +9,5 @@ public interface IGameStateService
     IEnumerable<GameState> GetGuildGames(string guildId);
     IEnumerable<MiniGameState> GetPlayerGames(string userId);
     (bool success, string message) LoadDummyData(string filePath = "dummyState.json");
+    Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime);
 }

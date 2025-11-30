@@ -1,10 +1,11 @@
 ﻿using System.IO.Abstractions;
 using System.Text.Json;
 using Clocktower.Server.Common.Services;
+using Clocktower.Server.Socket;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, IFileSystem fileSystem) : IGameStateService
+public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, IFileSystem fileSystem, INotificationService notificationService) : IGameStateService
 {
     public IEnumerable<GameState> GetGames() =>
         gameStateStore.GetAll();
@@ -91,5 +92,22 @@ public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, I
         return addSuccessful
             ? (true, newGameState, "Game started successfully")
             : (false, null, $"Game Id '{gameId}' already exists");
+    }
+
+    public async Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime)
+    {
+        try
+        {
+            var gameState = gameStateStore.Get(gameId);
+            if (gameState is null) return (false, "Game not found");
+
+            gameStateStore.SetTime(gameId, gameTime);
+            await notificationService.BroadcastTownTime(gameId, gameTime);
+            return (true, $"Time set to {gameTime}");
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
     }
 }

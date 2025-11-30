@@ -1,5 +1,5 @@
 ﻿using Clocktower.Server.Data.Types.Enum;
-using Clocktower.Server.Discord.Town.Endpoints;
+using Clocktower.Server.Game.Endpoints;
 using FluentValidation.TestHelper;
 
 namespace Clocktower.ServerTests.Discord.Town.Endpoints.Validators;
