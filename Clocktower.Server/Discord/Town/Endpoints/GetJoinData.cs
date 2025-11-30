@@ -1,7 +1,6 @@
 ﻿using Clocktower.Server.Discord.Town.Services;
-using Microsoft.AspNetCore.Mvc;
 
-namespace Clocktower.Server.Discord.Auth.Endpoints;
+namespace Clocktower.Server.Discord.Town.Endpoints;
 
 [UsedImplicitly]
 public class GetJoinData : IEndpoint
@@ -14,7 +13,7 @@ public class GetJoinData : IEndpoint
             .WithDescription("Retrieves temporary join data by key");
     }
 
-    private static Results<Ok<JoinData>, NotFound> Handle(
+    internal static Results<Ok<JoinData>, NotFound> Handle(
         string key,
         [FromServices] IDiscordTownService discordTownService)
     {

@@ -17,21 +17,10 @@ public class Secrets
         if (string.IsNullOrWhiteSpace(ServerUri)) return (false, $"Missing {nameof(ServerUri)}");
         if (string.IsNullOrWhiteSpace(FeUri)) return (false, $"Missing {nameof(FeUri)}");
         var jwtResult = Jwt.HasAllSecrets();
-        if (!jwtResult.success) return (false, jwtResult.message);
-        return (true, string.Empty);
-    }
-}
-
-[UsedImplicitly]
-public class JwtSecrets
-{
-    [UsedImplicitly] public required string SigningKey { get; set; }
-    [UsedImplicitly] public required string Audience { get; set; }
-
-    public (bool success, string message) HasAllSecrets()
-    {
-        if (string.IsNullOrWhiteSpace(SigningKey)) return (false, $"Missing {nameof(SigningKey)}");
-        if (string.IsNullOrWhiteSpace(Audience)) return (false, $"Missing {nameof(Audience)}");
+        if (!jwtResult.success)
+        {
+            return (false, jwtResult.message);
+        }
         return (true, string.Empty);
     }
 }

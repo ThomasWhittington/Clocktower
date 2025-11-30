@@ -8,10 +8,18 @@ public class GuildIdRequestValidator : AbstractValidator<GuildIdRequest>
 {
     public GuildIdRequestValidator()
     {
-        RuleFor(x => x.GuildId)
-            .NotEmpty()
-            .WithMessage("GuildId cannot be empty")
-            .Must(Common.Validation.BeValidDiscordSnowflake)
-            .WithMessage("GuildId must be a valid Discord snowflake");
+        RuleFor(x => x.GuildId).MustBeValidSnowflake(nameof(GuildIdRequest.GuildId));
+    }
+}
+
+[UsedImplicitly]
+public record UserIdRequest(string UserId);
+
+[UsedImplicitly]
+public class UserIdRequestValidator : AbstractValidator<UserIdRequest>
+{
+    public UserIdRequestValidator()
+    {
+        RuleFor(x => x.UserId).MustBeValidSnowflake(nameof(UserIdRequest.UserId));
     }
 }

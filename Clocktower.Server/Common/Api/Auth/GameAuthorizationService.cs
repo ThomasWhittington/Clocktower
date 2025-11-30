@@ -2,11 +2,11 @@
 
 namespace Clocktower.Server.Common.Api.Auth;
 
-public class GameAuthorizationService : IGameAuthorizationService
+public class GameAuthorizationService(IGameStateStore gameStateStore) : IGameAuthorizationService
 {
-    public bool IsStoryTellerForGameAsync(string userId, string gameId)
+    public bool IsStoryTellerForGame(string userId, string gameId)
     {
-        var gameState = GameStateStore.Get(gameId);
+        var gameState = gameStateStore.Get(gameId);
         return gameState is not null && gameState.IsUserOfType(userId, UserType.StoryTeller);
     }
 }

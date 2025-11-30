@@ -1,5 +1,8 @@
-﻿namespace Clocktower.Server.Common.Api.Filters;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Clocktower.Server.Common.Api.Filters;
+
+[ExcludeFromCodeCoverage(Justification = "Too complex to mock. Tested implicitly")]
 public class RequestValidationFilter<TRequest>(ILogger<RequestValidationFilter<TRequest>> logger, IValidator<TRequest>? validator = null) : IEndpointFilter
 {
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)

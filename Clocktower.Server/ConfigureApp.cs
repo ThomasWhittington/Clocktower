@@ -1,9 +1,11 @@
-﻿using Clocktower.Server.Socket;
+﻿using System.Diagnostics.CodeAnalysis;
+using Clocktower.Server.Socket;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
 
 namespace Clocktower.Server;
 
+[ExcludeFromCodeCoverage]
 public static class ConfigureApp
 {
     public static void Configure(this WebApplication app)

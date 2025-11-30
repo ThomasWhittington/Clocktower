@@ -303,7 +303,7 @@
     "tags": [],
     "title": "Unit test coverage of server",
     "description": "I need to add decent coverage of the server code before it gets out of hand",
-    "status": "TODO",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,
@@ -315,6 +315,19 @@
         "minute": 6,
         "second": 40,
         "nano": 915808900
+      }
+    },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 30
+      },
+      "time": {
+        "hour": 23,
+        "minute": 11,
+        "second": 55,
+        "nano": 882735000
       }
     },
     "isImported": false
@@ -337,6 +350,65 @@
         "minute": 7,
         "second": 38,
         "nano": 619056300
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_130",
+    "priority": "HIGH",
+    "tags": [],
+    "title": "Change static stores to DI services",
+    "description": "GameStateStore and TownOccupancyStore should be interfaced services for better testability",
+    "status": "DONE",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 19
+      },
+      "time": {
+        "hour": 14,
+        "minute": 19,
+        "second": 7,
+        "nano": 709796800
+      }
+    },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 19
+      },
+      "time": {
+        "hour": 16,
+        "minute": 3,
+        "second": 17,
+        "nano": 353098700
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_157",
+    "priority": "MEDIUM",
+    "tags": [
+      "todo"
+    ],
+    "title": "",
+    "description": "[TODO] should update user status in game state. Also take in gameId rather than guildId",
+    "status": "DONE",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 11,
+        "day": 20
+      },
+      "time": {
+        "hour": 13,
+        "minute": 34,
+        "second": 40,
+        "nano": 978937100
       }
     },
     "isImported": false

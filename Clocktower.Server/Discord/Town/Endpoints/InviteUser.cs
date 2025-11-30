@@ -11,11 +11,11 @@ public class InviteUser : IEndpoint
         .SetOpenApiOperationId<InviteUser>()
         .WithSummary("Invites user to the specified game")
         .WithDescription("Invites user to the specified game")
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<GameAndUserRequest>();
 
-    private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle(
-        [AsParameters] Request request,
-        IDiscordTownService discordTownService)
+    internal static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle(
+        [AsParameters] GameAndUserRequest request,
+       [FromServices] IDiscordTownService discordTownService)
     {
         var gameId = request.GameId.Trim();
         var userId = ulong.Parse(request.UserId);
@@ -29,29 +29,10 @@ public class InviteUser : IEndpoint
             case InviteUserOutcome.UserNotFoundError:
                 return TypedResults.NotFound(message);
             case InviteUserOutcome.InvalidGuildError:
+            case InviteUserOutcome.DmChannelError:
             case InviteUserOutcome.UnknownError:
             default:
                 return TypedResults.BadRequest(message);
-        }
-    }
-
-    [UsedImplicitly]
-    public record Request(string GameId, string UserId);
-
-    [UsedImplicitly]
-    public class RequestValidator : AbstractValidator<Request>
-    {
-        public RequestValidator()
-        {
-            RuleFor(x => x.GameId)
-                .NotEmpty()
-                .WithMessage("GameId cannot be empty");
-
-            RuleFor(x => x.UserId)
-                .NotEmpty()
-                .WithMessage("UserId cannot be empty")
-                .Must(Common.Validation.BeValidDiscordSnowflake)
-                .WithMessage("UserId must be a valid Discord snowflake");
         }
     }
 }

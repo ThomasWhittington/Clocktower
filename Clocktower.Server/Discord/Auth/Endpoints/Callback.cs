@@ -1,5 +1,4 @@
 ﻿using Clocktower.Server.Discord.Auth.Services;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Clocktower.Server.Discord.Auth.Endpoints;
 
@@ -10,11 +9,10 @@ public class Callback : IEndpoint
     {
         app.MapGet("/callback", Handle)
             .SetOpenApiOperationId<Callback>()
-            .WithSummary("Handle Discord OAuth callback")
-            .WithDescription("Handles the callback from Discord OAuth");
+            .WithSummaryAndDescription("Handle Discord OAuth callback");
     }
 
-    private static async Task<Results<RedirectHttpResult, BadRequest<string>>> Handle(
+    internal static async Task<RedirectHttpResult> Handle(
         [FromQuery] string? code,
         [FromQuery] string? error,
         [FromServices] IDiscordAuthService discordAuthService)

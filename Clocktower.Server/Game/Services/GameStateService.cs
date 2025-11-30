@@ -1,44 +1,60 @@
-﻿using System.Text.Json;
-using Clocktower.Server.Discord.Services;
+﻿using System.IO.Abstractions;
+using System.Text.Json;
+using Clocktower.Server.Common.Services;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GameStateService(DiscordBotService bot)
+public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, IFileSystem fileSystem) : IGameStateService
 {
     public IEnumerable<GameState> GetGames() =>
-        GameStateStore.GetAll();
+        gameStateStore.GetAll();
 
-    public IEnumerable<GameState> GetGames(string guildId) =>
-        GameStateStore.GetGames(guildId);
+    public IEnumerable<GameState> GetGuildGames(string guildId) =>
+        gameStateStore.GetGuildGames(guildId);
 
     public IEnumerable<MiniGameState> GetPlayerGames(string userId)
     {
-        var playerGames = GameStateStore.GetUserGames(userId);
+        var playerGames = gameStateStore.GetUserGames(userId);
         var miniGameStates = playerGames.Select(o => new MiniGameState(o.Id, o.CreatedBy, o.CreatedDate));
         return miniGameStates;
     }
 
-    public (bool success, string message) LoadDummyData()
+    public (bool success, string message) LoadDummyData(string filePath = "dummyState.json")
     {
-        var json = File.ReadAllText("dummyState.json");
-        var games = JsonSerializer.Deserialize<GameState[]>(json);
-        if (games == null)
+        try
+        {
+            var json = fileSystem.File.ReadAllText(filePath);
+            var games = JsonSerializer.Deserialize<GameState[]>(json);
+            if (games == null)
+            {
+                return (false, "Failed to deserialize json");
+            }
+
+            gameStateStore.Clear();
+            foreach (var gameState in games)
+            {
+                gameStateStore.Set(gameState);
+            }
+
+            return (true, "Loaded dummy data");
+        }
+        catch (JsonException)
         {
             return (false, "Failed to deserialize json");
         }
-
-        GameStateStore.Clear();
-        foreach (var gameState in games)
+        catch (FileNotFoundException)
         {
-            GameStateStore.Set(gameState.Id, gameState);
+            return (false, "File not found");
         }
-
-        return (true, "Loaded dummy data");
+        catch (Exception ex)
+        {
+            return (false, $"Error loading dummy data: {ex.Message}");
+        }
     }
 
     public (bool success, GameState? gameState, string message) GetGame(string gameId)
     {
-        var game = GameStateStore.Get(gameId);
+        var game = gameStateStore.Get(gameId);
 
         return game is not null
             ? (true, game, "Game retrieved successfully")
@@ -48,7 +64,7 @@ public class GameStateService(DiscordBotService bot)
 
     public (bool success, string message) DeleteGame(string gameId)
     {
-        bool deleteSuccessful = GameStateStore.Remove(gameId);
+        bool deleteSuccessful = gameStateStore.Remove(gameId);
 
         return deleteSuccessful
             ? (true, "Game deleted successfully")
@@ -57,7 +73,7 @@ public class GameStateService(DiscordBotService bot)
 
     public (bool success, GameState? gameState, string message) StartNewGame(string guildId, string gameId, ulong userId)
     {
-        var user = bot.Client.GetUser(userId);
+        var user = bot.GetUser(userId);
         if (user is null) return (false, null, "Couldn't find user");
         var gameUser = user.AsGameUser();
         gameUser.UserType = UserType.StoryTeller;
@@ -70,7 +86,7 @@ public class GameStateService(DiscordBotService bot)
             Users = [gameUser]
         };
 
-        bool addSuccessful = GameStateStore.Set(gameId, newGameState);
+        bool addSuccessful = gameStateStore.Set(newGameState);
 
         return addSuccessful
             ? (true, newGameState, "Game started successfully")

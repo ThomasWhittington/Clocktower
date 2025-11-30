@@ -1,5 +1,4 @@
 ﻿using Clocktower.Server.Discord.Auth.Services;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Clocktower.Server.Discord.Auth.Endpoints;
 
@@ -14,7 +13,7 @@ public class GetAuthData : IEndpoint
             .WithDescription("Retrieves temporary authentication data by key");
     }
 
-    private static Results<Ok<UserAuthData>, NotFound> Handle(
+    internal static Results<Ok<UserAuthData>, NotFound> Handle(
         string key,
         [FromServices] IDiscordAuthService discordAuthService)
     {

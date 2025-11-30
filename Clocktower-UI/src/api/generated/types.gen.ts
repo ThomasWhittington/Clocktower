@@ -60,8 +60,8 @@ export type ClocktowerServerDataMiniGuild = {
 };
 
 export type ClocktowerServerDataTownOccupants = {
-    readonly userCount?: number;
     channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
+    readonly userCount?: number;
 };
 
 export type ClocktowerServerDataTypesEnumEdition = 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
@@ -263,14 +263,12 @@ export type BotCallbackApiData = {
     url: '/api/discord/auth/bot-callback';
 };
 
-export type BotCallbackApiErrors = {
+export type BotCallbackApiResponses = {
     /**
-     * Bad Request
+     * OK
      */
-    400: string;
+    200: unknown;
 };
-
-export type BotCallbackApiError = BotCallbackApiErrors[keyof BotCallbackApiErrors];
 
 export type CallbackApiData = {
     body?: never;
@@ -281,15 +279,6 @@ export type CallbackApiData = {
     };
     url: '/api/discord/auth/callback';
 };
-
-export type CallbackApiErrors = {
-    /**
-     * Bad Request
-     */
-    400: string;
-};
-
-export type CallbackApiError = CallbackApiErrors[keyof CallbackApiErrors];
 
 export type CallbackApiResponses = {
     /**
@@ -339,31 +328,6 @@ export type LoginApiErrors = {
 
 export type LoginApiError = LoginApiErrors[keyof LoginApiErrors];
 
-export type GetJoinDataApiData = {
-    body?: never;
-    path: {
-        key: string;
-    };
-    query?: never;
-    url: '/api/discord/auth/join/{key}';
-};
-
-export type GetJoinDataApiErrors = {
-    /**
-     * Not Found
-     */
-    404: unknown;
-};
-
-export type GetJoinDataApiResponses = {
-    /**
-     * OK
-     */
-    200: ClocktowerServerDataTypesJoinData;
-};
-
-export type GetJoinDataApiResponse = GetJoinDataApiResponses[keyof GetJoinDataApiResponses];
-
 export type DeleteTownApiData = {
     body?: never;
     path: {
@@ -378,10 +342,6 @@ export type DeleteTownApiErrors = {
      * Bad Request
      */
     400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
-    /**
-     * Not Found
-     */
-    404: string;
 };
 
 export type DeleteTownApiError = DeleteTownApiErrors[keyof DeleteTownApiErrors];
@@ -409,10 +369,6 @@ export type CreateTownApiErrors = {
      * Bad Request
      */
     400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
-    /**
-     * Not Found
-     */
-    404: string;
 };
 
 export type CreateTownApiError = CreateTownApiErrors[keyof CreateTownApiErrors];
@@ -425,6 +381,31 @@ export type CreateTownApiResponses = {
 };
 
 export type CreateTownApiResponse = CreateTownApiResponses[keyof CreateTownApiResponses];
+
+export type GetJoinDataApiData = {
+    body?: never;
+    path: {
+        key: string;
+    };
+    query?: never;
+    url: '/api/discord/town/join/{key}';
+};
+
+export type GetJoinDataApiErrors = {
+    /**
+     * Not Found
+     */
+    404: unknown;
+};
+
+export type GetJoinDataApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerDataTypesJoinData;
+};
+
+export type GetJoinDataApiResponse = GetJoinDataApiResponses[keyof GetJoinDataApiResponses];
 
 export type GetTownOccupancyApiData = {
     body?: never;
@@ -440,10 +421,6 @@ export type GetTownOccupancyApiErrors = {
      * Bad Request
      */
     400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
-    /**
-     * Not Found
-     */
-    404: string;
 };
 
 export type GetTownOccupancyApiError = GetTownOccupancyApiErrors[keyof GetTownOccupancyApiErrors];
@@ -471,10 +448,6 @@ export type GetTownStatusApiErrors = {
      * Bad Request
      */
     400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
-    /**
-     * Not Found
-     */
-    404: string;
 };
 
 export type GetTownStatusApiError = GetTownStatusApiErrors[keyof GetTownStatusApiErrors];
@@ -574,37 +547,6 @@ export type PingUserApiResponses = {
     200: unknown;
 };
 
-export type RebuildTownApiData = {
-    body?: never;
-    path: {
-        guildId: string;
-    };
-    query?: never;
-    url: '/api/discord/town/{guildId}/rebuild';
-};
-
-export type RebuildTownApiErrors = {
-    /**
-     * Bad Request
-     */
-    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
-    /**
-     * Not Found
-     */
-    404: string;
-};
-
-export type RebuildTownApiError = RebuildTownApiErrors[keyof RebuildTownApiErrors];
-
-export type RebuildTownApiResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type RebuildTownApiResponse = RebuildTownApiResponses[keyof RebuildTownApiResponses];
-
 export type SetTimeApiData = {
     body?: never;
     path: {
@@ -637,11 +579,11 @@ export type SetTimeApiResponse = SetTimeApiResponses[keyof SetTimeApiResponses];
 export type ToggleStoryTellerApiData = {
     body?: never;
     path: {
-        guildId: string;
+        gameId: string;
         userId: string;
     };
     query?: never;
-    url: '/api/discord/town/{guildId}/{userId}';
+    url: '/api/discord/town/{gameId}/{userId}';
 };
 
 export type ToggleStoryTellerApiErrors = {
@@ -722,15 +664,6 @@ export type GetGamesApiData = {
     };
     url: '/api/games';
 };
-
-export type GetGamesApiErrors = {
-    /**
-     * Not Found
-     */
-    404: string;
-};
-
-export type GetGamesApiError = GetGamesApiErrors[keyof GetGamesApiErrors];
 
 export type GetGamesApiResponses = {
     /**

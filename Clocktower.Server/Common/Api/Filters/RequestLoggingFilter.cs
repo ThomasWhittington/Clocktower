@@ -1,5 +1,8 @@
-﻿namespace Clocktower.Server.Common.Api.Filters;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Clocktower.Server.Common.Api.Filters;
+
+[ExcludeFromCodeCoverage(Justification = "Basic logging")]
 public class RequestLoggingFilter(ILogger<RequestLoggingFilter> logger) : IEndpointFilter
 {
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)

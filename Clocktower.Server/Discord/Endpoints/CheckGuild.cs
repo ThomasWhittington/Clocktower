@@ -13,17 +13,12 @@ public class CheckGuild : IEndpoint
         .WithDescription("Checks if bot has access to the guild")
         .WithRequestValidation<GuildIdRequest>();
 
-    private static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] GuildIdRequest request, IDiscordService discordService)
+    internal static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] GuildIdRequest request, [FromServices] IDiscordService discordService)
     {
         var guildId = ulong.Parse(request.GuildId);
 
-        var (success, valid, name, message) = discordService.CheckGuildId(guildId);
-        if (success)
-        {
-            return TypedResults.Ok(new Response(valid, name, message));
-        }
-
-        return TypedResults.BadRequest(message);
+        var (success, name, message) = discordService.CheckGuildId(guildId);
+        return success ? TypedResults.Ok(new Response(success, name, message)) : TypedResults.BadRequest(message);
     }
 
     [UsedImplicitly]

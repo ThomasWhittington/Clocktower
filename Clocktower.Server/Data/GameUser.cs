@@ -1,6 +1,6 @@
 ﻿namespace Clocktower.Server.Data;
 
-public class GameUser(string id, string name, string avatarUrl)
+public class GameUser(string id, string name, string avatarUrl) : IIdentifiable
 {
     public string Id { get; set; } = id;
     public string Name { get; set; } = name;

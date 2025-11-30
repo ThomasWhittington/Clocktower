@@ -6,10 +6,9 @@ public class Health : IEndpoint
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/health", Handle)
         .SetOpenApiOperationId<Health>()
-        .WithSummary("Checks the health of the server")
-        .WithDescription("Checks the health of the server");
+        .WithSummaryAndDescription("Checks the health of the server");
 
-    private static Ok<Response> Handle()
+    internal static Ok<Response> Handle()
     {
         return TypedResults.Ok(new Response("Healthy", DateTime.UtcNow));
     }

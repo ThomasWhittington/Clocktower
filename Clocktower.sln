@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clocktower.Server", "Clocktower.Server\Clocktower.Server.csproj", "{5F4F6819-F992-40DA-AFEB-38C7FE73C3FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clocktower.ServerTests", "Clocktower.ServerTests\Clocktower.ServerTests.csproj", "{E62C73A5-089C-47D5-A8F8-F654A1803F7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{5F4F6819-F992-40DA-AFEB-38C7FE73C3FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F4F6819-F992-40DA-AFEB-38C7FE73C3FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F4F6819-F992-40DA-AFEB-38C7FE73C3FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E62C73A5-089C-47D5-A8F8-F654A1803F7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E62C73A5-089C-47D5-A8F8-F654A1803F7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E62C73A5-089C-47D5-A8F8-F654A1803F7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E62C73A5-089C-47D5-A8F8-F654A1803F7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

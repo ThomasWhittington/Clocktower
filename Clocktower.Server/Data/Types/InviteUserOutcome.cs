@@ -6,5 +6,6 @@ public enum InviteUserOutcome
     GameDoesNotExistError,
     InvalidGuildError,
     UserNotFoundError,
+    DmChannelError,
     UnknownError
 }

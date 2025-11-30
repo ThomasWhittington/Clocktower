@@ -1,4 +1,6 @@
-﻿namespace Clocktower.Server.Roles.Endpoints;
+﻿using Clocktower.Server.Roles.Services;
+
+namespace Clocktower.Server.Roles.Endpoints;
 
 [UsedImplicitly]
 public class GetRoles : IEndpoint
@@ -10,20 +12,10 @@ public class GetRoles : IEndpoint
         .WithDescription("Filter roles by edition and/or role type");
 
 
-    public static Response Handle([AsParameters] Request request)
+    public static Ok<Response> Handle([AsParameters] Request request, [FromServices] IRolesService rolesService)
     {
-        var roles = Role.AllRoles.AsEnumerable();
-        if (request.Edition.HasValue)
-        {
-            roles = roles.Where(o => o.Edition == request.Edition);
-        }
-
-        if (request.RoleType.HasValue)
-        {
-            roles = roles.Where(o => o.Type == request.RoleType);
-        }
-
-        return new Response(roles);
+        var roles = rolesService.GetRoles(request.Edition, request.RoleType);
+        return TypedResults.Ok(new Response(roles));
     }
 
     [UsedImplicitly]

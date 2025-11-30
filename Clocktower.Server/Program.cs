@@ -1,3 +1,4 @@
+global using Clocktower.Server.Discord.Town.Endpoints.Validation;
 global using Microsoft.AspNetCore.Http.HttpResults;
 global using Clocktower.Server.Common.Api;
 global using FluentValidation;
@@ -11,82 +12,95 @@ global using Clocktower.Server.Game.Services;
 global using Clocktower.Server.Common.Api.Extensions;
 global using Clocktower.Server.Common;
 global using Clocktower.Server.Data.Stores;
+global using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text;
-using Clocktower.Server;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Protocols.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .CreateBootstrapLogger();
+[assembly: InternalsVisibleTo("Clocktower.ServerTests")]
 
-try
+namespace Clocktower.Server;
+
+[ExcludeFromCodeCoverage]
+internal abstract class Program
 {
-    Log.Information("Starting web application");
-    var builder = WebApplication.CreateBuilder(args);
-
-
-    builder.AddServices();
-
-    var secrets = builder.Configuration.GetSection(nameof(Secrets)).Get<Secrets>()!;
-    var secretsValidation = secrets.HasAllSecrets();
-    if (!secretsValidation.success)
+    private static async Task Main(string[] args)
     {
-        throw new InvalidConfigurationException($"Secrets invalid: {secretsValidation.message}");
-    }
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateBootstrapLogger();
 
-    builder.Services.AddAuthentication("Bearer")
-        .AddJwtBearer("Bearer", options =>
+        try
         {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidIssuer = secrets.ServerUri,
-                ValidateAudience = true,
-                ValidAudience = secrets.Jwt.Audience,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(secrets.Jwt.SigningKey)
-                ),
-                ValidateLifetime = true,
-            };
+            Log.Information("Starting web application");
+            var builder = WebApplication.CreateBuilder(args);
 
-            options.Events = new JwtBearerEvents
-            {
-                OnMessageReceived = context =>
-                {
-                    var accessToken = context.Request.Query["access_token"];
-                    var path = context.HttpContext.Request.Path;
-                    if (!string.IsNullOrEmpty(accessToken) &&
-                        path.StartsWithSegments("/discordHub"))
-                    {
-                        context.Token = accessToken;
-                    }
 
-                    return Task.CompletedTask;
-                }
-            };
-        });
-    builder.Services.AddAuthorizationBuilder()
-        .AddPolicy("StoryTellerForGame", policy =>
+            builder.AddServices();
+
+            var secrets = builder.Configuration.GetSection(nameof(Secrets)).Get<Secrets>()!;
+            var secretsValidation = secrets.HasAllSecrets();
+            if (!secretsValidation.success)
             {
-                policy.RequireClaim("is_storyteller", "true");
-                policy.AddRequirements(new StoryTellerForGameRequirement());
+                throw new InvalidConfigurationException($"Secrets invalid: {secretsValidation.message}");
             }
-        );
-    var app = builder.Build();
-    app.Configure();
+
+            builder.Services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = secrets.ServerUri,
+                        ValidateAudience = true,
+                        ValidAudience = secrets.Jwt.Audience,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(secrets.Jwt.SigningKey)
+                        ),
+                        ValidateLifetime = true,
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                path.StartsWithSegments("/discordHub"))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+            builder.Services.AddAuthorizationBuilder()
+                .AddPolicy("StoryTellerForGame", policy =>
+                    {
+                        policy.RequireClaim("is_storyteller", "true");
+                        policy.AddRequirements(new StoryTellerForGameRequirement());
+                    }
+                );
+            var app = builder.Build();
+            app.Configure();
 
 
-    await app.RunAsync();
-}
-catch (Exception ex)
-{
-    Log.Fatal(ex, "Application terminated unexpectedly");
-}
-finally
-{
-    await Log.CloseAndFlushAsync();
+            await app.RunAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Application terminated unexpectedly");
+        }
+        finally
+        {
+            await Log.CloseAndFlushAsync();
+        }
+    }
 }

@@ -9,8 +9,6 @@
     inviteUserApi,
     moveUserToChannelApi,
     pingUserApi,
-    rebuildTownApi,
-    type RebuildTownApiResponse,
     setTimeApi
 } from '@/api';
 import {
@@ -47,25 +45,6 @@ async function getTownStatus(id: string): Promise<GetTownStatusApiResponse> {
     };
 }
 
-async function rebuildTown(id: string): Promise<RebuildTownApiResponse> {
-    const {
-        data,
-        error
-    } = await rebuildTownApi({
-        client: apiClient,
-        path: {
-            guildId: id
-        }
-    });
-
-    if (error) {
-        console.error('Failed to rebuild town:', error);
-        throw new Error(error.toString());
-    }
-
-    return data ?? '';
-}
-
 async function getTownOccupancy(id: string): Promise<TownOccupants> {
     const {
         data,
@@ -78,7 +57,7 @@ async function getTownOccupancy(id: string): Promise<TownOccupants> {
     });
 
     if (error) {
-        console.error('Failed to rebuild town:', error);
+        console.error('Failed to get Town Occupancy', error);
         throw new Error(error.toString());
     }
 
@@ -224,7 +203,6 @@ const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGame
 export const discordService = {
     getGuildsWithUser,
     getTownStatus,
-    rebuildTown,
     getTownOccupancy,
     moveUserToChannel,
     getAuthData,

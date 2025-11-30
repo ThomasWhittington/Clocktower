@@ -2,37 +2,37 @@
 
 namespace Clocktower.Server.Data.Stores;
 
-public static class TownOccupancyStore
+public class TownOccupancyStore : ITownOccupancyStore
 {
-    private static readonly ConcurrentDictionary<string, TownOccupants> Store = new();
+    private readonly ConcurrentDictionary<string, TownOccupants> _store = new();
 
-    public static void Clear() => Store.Clear();
+    public void Clear() => _store.Clear();
 
-    public static TownOccupants? Get(string guildId) =>
-        Store.TryGetValue(guildId, out var state) ? state : null;
+    public TownOccupants? Get(string guildId) =>
+        _store.TryGetValue(guildId, out var state) ? state : null;
 
-    public static TownOccupants? Get(ulong guildId) => Get(guildId.ToString());
+    public TownOccupants? Get(ulong guildId) => Get(guildId.ToString());
 
-    public static bool Remove(string guildId) => Store.TryRemove(guildId, out _);
-    public static bool Remove(ulong guildId) => Remove(guildId.ToString());
+    public bool Remove(string guildId) => _store.TryRemove(guildId, out _);
+    public bool Remove(ulong guildId) => Remove(guildId.ToString());
 
-    public static bool Set(string guildId, TownOccupants state)
+    public bool Set(string guildId, TownOccupants state)
     {
         var currentValue = Get(guildId);
         if (currentValue is not null) return false;
-        Store[guildId] = state;
+        _store[guildId] = state;
         return true;
     }
 
-    public static bool Set(ulong guildId, TownOccupants state) => Set(guildId.ToString(), state);
+    public bool Set(ulong guildId, TownOccupants state) => Set(guildId.ToString(), state);
 
-    public static bool TryUpdate(string guildId, Func<TownOccupants, TownOccupants> updateFn)
+    public bool TryUpdate(string guildId, Func<TownOccupants, TownOccupants> updateFn)
     {
-        if (!Store.TryGetValue(guildId, out var existing)) return false;
+        if (!_store.TryGetValue(guildId, out var existing)) return false;
 
-        Store[guildId] = updateFn(existing);
+        _store[guildId] = updateFn(existing);
         return true;
     }
 
-    public static bool TryUpdate(ulong guildId, Func<TownOccupants, TownOccupants> updateFn) => TryUpdate(guildId.ToString(), updateFn);
+    public bool TryUpdate(ulong guildId, Func<TownOccupants, TownOccupants> updateFn) => TryUpdate(guildId.ToString(), updateFn);
 }
