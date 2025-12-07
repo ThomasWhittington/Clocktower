@@ -7,7 +7,7 @@ import {
     DiscordTownPanel
 } from "../components/features";
 import {
-    useDiscordHub
+    useServerHub
 } from "@/hooks";
 import {
     HubConnectionState
@@ -21,7 +21,7 @@ function Game() {
     const {
         connectionState,
         gameTime
-    } = useDiscordHub();
+    } = useServerHub();
 
     return (
         <>

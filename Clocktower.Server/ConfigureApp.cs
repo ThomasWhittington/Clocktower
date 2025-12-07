@@ -23,6 +23,6 @@ public static class ConfigureApp
         app.UseAuthorization();
         app.MapEndpoints();
 
-        app.MapHub<DiscordNotificationHub>("/discordHub");
+        app.MapHub<DiscordNotificationHub>("/serverHub");
     }
 }

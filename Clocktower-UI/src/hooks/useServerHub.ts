@@ -32,7 +32,7 @@ export type SessionSyncState = {
     gameTime: GameTime,
     jwt: string
 };
-type DiscordHubState = {
+type HubState = {
     townOccupancy?: TownOccupants;
     userPresenceStates: UserPresenceStates;
     userVoiceStates: UserVoiceStates;
@@ -42,13 +42,13 @@ type DiscordHubState = {
 
 let joinedGameId: string | null = null;
 let globalConnection: signalR.HubConnection | null = null;
-let globalState: DiscordHubState = {
+let globalState: HubState = {
     userPresenceStates: {},
     userVoiceStates: {},
     connectionState: signalR.HubConnectionState.Disconnected,
     gameTime: GameTime.Night
 };
-const globalListeners = new Set<(state: DiscordHubState) => void>();
+const globalListeners = new Set<(state: HubState) => void>();
 
 const notifyListeners = () => {
     for (const listener of globalListeners) {
@@ -56,12 +56,12 @@ const notifyListeners = () => {
     }
 };
 
-const setState = (updates: Partial<DiscordHubState>) => {
+const setState = (updates: Partial<HubState>) => {
     globalState = {...globalState, ...updates};
     notifyListeners();
 };
 
-const resetDiscordHubState = () => {
+export const resetHubState = () => {
     globalState = {
         userPresenceStates: {},
         userVoiceStates: {},
@@ -75,7 +75,7 @@ const createConnection = async (jwt?: string) => {
     if (globalConnection) return;
 
     globalConnection = new signalR.HubConnectionBuilder()
-        .withUrl(import.meta.env.VITE_CLOCKTOWER_SERVER_URI + '/discordHub', {
+        .withUrl(import.meta.env.VITE_CLOCKTOWER_SERVER_URI + '/serverHub', {
             accessTokenFactory: () => jwt ?? ''
         })
         .withAutomaticReconnect()
@@ -120,9 +120,9 @@ const createConnection = async (jwt?: string) => {
     }
 };
 
-export const useDiscordHub = () => {
-    const [state, setState] = useState<DiscordHubState>(globalState);
-    const listenerRef = useRef<(state: DiscordHubState) => void>(null);
+export const useServerHub = () => {
+    const [state, setState] = useState<HubState>(globalState);
+    const listenerRef = useRef<(state: HubState) => void>(null);
 
     const {
         gameId,
@@ -130,7 +130,7 @@ export const useDiscordHub = () => {
     } = useAppStore.getState();
 
     useEffect(() => {
-        const listener = (newState: DiscordHubState) => setState(newState);
+        const listener = (newState: HubState) => setState(newState);
         listenerRef.current = listener;
         globalListeners.add(listener);
 
@@ -199,7 +199,6 @@ export const leaveGameGroup = async (gameId: string) => {
     joinedGameId = null;
 };
 
-export const updateDiscordHubState = (updates: Partial<DiscordHubState>) => {
+export const updateHubState = (updates: Partial<HubState>) => {
     setState(updates);
 };
-export const resetDiscordHub = resetDiscordHubState;

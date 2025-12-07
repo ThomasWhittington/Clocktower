@@ -454,7 +454,7 @@
     "tags": [],
     "title": "Persist townOccupancy for refresh",
     "description": "When user refreshes the page, the townoccpancy isn\u0027t saved, the previous town occupancy should be used if. Should probably add a signalR update to ensure it is up todate on refresh",
-    "status": "TODO",
+    "status": "IN_PROGRESS",
     "date": {
       "date": {
         "year": 2025,

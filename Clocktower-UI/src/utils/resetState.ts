@@ -5,11 +5,11 @@ import {
     resetTownOccupancy
 } from "@/components/features/discordTownPanel/hooks";
 import {
-    resetDiscordHub
+    resetHubState
 } from "@/hooks";
 
 export const resetAllApplicationState = () => {
     useAppStore.getState().reset();
     resetTownOccupancy();
-    resetDiscordHub();
+    resetHubState();
 };

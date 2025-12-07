@@ -1,12 +1,12 @@
 ﻿import {
-    useDiscordHub
+    useServerHub
 } from "@/hooks";
 
 export const useUserVoiceStatus = (userId: string) => {
     const {
         userVoiceStates,
         connectionState
-    } = useDiscordHub();
+    } = useServerHub();
 
     const voiceStates =
         userId && connectionState === 'Connected'

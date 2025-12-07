@@ -72,7 +72,7 @@ internal abstract class Program
                             var accessToken = context.Request.Query["access_token"];
                             var path = context.HttpContext.Request.Path;
                             if (!string.IsNullOrEmpty(accessToken) &&
-                                path.StartsWithSegments("/discordHub"))
+                                path.StartsWithSegments("/serverHub"))
                             {
                                 context.Token = accessToken;
                             }

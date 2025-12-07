@@ -7,7 +7,7 @@ import {
     useAppStore
 } from '@/store';
 import {
-    useDiscordHub
+    useServerHub
 } from "@/hooks";
 import {
     discordService
@@ -94,7 +94,7 @@ export const useTownOccupancy = () => {
     const listenerRef = useRef<(state: TownOccupancyState) => void>(null);
 
     const guildId = useAppStore((state) => state.guildId);
-    const {townOccupancy: realtimeTownOccupancy} = useDiscordHub();
+    const {townOccupancy: realtimeTownOccupancy} = useServerHub();
 
     useEffect(() => {
         const listener = (newState: TownOccupancyState) => setState(newState);

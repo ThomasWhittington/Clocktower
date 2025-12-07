@@ -23,7 +23,7 @@ import {
 import {
     joinGameGroup,
     leaveGameGroup,
-    useDiscordHub
+    useServerHub
 } from "@/hooks";
 
 function GameManager() {
@@ -38,7 +38,7 @@ function GameManager() {
     const currentUser = useAppStore((state) => state.currentUser);
     const setGameId = useAppStore((state) => state.setGameId);
 
-    const {gameTime} = useDiscordHub();
+    const {gameTime} = useServerHub();
 
     const clearError = () => {
         setHasError(false);

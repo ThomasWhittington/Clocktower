@@ -1,4 +1,4 @@
 ﻿export *
     from './useServerHeartbeat'
 export *
-    from './useDiscordHub'
+    from './useServerHub'

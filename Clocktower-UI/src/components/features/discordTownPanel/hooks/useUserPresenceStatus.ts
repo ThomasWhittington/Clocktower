@@ -2,12 +2,12 @@
     useAppStore
 } from '@/store';
 import {
-    useDiscordHub
+    useServerHub
 } from "@/hooks";
 
 export const useUserPresenceStatus = () => {
     const currentUser = useAppStore((state) => state.currentUser);
-    const { userPresenceStates, connectionState } = useDiscordHub();
+    const { userPresenceStates, connectionState } = useServerHub();
 
     const isInVoiceChannel =
         currentUser?.id && connectionState === 'Connected'
