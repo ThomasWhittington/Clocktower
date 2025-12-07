@@ -2,7 +2,7 @@
 using Clocktower.Server.Game.Endpoints;
 using Clocktower.Server.Game.Services;
 
-namespace Clocktower.ServerTests.Discord.Town.Endpoints;
+namespace Clocktower.ServerTests.Game.Endpoints;
 
 [TestClass]
 public class SetTimeTests

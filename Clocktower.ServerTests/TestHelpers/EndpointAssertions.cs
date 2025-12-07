@@ -57,6 +57,12 @@ public static class EndpointAssertions
             return endpoint;
         }
 
+        public RouteEndpoint ShouldAllowAnonymous()
+        {
+            endpoint.GetMetadata<IAllowAnonymous>().Should().NotBeNull();
+            return endpoint;
+        }
+
         public RouteEndpoint ShouldHaveStorytellerAuthorization()
         {
             endpoint.GetMetadata<AuthorizeAttribute>().Policy.Should().Be("StoryTellerForGame");

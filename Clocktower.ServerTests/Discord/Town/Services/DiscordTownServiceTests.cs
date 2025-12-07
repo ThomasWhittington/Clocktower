@@ -273,6 +273,7 @@ public class DiscordTownServiceTests
             GuildId = GuildId.ToString(),
             Users = []
         };
+        var gameUser = CommonMethods.GetRandomGameUser(UserId.ToString());
         _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
@@ -281,11 +282,12 @@ public class DiscordTownServiceTests
         role.Setup(o => o.Id).Returns(roleId);
         user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.Roles).Returns([]);
+        user.Setup(o => o.AsGameUser()).Returns(gameUser);
 
         _ = await Sut.ToggleStoryTeller(GameId, UserId);
 
         _mockGameStateStore.Verify(o => o.Get(GameId), Times.Exactly(2));
-        _mockGameStateStore.Verify(o => o.AddUserToGame(GameId, It.Is<GameUser>(g => g.Id == UserId.ToString())), Times.Once);
+        _mockGameStateStore.Verify(o => o.AddUserToGame(GameId, gameUser), Times.Once);
     }
 
     [TestMethod]
@@ -990,15 +992,18 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_GetsJwtToken_WhenDataGood()
     {
+        var gameState = new GameState { GuildId = "1" };
+        var gameUser = CommonMethods.GetRandomGameUser(UserId.ToString());
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.CreateDmChannelAsync()).ReturnsAsync(dmChannel.Object);
-        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player))).Returns(Jwt);
+        user.Setup(o => o.AsGameUser(gameState)).Returns(gameUser);
+        _mockJwtWriter.Setup(o => o.GetJwtToken(gameUser)).Returns(Jwt);
 
         _ = await Sut.InviteUser(GameId, UserId);
 
@@ -1008,15 +1013,18 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_GeneratesId_WhenGotJwt()
     {
+        var gameState = new GameState { GuildId = "1" };
+        var gameUser = CommonMethods.GetRandomGameUser(UserId.ToString());
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.CreateDmChannelAsync()).ReturnsAsync(dmChannel.Object);
-        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player))).Returns(Jwt);
+        user.Setup(o => o.AsGameUser(gameState)).Returns(gameUser);
+        _mockJwtWriter.Setup(o => o.GetJwtToken(gameUser)).Returns(Jwt);
         _mockIdGenerator.Setup(o => o.GenerateId()).Returns(Key);
 
         _ = await Sut.InviteUser(GameId, UserId);
@@ -1027,15 +1035,20 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_SetsCache_WhenGotKey()
     {
+        const string feUri = "fe-uri";
+        CommonMethods.SetUpMockSecrets(_mockSecrets, feUri: feUri);
+        var gameState = new GameState { GuildId = "1" };
+        var gameUser = CommonMethods.GetRandomGameUser(UserId.ToString());
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.CreateDmChannelAsync()).ReturnsAsync(dmChannel.Object);
-        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player))).Returns(Jwt);
+        user.Setup(o => o.AsGameUser(gameState)).Returns(gameUser);
+        _mockJwtWriter.Setup(o => o.GetJwtToken(gameUser)).Returns(Jwt);
         _mockIdGenerator.Setup(o => o.GenerateId()).Returns(Key);
         var mockCacheEntry = new Mock<ICacheEntry>();
         _mockCache.Setup(o => o.CreateEntry(It.IsAny<object>())).Returns(mockCacheEntry.Object);
@@ -1052,15 +1065,18 @@ public class DiscordTownServiceTests
     {
         const string feUri = "fe-uri";
         CommonMethods.SetUpMockSecrets(_mockSecrets, feUri: feUri);
+        var gameState = new GameState { GuildId = "1" };
+        var gameUser = CommonMethods.GetRandomGameUser(UserId.ToString());
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         user.Setup(o => o.Id).Returns(UserId);
         user.Setup(o => o.CreateDmChannelAsync()).ReturnsAsync(dmChannel.Object);
-        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player))).Returns(Jwt);
+        user.Setup(o => o.AsGameUser(gameState)).Returns(gameUser);
+        _mockJwtWriter.Setup(o => o.GetJwtToken(gameUser)).Returns(Jwt);
         _mockIdGenerator.Setup(o => o.GenerateId()).Returns(Key);
         var mockCacheEntry = new Mock<ICacheEntry>();
         _mockCache.Setup(o => o.CreateEntry(It.IsAny<object>())).Returns(mockCacheEntry.Object);

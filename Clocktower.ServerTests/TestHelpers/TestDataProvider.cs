@@ -10,6 +10,22 @@ public static class TestDataProvider
         return Enum.GetValues<T>().Select(enumValue => new object[] { enumValue });
     }
 
+    public static IEnumerable<object[]> GenerateBooleanCombinations(int count)
+    {
+        var totalCombinations = (int)Math.Pow(2, count);
+
+        for (int i = 0; i < totalCombinations; i++)
+        {
+            var combination = new object[count];
+            for (int j = 0; j < count; j++)
+            {
+                combination[j] = (i & (1 << j)) != 0;
+            }
+
+            yield return combination;
+        }
+    }
+
     public static IEnumerable<Role> GetDummyRoles()
     {
         return

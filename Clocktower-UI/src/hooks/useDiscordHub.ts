@@ -14,8 +14,12 @@ import type {
 import {
     useAppStore
 } from "@/store";
+import type {
+    VoiceState
+} from "@/types/voiceState.ts";
 
-type UserVoiceStates = Record<string, boolean>;
+type UserPresenceStates = Record<string, boolean>;
+type UserVoiceStates = Record<string, VoiceState>;
 
 export enum GameTime {
     Unknown = 0,
@@ -30,6 +34,7 @@ export type SessionSyncState = {
 };
 type DiscordHubState = {
     townOccupancy?: TownOccupants;
+    userPresenceStates: UserPresenceStates;
     userVoiceStates: UserVoiceStates;
     connectionState: signalR.HubConnectionState;
     gameTime: GameTime
@@ -38,6 +43,7 @@ type DiscordHubState = {
 let joinedGameId: string | null = null;
 let globalConnection: signalR.HubConnection | null = null;
 let globalState: DiscordHubState = {
+    userPresenceStates: {},
     userVoiceStates: {},
     connectionState: signalR.HubConnectionState.Disconnected,
     gameTime: GameTime.Night
@@ -57,6 +63,7 @@ const setState = (updates: Partial<DiscordHubState>) => {
 
 const resetDiscordHubState = () => {
     globalState = {
+        userPresenceStates: {},
         userVoiceStates: {},
         connectionState: HubConnectionState.Disconnected,
         gameTime: GameTime.Night
@@ -87,11 +94,15 @@ const createConnection = async (jwt?: string) => {
         console.log(`ping from server: ${message}`);
     });
 
-    globalConnection.on('UserVoiceStateChanged', (userId: string, isInVoice: boolean) => {
+    globalConnection.on('UserVoiceStateChanged', (userId: string, isInVoice: boolean, voiceState: VoiceState) => {
         setState({
+            userPresenceStates: {
+                ...globalState.userPresenceStates,
+                [userId]: isInVoice
+            },
             userVoiceStates: {
                 ...globalState.userVoiceStates,
-                [userId]: isInVoice
+                [userId]: voiceState
             }
         });
     });

@@ -167,7 +167,7 @@
     "tags": [],
     "title": "Add discord user status icons",
     "description": "Add muted/ deafened icons to town user status",
-    "status": "TODO",
+    "status": "IN_PROGRESS",
     "date": {
       "date": {
         "year": 2025,
@@ -409,6 +409,28 @@
         "minute": 34,
         "second": 40,
         "nano": 978937100
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_186",
+    "priority": "LOW",
+    "tags": [],
+    "title": "BRB option",
+    "description": "Users should have a button to mark BRB, user should have an icon when this is the case and a obvious return button to click when they are back",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 7
+      },
+      "time": {
+        "hour": 15,
+        "minute": 31,
+        "second": 34,
+        "nano": 389956100
       }
     },
     "isImported": false

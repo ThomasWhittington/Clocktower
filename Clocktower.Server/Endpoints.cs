@@ -16,6 +16,7 @@ public static class Endpoints
         endpoints.MapRolesEndpoints();
         endpoints.MapGamesEndpoints();
         endpoints.MapDiscordEndpoints();
+        endpoints.MapDiscordGameActionEndpoints();
         endpoints.MapDiscordAuthEndpoints();
         endpoints.MapDiscordTownEndpoints();
     }
@@ -58,6 +59,15 @@ public static class Endpoints
                 .MapEndpointsFromNamespace("Clocktower.Server.Discord.Endpoints");
         }
 
+        private void MapDiscordGameActionEndpoints()
+        {
+            var endpoints = app.MapGroup("/discord-game-action")
+                .WithTags("Discord Game Action");
+
+            endpoints.MapPublicGroup()
+                .MapEndpointsFromNamespace("Clocktower.Server.Discord.GameAction.Endpoints");
+        }
+        
         private void MapDiscordAuthEndpoints()
         {
             var endpoints = app.MapGroup("/discord/auth")

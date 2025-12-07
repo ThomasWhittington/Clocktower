@@ -48,6 +48,25 @@ public class StoryTellerForGameHandlerTests
 
         context.HasSucceeded.Should().BeTrue();
     }
+    
+    
+    [TestMethod]
+    public async Task HandleAsync_ShouldSucceed_WhenTestBypass()
+    {
+        var httpContext = new DefaultHttpContext();
+        _mockHttpContextAccessor.Setup(x => x.HttpContext).Returns(httpContext);
+
+        var user = new ClaimsPrincipal(new ClaimsIdentity([
+            new Claim("test_bypass", "true")
+        ]));
+        
+        var requirement = new StoryTellerForGameRequirement();
+        var context = new AuthorizationHandlerContext([requirement], user, null);
+
+        await Sut.HandleAsync(context);
+
+        context.HasSucceeded.Should().BeTrue();
+    }
 
     [TestMethod]
     public async Task HandleAsync_ShouldNotSucceed_WhenUserIsNotStoryTellerRole()

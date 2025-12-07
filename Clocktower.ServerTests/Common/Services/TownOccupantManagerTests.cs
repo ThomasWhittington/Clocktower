@@ -306,11 +306,11 @@ public class TownOccupantManagerTests
 
     #endregion
 
-    private static IDiscordUser CreateMockDiscordUser(string id)
+    private static IDiscordGuildUser CreateMockDiscordUser(string id)
     {
-        var mockUser = new Mock<IDiscordUser>();
+        var mockUser = new Mock<IDiscordGuildUser>();
         mockUser.Setup(u => u.Id).Returns(ulong.Parse(id));
-        mockUser.Setup(u => u.GlobalName).Returns(string.Empty);
+        mockUser.Setup(u => u.DisplayName).Returns(string.Empty);
         mockUser.Setup(u => u.DisplayAvatarUrl).Returns(string.Empty);
         mockUser.Setup(u => u.AsGameUser()).Returns(new GameUser(id, string.Empty, string.Empty));
         return mockUser.Object;

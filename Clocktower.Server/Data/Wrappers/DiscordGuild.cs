@@ -121,4 +121,9 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         var miniCategory = new MiniCategory(categoryChannel.Id.ToString(), categoryChannel.Name, categoryChannel.GetChannelOccupancy());
         return miniCategory;
     }
+    
+    public IEnumerable<IDiscordGuildUser> GetGuildUsers(IEnumerable<string> userIds)
+    {
+        return Users.Where(o => userIds.Contains(o.Id.ToString()));
+    }
 }

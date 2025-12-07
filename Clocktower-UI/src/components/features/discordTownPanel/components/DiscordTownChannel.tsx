@@ -14,7 +14,7 @@ import {
     ValidationUtils
 } from "@/utils";
 import {
-    useUserVoiceStatus
+    useUserPresenceStatus
 } from "@/components/features/discordTownPanel/hooks";
 
 
@@ -24,7 +24,7 @@ function DiscordTownChannel({channel}: Readonly<{
 
     const guildId = useAppStore((state) => state.guildId);
     const currentUser = useAppStore((state) => state.currentUser);
-    const {isInVoiceChannel} = useUserVoiceStatus();
+    const {isInVoiceChannel} = useUserPresenceStatus();
     
     const moveUserHere = async () => {
         if (!(ValidationUtils.isValidDiscordId(guildId) &&

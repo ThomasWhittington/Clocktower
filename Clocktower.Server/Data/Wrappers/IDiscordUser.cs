@@ -6,6 +6,8 @@ public interface IDiscordUser
     string GlobalName { get; }
     string DisplayAvatarUrl { get; }
 
+    IDiscordGuildUser? GetGuildUser();
+
     Task<IDiscordDmChannel?> CreateDmChannelAsync();
     GameUser AsGameUser();
 }

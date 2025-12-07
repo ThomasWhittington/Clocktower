@@ -8,7 +8,7 @@ public class NotificationService(IHubContext<DiscordNotificationHub, IDiscordNot
     public Task BroadcastTownOccupancyUpdate(string gameId, TownOccupants occupants) => hub.Clients.Group(GetGameGroupName(gameId)).TownOccupancyUpdated(occupants);
 
 
-    public Task BroadcastUserVoiceStateChanged(string gameId, string userId, bool inVoice) => hub.Clients.Group(GetGameGroupName(gameId)).UserVoiceStateChanged(userId, inVoice);
+    public Task BroadcastUserVoiceStateChanged(string gameId, string userId, bool inVoice, MutedState mutedState) => hub.Clients.Group(GetGameGroupName(gameId)).UserVoiceStateChanged(userId, inVoice, mutedState);
     public Task BroadcastTownTime(string gameId, GameTime gameTime) => hub.Clients.Group(GetGameGroupName(gameId)).TownTimeChanged((int)gameTime);
     public Task PingUser(string targetUserId, string message) => hub.Clients.User(targetUserId).PingUser(message);
     

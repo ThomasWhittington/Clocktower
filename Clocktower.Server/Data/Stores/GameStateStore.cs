@@ -63,7 +63,12 @@ public class GameStateStore : IGameStateStore
         });
     }
 
-    public GameState? UpdateUser(string gameId, ulong userId, UserType? userType = null, bool? isPlaying = null)
+    public GameState? UpdateUser(string gameId,
+        ulong userId,
+        UserType? userType = null,
+        bool? isPlaying = null,
+        bool? isPresent = null,
+        MutedState? discordMutedState = null)
     {
         TryUpdate(gameId, UpdateFunction);
         return Get(gameId);
@@ -81,6 +86,16 @@ public class GameStateStore : IGameStateStore
             if (isPlaying.HasValue)
             {
                 user.IsPlaying = isPlaying.Value;
+            }
+
+            if (isPresent.HasValue)
+            {
+                user.IsPresent = isPresent.Value;
+            }
+
+            if (discordMutedState is not null)
+            {
+                user.MutedState = discordMutedState;
             }
 
             return state;

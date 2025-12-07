@@ -23,4 +23,5 @@ public interface IDiscordGuild
     Task<IDiscordRestCategoryChannel> CreateCategoryAsync(string categoryName, bool everyoneCanSee, IDiscordRole? roleToSeeChannel = null);
     IDiscordCategoryChannel? GetCategoryChannelByName(string name);
     MiniCategory? GetMiniCategory(string categoryName);
+    IEnumerable<IDiscordGuildUser> GetGuildUsers(IEnumerable<string> userIds);
 }

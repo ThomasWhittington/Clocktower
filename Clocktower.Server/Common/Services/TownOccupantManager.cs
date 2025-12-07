@@ -4,7 +4,7 @@ namespace Clocktower.Server.Common.Services;
 
 public class TownOccupantManager : ITownOccupantManager
 {
-    public TownOccupants MoveUser(TownOccupants current, IDiscordUser user, IDiscordVoiceChannel? newChannel)
+    public TownOccupants MoveUser(TownOccupants current, IDiscordGuildUser user, IDiscordVoiceChannel? newChannel)
     {
         var currentChannel = FindUserChannel(current, user.Id.ToString());
         if (currentChannel is not null && newChannel is not null &&

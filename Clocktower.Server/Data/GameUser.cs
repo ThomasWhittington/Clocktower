@@ -8,4 +8,5 @@ public class GameUser(string id, string name, string avatarUrl) : IIdentifiable
     public bool IsPlaying { get; set; }
     public bool IsPresent { get; set; }
     public UserType UserType { get; set; } = UserType.Unknown;
+    public MutedState MutedState { get; set; } = null!;
 }

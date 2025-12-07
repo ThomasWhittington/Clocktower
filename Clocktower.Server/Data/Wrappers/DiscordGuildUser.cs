@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Clocktower.Server.Data.Extensions;
 using Discord.WebSocket;
 
 namespace Clocktower.Server.Data.Wrappers;
@@ -9,6 +10,10 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
     public ulong Id => user.Id;
     public string DisplayName => user.DisplayName;
     public string DisplayAvatarUrl => user.GetDisplayAvatarUrl();
+    public bool IsServerMuted => user.IsMuted;
+    public bool IsServerDeafened => user.IsDeafened;
+    public bool IsSelfMuted => user.IsSelfMuted;
+    public bool IsSelfDeafened => user.IsDeafened;
     public IDiscordVoiceState? VoiceState => user.VoiceState.HasValue ? new DiscordVoiceState(user.VoiceState.Value) : null;
     public IEnumerable<IDiscordRole> Roles => user.Roles.Select(r => new DiscordRole(r));
 
@@ -40,6 +45,30 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
 
     public bool DoesUserHaveRole(ulong roleId)
     {
-       return Roles.Any(o => o.Id == roleId);
+        return Roles.Any(o => o.Id == roleId);
+    }
+
+    public async Task SetIsServerMuted(bool isMuted)
+    {
+        await user.ModifyAsync(o => o.Mute = isMuted);
+    }
+
+    public GameUser AsGameUser(GameState? gameState = null)
+    {
+        var result = new GameUser(user.Id.ToString(), user.DisplayName, DisplayAvatarUrl)
+        {
+            MutedState = new MutedState(IsServerMuted, IsServerDeafened, IsSelfMuted, IsSelfDeafened)
+        };
+        if (gameState is not null)
+        {
+            result.UserType = gameState.GetUserType(user.Id.ToString());
+        }
+
+        return result;
+    }
+
+    public async Task SetIsServerDeafened(bool isDeafened)
+    {
+        await user.ModifyAsync(o => o.Deaf = isDeafened);
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Text.Json.Serialization;
+using Clocktower.Server.Admin.Services;
 using Clocktower.Server.Common.Api.Auth;
 using Clocktower.Server.Common.Services;
 using Clocktower.Server.Discord;
 using Clocktower.Server.Discord.Auth.Services;
+using Clocktower.Server.Discord.GameAction.Services;
 using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Discord.Town.Services;
 using Clocktower.Server.Roles.Services;
@@ -12,6 +14,7 @@ using Clocktower.Server.Socket;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
@@ -68,8 +71,10 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IDiscordAuthApiService, DiscordAuthApiService>();
             builder.Services.AddSingleton<IDiscordConstantsService, DiscordConstantsService>();
 
+            builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IDiscordAuthService, DiscordAuthService>();
             builder.Services.AddScoped<IGameStateService, GameStateService>();
+            builder.Services.AddScoped<IDiscordGameActionService, DiscordGameActionService>();
             builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddScoped<IGameAuthorizationService, GameAuthorizationService>();
             builder.Services.AddScoped<IAuthorizationHandler, StoryTellerForGameHandler>();
@@ -94,9 +99,32 @@ public static class ConfigureServices
             {
                 options.CustomSchemaIds(type => type.FullName?.Replace('+', '.'));
                 options.InferSecuritySchemes();
-            });
+                options.SchemaFilter<EnumSchemaFilter>();
 
-            builder.Services.AddSwaggerGen(c => { c.SchemaFilter<EnumSchemaFilter>(); });
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
         }
 
         private void AddSignalR()

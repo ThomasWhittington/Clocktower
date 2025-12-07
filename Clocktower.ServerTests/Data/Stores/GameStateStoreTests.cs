@@ -259,10 +259,48 @@ public class GameStateStoreTests
         thisUser.Should().NotBeNull();
         thisUser.IsPlaying.Should().Be(isPlaying);
     }
+    
+    [TestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public void UpdateUser_Updates_IsPresent(bool isPresent)
+    {
+        const ulong userId = 1L;
+        var game1 = NewGame("game1");
+        _sut.Set(game1);
+        var user = CommonMethods.GetRandomGameUser(userId.ToString());
+        _sut.AddUserToGame("game1", user);
 
+        var result = _sut.UpdateUser(game1.Id, userId, isPresent: isPresent);
+        result.Should().NotBeNull();
+        var thisUser = result.GetUser(userId.ToString());
+        thisUser.Should().NotBeNull();
+        thisUser.IsPresent.Should().Be(isPresent);
+    }
+    
+    [TestMethod]
+    [DynamicData(nameof(GetMutedStateCombinations))]
+    public void UpdateUser_Updates_MutedState(bool isServerMuted, bool isSelfMuted, bool isServerDeafened, bool isSelfDeafened)
+    {
+        const ulong userId = 1L;
+        var game1 = NewGame("game1");
+        _sut.Set(game1);
+        var user = CommonMethods.GetRandomGameUser(userId.ToString());
+        _sut.AddUserToGame("game1", user);
+        var mutedState = new MutedState(isServerMuted, isServerDeafened, isSelfMuted, isSelfDeafened);
+        
+        
+        var result = _sut.UpdateUser(game1.Id, userId, discordMutedState: mutedState);
+        result.Should().NotBeNull();
+        var thisUser = result.GetUser(userId.ToString());
+        thisUser.Should().NotBeNull();
+        thisUser.MutedState.Should().Be(mutedState);
+    }
     #endregion
 
 
     private static IEnumerable<object[]> GetGameTimeValues() => TestDataProvider.GetAllEnumValues<GameTime>();
     private static IEnumerable<object[]> GetUserTypeValues() => TestDataProvider.GetAllEnumValues<UserType>();
+    public static IEnumerable<object[]> GetMutedStateCombinations() => TestDataProvider.GenerateBooleanCombinations(4);
+
 }
