@@ -102,6 +102,7 @@ h1 {
 .error {
     @apply bg-[url('/images/evening-bg.png')] bg-cover bg-center;
 }
+
 .main-image {
     object-fit: cover;
 }
@@ -121,6 +122,8 @@ h1 {
 
 @theme {
     --color-discord: #1f2936;
+    --color-discord-icon: #76777e;
+    --color-discord-warning: #c6383d;
     --color-forestgreen: #4d8e53;
 }
 

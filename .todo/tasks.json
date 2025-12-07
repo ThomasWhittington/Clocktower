@@ -167,7 +167,7 @@
     "tags": [],
     "title": "Add discord user status icons",
     "description": "Add muted/ deafened icons to town user status",
-    "status": "IN_PROGRESS",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,
@@ -179,6 +179,19 @@
         "minute": 39,
         "second": 34,
         "nano": 814565500
+      }
+    },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 7
+      },
+      "time": {
+        "hour": 23,
+        "minute": 24,
+        "second": 48,
+        "nano": 140604500
       }
     },
     "isImported": false
@@ -431,6 +444,28 @@
         "minute": 31,
         "second": 34,
         "nano": 389956100
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_202",
+    "priority": "HIGH",
+    "tags": [],
+    "title": "Persist townOccupancy for refresh",
+    "description": "When user refreshes the page, the townoccpancy isn\u0027t saved, the previous town occupancy should be used if. Should probably add a signalR update to ensure it is up todate on refresh",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 7
+      },
+      "time": {
+        "hour": 16,
+        "minute": 15,
+        "second": 26,
+        "nano": 562789200
       }
     },
     "isImported": false

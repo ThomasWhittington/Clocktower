@@ -14,7 +14,7 @@
     .channel-button {
         @apply absolute -top-3 left-4 bg-discord px-2 text-sm font-semibold text-white! rounded-2xl hover:bg-forestgreen;
     }
-    
+
     .channel-button-enabled {
         @apply cursor-pointer;
     }
@@ -45,8 +45,20 @@
     .town-user-status > img {
         @apply size-7 rounded-full mr-2;
     }
-    
-    .town-user-status>p{
+
+    .town-user-status > p {
         @apply content-center;
     }
-}
+
+    .user-status-icon-self {
+        @apply text-discord-icon;
+    }
+
+    .user-status-icon-server {
+        @apply text-discord-warning;
+    }
+
+    .discord-user-voice-status {
+        @apply flex flex-row gap-2 ml-4
+    }
+} 
