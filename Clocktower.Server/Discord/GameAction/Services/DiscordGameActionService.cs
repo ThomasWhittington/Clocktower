@@ -18,7 +18,7 @@ public class DiscordGameActionService(
 
         var toBeMuted = gameState.StoryTellers.Where(o =>
             o.IsPresent &&
-            o.MutedState.IsServerMuted == !muted
+            o.VoiceState.IsServerMuted == !muted
         );
         var discordUserToBeMuted = guild.GetGuildUsers(toBeMuted.GetIds());
 

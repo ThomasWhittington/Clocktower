@@ -19,18 +19,20 @@ public class DiscordBotHandler(
         if (guildUser is null) return;
         var gameState = gameStateStore.GetGuildGames(guildId.Value).FirstOrDefault();
 
-        await UpdateTownOccupancy(guildUser, before, after, gameState?.Id, guildId.Value);
-
-        if (gameState is null) return;
-
-        await UpdateMutedStatus(guildUser, before, after, gameState.Id);
+        var channelsAreSame = before.VoiceChannel?.Id == after.VoiceChannel?.Id;
+        if (channelsAreSame)
+        {
+            if (gameState is null) return;
+            await UpdateVoiceStatus(guildUser, after, gameState.Id, guildId.Value);
+        }
+        else
+        {
+            await UpdateTownOccupancy(guildUser, after, gameState?.Id, guildId.Value);
+        }
     }
 
-    public virtual async Task UpdateTownOccupancy(IDiscordGuildUser user, IDiscordVoiceState before, IDiscordVoiceState after, string? gameId, ulong guildId)
+    public virtual async Task UpdateTownOccupancy(IDiscordGuildUser user, IDiscordVoiceState after, string? gameId, ulong guildId)
     {
-        var channelsAreSame = before.VoiceChannel?.Id == after.VoiceChannel?.Id;
-        if (channelsAreSame) return;
-
         using var scope = serviceScopeFactory.CreateScope();
         var townService = scope.ServiceProvider.GetRequiredService<IDiscordTownService>();
         var (success, thisTownOccupancy, _) = await townService.GetTownOccupancy(guildId);
@@ -43,13 +45,17 @@ public class DiscordBotHandler(
         }
     }
 
-    public virtual async Task UpdateMutedStatus(IDiscordGuildUser user, IDiscordVoiceState before, IDiscordVoiceState after, string gameId)
+    public virtual async Task UpdateVoiceStatus(IDiscordGuildUser user, IDiscordVoiceState after, string gameId, ulong guildId)
     {
         bool inVoice = after.VoiceChannel != null;
-        var discordMutedState = new MutedState(after.IsMuted, after.IsDeafened, after.IsSelfMuted, after.IsSelfDeafened);
+        var discordVoiceState = new VoiceState(after.IsMuted, after.IsDeafened, after.IsSelfMuted, after.IsSelfDeafened);
 
-        gameStateStore.UpdateUser(gameId, user.Id, isPresent: inVoice, discordMutedState: discordMutedState);
+        gameStateStore.UpdateUser(gameId, user.Id, isPresent: inVoice, voiceState: discordVoiceState);
 
-        await notificationService.BroadcastUserVoiceStateChanged(gameId, user.Id.ToString(), inVoice, discordMutedState);
+        var townOccupants = townOccupantManager.UpdateUserStatus(guildId, user.Id, inVoice, discordVoiceState);
+        if (townOccupants is not null)
+        {
+            await notificationService.BroadcastTownOccupancyUpdate(gameId, townOccupants);
+        }
     }
 }

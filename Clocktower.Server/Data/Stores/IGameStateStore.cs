@@ -14,5 +14,5 @@ public interface IGameStateStore
 
     void AddUserToGame(string gameId, GameUser gameUser);
     void SetTime(string gameId, GameTime gameTime);
-    GameState? UpdateUser(string gameId, ulong userId, UserType? userType = null, bool? isPlaying = null,bool? isPresent = null, MutedState? discordMutedState = null);
+    GameState? UpdateUser(string gameId, ulong userId, UserType? userType = null, bool? isPlaying = null,bool? isPresent = null, VoiceState? voiceState = null);
 }

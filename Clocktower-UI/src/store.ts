@@ -10,7 +10,7 @@ interface AppState {
     guildId: string,
     gameId: string | null,
     currentUser?: User,
-    jwt?: string;
+    jwt: string | null;
     setGuildId: (value: string) => void;
     setGameId: (value: string | null) => void;
     setCurrentUser: (value: User) => void;
@@ -19,8 +19,8 @@ interface AppState {
     reset: () => void;
 }
 
-const getStoredJwt = (): string | undefined => {
-    return localStorage.getItem('jwt') ?? undefined;
+const getStoredJwt = (): string | null => {
+    return localStorage.getItem('jwt') ?? null;
 };
 
 const setStoredJwt = (jwt: string | undefined) => {

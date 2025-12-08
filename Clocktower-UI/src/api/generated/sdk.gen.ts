@@ -30,6 +30,8 @@ import type {
     GetAuthDataApiData,
     GetAuthDataApiErrors,
     GetAuthDataApiResponses,
+    GetAuthTokenApiData,
+    GetAuthTokenApiErrors,
     GetGameApiData,
     GetGameApiErrors,
     GetGameApiResponses,
@@ -70,6 +72,9 @@ import type {
     SendMessageApiData,
     SendMessageApiErrors,
     SendMessageApiResponses,
+    SetMuteAllPlayersApiData,
+    SetMuteAllPlayersApiErrors,
+    SetMuteAllPlayersApiResponses,
     SetTimeApiData,
     SetTimeApiErrors,
     SetTimeApiResponses,
@@ -96,12 +101,40 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
+ * Get JWT token for testing
+ *
+ * Returns a JWT token for API testing purposes
+ */
+export const getAuthTokenApi = <ThrowOnError extends boolean = false>(options: Options<GetAuthTokenApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<unknown, GetAuthTokenApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/admin/auth/token',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
  * Checks the health of the server
  *
  * Checks the health of the server
  */
 export const healthApi = <ThrowOnError extends boolean = false>(options?: Options<HealthApiData, ThrowOnError>) => {
     return (options?.client ?? client).get<HealthApiResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/admin/health',
         ...options
     });
@@ -114,6 +147,12 @@ export const healthApi = <ThrowOnError extends boolean = false>(options?: Option
  */
 export const checkGuildApi = <ThrowOnError extends boolean = false>(options: Options<CheckGuildApiData, ThrowOnError>) => {
     return (options.client ?? client).get<CheckGuildApiResponses, CheckGuildApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/{guildId}/check',
         ...options
     });
@@ -126,6 +165,12 @@ export const checkGuildApi = <ThrowOnError extends boolean = false>(options: Opt
  */
 export const getGuildsWithUserApi = <ThrowOnError extends boolean = false>(options: Options<GetGuildsWithUserApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetGuildsWithUserApiResponses, GetGuildsWithUserApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/{userId}/guilds',
         ...options
     });
@@ -138,6 +183,12 @@ export const getGuildsWithUserApi = <ThrowOnError extends boolean = false>(optio
  */
 export const sendMessageApi = <ThrowOnError extends boolean = false>(options: Options<SendMessageApiData, ThrowOnError>) => {
     return (options.client ?? client).post<SendMessageApiResponses, SendMessageApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/message',
         ...options,
         headers: {
@@ -154,6 +205,12 @@ export const sendMessageApi = <ThrowOnError extends boolean = false>(options: Op
  */
 export const addBotApi = <ThrowOnError extends boolean = false>(options?: Options<AddBotApiData, ThrowOnError>) => {
     return (options?.client ?? client).get<unknown, AddBotApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/auth/addBot',
         ...options
     });
@@ -166,6 +223,12 @@ export const addBotApi = <ThrowOnError extends boolean = false>(options?: Option
  */
 export const botCallbackApi = <ThrowOnError extends boolean = false>(options?: Options<BotCallbackApiData, ThrowOnError>) => {
     return (options?.client ?? client).get<BotCallbackApiResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/auth/bot-callback',
         ...options
     });
@@ -178,6 +241,12 @@ export const botCallbackApi = <ThrowOnError extends boolean = false>(options?: O
  */
 export const callbackApi = <ThrowOnError extends boolean = false>(options?: Options<CallbackApiData, ThrowOnError>) => {
     return (options?.client ?? client).get<CallbackApiResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/auth/callback',
         ...options
     });
@@ -190,6 +259,12 @@ export const callbackApi = <ThrowOnError extends boolean = false>(options?: Opti
  */
 export const getAuthDataApi = <ThrowOnError extends boolean = false>(options: Options<GetAuthDataApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetAuthDataApiResponses, GetAuthDataApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/auth/data/{key}',
         ...options
     });
@@ -202,7 +277,31 @@ export const getAuthDataApi = <ThrowOnError extends boolean = false>(options: Op
  */
 export const loginApi = <ThrowOnError extends boolean = false>(options?: Options<LoginApiData, ThrowOnError>) => {
     return (options?.client ?? client).get<unknown, LoginApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/auth',
+        ...options
+    });
+};
+
+/**
+ * Sets muted status for players in game
+ *
+ * Sets muted status for players (not storytellers/ spectators) connected to voice for game
+ */
+export const setMuteAllPlayersApi = <ThrowOnError extends boolean = false>(options: Options<SetMuteAllPlayersApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetMuteAllPlayersApiResponses, SetMuteAllPlayersApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/discord-game-action/set-mute-players/{gameId}/{muted}',
         ...options
     });
 };
@@ -214,6 +313,12 @@ export const loginApi = <ThrowOnError extends boolean = false>(options?: Options
  */
 export const deleteTownApi = <ThrowOnError extends boolean = false>(options: Options<DeleteTownApiData, ThrowOnError>) => {
     return (options.client ?? client).delete<DeleteTownApiResponses, DeleteTownApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/town/{guildId}',
         ...options
     });
@@ -226,6 +331,12 @@ export const deleteTownApi = <ThrowOnError extends boolean = false>(options: Opt
  */
 export const createTownApi = <ThrowOnError extends boolean = false>(options: Options<CreateTownApiData, ThrowOnError>) => {
     return (options.client ?? client).post<CreateTownApiResponses, CreateTownApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/town/{guildId}',
         ...options
     });
@@ -238,6 +349,12 @@ export const createTownApi = <ThrowOnError extends boolean = false>(options: Opt
  */
 export const getJoinDataApi = <ThrowOnError extends boolean = false>(options: Options<GetJoinDataApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetJoinDataApiResponses, GetJoinDataApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/town/join/{key}',
         ...options
     });
@@ -250,6 +367,12 @@ export const getJoinDataApi = <ThrowOnError extends boolean = false>(options: Op
  */
 export const getTownOccupancyApi = <ThrowOnError extends boolean = false>(options: Options<GetTownOccupancyApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetTownOccupancyApiResponses, GetTownOccupancyApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/town/{guildId}/occupancy',
         ...options
     });
@@ -262,6 +385,12 @@ export const getTownOccupancyApi = <ThrowOnError extends boolean = false>(option
  */
 export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: Options<GetTownStatusApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetTownStatusApiResponses, GetTownStatusApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/town/{guildId}/status',
         ...options
     });
@@ -274,6 +403,12 @@ export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: 
  */
 export const inviteUserApi = <ThrowOnError extends boolean = false>(options: Options<InviteUserApiData, ThrowOnError>) => {
     return (options.client ?? client).post<InviteUserApiResponses, InviteUserApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/town/{gameId}/invite/{userId}',
         ...options
     });
@@ -286,6 +421,12 @@ export const inviteUserApi = <ThrowOnError extends boolean = false>(options: Opt
  */
 export const moveUserToChannelApi = <ThrowOnError extends boolean = false>(options: Options<MoveUserToChannelApiData, ThrowOnError>) => {
     return (options.client ?? client).post<MoveUserToChannelApiResponses, MoveUserToChannelApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/town/{guildId}/{userId}/{channelId}',
         ...options
     });
@@ -298,6 +439,12 @@ export const moveUserToChannelApi = <ThrowOnError extends boolean = false>(optio
  */
 export const pingUserApi = <ThrowOnError extends boolean = false>(options: Options<PingUserApiData, ThrowOnError>) => {
     return (options.client ?? client).post<PingUserApiResponses, PingUserApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/town/ping/{userId}',
         ...options
     });
@@ -310,6 +457,12 @@ export const pingUserApi = <ThrowOnError extends boolean = false>(options: Optio
  */
 export const toggleStoryTellerApi = <ThrowOnError extends boolean = false>(options: Options<ToggleStoryTellerApiData, ThrowOnError>) => {
     return (options.client ?? client).post<ToggleStoryTellerApiResponses, ToggleStoryTellerApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/discord/town/{gameId}/{userId}',
         ...options
     });
@@ -322,6 +475,12 @@ export const toggleStoryTellerApi = <ThrowOnError extends boolean = false>(optio
  */
 export const deleteGameApi = <ThrowOnError extends boolean = false>(options: Options<DeleteGameApiData, ThrowOnError>) => {
     return (options.client ?? client).delete<DeleteGameApiResponses, DeleteGameApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/games/{gameId}/delete',
         ...options
     });
@@ -334,6 +493,12 @@ export const deleteGameApi = <ThrowOnError extends boolean = false>(options: Opt
  */
 export const getGameApi = <ThrowOnError extends boolean = false>(options: Options<GetGameApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetGameApiResponses, GetGameApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/games/{gameId}',
         ...options
     });
@@ -346,6 +511,12 @@ export const getGameApi = <ThrowOnError extends boolean = false>(options: Option
  */
 export const getGamesApi = <ThrowOnError extends boolean = false>(options?: Options<GetGamesApiData, ThrowOnError>) => {
     return (options?.client ?? client).get<GetGamesApiResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/games',
         ...options
     });
@@ -358,6 +529,12 @@ export const getGamesApi = <ThrowOnError extends boolean = false>(options?: Opti
  */
 export const getPlayerGamesApi = <ThrowOnError extends boolean = false>(options: Options<GetPlayerGamesApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetPlayerGamesApiResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/games/player/{userId}',
         ...options
     });
@@ -370,6 +547,12 @@ export const getPlayerGamesApi = <ThrowOnError extends boolean = false>(options:
  */
 export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?: Options<LoadDummyGamesApiData, ThrowOnError>) => {
     return (options?.client ?? client).post<LoadDummyGamesApiResponses, LoadDummyGamesApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/games/load',
         ...options
     });
@@ -382,6 +565,12 @@ export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?
  */
 export const setTimeApi = <ThrowOnError extends boolean = false>(options: Options<SetTimeApiData, ThrowOnError>) => {
     return (options.client ?? client).post<SetTimeApiResponses, SetTimeApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/games/{gameId}/time',
         ...options
     });
@@ -394,6 +583,12 @@ export const setTimeApi = <ThrowOnError extends boolean = false>(options: Option
  */
 export const startGameApi = <ThrowOnError extends boolean = false>(options: Options<StartGameApiData, ThrowOnError>) => {
     return (options.client ?? client).post<StartGameApiResponses, StartGameApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/games/{gameId}/start/{guildId}/{userId}',
         ...options
     });
@@ -406,6 +601,12 @@ export const startGameApi = <ThrowOnError extends boolean = false>(options: Opti
  */
 export const getRolesApi = <ThrowOnError extends boolean = false>(options?: Options<GetRolesApiData, ThrowOnError>) => {
     return (options?.client ?? client).get<GetRolesApiResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
         url: '/api/roles',
         ...options
     });

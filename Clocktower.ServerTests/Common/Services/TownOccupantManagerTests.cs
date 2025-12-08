@@ -1,5 +1,6 @@
 ﻿using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data;
+using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Wrappers;
 
 namespace Clocktower.ServerTests.Common.Services;
@@ -7,7 +8,15 @@ namespace Clocktower.ServerTests.Common.Services;
 [TestClass]
 public class TownOccupantManagerTests
 {
-    private static ITownOccupantManager Sut => new TownOccupantManager();
+    private Mock<ITownOccupancyStore> _mockTownOccupancyStore = null!;
+    private ITownOccupantManager _sut = null!;
+
+    [TestInitialize]
+    public void SetUp()
+    {
+        _mockTownOccupancyStore = new Mock<ITownOccupancyStore>();
+        _sut = new TownOccupantManager(_mockTownOccupancyStore.Object);
+    }
 
     private static TownOccupants GetDummyTownOccupants()
     {
@@ -46,7 +55,7 @@ public class TownOccupantManagerTests
         var occupants = GetDummyTownOccupants();
         const string userId = "3001";
 
-        var result = Sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(occupants, userId);
 
         result.Should().NotBeNull();
         result.Channel.Id.Should().Be("2001");
@@ -60,7 +69,7 @@ public class TownOccupantManagerTests
         var occupants = GetDummyTownOccupants();
         const string userId = "3003";
 
-        var result = Sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(occupants, userId);
 
         result.Should().NotBeNull();
         result.Channel.Id.Should().Be("2002");
@@ -74,7 +83,7 @@ public class TownOccupantManagerTests
         var occupants = GetDummyTownOccupants();
         const string userId = "nonexistent";
 
-        var result = Sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(occupants, userId);
 
         result.Should().BeNull();
     }
@@ -85,7 +94,7 @@ public class TownOccupantManagerTests
         var occupants = CreateEmptyTownOccupants();
         const string userId = "3001";
 
-        var result = Sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(occupants, userId);
 
         result.Should().BeNull();
     }
@@ -96,7 +105,7 @@ public class TownOccupantManagerTests
         var occupants = GetDummyTownOccupants();
         const string userId = "";
 
-        var result = Sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(occupants, userId);
 
         result.Should().BeNull();
     }
@@ -107,7 +116,7 @@ public class TownOccupantManagerTests
         var occupants = GetDummyTownOccupants();
         string userId = null!;
 
-        var result = Sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(occupants, userId);
 
         result.Should().BeNull();
     }
@@ -118,7 +127,7 @@ public class TownOccupantManagerTests
         var occupants = GetDummyTownOccupants();
         const string userId = "3002";
 
-        var result = Sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(occupants, userId);
 
         result.Should().NotBeNull();
         result.Channel.Id.Should().Be("2002");
@@ -138,7 +147,7 @@ public class TownOccupantManagerTests
         var mockUser = CreateMockDiscordUser("3005");
         var mockChannel = CreateMockDiscordVoiceChannel("2001");
 
-        var result = Sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
 
         var targetChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
@@ -155,7 +164,7 @@ public class TownOccupantManagerTests
         var mockUser = CreateMockDiscordUser("3001");
         var mockChannel = CreateMockDiscordVoiceChannel("2001");
 
-        var result = Sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
 
         result.Should().BeSameAs(occupants);
     }
@@ -167,19 +176,19 @@ public class TownOccupantManagerTests
         var mockUser = CreateMockDiscordUser("3003");
         var mockChannel = CreateMockDiscordVoiceChannel("2001");
 
-        var result = Sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
 
         var sourceChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
             .First(ch => ch.Channel.Id == "2002");
-        
+
         sourceChannel.Occupants.Should().HaveCount(1);
         sourceChannel.Occupants.Should().NotContain(u => u.Id == "3003");
 
         var targetChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
             .First(ch => ch.Channel.Id == "2001");
-        
+
         targetChannel.Occupants.Should().HaveCount(2);
         targetChannel.Occupants.Should().Contain(u => u.Id == "3001");
         targetChannel.Occupants.Should().Contain(u => u.Id == "3003");
@@ -191,7 +200,7 @@ public class TownOccupantManagerTests
         var occupants = GetDummyTownOccupants();
         var mockUser = CreateMockDiscordUser("3003");
 
-        var result = Sut.MoveUser(occupants, mockUser, null);
+        var result = _sut.MoveUser(occupants, mockUser, null);
 
         var sourceChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
@@ -207,7 +216,7 @@ public class TownOccupantManagerTests
         var mockUser = CreateMockDiscordUser("3001");
         var mockChannel = CreateMockDiscordVoiceChannel("2205");
 
-        var result = Sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
 
         var category1 = result.ChannelCategories.Should().Contain(c => c.Id == "1001").Subject;
         var channel1 = category1.Channels.Should().Contain(ch => ch.Channel.Id == "2001").Subject;
@@ -227,7 +236,7 @@ public class TownOccupantManagerTests
         var mockUser = CreateMockDiscordUser("3001");
         var mockChannel = CreateMockDiscordVoiceChannel("9999");
 
-        var result = Sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
 
         var sourceChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
@@ -248,7 +257,7 @@ public class TownOccupantManagerTests
         var mockUser = CreateMockDiscordUser("3002");
         var mockChannel = CreateMockDiscordVoiceChannel("2001");
 
-        var result = Sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
 
         var sourceChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
@@ -257,7 +266,7 @@ public class TownOccupantManagerTests
         sourceChannel.Occupants.Should().Contain(u => u.Id == "3003");
         sourceChannel.Occupants.Should().NotContain(u => u.Id == "3002");
 
-        
+
         var targetChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
             .First(ch => ch.Channel.Id == "2001");
@@ -274,7 +283,7 @@ public class TownOccupantManagerTests
         var mockUser = CreateMockDiscordUser("3001");
         var mockChannel = CreateMockDiscordVoiceChannel("2002");
 
-        var result = Sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
 
         result.UserCount.Should().Be(initialUserCount);
     }
@@ -287,7 +296,7 @@ public class TownOccupantManagerTests
         var mockUser = CreateMockDiscordUser("3009");
         var mockChannel = CreateMockDiscordVoiceChannel("2001");
 
-        var result = Sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
 
         result.UserCount.Should().Be(initialUserCount + 1);
     }
@@ -299,7 +308,7 @@ public class TownOccupantManagerTests
         var initialUserCount = occupants.UserCount;
         var mockUser = CreateMockDiscordUser("3001");
 
-        var result = Sut.MoveUser(occupants, mockUser, null);
+        var result = _sut.MoveUser(occupants, mockUser, null);
 
         result.UserCount.Should().Be(initialUserCount - 1);
     }

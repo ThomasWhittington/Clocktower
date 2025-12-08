@@ -4,6 +4,10 @@ export type ClientOptions = {
     baseUrl: 'http://localhost:5120' | (string & {});
 };
 
+export type ClocktowerServerAdminEndpointsGetAuthTokenTokenRequest = {
+    username?: string | null;
+};
+
 export type ClocktowerServerAdminEndpointsHealthResponse = {
     status?: string | null;
     timeStamp?: Date;
@@ -35,6 +39,7 @@ export type ClocktowerServerDataGameUser = {
     isPlaying?: boolean;
     isPresent?: boolean;
     userType?: ClocktowerServerDataTypesEnumUserType;
+    voiceState?: ClocktowerServerDataVoiceState;
 };
 
 export type ClocktowerServerDataMiniCategory = {
@@ -91,6 +96,13 @@ export type ClocktowerServerDataUserAuthData = {
     jwt?: string | null;
 };
 
+export type ClocktowerServerDataVoiceState = {
+    isServerMuted?: boolean;
+    isServerDeafened?: boolean;
+    isSelfMuted?: boolean;
+    isSelfDeafened?: boolean;
+};
+
 export type ClocktowerServerDiscordEndpointsCheckGuildResponse = {
     valid?: boolean;
     name?: string | null;
@@ -142,6 +154,22 @@ export type ClocktowerServerDataGameStateWritable = {
 export type ClocktowerServerDataTownOccupantsWritable = {
     channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
 };
+
+export type GetAuthTokenApiData = {
+    body: ClocktowerServerAdminEndpointsGetAuthTokenTokenRequest;
+    path?: never;
+    query?: never;
+    url: '/api/admin/auth/token';
+};
+
+export type GetAuthTokenApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: string;
+};
+
+export type GetAuthTokenApiError = GetAuthTokenApiErrors[keyof GetAuthTokenApiErrors];
 
 export type HealthApiData = {
     body?: never;
@@ -327,6 +355,38 @@ export type LoginApiErrors = {
 };
 
 export type LoginApiError = LoginApiErrors[keyof LoginApiErrors];
+
+export type SetMuteAllPlayersApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        muted: boolean;
+    };
+    query?: never;
+    url: '/api/discord-game-action/set-mute-players/{gameId}/{muted}';
+};
+
+export type SetMuteAllPlayersApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: string;
+    /**
+     * Not Found
+     */
+    404: string;
+};
+
+export type SetMuteAllPlayersApiError = SetMuteAllPlayersApiErrors[keyof SetMuteAllPlayersApiErrors];
+
+export type SetMuteAllPlayersApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetMuteAllPlayersApiResponse = SetMuteAllPlayersApiResponses[keyof SetMuteAllPlayersApiResponses];
 
 export type DeleteTownApiData = {
     body?: never;

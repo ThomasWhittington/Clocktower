@@ -57,6 +57,9 @@ const clocktowerServerDataGameUserSchemaResponseTransformer = (data: any) => {
     if (data.userType) {
         data.userType = clocktowerServerDataTypesEnumUserTypeSchemaResponseTransformer(data.userType);
     }
+    if (data.voiceState) {
+        data.voiceState = clocktowerServerDataVoiceStateSchemaResponseTransformer(data.voiceState);
+    }
     return data;
 };
 

@@ -8,12 +8,13 @@ namespace Clocktower.Server.Data.Wrappers;
 public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
 {
     public ulong Id => user.Id;
+    public ulong GuildId => user.Guild.Id;
     public string DisplayName => user.DisplayName;
     public string DisplayAvatarUrl => user.GetDisplayAvatarUrl();
     public bool IsServerMuted => user.IsMuted;
     public bool IsServerDeafened => user.IsDeafened;
     public bool IsSelfMuted => user.IsSelfMuted;
-    public bool IsSelfDeafened => user.IsDeafened;
+    public bool IsSelfDeafened => user.IsSelfDeafened;
     public IDiscordVoiceState? VoiceState => user.VoiceState.HasValue ? new DiscordVoiceState(user.VoiceState.Value) : null;
     public IEnumerable<IDiscordRole> Roles => user.Roles.Select(r => new DiscordRole(r));
 
@@ -57,7 +58,8 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
     {
         var result = new GameUser(user.Id.ToString(), user.DisplayName, DisplayAvatarUrl)
         {
-            MutedState = new MutedState(IsServerMuted, IsServerDeafened, IsSelfMuted, IsSelfDeafened)
+            VoiceState = new VoiceState(IsServerMuted, IsServerDeafened, IsSelfMuted, IsSelfDeafened),
+            IsPresent = VoiceState?.VoiceChannel != null
         };
         if (gameState is not null)
         {

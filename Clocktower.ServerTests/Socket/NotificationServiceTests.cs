@@ -47,14 +47,14 @@ public class NotificationServiceTests
         const string gameId = "test-game-456";
         const string userId = "user-123";
         const bool inVoice = true;
-        var mutedState = new MutedState(true, false, true, false);
+        var voiceState = new VoiceState(true, false, true, false);
 
         _mockClients.Setup(c => c.Group("game:test-game-456")).Returns(_mockClientProxy.Object);
 
-        await Sut.BroadcastUserVoiceStateChanged(gameId, userId, inVoice, mutedState);
+        await Sut.BroadcastUserVoiceStateChanged(gameId, userId, inVoice, voiceState);
 
         _mockClients.Verify(c => c.Group("game:test-game-456"), Times.Once);
-        _mockClientProxy.Verify(cp => cp.UserVoiceStateChanged(userId, inVoice, mutedState), Times.Once);
+        _mockClientProxy.Verify(cp => cp.UserVoiceStateChanged(userId, inVoice, voiceState), Times.Once);
     }
 
     [TestMethod]

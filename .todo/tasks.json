@@ -454,7 +454,7 @@
     "tags": [],
     "title": "Persist townOccupancy for refresh",
     "description": "When user refreshes the page, the townoccpancy isn\u0027t saved, the previous town occupancy should be used if. Should probably add a signalR update to ensure it is up todate on refresh",
-    "status": "IN_PROGRESS",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,
@@ -466,6 +466,41 @@
         "minute": 15,
         "second": 26,
         "nano": 562789200
+      }
+    },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 8
+      },
+      "time": {
+        "hour": 12,
+        "minute": 53,
+        "second": 20,
+        "nano": 73454000
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_219",
+    "priority": "HIGH",
+    "tags": [],
+    "title": "Seperate user data",
+    "description": "Users currently all are GameUsers, split off /adapt a TownUser and a GameUser with a central user control for common data",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 8
+      },
+      "time": {
+        "hour": 12,
+        "minute": 53,
+        "second": 6,
+        "nano": 15970500
       }
     },
     "isImported": false

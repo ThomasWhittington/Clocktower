@@ -8,23 +8,30 @@ public class TownOccupancyStore : ITownOccupancyStore
 
     public void Clear() => _store.Clear();
 
-    public TownOccupants? Get(string guildId) =>
-        _store.TryGetValue(guildId, out var state) ? state : null;
+    public TownOccupants? Get(string? guildId)
+    {
+        if (guildId is null) return null;
+        return _store.TryGetValue(guildId, out var state) ? state : null;
+    }
 
-    public TownOccupants? Get(ulong guildId) => Get(guildId.ToString());
+    public TownOccupants? Get(ulong? guildId)
+    {
+        if (guildId is null) return null;
+        return Get(guildId.ToString());
+    }
 
     public bool Remove(string guildId) => _store.TryRemove(guildId, out _);
     public bool Remove(ulong guildId) => Remove(guildId.ToString());
 
-    public bool Set(string guildId, TownOccupants state)
+    public bool Set(string guildId, TownOccupants state, bool force = false)
     {
         var currentValue = Get(guildId);
-        if (currentValue is not null) return false;
+        if (currentValue is not null && !force) return false;
         _store[guildId] = state;
         return true;
     }
 
-    public bool Set(ulong guildId, TownOccupants state) => Set(guildId.ToString(), state);
+    public bool Set(ulong guildId, TownOccupants state, bool force = false) => Set(guildId.ToString(), state, force);
 
     public bool TryUpdate(string guildId, Func<TownOccupants, TownOccupants> updateFn)
     {

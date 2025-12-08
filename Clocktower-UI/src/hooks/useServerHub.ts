@@ -30,7 +30,8 @@ export enum GameTime {
 
 export type SessionSyncState = {
     gameTime: GameTime,
-    jwt: string
+    jwt: string,
+    townOccupancy?: TownOccupants;
 };
 type HubState = {
     townOccupancy?: TownOccupants;
@@ -70,13 +71,19 @@ export const resetHubState = () => {
     };
     notifyListeners();
 };
+const isConnected = (connection: signalR.HubConnection | null): connection is signalR.HubConnection => {
+    return connection !== null && connection.state === HubConnectionState.Connected;
+};
 
-const createConnection = async (jwt?: string) => {
+const createConnection = async () => {
     if (globalConnection) return;
 
     globalConnection = new signalR.HubConnectionBuilder()
         .withUrl(import.meta.env.VITE_CLOCKTOWER_SERVER_URI + '/serverHub', {
-            accessTokenFactory: () => jwt ?? ''
+            accessTokenFactory: () => {
+                const {jwt} = useAppStore.getState();
+                return jwt ?? '';
+            }
         })
         .withAutomaticReconnect()
         .configureLogging(signalR.LogLevel.Information)
@@ -93,20 +100,7 @@ const createConnection = async (jwt?: string) => {
     globalConnection.on('PingUser', (message: string) => {
         console.log(`ping from server: ${message}`);
     });
-
-    globalConnection.on('UserVoiceStateChanged', (userId: string, isInVoice: boolean, voiceState: VoiceState) => {
-        setState({
-            userPresenceStates: {
-                ...globalState.userPresenceStates,
-                [userId]: isInVoice
-            },
-            userVoiceStates: {
-                ...globalState.userVoiceStates,
-                [userId]: voiceState
-            }
-        });
-    });
-
+    
     globalConnection.onclose(() => setState({connectionState: signalR.HubConnectionState.Disconnected}));
     globalConnection.onreconnecting(() => setState({connectionState: signalR.HubConnectionState.Reconnecting}));
     globalConnection.onreconnected(() => setState({connectionState: signalR.HubConnectionState.Connected}));
@@ -120,28 +114,68 @@ const createConnection = async (jwt?: string) => {
     }
 };
 
+export const handleJwtUpdate = async () => {
+    if (isConnected(globalConnection)) {
+        await globalConnection.stop();
+        globalConnection = null;
+        joinedGameId = null;
+
+        await createConnection();
+
+        const {gameId} = useAppStore.getState();
+        if (gameId && isConnected(globalConnection)) {
+            await joinGameGroup(gameId);
+        }
+    }
+};
+
+const hasJwtMeaningfullyChanged = (oldJwt: string | null, newJwt: string): boolean => {
+    if (!oldJwt) return true;
+
+    try {
+        const oldPayload = JSON.parse(atob(oldJwt.split('.')[1]));
+        const newPayload = JSON.parse(atob(newJwt.split('.')[1]));
+
+        const {
+            exp: oldExp,
+            ...oldRest
+        } = oldPayload;
+        const {
+            exp: newExp,
+            ...newRest
+        } = newPayload;
+
+        return JSON.stringify(oldRest) !== JSON.stringify(newRest);
+    } catch {
+        return true;
+    }
+};
+let currentJwtContent: string | null = null;
+
 export const useServerHub = () => {
     const [state, setState] = useState<HubState>(globalState);
     const listenerRef = useRef<(state: HubState) => void>(null);
-
-    const {
-        gameId,
-        jwt
-    } = useAppStore.getState();
+    const initializedRef = useRef(false);
+    const {gameId} = useAppStore.getState();
 
     useEffect(() => {
         const listener = (newState: HubState) => setState(newState);
         listenerRef.current = listener;
         globalListeners.add(listener);
 
-        (async () => {
-            await createConnection(jwt);
-            if (gameId && globalConnection?.state === HubConnectionState.Connected) {
-                await joinGameGroup(gameId);
-            } else if (!gameId) {
-                console.warn('Failed to join game signals: no gameId');
-            }
-        })().catch(console.error);
+        if (!initializedRef.current) {
+            initializedRef.current = true;
+
+            (async () => {
+                await createConnection();
+
+                if (gameId && isConnected(globalConnection)) {
+                    await joinGameGroup(gameId);
+                } else if (!gameId) {
+                    console.warn('Failed to join game signals: no gameId');
+                }
+            })().catch(console.error);
+        }
 
         return () => {
             if (listenerRef.current) {
@@ -154,12 +188,20 @@ export const useServerHub = () => {
                         globalConnection.stop();
                         globalConnection = null;
                         joinedGameId = null;
+                        initializedRef.current = false;
                     }
                 }, 100);
             }
         };
-    }, [gameId, jwt]);
+    }, []);
 
+    useEffect(() => {
+        if (initializedRef.current && isConnected(globalConnection)) {
+            if (gameId) {
+                joinGameGroup(gameId).catch(console.error);
+            }
+        }
+    }, [gameId]);
     return state;
 };
 
@@ -169,13 +211,8 @@ export const joinGameGroup = async (gameId: string) => {
         currentUser
     } = useAppStore.getState();
 
-    if (!globalConnection || globalConnection.state !== HubConnectionState.Connected) {
-        return;
-    }
-
-    if (joinedGameId === gameId) {
-        return;
-    }
+    if (!isConnected(globalConnection)) return;
+    if (joinedGameId === gameId) return;
 
     if (joinedGameId && joinedGameId !== gameId) {
         await globalConnection.invoke('LeaveGameGroup', joinedGameId);
@@ -185,9 +222,20 @@ export const joinGameGroup = async (gameId: string) => {
     joinedGameId = gameId;
     if (snapshot) {
         setState({
-            gameTime: snapshot.gameTime
+            gameTime: snapshot.gameTime,
+            townOccupancy: snapshot.townOccupancy
         });
-        setJwt(snapshot.jwt);
+        const currentJwt = useAppStore.getState().jwt;
+        if (snapshot.jwt !== currentJwt) {
+            setJwt(snapshot.jwt);
+            if (hasJwtMeaningfullyChanged(currentJwtContent, snapshot.jwt)) {
+                console.log('JWT content changed, reconnecting...');
+                currentJwtContent = snapshot.jwt;
+                await handleJwtUpdate();
+            } else {
+                console.log('JWT expiration updated, no reconnection needed');
+            }
+        }
     }
 };
 
@@ -197,8 +245,4 @@ export const leaveGameGroup = async (gameId: string) => {
     }
     await globalConnection.invoke('LeaveGameGroup', gameId);
     joinedGameId = null;
-};
-
-export const updateHubState = (updates: Partial<HubState>) => {
-    setState(updates);
 };

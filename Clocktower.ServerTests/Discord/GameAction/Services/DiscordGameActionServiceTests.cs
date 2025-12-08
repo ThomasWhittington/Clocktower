@@ -37,7 +37,7 @@ public class DiscordGameActionServiceTests
                 {
                     UserType = user.userType,
                     IsPresent = user.isPresent,
-                    MutedState = new MutedState(user.muted, false, false, false)
+                    VoiceState = new VoiceState(user.muted, false, false, false)
                 });
             }
         }

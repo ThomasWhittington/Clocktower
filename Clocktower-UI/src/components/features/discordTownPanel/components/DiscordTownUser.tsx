@@ -2,17 +2,12 @@
     GameUser
 } from "@/types";
 import {
-    useUserVoiceStatus
-} from "@/components/features/discordTownPanel/hooks";
-import {
     DiscordUserVoiceStatus
 } from "@/components/ui";
 
 function DiscordTownUser({user}: Readonly<{
     user: GameUser
 }>) {
-    const {voiceStates} = useUserVoiceStatus(user.id);
-
     return (
         <div
             className="town-user-status">
@@ -24,8 +19,8 @@ function DiscordTownUser({user}: Readonly<{
             <p>{user.name}</p>
 
             {
-                voiceStates &&
-                <DiscordUserVoiceStatus voiceState={voiceStates}/>
+                user.voiceState &&
+                <DiscordUserVoiceStatus voiceState={user.voiceState}/>
             }
         </div>
     );

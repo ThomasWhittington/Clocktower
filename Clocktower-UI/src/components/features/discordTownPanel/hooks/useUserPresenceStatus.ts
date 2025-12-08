@@ -4,15 +4,23 @@
 import {
     useServerHub
 } from "@/hooks";
+import {
+    findGameUserById
+} from "@/types";
 
 export const useUserPresenceStatus = () => {
     const currentUser = useAppStore((state) => state.currentUser);
-    const { userPresenceStates, connectionState } = useServerHub();
+    const {
+        townOccupancy,
+        connectionState
+    } = useServerHub();
 
-    const isInVoiceChannel =
-        currentUser?.id && connectionState === 'Connected'
-            ? userPresenceStates[currentUser.id.toString()] ?? false
-            : false;
+    let isInVoiceChannel;
+    if (townOccupancy && currentUser?.id && connectionState === 'Connected') {
+        const thisUser = findGameUserById(townOccupancy, currentUser.id);
+        if (thisUser === undefined) isInVoiceChannel = false;
+        else isInVoiceChannel = thisUser.isPresent;
+    }
 
-    return { isInVoiceChannel };
+    return {isInVoiceChannel};
 };

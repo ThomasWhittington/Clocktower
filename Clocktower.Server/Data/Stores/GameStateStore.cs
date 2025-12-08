@@ -68,7 +68,7 @@ public class GameStateStore : IGameStateStore
         UserType? userType = null,
         bool? isPlaying = null,
         bool? isPresent = null,
-        MutedState? discordMutedState = null)
+        VoiceState? voiceState = null)
     {
         TryUpdate(gameId, UpdateFunction);
         return Get(gameId);
@@ -93,9 +93,9 @@ public class GameStateStore : IGameStateStore
                 user.IsPresent = isPresent.Value;
             }
 
-            if (discordMutedState is not null)
+            if (voiceState is not null)
             {
-                user.MutedState = discordMutedState;
+                user.VoiceState = voiceState;
             }
 
             return state;

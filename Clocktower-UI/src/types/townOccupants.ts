@@ -6,6 +6,9 @@ import {
     mapToMiniCategory,
     type MiniCategory
 } from "./miniCategory.ts";
+import type {
+    GameUser
+} from "@/types/gameUser.ts";
 
 export type TownOccupants = {
     readonly userCount: number;
@@ -20,4 +23,16 @@ export function mapToTownOccupants(apiTownOccupants: ClocktowerServerDataTownOcc
         userCount: apiTownOccupants.userCount ?? 0,
         channelCategories: channelCategories
     };
+}
+
+export function findGameUserById(townOccupants: TownOccupants, userId: string): GameUser | undefined {
+    for (const category of townOccupants.channelCategories) {
+        for (const channelOccupant of category.channels) {
+            const user = channelOccupant.occupants.find(occupant => occupant.id === userId);
+            if (user) {
+                return user;
+            }
+        }
+    }
+    return undefined;
 }

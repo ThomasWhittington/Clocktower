@@ -279,28 +279,28 @@ public class GameStateStoreTests
     }
     
     [TestMethod]
-    [DynamicData(nameof(GetMutedStateCombinations))]
-    public void UpdateUser_Updates_MutedState(bool isServerMuted, bool isSelfMuted, bool isServerDeafened, bool isSelfDeafened)
+    [DynamicData(nameof(GetVoiceStateCombinations))]
+    public void UpdateUser_Updates_VoiceState(bool isServerMuted, bool isSelfMuted, bool isServerDeafened, bool isSelfDeafened)
     {
         const ulong userId = 1L;
         var game1 = NewGame("game1");
         _sut.Set(game1);
         var user = CommonMethods.GetRandomGameUser(userId.ToString());
         _sut.AddUserToGame("game1", user);
-        var mutedState = new MutedState(isServerMuted, isServerDeafened, isSelfMuted, isSelfDeafened);
+        var voiceState = new VoiceState(isServerMuted, isServerDeafened, isSelfMuted, isSelfDeafened);
         
         
-        var result = _sut.UpdateUser(game1.Id, userId, discordMutedState: mutedState);
+        var result = _sut.UpdateUser(game1.Id, userId, voiceState: voiceState);
         result.Should().NotBeNull();
         var thisUser = result.GetUser(userId.ToString());
         thisUser.Should().NotBeNull();
-        thisUser.MutedState.Should().Be(mutedState);
+        thisUser.VoiceState.Should().Be(voiceState);
     }
     #endregion
 
 
     private static IEnumerable<object[]> GetGameTimeValues() => TestDataProvider.GetAllEnumValues<GameTime>();
     private static IEnumerable<object[]> GetUserTypeValues() => TestDataProvider.GetAllEnumValues<UserType>();
-    public static IEnumerable<object[]> GetMutedStateCombinations() => TestDataProvider.GenerateBooleanCombinations(4);
+    public static IEnumerable<object[]> GetVoiceStateCombinations() => TestDataProvider.GenerateBooleanCombinations(4);
 
 }

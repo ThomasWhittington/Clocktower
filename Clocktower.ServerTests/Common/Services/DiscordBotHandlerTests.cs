@@ -12,7 +12,7 @@ namespace Clocktower.ServerTests.Common.Services;
 public class DiscordBotHandlerTests
 {
     private IDiscordBotHandler Sut => _mockHandler.Object;
-   
+
     private const ulong ChannelId1 = 1L;
     private const ulong ChannelId2 = 2L;
     private const ulong GuildId = 3L;
@@ -32,7 +32,6 @@ public class DiscordBotHandlerTests
     private Mock<IDiscordVoiceState> _after = null!;
     private Mock<IDiscordVoiceChannel> _voiceChannel1 = null!;
     private Mock<IDiscordVoiceChannel> _voiceChannel2 = null!;
-    
 
 
     [TestInitialize]
@@ -71,13 +70,10 @@ public class DiscordBotHandlerTests
         };
     }
 
-    private void Setup_UpdateTownOccupancy(Mock<IDiscordVoiceChannel>? beforeChannel = null, Mock<IDiscordVoiceChannel>? afterChannel = null, TownOccupants? getTownOccupancyValue = null, TownOccupants? moveUserValue = null)
+    private void Setup_UpdateTownOccupancy(TownOccupants? getTownOccupancyValue = null, TownOccupants? moveUserValue = null)
     {
-        Setup();
-        _voiceChannel1.Setup(o => o.Id).Returns(ChannelId1);
-        _voiceChannel2.Setup(o => o.Id).Returns(ChannelId2);
-        _before.Setup(o => o.VoiceChannel).Returns(beforeChannel is not null ? beforeChannel.Object : _voiceChannel1.Object);
-        _after.Setup(o => o.VoiceChannel).Returns(afterChannel is not null ? afterChannel.Object : _voiceChannel2.Object);
+        Setup_Mocks();
+
         _mockTownService.Setup(o => o.GetTownOccupancy(GuildId)).ReturnsAsync((getTownOccupancyValue is not null, getTownOccupancyValue, string.Empty));
         if (moveUserValue != null && getTownOccupancyValue != null)
         {
@@ -85,18 +81,24 @@ public class DiscordBotHandlerTests
         }
     }
 
-    private void Setup_UpdateMutedStatus(bool isServerMuted, bool isSelfMuted, bool isServerDeafened, bool isSelfDeafened, bool inVoice)
+    private void Setup_UpdateVoiceStatus(bool isServerMuted, bool isSelfMuted, bool isServerDeafened, bool isSelfDeafened, bool inVoice, TownOccupants? updateUserTownOccupants = null)
     {
-        Setup();
+        Setup_Mocks();
         _after.Setup(o => o.IsMuted).Returns(isServerMuted);
         _after.Setup(o => o.IsSelfMuted).Returns(isSelfMuted);
         _after.Setup(o => o.IsDeafened).Returns(isServerDeafened);
         _after.Setup(o => o.IsSelfDeafened).Returns(isSelfDeafened);
         _after.Setup(o => o.VoiceChannel).Returns(inVoice ? _voiceChannel2.Object : null);
+        _mockTownOccupantManager.Setup(o => o.UpdateUserStatus(GuildId, UserId, inVoice, It.Is<VoiceState>(ms =>
+            ms.IsSelfMuted == isSelfMuted &&
+            ms.IsSelfDeafened == isSelfDeafened &&
+            ms.IsServerDeafened == isServerDeafened &&
+            ms.IsServerMuted == isServerMuted
+        ))).Returns(updateUserTownOccupants);
     }
 
 
-    private void Setup(ulong? beforeGuildId = GuildId, ulong? afterGuildId = GuildId, bool hasGuildUser = true, string[]? gameIds = null)
+    private void Setup_Mocks(ulong? beforeGuildId = GuildId, ulong? afterGuildId = GuildId, bool hasGuildUser = true, string[]? gameIds = null, Mock<IDiscordVoiceChannel>? beforeChannel = null, Mock<IDiscordVoiceChannel>? afterChannel = null)
     {
         _before.Setup(o => o.GuildId).Returns(beforeGuildId);
         _after.Setup(o => o.GuildId).Returns(afterGuildId);
@@ -109,12 +111,17 @@ public class DiscordBotHandlerTests
 
         var gameStates = gameIds is null ? [] : gameIds.Select(o => new GameState { Id = o });
         _mockGameStateStore.Setup(o => o.GetGuildGames(GuildId)).Returns(gameStates);
+
+        _voiceChannel1.Setup(o => o.Id).Returns(ChannelId1);
+        _voiceChannel2.Setup(o => o.Id).Returns(ChannelId2);
+        _before.Setup(o => o.VoiceChannel).Returns(beforeChannel is not null ? beforeChannel.Object : _voiceChannel1.Object);
+        _after.Setup(o => o.VoiceChannel).Returns(afterChannel is not null ? afterChannel.Object : _voiceChannel2.Object);
     }
 
     [TestMethod]
     public async Task HandleUserVoiceStateUpdate_Exits_WhenNoGuildId()
     {
-        Setup(beforeGuildId: null, afterGuildId: null);
+        Setup_Mocks(beforeGuildId: null, afterGuildId: null);
 
         await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
 
@@ -124,7 +131,7 @@ public class DiscordBotHandlerTests
     [TestMethod]
     public async Task HandleUserVoiceStateUpdate_Exits_WhenGuildUserNotFound()
     {
-        Setup(hasGuildUser: false);
+        Setup_Mocks(hasGuildUser: false);
 
         await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
 
@@ -135,7 +142,7 @@ public class DiscordBotHandlerTests
     [TestMethod]
     public async Task HandleUserVoiceStateUpdate_CallsGetGuildGames()
     {
-        Setup();
+        Setup_Mocks();
 
         await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
 
@@ -143,53 +150,58 @@ public class DiscordBotHandlerTests
     }
 
     [TestMethod]
+    public async Task HandleUserVoiceStateUpdate_CallsUpdateTownOccupancy_WhenChannelsDoNotMatch()
+    {
+        const string gameId = "game-id";
+        Setup_Mocks(gameIds: [gameId, "game-id2"], beforeChannel: _voiceChannel1, afterChannel: _voiceChannel2);
+
+        await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
+
+        _mockHandler.Verify(x => x.UpdateTownOccupancy(_guildUser.Object, _after.Object, gameId, GuildId), Times.Once);
+        _mockHandler.Verify(x => x.UpdateVoiceStatus(_guildUser.Object, _after.Object, gameId, GuildId), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task HandleUserVoiceStateUpdate_CallsUpdateTownOccupancy_WhenChannelsMatch_WithGameState()
+    {
+        const string gameId = "game-id";
+        Setup_Mocks(gameIds: [gameId, "game-id2"], beforeChannel: _voiceChannel1, afterChannel: _voiceChannel1);
+
+        await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
+
+        _mockHandler.Verify(x => x.UpdateVoiceStatus(_guildUser.Object, _after.Object, gameId, GuildId), Times.Once);
+        _mockHandler.Verify(x => x.UpdateTownOccupancy(_guildUser.Object, _after.Object, gameId, GuildId), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task HandleUserVoiceStateUpdate_CallsUpdateTownOccupancy_WhenChannelsMatch_WithNoGameState()
+    {
+        Setup_Mocks(gameIds: [], beforeChannel: _voiceChannel1, afterChannel: _voiceChannel1);
+
+        await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
+
+        _mockHandler.Verify(x => x.UpdateVoiceStatus(_guildUser.Object, _after.Object, It.IsAny<string>(), GuildId), Times.Never);
+        _mockHandler.Verify(x => x.UpdateTownOccupancy(_guildUser.Object, _after.Object, It.IsAny<string>(), GuildId), Times.Never);
+    }
+
+    [TestMethod]
     public async Task HandleUserVoiceStateUpdate_CallsUpdateTownOccupancy()
     {
         const string gameId = "game-id";
-        Setup(gameIds: [gameId, "game-id2"]);
+        Setup_Mocks(gameIds: [gameId, "game-id2"]);
 
         await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
 
-        _mockHandler.Verify(x => x.UpdateTownOccupancy(_guildUser.Object, _before.Object, _after.Object, gameId, GuildId), Times.Once);
+        _mockHandler.Verify(x => x.UpdateTownOccupancy(_guildUser.Object, _after.Object, gameId, GuildId), Times.Once);
     }
 
-    [TestMethod]
-    public async Task HandleUserVoiceStateUpdate_CallsUpdateMutedStatus_WhenHasGameState()
-    {
-        string[] gameIds = ["game-id1", "game-id2"];
-        Setup(gameIds: gameIds);
-
-        await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
-
-        _mockHandler.Verify(x => x.UpdateMutedStatus(_guildUser.Object, _before.Object, _after.Object, gameIds[0]), Times.Once);
-    }
 
     [TestMethod]
-    public async Task HandleUserVoiceStateUpdate_NotCallUpdateMutedStatus_WhenHasNoGameState()
-    {
-        Setup(gameIds: []);
-
-        await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
-
-        _mockHandler.Verify(x => x.UpdateMutedStatus(_guildUser.Object, _before.Object, _after.Object, It.IsAny<string>()), Times.Never);
-    }
-
-    [TestMethod]
-    public async Task UpdateTownOccupancy_Exits_WhenChannelsMatch()
-    {
-        Setup_UpdateTownOccupancy(beforeChannel: _voiceChannel1, afterChannel: _voiceChannel1);
-
-        await Sut.UpdateTownOccupancy(_guildUser.Object, _before.Object, _after.Object, null, GuildId);
-
-        _mockServiceScopeFactory.Verify(f => f.CreateScope(), Times.Never);
-    }
-
-    [TestMethod]
-    public async Task UpdateTownOccupancy_CreatesTownService_WhenMoveOccurred()
+    public async Task UpdateTownOccupancy_CreatesTownService()
     {
         Setup_UpdateTownOccupancy();
 
-        await Sut.UpdateTownOccupancy(_guildUser.Object, _before.Object, _after.Object, null, GuildId);
+        await Sut.UpdateTownOccupancy(_guildUser.Object, _after.Object, null, GuildId);
 
         _mockServiceScopeFactory.Verify(f => f.CreateScope(), Times.Once);
         _mockServiceProvider.Verify(o => o.GetService(typeof(IDiscordTownService)), Times.Once);
@@ -200,7 +212,7 @@ public class DiscordBotHandlerTests
     {
         Setup_UpdateTownOccupancy(getTownOccupancyValue: null);
 
-        await Sut.UpdateTownOccupancy(_guildUser.Object, _before.Object, _after.Object, null, GuildId);
+        await Sut.UpdateTownOccupancy(_guildUser.Object, _after.Object, null, GuildId);
 
         _mockTownOccupantManager.Verify(o => o.MoveUser(
             It.IsAny<TownOccupants>(),
@@ -215,7 +227,7 @@ public class DiscordBotHandlerTests
         var dummyTownOccupancy = GetDummyTownOccupants();
         Setup_UpdateTownOccupancy(getTownOccupancyValue: dummyTownOccupancy);
 
-        await Sut.UpdateTownOccupancy(_guildUser.Object, _before.Object, _after.Object, null, GuildId);
+        await Sut.UpdateTownOccupancy(_guildUser.Object, _after.Object, null, GuildId);
 
         _mockTownOccupantManager.Verify(o => o.MoveUser(
             dummyTownOccupancy,
@@ -230,7 +242,7 @@ public class DiscordBotHandlerTests
         var dummyTownOccupancy = GetDummyTownOccupants();
         Setup_UpdateTownOccupancy(getTownOccupancyValue: dummyTownOccupancy);
 
-        await Sut.UpdateTownOccupancy(_guildUser.Object, _before.Object, _after.Object, null, GuildId);
+        await Sut.UpdateTownOccupancy(_guildUser.Object, _after.Object, null, GuildId);
 
         _mockNotificationService.Verify(o => o.BroadcastTownOccupancyUpdate(
             It.IsAny<string>(),
@@ -246,37 +258,31 @@ public class DiscordBotHandlerTests
         var dummyTownOccupancy2 = new TownOccupants([]);
         Setup_UpdateTownOccupancy(getTownOccupancyValue: dummyTownOccupancy, moveUserValue: dummyTownOccupancy2);
 
-        await Sut.UpdateTownOccupancy(_guildUser.Object, _before.Object, _after.Object, gameId, GuildId);
+        await Sut.UpdateTownOccupancy(_guildUser.Object, _after.Object, gameId, GuildId);
 
         _mockNotificationService.Verify(o => o.BroadcastTownOccupancyUpdate(gameId, dummyTownOccupancy2), Times.Once);
     }
 
     [TestMethod]
-    [DynamicData(nameof(GetMutedStateCombinations))]
+    [DynamicData(nameof(GetVoiceStateCombinations))]
     public async Task HandleUserVoiceStateUpdate_UpdatesUser_And_NotifyClients(bool inVoice, bool isServerMuted, bool isSelfMuted, bool isServerDeafened, bool isSelfDeafened)
     {
         const string gameId = "game-id";
-        Setup_UpdateMutedStatus(isServerMuted, isSelfMuted, isServerDeafened, isSelfDeafened, inVoice);
+        var townOccupancy = new TownOccupants([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
+        Setup_UpdateVoiceStatus(isServerMuted, isSelfMuted, isServerDeafened, isSelfDeafened, inVoice, townOccupancy);
 
-        await Sut.UpdateMutedStatus(_guildUser.Object, _before.Object, _after.Object, gameId);
+        await Sut.UpdateVoiceStatus(_guildUser.Object, _after.Object, gameId, GuildId);
 
         _mockGameStateStore.Verify(o => o.UpdateUser(gameId, UserId, null, null,
             isPresent: inVoice,
-            discordMutedState: It.Is<MutedState>(ms =>
+            voiceState: It.Is<VoiceState>(ms =>
                 ms.IsSelfMuted == isSelfMuted &&
                 ms.IsSelfDeafened == isSelfDeafened &&
                 ms.IsServerDeafened == isServerDeafened &&
                 ms.IsServerMuted == isServerMuted
             )
         ), Times.Once);
-        _mockNotificationService.Verify(o => o.BroadcastUserVoiceStateChanged(gameId, UserId.ToString(), inVoice,
-            It.Is<MutedState>(ms =>
-                ms.IsSelfMuted == isSelfMuted &&
-                ms.IsSelfDeafened == isSelfDeafened &&
-                ms.IsServerDeafened == isServerDeafened &&
-                ms.IsServerMuted == isServerMuted
-            )
-        ), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastTownOccupancyUpdate(gameId, townOccupancy), Times.Once);
     }
 
     private static TownOccupants GetDummyTownOccupants()
@@ -304,5 +310,5 @@ public class DiscordBotHandlerTests
         new ChannelOccupants(new MiniChannel("night-channel-3", "Night Channel 3"), []),
     ]);
 
-    public static IEnumerable<object[]> GetMutedStateCombinations() => TestDataProvider.GenerateBooleanCombinations(5);
+    public static IEnumerable<object[]> GetVoiceStateCombinations() => TestDataProvider.GenerateBooleanCombinations(5);
 }

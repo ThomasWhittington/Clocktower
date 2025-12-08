@@ -11,6 +11,7 @@ using Clocktower.Server.Discord.Services;
 using Clocktower.Server.Discord.Town.Services;
 using Clocktower.Server.Roles.Services;
 using Clocktower.Server.Socket;
+using Clocktower.Server.Socket.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
@@ -58,6 +59,7 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IIdGenerator, GuidIdGenerator>();
             builder.Services.AddSingleton<IJwtWriter, JwtWriter>();
             builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
+            builder.Services.AddSingleton<IHubStateManager, HubStateManager>();
             builder.Services.AddSingleton<IGameStateStore, GameStateStore>();
             builder.Services.AddSingleton<ITownOccupancyStore, TownOccupancyStore>();
             builder.Services.AddSingleton<ITownOccupantManager, TownOccupantManager>();

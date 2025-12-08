@@ -3,6 +3,7 @@
 public interface IDiscordGuildUser
 {
     ulong Id { get; }
+    ulong GuildId { get; }
     string DisplayName { get; }
     string DisplayAvatarUrl { get; }
     public bool IsServerMuted { get; }
