@@ -526,5 +526,27 @@
       }
     },
     "isImported": false
+  },
+  {
+    "id": "TASK_273",
+    "priority": "MEDIUM",
+    "tags": [],
+    "title": "Basic town layout",
+    "description": "Create a basic dynamic circle for all players. \n\nShould highlight the current player (blue)\nand also highlight other users in the same call (green)\n\nHave a list of story tellers in the corner.\n\nShould all update automatically as the seating order changes",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 10
+      },
+      "time": {
+        "hour": 16,
+        "minute": 36,
+        "second": 56,
+        "nano": 756605100
+      }
+    },
+    "isImported": false
   }
 ]
