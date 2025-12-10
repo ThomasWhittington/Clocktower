@@ -6,7 +6,7 @@ namespace Clocktower.Server.Common.Services;
 
 public class DiscordBotHandler(
     IGameStateStore gameStateStore,
-    ITownOccupantManager townOccupantManager,
+    IDiscordTownManager discordDiscordTownManager,
     IUserService userService,
     INotificationService notificationService,
     IServiceScopeFactory serviceScopeFactory
@@ -28,21 +28,21 @@ public class DiscordBotHandler(
         }
         else
         {
-            await UpdateTownOccupancy(guildUser, after, gameState?.Id, guildId.Value);
+            await UpdateDiscordTown(guildUser, after, gameState?.Id, guildId.Value);
         }
     }
 
-    public virtual async Task UpdateTownOccupancy(IDiscordGuildUser user, IDiscordVoiceState after, string? gameId, ulong guildId)
+    public virtual async Task UpdateDiscordTown(IDiscordGuildUser user, IDiscordVoiceState after, string? gameId, ulong guildId)
     {
         using var scope = serviceScopeFactory.CreateScope();
         var townService = scope.ServiceProvider.GetRequiredService<IDiscordTownService>();
-        var (success, thisTownOccupancy, _) = await townService.GetTownOccupancy(guildId);
-        if (!success || thisTownOccupancy is null) return;
-        var newTownOccupancy = townOccupantManager.MoveUser(thisTownOccupancy, user, after.VoiceChannel);
+        var (success, discordTown, _) = await townService.GetDiscordTown(guildId);
+        if (!success || discordTown is null) return;
+        var newDiscordTown = discordDiscordTownManager.MoveUser(discordTown, user, after.VoiceChannel);
 
         if (gameId is not null)
         {
-            await notificationService.BroadcastTownOccupancyUpdate(gameId, newTownOccupancy);
+            await notificationService.BroadcastDiscordTownUpdate(gameId, newDiscordTown);
         }
     }
 
@@ -53,10 +53,10 @@ public class DiscordBotHandler(
 
         userService.UpdateDiscordPresence(user.Id.ToString(), guildId.ToString(), inVoice, discordVoiceState);
 
-        var townOccupants = townOccupantManager.GetTownOccupancy(guildId);
-        if (townOccupants is not null)
+        var discordTown = discordDiscordTownManager.GetDiscordTown(guildId);
+        if (discordTown is not null)
         {
-            await notificationService.BroadcastTownOccupancyUpdate(gameId, townOccupants);
+            await notificationService.BroadcastDiscordTownUpdate(gameId, discordTown);
         }
     }
 }

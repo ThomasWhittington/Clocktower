@@ -4,23 +4,23 @@ using Clocktower.Server.Data.Stores;
 namespace Clocktower.ServerTests.Data.Stores;
 
 [TestClass]
-public class TownOccupancyStoreTests
+public class DiscordTownStoreTests
 {
-    private ITownOccupancyStore _sut = null!;
-    private TownOccupants _dummyOccupants = null!;
+    private IDiscordTownStore _sut = null!;
+    private DiscordTown _dummy = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _sut = new TownOccupancyStore();
-        _dummyOccupants = GetDummyTownOccupants();
+        _sut = new DiscordTownStore();
+        _dummy = GetDummyDiscordTown();
     }
 
-    private static TownOccupants GetDummyTownOccupants()
+    private static DiscordTown GetDummyDiscordTown()
     {
         var channelCategories = new List<MiniCategory> { DayCategory, NightCategory };
-        var townOccupants = new TownOccupants(channelCategories);
-        return townOccupants;
+        var discordTown = new DiscordTown(channelCategories);
+        return discordTown;
     }
 
     private static readonly MiniCategory DayCategory = new("1001", "Day Category", [
@@ -44,21 +44,21 @@ public class TownOccupancyStoreTests
     [TestMethod]
     public void Set_WhenGuildDoesNotExist_ReturnsTrue()
     {
-        var result = _sut.Set("guild1", _dummyOccupants);
+        var result = _sut.Set("guild1", _dummy);
 
         result.Should().BeTrue();
-        _sut.Get("guild1").Should().Be(_dummyOccupants);
+        _sut.Get("guild1").Should().Be(_dummy);
     }
 
     [TestMethod]
     public void Set_WhenGuildAlreadyExists_ReturnsFalse()
     {
-        _sut.Set("guild1", _dummyOccupants);
+        _sut.Set("guild1", _dummy);
 
-        var result = _sut.Set("guild1", new TownOccupants([]));
+        var result = _sut.Set("guild1", new DiscordTown([]));
 
         result.Should().BeFalse();
-        _sut.Get("guild1").Should().BeEquivalentTo(_dummyOccupants);
+        _sut.Get("guild1").Should().BeEquivalentTo(_dummy);
     }
 
     [TestMethod]
@@ -80,8 +80,8 @@ public class TownOccupancyStoreTests
     [TestMethod]
     public void TryUpdate_WhenGuildExists_UpdatesAndReturnsTrue()
     {
-        _sut.Set("guild1", _dummyOccupants);
-        var newOccupants = new TownOccupants([]);
+        _sut.Set("guild1", _dummy);
+        var newOccupants = new DiscordTown([]);
 
         var result = _sut.TryUpdate("guild1", _ => newOccupants);
 
@@ -92,7 +92,7 @@ public class TownOccupancyStoreTests
     [TestMethod]
     public void TryUpdate_WhenGuildDoesNotExist_ReturnsFalse()
     {
-        var result = _sut.TryUpdate("nonexistent", _ => _dummyOccupants);
+        var result = _sut.TryUpdate("nonexistent", _ => _dummy);
 
         result.Should().BeFalse();
     }
@@ -100,7 +100,7 @@ public class TownOccupancyStoreTests
     [TestMethod]
     public void Remove_WhenGuildExists_RemovesAndReturnsTrue()
     {
-        _sut.Set("guild1", _dummyOccupants);
+        _sut.Set("guild1", _dummy);
 
         var result = _sut.Remove("guild1");
 
@@ -113,18 +113,18 @@ public class TownOccupancyStoreTests
     {
         const ulong guildId = 123456789UL;
 
-        _sut.Set(guildId, _dummyOccupants).Should().BeTrue();
+        _sut.Set(guildId, _dummy).Should().BeTrue();
         _sut.Get((ulong?)null).Should().BeNull();
-        _sut.Get(guildId).Should().Be(_dummyOccupants);
-        _sut.TryUpdate(guildId, _ => _dummyOccupants);
+        _sut.Get(guildId).Should().Be(_dummy);
+        _sut.TryUpdate(guildId, _ => _dummy);
         _sut.Remove(guildId).Should().BeTrue();
     }
 
     [TestMethod]
     public void Clear_RemovesAllEntries()
     {
-        _sut.Set("guild1", _dummyOccupants);
-        _sut.Set("guild2", _dummyOccupants);
+        _sut.Set("guild1", _dummy);
+        _sut.Set("guild2", _dummy);
 
         _sut.Clear();
 
@@ -135,11 +135,11 @@ public class TownOccupancyStoreTests
     [TestMethod]
     public void GetTownByUser_UserNotInTown_ReturnsNull()
     {
-        var store = new TownOccupancyStore();
+        var store = new DiscordTownStore();
         const string userId = "user123";
         const string guildId = "guild456";
-        var townOccupants = GetDummyTownOccupants();
-        store.Set(guildId, townOccupants);
+        var discordTown = GetDummyDiscordTown();
+        store.Set(guildId, discordTown);
 
         var result = store.GetTownByUser(userId);
 
@@ -147,24 +147,24 @@ public class TownOccupancyStoreTests
     }
 
     [TestMethod]
-    public void GetTownByUser_UserExistsInTown_ReturnsTownOccupants()
+    public void GetTownByUser_UserExistsInTown_ReturnsDiscordTown()
     {
-        var store = new TownOccupancyStore();
+        var store = new DiscordTownStore();
         const string userId = "user123";
         const string guildId = "guild456";
-        var townOccupants = CreateTownWithUser(userId);
-        store.Set(guildId, townOccupants);
+        var discordTown = CreateTownWithUser(userId);
+        store.Set(guildId, discordTown);
 
         var result = store.GetTownByUser(userId);
 
         result.Should().NotBeNull();
-        result.Should().Be(townOccupants);
+        result.Should().Be(discordTown);
     }
 
     [TestMethod]
     public void GetTownByUser_UserInMultipleTowns_ReturnsFirstMatch()
     {
-        var store = new TownOccupancyStore();
+        var store = new DiscordTownStore();
         const string userId = "user123";
         var town1 = CreateTownWithUser(userId);
         var town2 = CreateTownWithUser(userId);
@@ -177,9 +177,9 @@ public class TownOccupancyStoreTests
         result.Should().BeOneOf(town1, town2);
     }
 
-    private static TownOccupants CreateTownWithUser(string userId)
+    private static DiscordTown CreateTownWithUser(string userId)
     {
-        return new TownOccupants([
+        return new DiscordTown([
             new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [
                 new ChannelOccupants(new MiniChannel(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString()),
                     [

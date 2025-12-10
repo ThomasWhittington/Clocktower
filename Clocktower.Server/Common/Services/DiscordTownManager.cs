@@ -2,9 +2,9 @@
 
 namespace Clocktower.Server.Common.Services;
 
-public class TownOccupantManager(ITownOccupancyStore townOccupancyStore) : ITownOccupantManager
+public class DiscordTownManager(IDiscordTownStore discordTownStore) : IDiscordTownManager
 {
-    public TownOccupants MoveUser(TownOccupants current, IDiscordGuildUser user, IDiscordVoiceChannel? newChannel)
+    public DiscordTown MoveUser(DiscordTown current, IDiscordGuildUser user, IDiscordVoiceChannel? newChannel)
     {
         var currentChannel = FindUserChannel(current, user.Id.ToString());
         if (currentChannel is not null && newChannel is not null &&
@@ -29,13 +29,13 @@ public class TownOccupantManager(ITownOccupancyStore townOccupancyStore) : ITown
                 }).ToList()
             }
         ).ToList();
-        var newTownOccupants = new TownOccupants(newChannelCategories);
-        townOccupancyStore.Set(user.GuildId, newTownOccupants, force: true);
-        return newTownOccupants;
+        var discordTown = new DiscordTown(newChannelCategories);
+        discordTownStore.Set(user.GuildId, discordTown, force: true);
+        return discordTown;
     }
 
 
-    public ChannelOccupants? FindUserChannel(TownOccupants occupants, string userId)
+    public ChannelOccupants? FindUserChannel(DiscordTown occupants, string userId)
     {
         return occupants.ChannelCategories
             .SelectMany(category => category.Channels)
@@ -44,10 +44,10 @@ public class TownOccupantManager(ITownOccupancyStore townOccupancyStore) : ITown
 
     public bool UpdateUserStatus(ulong guildId, string userId, bool isPresent, VoiceState discordVoiceState)
     {
-        var thisTownOccupancy = townOccupancyStore.Get(guildId);
-        if (thisTownOccupancy is null) return false;
+        var discordTown = discordTownStore.Get(guildId);
+        if (discordTown is null) return false;
 
-        var newChannelCategories = thisTownOccupancy.ChannelCategories.Select(category =>
+        var newChannelCategories = discordTown.ChannelCategories.Select(category =>
             category with
             {
                 Channels = category.Channels.Select(channel =>
@@ -63,19 +63,19 @@ public class TownOccupantManager(ITownOccupancyStore townOccupancyStore) : ITown
             }
         ).ToList();
 
-        var newTownOccupants = new TownOccupants(newChannelCategories);
-        townOccupancyStore.Set(guildId, newTownOccupants, force: true);
+        var newDiscordTown = new DiscordTown(newChannelCategories);
+        discordTownStore.Set(guildId, newDiscordTown, force: true);
         return true;
     }
 
-    public TownOccupants? GetTownOccupancy(ulong guildId) => townOccupancyStore.Get(guildId);
+    public DiscordTown? GetDiscordTown(ulong guildId) => discordTownStore.Get(guildId);
 
     public TownUser? GetTownUser(string userId)
     {
-        var townOccupancy = townOccupancyStore.GetTownByUser(userId);
-        if (townOccupancy is null) return null;
+        var discordTown = discordTownStore.GetTownByUser(userId);
+        if (discordTown is null) return null;
         
-        foreach (var category in townOccupancy.ChannelCategories)
+        foreach (var category in discordTown.ChannelCategories)
         {
             foreach (var channel in category.Channels)
             {

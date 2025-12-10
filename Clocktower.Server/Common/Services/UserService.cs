@@ -1,6 +1,6 @@
 ﻿namespace Clocktower.Server.Common.Services;
 
-public class UserService(ITownOccupancyStore townStore, IGameStateStore gameStore, ITownOccupantManager townOccupantManager)
+public class UserService(IDiscordTownStore discordTownStore, IGameStateStore gameStore, IDiscordTownManager discordTownManager)
     : IUserService
 {
     public IEnumerable<TownUser> GetTownUsersForGameUsers(
@@ -8,14 +8,14 @@ public class UserService(ITownOccupancyStore townStore, IGameStateStore gameStor
         string guildId,
         Func<TownUser, bool>? filter = null)
     {
-        var townOccupants = townStore.Get(guildId);
-        if (townOccupants == null) yield break;
+        var discordTown = discordTownStore.Get(guildId);
+        if (discordTown == null) yield break;
 
         var userIds = users.Select(p => p.Id).ToHashSet();
 
         foreach (
             var townUser in from category
-                in townOccupants.ChannelCategories
+                in discordTown.ChannelCategories
             from channel in category.Channels
             from townUser in channel.Occupants
             where userIds.Contains(townUser.Id) &&
@@ -27,10 +27,10 @@ public class UserService(ITownOccupancyStore townStore, IGameStateStore gameStor
     }
 
     public bool UpdateDiscordPresence(string userId, string guildId, bool isPresent, VoiceState voiceState) =>
-        townOccupantManager.UpdateUserStatus(ulong.Parse(guildId), userId, isPresent: isPresent, discordVoiceState: voiceState);
+        discordTownManager.UpdateUserStatus(ulong.Parse(guildId), userId, isPresent: isPresent, discordVoiceState: voiceState);
 
     public bool UpdateGameUser(string gameId, string userId, UserType? userType = null, bool? isPlaying = null) =>
         gameStore.UpdateUser(gameId, ulong.Parse(userId), userType: userType, isPlaying: isPlaying);
 
-    public string? GetUserName(string userId) => townOccupantManager.GetTownUser(userId)?.Name;
+    public string? GetUserName(string userId) => discordTownManager.GetTownUser(userId)?.Name;
 }

@@ -8,19 +8,19 @@ namespace Clocktower.ServerTests.Common.Services;
 [TestClass]
 public class UserServiceTests
 {
-    private Mock<ITownOccupancyStore> _mockTownOccupancyStore = null!;
+    private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
     private Mock<IGameStateStore> _mockGameStateStore = null!;
-    private Mock<ITownOccupantManager> _mockTownOccupantManager = null!;
+    private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private IUserService _sut = null!;
 
     [TestInitialize]
     public void SetUp()
     {
-        _mockTownOccupancyStore = StrictMockFactory.Create<ITownOccupancyStore>();
+        _mockDiscordTownStore = StrictMockFactory.Create<IDiscordTownStore>();
         _mockGameStateStore = StrictMockFactory.Create<IGameStateStore>();
-        _mockTownOccupantManager = StrictMockFactory.Create<ITownOccupantManager>();
+        _mockDiscordTownManager = StrictMockFactory.Create<IDiscordTownManager>();
 
-        _sut = new UserService(_mockTownOccupancyStore.Object, _mockGameStateStore.Object, _mockTownOccupantManager.Object);
+        _sut = new UserService(_mockDiscordTownStore.Object, _mockGameStateStore.Object, _mockDiscordTownManager.Object);
     }
 
     #region GetUserName
@@ -33,7 +33,7 @@ public class UserServiceTests
             townUser = CommonMethods.GetRandomTownUser(userId, name);
         }
 
-        _mockTownOccupantManager.Setup(o => o.GetTownUser(userId)).Returns(townUser);
+        _mockDiscordTownManager.Setup(o => o.GetTownUser(userId)).Returns(townUser);
     }
 
     [TestMethod]
@@ -91,7 +91,7 @@ public class UserServiceTests
 
     private void SetUp_UpdateDiscordPresence(string userId, ulong guildId, bool isPresent, VoiceState voiceState, bool updateReturn)
     {
-        _mockTownOccupantManager.Setup(o => o.UpdateUserStatus(guildId, userId, isPresent, voiceState)).Returns(updateReturn);
+        _mockDiscordTownManager.Setup(o => o.UpdateUserStatus(guildId, userId, isPresent, voiceState)).Returns(updateReturn);
     }
 
     [TestMethod]
@@ -114,12 +114,12 @@ public class UserServiceTests
     #region GetTownUsersForGameUsers
 
     [TestMethod]
-    public void GetTownUsersForGameUsers_ReturnsEmpty_WhenTownOccupantsNotFound()
+    public void GetTownUsersForGameUsers_ReturnsEmpty_WhendiscordTownNotFound()
     {
         var gameUsers = new[] { new GameUser("user1") };
         const string guildId = "guild123";
         
-        _mockTownOccupancyStore.Setup(x => x.Get(guildId)).Returns((TownOccupants?)null);
+        _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns((DiscordTown?)null);
 
         var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId);
 
@@ -131,9 +131,9 @@ public class UserServiceTests
     {
         var gameUsers = Array.Empty<GameUser>();
         const string guildId = "guild123";
-        var townOccupants = CreateTownOccupants();
+        var discordTown = CreateDiscordTown();
         
-        _mockTownOccupancyStore.Setup(x => x.Get(guildId)).Returns(townOccupants);
+        _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
         var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId);
 
@@ -154,8 +154,8 @@ public class UserServiceTests
         var townUser2 = new TownUser("user2", "User Two", "Avatar2");
         var townUser3 = new TownUser("user3", "User Three", "Avatar3");
         
-        var townOccupants = CreateTownOccupants(townUser1, townUser2, townUser3);
-        _mockTownOccupancyStore.Setup(x => x.Get(guildId)).Returns(townOccupants);
+        var discordTown = CreateDiscordTown(townUser1, townUser2, townUser3);
+        _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
         var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId).ToArray();
 
@@ -178,8 +178,8 @@ public class UserServiceTests
         var townUser1 = new TownUser("user1", "User One", "Avatar1") { IsPresent = true };
         var townUser2 = new TownUser("user2", "User Two", "Avatar2") { IsPresent = false };
         
-        var townOccupants = CreateTownOccupants(townUser1, townUser2);
-        _mockTownOccupancyStore.Setup(x => x.Get(guildId)).Returns(townOccupants);
+        var discordTown = CreateDiscordTown(townUser1, townUser2);
+        _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
         var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId, u => u.IsPresent).ToArray();
 
@@ -195,8 +195,8 @@ public class UserServiceTests
         const string guildId = "guild123";
         
         var townUser1 = new TownUser("user1", "User One", "Avatar1") { IsPresent = false };
-        var townOccupants = CreateTownOccupants(townUser1);
-        _mockTownOccupancyStore.Setup(x => x.Get(guildId)).Returns(townOccupants);
+        var discordTown = CreateDiscordTown(townUser1);
+        _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
         var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId, u => u.IsPresent);
 
@@ -220,9 +220,9 @@ public class UserServiceTests
         var channel2 = new ChannelOccupants(new MiniChannel("ch2", "Channel 2"), [townUser2]);
         
         var category = new MiniCategory("cat1", "Test Category", [channel1, channel2]);
-        var townOccupants = new TownOccupants([category]);
+        var discordTown = new DiscordTown([category]);
         
-        _mockTownOccupancyStore.Setup(x => x.Get(guildId)).Returns(townOccupants);
+        _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
         var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId).ToArray();
 
@@ -250,9 +250,9 @@ public class UserServiceTests
         var category1 = new MiniCategory("cat1", "Category 1", [channel1]);
         var category2 = new MiniCategory("cat2", "Category 2", [channel2]);
         
-        var townOccupants = new TownOccupants([category1, category2]);
+        var discordTown = new DiscordTown([category1, category2]);
         
-        _mockTownOccupancyStore.Setup(x => x.Get(guildId)).Returns(townOccupants);
+        _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
         var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId).ToArray();
 
@@ -267,14 +267,14 @@ public class UserServiceTests
         var gameUsers = new[] { new GameUser("user1") };
         const string guildId = "specific-guild-123";
         
-        _mockTownOccupancyStore.Setup(x => x.Get(guildId)).Returns((TownOccupants?)null);
+        _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns((DiscordTown?)null);
 
         _ = _sut.GetTownUsersForGameUsers(gameUsers, guildId).ToList();
 
-        _mockTownOccupancyStore.Verify(x => x.Get(guildId), Times.Once);
+        _mockDiscordTownStore.Verify(x => x.Get(guildId), Times.Once);
     }
 
-    private static TownOccupants CreateTownOccupants(params TownUser[] users)
+    private static DiscordTown CreateDiscordTown(params TownUser[] users)
     {
         var channel = new ChannelOccupants(
             new MiniChannel("channel1", "Test Channel"), 
@@ -282,7 +282,7 @@ public class UserServiceTests
         
         var category = new MiniCategory("category1", "Test Category", [channel]);
         
-        return new TownOccupants([category]);
+        return new DiscordTown([category]);
     }
     #endregion
 }

@@ -34,7 +34,7 @@ public class DiscordTownServiceTests
     private Mock<IDiscordBot> _mockBot = null!;
     private Mock<INotificationService> _mockNotificationService = null!;
     private Mock<IGameStateStore> _mockGameStateStore = null!;
-    private Mock<ITownOccupancyStore> _mockTownOccupancyStore = null!;
+    private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
     private Mock<IJwtWriter> _mockJwtWriter = null!;
     private Mock<IMemoryCache> _mockCache = null!;
     private Mock<IOptions<Secrets>> _mockSecrets = null!;
@@ -45,7 +45,7 @@ public class DiscordTownServiceTests
         _mockBot.Object,
         _mockNotificationService.Object,
         _mockGameStateStore.Object,
-        _mockTownOccupancyStore.Object,
+        _mockDiscordTownStore.Object,
         _mockJwtWriter.Object,
         _mockCache.Object,
         _mockSecrets.Object,
@@ -59,7 +59,7 @@ public class DiscordTownServiceTests
         _mockBot = new Mock<IDiscordBot>();
         _mockNotificationService = new Mock<INotificationService>();
         _mockGameStateStore = new Mock<IGameStateStore>();
-        _mockTownOccupancyStore = new Mock<ITownOccupancyStore>();
+        _mockDiscordTownStore = new Mock<IDiscordTownStore>();
         _mockJwtWriter = new Mock<IJwtWriter>();
         _mockCache = new Mock<IMemoryCache>();
         _mockSecrets = new Mock<IOptions<Secrets>>();
@@ -798,44 +798,44 @@ public class DiscordTownServiceTests
 
     #endregion
 
-    #region GetTownOccupancy
+    #region GetDiscordTown
 
     [TestMethod]
-    public async Task GetTownOccupancy_ReturnsFalse_WhenExceptionThrown()
+    public async Task GetDiscordTown_ReturnsFalse_WhenExceptionThrown()
     {
         const string exMessage = "message";
-        _mockTownOccupancyStore.Setup(o => o.Get(GuildId)).Throws(new Exception(exMessage));
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Throws(new Exception(exMessage));
 
-        var (success, townOccupants, message) = await Sut.GetTownOccupancy(GuildId);
+        var (success, discordTown, message) = await Sut.GetDiscordTown(GuildId);
 
         success.Should().BeFalse();
-        townOccupants.Should().BeNull();
+        discordTown.Should().BeNull();
         message.Should().Be(exMessage);
     }
 
     [TestMethod]
-    public async Task GetTownOccupancy_ReturnsTrue_WhenStoreHasValue()
+    public async Task GetDiscordTown_ReturnsTrue_WhenStoreHasValue()
     {
-        var dummyTownOccupants = GetDummyTownOccupants();
-        _mockTownOccupancyStore.Setup(o => o.Get(GuildId)).Returns(dummyTownOccupants);
+        var dummyDiscordTown = GetDummyDiscordTown();
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns(dummyDiscordTown);
 
-        var (success, townOccupants, message) = await Sut.GetTownOccupancy(GuildId);
+        var (success, discordTown, message) = await Sut.GetDiscordTown(GuildId);
 
         success.Should().BeTrue();
-        townOccupants.Should().Be(dummyTownOccupants);
+        discordTown.Should().Be(dummyDiscordTown);
         message.Should().Be("Got from store");
     }
 
     [TestMethod]
-    public async Task GetTownOccupancy_ReturnsFalse_WhenGuildNotFound()
+    public async Task GetDiscordTown_ReturnsFalse_WhenGuildNotFound()
     {
-        _mockTownOccupancyStore.Setup(o => o.Get(GuildId)).Returns((TownOccupants?)null);
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns((DiscordTown?)null);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns((IDiscordGuild?)null);
 
-        var (success, townOccupants, message) = await Sut.GetTownOccupancy(GuildId);
+        var (success, discordTown, message) = await Sut.GetDiscordTown(GuildId);
 
         success.Should().BeFalse();
-        townOccupants.Should().Be(null);
+        discordTown.Should().Be(null);
         message.Should().Be(GuildNotFoundMessage);
     }
 
@@ -844,66 +844,66 @@ public class DiscordTownServiceTests
     [DataRow(true, false)]
     [DataRow(false, true)]
     [DataRow(false, false)]
-    public async Task GetTownOccupancy_SetsStore_WithExpectedCategories(bool hasDayCategory, bool hasNightCategory)
+    public async Task GetDiscordTown_SetsStore_WithExpectedCategories(bool hasDayCategory, bool hasNightCategory)
     {
         var guild = new Mock<IDiscordGuild>();
         var channelCategories = new List<MiniCategory>();
         if (hasDayCategory) channelCategories.Add(DayCategory);
         if (hasNightCategory) channelCategories.Add(NightCategory);
-        var expectedTownOccupants = new TownOccupants(channelCategories);
+        var expectedDiscordTown = new DiscordTown(channelCategories);
         _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategory.Name);
         _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategory.Name);
-        _mockTownOccupancyStore.Setup(o => o.Get(GuildId)).Returns((TownOccupants?)null);
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns((DiscordTown?)null);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetMiniCategory(DayCategory.Name)).Returns(hasDayCategory ? DayCategory : null);
         guild.Setup(o => o.GetMiniCategory(NightCategory.Name)).Returns(hasNightCategory ? NightCategory : null);
 
-        var (success, townOccupants, message) = await Sut.GetTownOccupancy(GuildId);
+        var (success, discordTown, message) = await Sut.GetDiscordTown(GuildId);
 
         success.Should().BeTrue();
-        townOccupants.Should().BeEquivalentTo(expectedTownOccupants);
-        message.Should().Be($"Town occupancy {townOccupants.UserCount}");
+        discordTown.Should().BeEquivalentTo(expectedDiscordTown);
+        message.Should().Be($"Discord town {discordTown.UserCount}");
     }
 
     [TestMethod]
-    public async Task GetTownOccupancy_NotifiesClients_WhenGameFound()
+    public async Task GetDiscordTown_NotifiesClients_WhenGameFound()
     {
         var guild = new Mock<IDiscordGuild>();
-        var expectedTownOccupants = GetDummyTownOccupants();
+        var expectedDiscordTown = GetDummyDiscordTown();
         _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategory.Name);
         _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategory.Name);
-        _mockTownOccupancyStore.Setup(o => o.Get(GuildId)).Returns((TownOccupants?)null);
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns((DiscordTown?)null);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetMiniCategory(DayCategory.Name)).Returns(DayCategory);
         guild.Setup(o => o.GetMiniCategory(NightCategory.Name)).Returns(NightCategory);
         _mockGameStateStore.Setup(o => o.GetGuildGames(GuildId)).Returns([new GameState { Id = GameId }]);
 
-        TownOccupants? capturedTownOccupants = null;
+        DiscordTown? capturedDiscordTown = null;
         _mockNotificationService.Setup(o =>
-            o.BroadcastTownOccupancyUpdate(It.IsAny<string>(), It.IsAny<TownOccupants>())
-        ).Callback<string, TownOccupants>((_, occupants) => capturedTownOccupants = occupants);
+            o.BroadcastDiscordTownUpdate(It.IsAny<string>(), It.IsAny<DiscordTown>())
+        ).Callback<string, DiscordTown>((_, town) => capturedDiscordTown = town);
 
-        _ = await Sut.GetTownOccupancy(GuildId);
+        _ = await Sut.GetDiscordTown(GuildId);
 
-        _mockNotificationService.Verify(o => o.BroadcastTownOccupancyUpdate(GameId, It.IsAny<TownOccupants>()), Times.Once);
-        capturedTownOccupants.Should().BeEquivalentTo(expectedTownOccupants);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId, It.IsAny<DiscordTown>()), Times.Once);
+        capturedDiscordTown.Should().BeEquivalentTo(expectedDiscordTown);
     }
 
     [TestMethod]
-    public async Task GetTownOccupancy_DoesNotNotifyClients_WhenNoGameFound()
+    public async Task GetDiscordTown_DoesNotNotifyClients_WhenNoGameFound()
     {
         var guild = new Mock<IDiscordGuild>();
         _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategory.Name);
         _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategory.Name);
-        _mockTownOccupancyStore.Setup(o => o.Get(GuildId)).Returns((TownOccupants?)null);
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns((DiscordTown?)null);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetMiniCategory(DayCategory.Name)).Returns(DayCategory);
         guild.Setup(o => o.GetMiniCategory(NightCategory.Name)).Returns(NightCategory);
         _mockGameStateStore.Setup(o => o.GetGuildGames(GuildId)).Returns([]);
 
-        _ = await Sut.GetTownOccupancy(GuildId);
+        _ = await Sut.GetDiscordTown(GuildId);
 
-        _mockNotificationService.Verify(o => o.BroadcastTownOccupancyUpdate(GameId, It.IsAny<TownOccupants>()), Times.Never);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId, It.IsAny<DiscordTown>()), Times.Never);
     }
 
     #endregion
@@ -1091,11 +1091,11 @@ public class DiscordTownServiceTests
 
     #endregion
 
-    private static TownOccupants GetDummyTownOccupants()
+    private static DiscordTown GetDummyDiscordTown()
     {
         var channelCategories = new List<MiniCategory> { DayCategory, NightCategory };
-        var townOccupants = new TownOccupants(channelCategories);
-        return townOccupants;
+        var discordTown = new DiscordTown(channelCategories);
+        return discordTown;
     }
 
     private static readonly MiniCategory DayCategory = new("day-category", "Day Category", [

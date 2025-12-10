@@ -13,7 +13,7 @@ public class DiscordTownService(
     IDiscordBot bot,
     INotificationService notificationService,
     IGameStateStore gameStateStore,
-    ITownOccupancyStore townOccupancyStore,
+    IDiscordTownStore discordTownStore,
     IJwtWriter jwtWriter,
     IMemoryCache cache,
     IOptions<Secrets> secretsOptions,
@@ -137,12 +137,12 @@ public class DiscordTownService(
         }
     }
 
-    public async Task<(bool success, TownOccupants? townOccupants, string message)> GetTownOccupancy(ulong guildId)
+    public async Task<(bool success, DiscordTown? discordTown, string message)> GetDiscordTown(ulong guildId)
     {
         try
         {
-            var thisTownOccupancy = townOccupancyStore.Get(guildId);
-            if (thisTownOccupancy != null) return (true, thisTownOccupancy, "Got from store");
+            var thisDiscordTown = discordTownStore.Get(guildId);
+            if (thisDiscordTown != null) return (true, thisDiscordTown, "Got from store");
 
             var guild = bot.GetGuild(guildId);
             if (guild is null) return (false, null, GuildNotFoundMessage);
@@ -153,13 +153,13 @@ public class DiscordTownService(
             var nightCategory = guild.GetMiniCategory(discordConstants.NightCategoryName);
             if (nightCategory != null) channelCategories.Add(nightCategory);
 
-            var townOccupants = new TownOccupants(channelCategories);
+            var discordTown = new DiscordTown(channelCategories);
 
-            townOccupancyStore.Set(guildId, townOccupants);
+            discordTownStore.Set(guildId, discordTown);
 
             var gameState = gameStateStore.GetGuildGames(guildId).FirstOrDefault();
-            if (gameState is not null) await notificationService.BroadcastTownOccupancyUpdate(gameState.Id, townOccupants);
-            return (true, townOccupants, $"Town occupancy {townOccupants.UserCount}");
+            if (gameState is not null) await notificationService.BroadcastDiscordTownUpdate(gameState.Id, discordTown);
+            return (true, discordTown, $"Discord town {discordTown.UserCount}");
         }
         catch (Exception ex)
         {

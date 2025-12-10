@@ -31,12 +31,12 @@ public class DiscordNotificationHubTests
 
     private static SessionSyncState GetSessionSyncState(string jwt)
     {
-        var townOccupancy = new TownOccupants([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
+        var discordTown = new DiscordTown([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
         var result = new SessionSyncState
         {
             GameTime = GameTime.Day,
             Jwt = jwt,
-            TownOccupancy = townOccupancy
+            DiscordTown = discordTown
         };
         return result;
     }

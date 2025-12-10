@@ -2,24 +2,24 @@
 
 namespace Clocktower.Server.Data.Stores;
 
-public class TownOccupancyStore : ITownOccupancyStore
+public class DiscordTownStore : IDiscordTownStore
 {
-    private readonly ConcurrentDictionary<string, TownOccupants> _store = new();
+    private readonly ConcurrentDictionary<string, DiscordTown> _store = new();
 
     public void Clear() => _store.Clear();
 
-    public TownOccupants? Get(string? guildId)
+    public DiscordTown? Get(string? guildId)
     {
         if (guildId is null) return null;
         return _store.TryGetValue(guildId, out var state) ? state : null;
     }
 
-    public TownOccupants? Get(ulong? guildId) => Get(guildId.ToString());
+    public DiscordTown? Get(ulong? guildId) => Get(guildId.ToString());
 
     public bool Remove(string guildId) => _store.TryRemove(guildId, out _);
     public bool Remove(ulong guildId) => Remove(guildId.ToString());
 
-    public bool Set(string guildId, TownOccupants state, bool force = false)
+    public bool Set(string guildId, DiscordTown state, bool force = false)
     {
         var currentValue = Get(guildId);
         if (currentValue is not null && !force) return false;
@@ -27,9 +27,9 @@ public class TownOccupancyStore : ITownOccupancyStore
         return true;
     }
 
-    public bool Set(ulong guildId, TownOccupants state, bool force = false) => Set(guildId.ToString(), state, force);
+    public bool Set(ulong guildId, DiscordTown state, bool force = false) => Set(guildId.ToString(), state, force);
 
-    public bool TryUpdate(string guildId, Func<TownOccupants, TownOccupants> updateFn)
+    public bool TryUpdate(string guildId, Func<DiscordTown, DiscordTown> updateFn)
     {
         if (!_store.TryGetValue(guildId, out var existing)) return false;
 
@@ -37,9 +37,9 @@ public class TownOccupancyStore : ITownOccupancyStore
         return true;
     }
 
-    public bool TryUpdate(ulong guildId, Func<TownOccupants, TownOccupants> updateFn) => TryUpdate(guildId.ToString(), updateFn);
+    public bool TryUpdate(ulong guildId, Func<DiscordTown, DiscordTown> updateFn) => TryUpdate(guildId.ToString(), updateFn);
 
-    public TownOccupants? GetTownByUser(string userId)
+    public DiscordTown? GetTownByUser(string userId)
     {
         return _store.Values
             .FirstOrDefault(town => 

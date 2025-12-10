@@ -1,6 +1,6 @@
 ﻿namespace Clocktower.Server.Data;
 
-public record TownOccupants(List<MiniCategory> ChannelCategories)
+public record DiscordTown(List<MiniCategory> ChannelCategories)
 {
     public int UserCount => TownUsers.Count();
 
