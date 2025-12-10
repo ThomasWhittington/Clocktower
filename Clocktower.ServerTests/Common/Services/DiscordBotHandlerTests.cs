@@ -156,25 +156,33 @@ public class DiscordBotHandlerTests
     [TestMethod]
     public async Task HandleUserVoiceStateUpdate_CallsUpdateDiscordTown_WhenChannelsDoNotMatch()
     {
-        const string gameId = "game-id";
-        Setup_Mocks(gameIds: [gameId, "game-id2"], beforeChannel: _voiceChannel1, afterChannel: _voiceChannel2);
+        const string gameId1 = "game-id1";
+        const string gameId2 = "game-id2";
+        string[] gameIds = [gameId1, gameId2];
+        Setup_Mocks(gameIds: gameIds, beforeChannel: _voiceChannel1, afterChannel: _voiceChannel2);
 
         await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
 
-        _mockHandler.Verify(x => x.UpdateDiscordTown(_guildUser.Object, _after.Object, gameId, GuildId), Times.Once);
-        _mockHandler.Verify(x => x.UpdateVoiceStatus(_guildUser.Object, _after.Object, gameId, GuildId), Times.Never);
+        _mockHandler.Verify(x => x.UpdateDiscordTown(_guildUser.Object, _after.Object, gameId1, GuildId), Times.Once);
+        _mockHandler.Verify(x => x.UpdateDiscordTown(_guildUser.Object, _after.Object, gameId2, GuildId), Times.Once);
+        _mockHandler.Verify(x => x.UpdateVoiceStatus(_guildUser.Object, _after.Object, gameId1, GuildId), Times.Never);
+        _mockHandler.Verify(x => x.UpdateVoiceStatus(_guildUser.Object, _after.Object, gameId2, GuildId), Times.Never);
     }
 
     [TestMethod]
     public async Task HandleUserVoiceStateUpdate_CallsUpdateDiscordTown_WhenChannelsMatch_WithGameState()
     {
-        const string gameId = "game-id";
-        Setup_Mocks(gameIds: [gameId, "game-id2"], beforeChannel: _voiceChannel1, afterChannel: _voiceChannel1);
+        const string gameId1 = "game-id1";
+        const string gameId2 = "game-id2";
+        string[] gameIds = [gameId1, gameId2];
+        Setup_Mocks(gameIds: gameIds, beforeChannel: _voiceChannel1, afterChannel: _voiceChannel1);
 
         await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
 
-        _mockHandler.Verify(x => x.UpdateVoiceStatus(_guildUser.Object, _after.Object, gameId, GuildId), Times.Once);
-        _mockHandler.Verify(x => x.UpdateDiscordTown(_guildUser.Object, _after.Object, gameId, GuildId), Times.Never);
+        _mockHandler.Verify(x => x.UpdateVoiceStatus(_guildUser.Object, _after.Object, gameId1, GuildId), Times.Once);
+        _mockHandler.Verify(x => x.UpdateVoiceStatus(_guildUser.Object, _after.Object, gameId2, GuildId), Times.Once);
+        _mockHandler.Verify(x => x.UpdateDiscordTown(_guildUser.Object, _after.Object, gameId1, GuildId), Times.Never);
+        _mockHandler.Verify(x => x.UpdateDiscordTown(_guildUser.Object, _after.Object, gameId2, GuildId), Times.Never);
     }
 
     [TestMethod]
@@ -205,7 +213,7 @@ public class DiscordBotHandlerTests
     {
         Setup_UpdateDiscordTown();
 
-        await Sut.UpdateDiscordTown(_guildUser.Object, _after.Object, null, GuildId);
+        await Sut.UpdateDiscordTown(_guildUser.Object, _after.Object, It.IsAny<string>(), GuildId);
 
         _mockServiceScopeFactory.Verify(f => f.CreateScope(), Times.Once);
         _mockServiceProvider.Verify(o => o.GetService(typeof(IDiscordTownService)), Times.Once);
@@ -216,7 +224,7 @@ public class DiscordBotHandlerTests
     {
         Setup_UpdateDiscordTown(getDiscordTownValue: null);
 
-        await Sut.UpdateDiscordTown(_guildUser.Object, _after.Object, null, GuildId);
+        await Sut.UpdateDiscordTown(_guildUser.Object, _after.Object, It.IsAny<string>(), GuildId);
 
         _mockDiscordTownManager.Verify(o => o.MoveUser(
             It.IsAny<DiscordTown>(),
@@ -231,7 +239,7 @@ public class DiscordBotHandlerTests
         var dummyDiscordTown = GetDummyDiscordTown();
         Setup_UpdateDiscordTown(getDiscordTownValue: dummyDiscordTown);
 
-        await Sut.UpdateDiscordTown(_guildUser.Object, _after.Object, null, GuildId);
+        await Sut.UpdateDiscordTown(_guildUser.Object, _after.Object, It.IsAny<string>(), GuildId);
 
         _mockDiscordTownManager.Verify(o => o.MoveUser(
             dummyDiscordTown,
@@ -241,17 +249,17 @@ public class DiscordBotHandlerTests
     }
 
     [TestMethod]
-    public async Task UpdateDiscordTown_DoesNotNotifyClients_WhenNoGame()
+    public async Task UpdateDiscordTown_NotifiesClients_WhenNoGame()
     {
         var dummyDiscordTown = GetDummyDiscordTown();
-        Setup_UpdateDiscordTown(getDiscordTownValue: dummyDiscordTown);
+        Setup_UpdateDiscordTown( getDiscordTownValue: dummyDiscordTown);
 
-        await Sut.UpdateDiscordTown(_guildUser.Object, _after.Object, null, GuildId);
+        await Sut.UpdateDiscordTown(_guildUser.Object, _after.Object, string.Empty, GuildId);
 
         _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(
-            It.IsAny<string>(),
+            string.Empty,
             It.IsAny<DiscordTown>()
-        ), Times.Never);
+        ), Times.Once);
     }
 
     [TestMethod]

@@ -18,21 +18,26 @@ public class DiscordBotHandler(
         if (!guildId.HasValue) return;
         var guildUser = user.GetGuildUser();
         if (guildUser is null) return;
-        var gameState = gameStateStore.GetGuildGames(guildId.Value).FirstOrDefault();
+        var gameStates = gameStateStore.GetGuildGames(guildId.Value);
 
         var channelsAreSame = before.VoiceChannel?.Id == after.VoiceChannel?.Id;
         if (channelsAreSame)
         {
-            if (gameState is null) return;
-            await UpdateVoiceStatus(guildUser, after, gameState.Id, guildId.Value);
+            foreach (var gameState in gameStates)
+            {
+                await UpdateVoiceStatus(guildUser, after, gameState.Id, guildId.Value);
+            }
         }
         else
         {
-            await UpdateDiscordTown(guildUser, after, gameState?.Id, guildId.Value);
+            foreach (var gameState in gameStates)
+            {
+                await UpdateDiscordTown(guildUser, after, gameState.Id, guildId.Value);
+            }
         }
     }
 
-    public virtual async Task UpdateDiscordTown(IDiscordGuildUser user, IDiscordVoiceState after, string? gameId, ulong guildId)
+    public virtual async Task UpdateDiscordTown(IDiscordGuildUser user, IDiscordVoiceState after, string gameId, ulong guildId)
     {
         using var scope = serviceScopeFactory.CreateScope();
         var townService = scope.ServiceProvider.GetRequiredService<IDiscordTownService>();
@@ -40,10 +45,7 @@ public class DiscordBotHandler(
         if (!success || discordTown is null) return;
         var newDiscordTown = discordDiscordTownManager.MoveUser(discordTown, user, after.VoiceChannel);
 
-        if (gameId is not null)
-        {
-            await notificationService.BroadcastDiscordTownUpdate(gameId, newDiscordTown);
-        }
+        await notificationService.BroadcastDiscordTownUpdate(gameId, newDiscordTown);
     }
 
     public virtual async Task UpdateVoiceStatus(IDiscordGuildUser user, IDiscordVoiceState after, string gameId, ulong guildId)
