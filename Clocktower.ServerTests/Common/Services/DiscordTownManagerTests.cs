@@ -6,28 +6,28 @@ using Clocktower.Server.Data.Wrappers;
 namespace Clocktower.ServerTests.Common.Services;
 
 [TestClass]
-public class TownOccupantManagerTests
+public class DiscordTownManagerTests
 {
-    private Mock<ITownOccupancyStore> _mockTownOccupancyStore = null!;
-    private ITownOccupantManager _sut = null!;
+    private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
+    private IDiscordTownManager _sut = null!;
     private const ulong GuildId = 1L;
-    private TownOccupants _capturedTownOccupants = null!;
+    private DiscordTown _capturedDiscordTown = null!;
 
     [TestInitialize]
     public void SetUp()
     {
-        _mockTownOccupancyStore = StrictMockFactory.Create<ITownOccupancyStore>();
-        _sut = new TownOccupantManager(_mockTownOccupancyStore.Object);
+        _mockDiscordTownStore = StrictMockFactory.Create<IDiscordTownStore>();
+        _sut = new DiscordTownManager(_mockDiscordTownStore.Object);
     }
 
-    private TownOccupants GetDummyTownOccupants()
+    private DiscordTown GetDummyDiscordTown()
     {
         var channelCategories = new List<MiniCategory> { DayCategory, NightCategory };
-        var townOccupants = new TownOccupants(channelCategories);
+        var discordTown = new DiscordTown(channelCategories);
 
-        _mockTownOccupancyStore.Setup(o => o.Set(GuildId, It.IsAny<TownOccupants>(), true)).Returns(true)
-            .Callback<ulong, TownOccupants, bool>((_, callbackTown, _) => _capturedTownOccupants = callbackTown);
-        return townOccupants;
+        _mockDiscordTownStore.Setup(o => o.Set(GuildId, It.IsAny<DiscordTown>(), true)).Returns(true)
+            .Callback<ulong, DiscordTown, bool>((_, callbackTown, _) => _capturedDiscordTown = callbackTown);
+        return discordTown;
     }
 
     private static readonly MiniCategory DayCategory = new("1001", "Day Category", [
@@ -49,7 +49,7 @@ public class TownOccupantManagerTests
     ]);
 
 
-    private static TownOccupants CreateEmptyTownOccupants() => new([]);
+    private static DiscordTown CreateEmptyDiscordTown() => new([]);
 
 
     #region FindUserChannel Tests
@@ -57,10 +57,10 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void FindUserChannel_WhenUserExists_ReturnsCorrectChannel()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         const string userId = "3001";
 
-        var result = _sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(dummyDiscordTown, userId);
 
         result.Should().NotBeNull();
         result.Channel.Id.Should().Be("2001");
@@ -71,10 +71,10 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void FindUserChannel_WhenUserExistsInSecondChannel_ReturnsCorrectChannel()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         const string userId = "3003";
 
-        var result = _sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(dummyDiscordTown, userId);
 
         result.Should().NotBeNull();
         result.Channel.Id.Should().Be("2002");
@@ -85,21 +85,21 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void FindUserChannel_WhenUserDoesNotExist_ReturnsNull()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         const string userId = "nonexistent";
 
-        var result = _sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(dummyDiscordTown, userId);
 
         result.Should().BeNull();
     }
 
     [TestMethod]
-    public void FindUserChannel_WhenTownOccupantsIsEmpty_ReturnsNull()
+    public void FindUserChannel_WhenDiscordTownIsEmpty_ReturnsNull()
     {
-        var occupants = CreateEmptyTownOccupants();
+        var dummyDiscordTown = CreateEmptyDiscordTown();
         const string userId = "3001";
 
-        var result = _sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(dummyDiscordTown, userId);
 
         result.Should().BeNull();
     }
@@ -107,10 +107,10 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void FindUserChannel_WhenUserIdIsEmpty_ReturnsNull()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         const string userId = "";
 
-        var result = _sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(dummyDiscordTown, userId);
 
         result.Should().BeNull();
     }
@@ -118,10 +118,10 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void FindUserChannel_WhenUserIdIsNull_ReturnsNull()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         string userId = null!;
 
-        var result = _sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(dummyDiscordTown, userId);
 
         result.Should().BeNull();
     }
@@ -129,10 +129,10 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void FindUserChannel_WhenChannelHasMultipleUsers_ReturnsChannelWithAllUsers()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         const string userId = "3002";
 
-        var result = _sut.FindUserChannel(occupants, userId);
+        var result = _sut.FindUserChannel(dummyDiscordTown, userId);
 
         result.Should().NotBeNull();
         result.Channel.Id.Should().Be("2002");
@@ -148,11 +148,11 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void MoveUser_WhenUserNotInAnyChannel_AddsUserToNewChannel()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         var mockUser = CreateMockDiscordUser("3005");
         var mockChannel = CreateMockDiscordVoiceChannel("2001");
 
-        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(dummyDiscordTown, mockUser, mockChannel);
 
         var targetChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
@@ -165,23 +165,23 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void MoveUser_WhenUserInSameChannel_ReturnsUnchanged()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         var mockUser = CreateMockDiscordUser("3001");
         var mockChannel = CreateMockDiscordVoiceChannel("2001");
 
-        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(dummyDiscordTown, mockUser, mockChannel);
 
-        result.Should().BeSameAs(occupants);
+        result.Should().BeSameAs(dummyDiscordTown);
     }
 
     [TestMethod]
     public void MoveUser_WhenMovingBetweenChannels_UpdatesBothChannels()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         var mockUser = CreateMockDiscordUser("3003");
         var mockChannel = CreateMockDiscordVoiceChannel("2001");
 
-        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(dummyDiscordTown, mockUser, mockChannel);
 
         var sourceChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
@@ -202,10 +202,10 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void MoveUser_WhenMovingToNullChannel_RemovesUserFromCurrentChannel()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         var mockUser = CreateMockDiscordUser("3003");
 
-        var result = _sut.MoveUser(occupants, mockUser, null);
+        var result = _sut.MoveUser(dummyDiscordTown, mockUser, null);
 
         var sourceChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
@@ -217,11 +217,11 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void MoveUser_WhenMovingToNewChannelInDifferentCategory_UpdatesCorrectCategories()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         var mockUser = CreateMockDiscordUser("3001");
         var mockChannel = CreateMockDiscordVoiceChannel("2205");
 
-        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(dummyDiscordTown, mockUser, mockChannel);
 
         var category1 = result.ChannelCategories.Should().Contain(c => c.Id == "1001").Subject;
         var channel1 = category1.Channels.Should().Contain(ch => ch.Channel.Id == "2001").Subject;
@@ -237,11 +237,11 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void MoveUser_WhenTargetChannelDoesNotExist_OnlyRemovesFromCurrentChannel()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         var mockUser = CreateMockDiscordUser("3001");
         var mockChannel = CreateMockDiscordVoiceChannel("9999");
 
-        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(dummyDiscordTown, mockUser, mockChannel);
 
         var sourceChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
@@ -258,11 +258,11 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void MoveUser_WhenMultipleUsersInChannel_OnlyMovesSpecifiedUser()
     {
-        var occupants = GetDummyTownOccupants();
+        var dummyDiscordTown = GetDummyDiscordTown();
         var mockUser = CreateMockDiscordUser("3002");
         var mockChannel = CreateMockDiscordVoiceChannel("2001");
 
-        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(dummyDiscordTown, mockUser, mockChannel);
 
         var sourceChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
@@ -283,12 +283,12 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void MoveUser_PreservesUserCount()
     {
-        var occupants = GetDummyTownOccupants();
-        var initialUserCount = occupants.UserCount;
+        var dummyDiscordTown = GetDummyDiscordTown();
+        var initialUserCount = dummyDiscordTown.UserCount;
         var mockUser = CreateMockDiscordUser("3001");
         var mockChannel = CreateMockDiscordVoiceChannel("2002");
 
-        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(dummyDiscordTown, mockUser, mockChannel);
 
         result.UserCount.Should().Be(initialUserCount);
     }
@@ -296,12 +296,12 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void MoveUser_WhenAddingNewUser_IncreasesUserCount()
     {
-        var occupants = GetDummyTownOccupants();
-        var initialUserCount = occupants.UserCount;
+        var dummyDiscordTown = GetDummyDiscordTown();
+        var initialUserCount = dummyDiscordTown.UserCount;
         var mockUser = CreateMockDiscordUser("3009");
         var mockChannel = CreateMockDiscordVoiceChannel("2001");
 
-        var result = _sut.MoveUser(occupants, mockUser, mockChannel);
+        var result = _sut.MoveUser(dummyDiscordTown, mockUser, mockChannel);
 
         result.UserCount.Should().Be(initialUserCount + 1);
     }
@@ -309,38 +309,38 @@ public class TownOccupantManagerTests
     [TestMethod]
     public void MoveUser_WhenRemovingUser_DecreasesUserCount()
     {
-        var occupants = GetDummyTownOccupants();
-        var initialUserCount = occupants.UserCount;
+        var dummyDiscordTown = GetDummyDiscordTown();
+        var initialUserCount = dummyDiscordTown.UserCount;
         var mockUser = CreateMockDiscordUser("3001");
 
-        var result = _sut.MoveUser(occupants, mockUser, null);
+        var result = _sut.MoveUser(dummyDiscordTown, mockUser, null);
 
         result.UserCount.Should().Be(initialUserCount - 1);
     }
 
     #endregion
 
-    #region GetTownOccupancy
+    #region GetDiscordTown
 
     [TestMethod]
-    public void GetTownOccupancy_ReturnsTown()
+    public void GetDiscordTown_ReturnsTown()
     {
-        var town = GetDummyTownOccupants();
-        _mockTownOccupancyStore.Setup(o => o.Get(GuildId)).Returns(town);
+        var town = GetDummyDiscordTown();
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns(town);
 
-        var result = _sut.GetTownOccupancy(GuildId);
+        var result = _sut.GetDiscordTown(GuildId);
 
         result.Should().Be(town);
-        _mockTownOccupancyStore.Verify(o => o.Get(GuildId), Times.Once);
+        _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
     }
 
     #endregion
 
     #region GetTownUser
 
-    private void Setup_GetTownUser(string userId, TownOccupants? townOccupants)
+    private void Setup_GetTownUser(string userId, DiscordTown? discordTown)
     {
-        _mockTownOccupancyStore.Setup(o => o.GetTownByUser(userId)).Returns(townOccupants);
+        _mockDiscordTownStore.Setup(o => o.GetTownByUser(userId)).Returns(discordTown);
     }
 
     [TestMethod]
@@ -358,7 +358,7 @@ public class TownOccupantManagerTests
     public void GetTownUser_ReturnsUser_WhenTownContainsUser()
     {
         const string userId = "3003";
-        var town = GetDummyTownOccupants();
+        var town = GetDummyDiscordTown();
         Setup_GetTownUser(userId, town);
 
         var result = _sut.GetTownUser(userId);
@@ -371,7 +371,7 @@ public class TownOccupantManagerTests
     public void GetTownUser_ReturnsNull_WhenTownNotContainUser()
     {
         const string userId = "9999";
-        var town = GetDummyTownOccupants();
+        var town = GetDummyDiscordTown();
         Setup_GetTownUser(userId, town);
 
         var result = _sut.GetTownUser(userId);
@@ -383,9 +383,9 @@ public class TownOccupantManagerTests
 
     #region UpdateUserStatus
 
-    private void Setup_UpdateUserStatus(TownOccupants? townOccupants)
+    private void Setup_UpdateUserStatus(DiscordTown? discordTown)
     {
-        _mockTownOccupancyStore.Setup(o => o.Get(GuildId)).Returns(townOccupants);
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns(discordTown);
     }
 
     [TestMethod]
@@ -408,13 +408,13 @@ public class TownOccupantManagerTests
         const string userId = "3003";
         const bool isPresent = true;
         VoiceState voiceState = new VoiceState(true, false, true, false);
-        var town = GetDummyTownOccupants();
+        var town = GetDummyDiscordTown();
         Setup_UpdateUserStatus(town);
 
         var result = _sut.UpdateUserStatus(GuildId, userId, isPresent, voiceState);
 
         result.Should().BeTrue();
-        var updatedUser = _capturedTownOccupants.TownUsers.FirstOrDefault(townUser => townUser.Id == userId);
+        var updatedUser = _capturedDiscordTown.TownUsers.FirstOrDefault(townUser => townUser.Id == userId);
 
         updatedUser.Should().NotBeNull();
         updatedUser.IsPresent.Should().Be(isPresent);

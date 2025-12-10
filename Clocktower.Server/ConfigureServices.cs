@@ -62,8 +62,8 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
             builder.Services.AddSingleton<IHubStateManager, HubStateManager>();
             builder.Services.AddSingleton<IGameStateStore, GameStateStore>();
-            builder.Services.AddSingleton<ITownOccupancyStore, TownOccupancyStore>();
-            builder.Services.AddSingleton<ITownOccupantManager, TownOccupantManager>();
+            builder.Services.AddSingleton<IDiscordTownStore, DiscordTownStore>();
+            builder.Services.AddSingleton<IDiscordTownManager, DiscordTownManager>();
             builder.Services.AddSingleton<INotificationService, NotificationService>();
             builder.Services.AddSingleton<IDiscordBotHandler, DiscordBotHandler>();
             builder.Services.AddSingleton<IMemoryCache, MemoryCache>();

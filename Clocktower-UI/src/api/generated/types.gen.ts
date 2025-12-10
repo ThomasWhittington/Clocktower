@@ -18,6 +18,12 @@ export type ClocktowerServerDataChannelOccupants = {
     occupants?: Array<ClocktowerServerDataTownUser> | null;
 };
 
+export type ClocktowerServerDataDiscordTown = {
+    channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
+    readonly userCount?: number;
+    readonly townUsers?: Array<ClocktowerServerDataTownUser> | null;
+};
+
 export type ClocktowerServerDataGameState = {
     id?: string | null;
     guildId?: string | null;
@@ -58,12 +64,6 @@ export type ClocktowerServerDataMiniGameState = {
 export type ClocktowerServerDataMiniGuild = {
     id?: string | null;
     name?: string | null;
-};
-
-export type ClocktowerServerDataTownOccupants = {
-    channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
-    readonly userCount?: number;
-    readonly townUsers?: Array<ClocktowerServerDataTownUser> | null;
 };
 
 export type ClocktowerServerDataTownUser = {
@@ -146,6 +146,10 @@ export type MicrosoftAspNetCoreHttpHttpValidationProblemDetails = {
     } | null | undefined;
 };
 
+export type ClocktowerServerDataDiscordTownWritable = {
+    channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
+};
+
 export type ClocktowerServerDataGameStateWritable = {
     id?: string | null;
     guildId?: string | null;
@@ -154,10 +158,6 @@ export type ClocktowerServerDataGameStateWritable = {
     createdBy?: ClocktowerServerDataGameUser;
     createdDate?: Date;
     gameTime?: ClocktowerServerDataTypesEnumGameTime;
-};
-
-export type ClocktowerServerDataTownOccupantsWritable = {
-    channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
 };
 
 export type GetAuthTokenApiData = {
@@ -447,6 +447,33 @@ export type CreateTownApiResponses = {
 
 export type CreateTownApiResponse = CreateTownApiResponses[keyof CreateTownApiResponses];
 
+export type GetDiscordTownApiData = {
+    body?: never;
+    path: {
+        guildId: string;
+    };
+    query?: never;
+    url: '/api/discord/town/{guildId}/occupancy';
+};
+
+export type GetDiscordTownApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+};
+
+export type GetDiscordTownApiError = GetDiscordTownApiErrors[keyof GetDiscordTownApiErrors];
+
+export type GetDiscordTownApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerDataDiscordTown;
+};
+
+export type GetDiscordTownApiResponse = GetDiscordTownApiResponses[keyof GetDiscordTownApiResponses];
+
 export type GetJoinDataApiData = {
     body?: never;
     path: {
@@ -471,33 +498,6 @@ export type GetJoinDataApiResponses = {
 };
 
 export type GetJoinDataApiResponse = GetJoinDataApiResponses[keyof GetJoinDataApiResponses];
-
-export type GetTownOccupancyApiData = {
-    body?: never;
-    path: {
-        guildId: string;
-    };
-    query?: never;
-    url: '/api/discord/town/{guildId}/occupancy';
-};
-
-export type GetTownOccupancyApiErrors = {
-    /**
-     * Bad Request
-     */
-    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
-};
-
-export type GetTownOccupancyApiError = GetTownOccupancyApiErrors[keyof GetTownOccupancyApiErrors];
-
-export type GetTownOccupancyApiResponses = {
-    /**
-     * OK
-     */
-    200: ClocktowerServerDataTownOccupants;
-};
-
-export type GetTownOccupancyApiResponse = GetTownOccupancyApiResponses[keyof GetTownOccupancyApiResponses];
 
 export type GetTownStatusApiData = {
     body?: never;

@@ -1,9 +1,9 @@
 ﻿import {
     type ClocktowerServerDataTypesEnumGameTime,
     getAuthDataApi,
+    getDiscordTownApi,
     getGuildsWithUserApi,
     getJoinDataApi,
-    getTownOccupancyApi,
     getTownStatusApi,
     type GetTownStatusApiResponse,
     inviteUserApi,
@@ -12,11 +12,11 @@
     setTimeApi
 } from '@/api';
 import {
+    type DiscordTown,
     GameTime,
+    mapToDiscordTown,
     mapToMiniGuild,
-    mapToTownOccupants,
-    type MiniGuild,
-    type TownOccupants
+    type MiniGuild
 } from "@/types";
 import {
     apiClient
@@ -43,11 +43,11 @@ async function getTownStatus(id: string): Promise<GetTownStatusApiResponse> {
     };
 }
 
-async function getTownOccupancy(id: string): Promise<TownOccupants> {
+async function getDiscordTown(id: string): Promise<DiscordTown> {
     const {
         data,
         error
-    } = await getTownOccupancyApi({
+    } = await getDiscordTownApi({
         client: apiClient,
         path: {
             guildId: id
@@ -55,13 +55,13 @@ async function getTownOccupancy(id: string): Promise<TownOccupants> {
     });
 
     if (error) {
-        console.error('Failed to get Town Occupancy', error);
+        console.error('Failed to get Discord Town', error);
         throw new Error(error.toString());
     }
 
 
     if (data) {
-        return mapToTownOccupants(data);
+        return mapToDiscordTown(data);
     }
     return {
         userCount: 0,
@@ -201,7 +201,7 @@ const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGame
 export const discordService = {
     getGuildsWithUser,
     getTownStatus,
-    getTownOccupancy,
+    getDiscordTown,
     moveUserToChannel,
     getAuthData,
     inviteUser,

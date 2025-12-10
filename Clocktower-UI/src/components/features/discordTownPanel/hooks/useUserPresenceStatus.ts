@@ -11,13 +11,13 @@ import {
 export const useUserPresenceStatus = () => {
     const currentUser = useAppStore((state) => state.currentUser);
     const {
-        townOccupancy,
+        discordTown,
         connectionState
     } = useServerHub();
 
     let isInVoiceChannel;
-    if (townOccupancy && currentUser?.id && connectionState === 'Connected') {
-        const thisUser = findGameUserById(townOccupancy, currentUser.id);
+    if (discordTown && currentUser?.id && connectionState === 'Connected') {
+        const thisUser = findGameUserById(discordTown, currentUser.id);
         if (thisUser === undefined) isInVoiceChannel = false;
         else isInVoiceChannel = thisUser.isPresent;
     }

@@ -1,12 +1,12 @@
 ﻿import {
     DiscordAdminPanel,
-    DiscordTown
+    DiscordTownCategory
 } from "./components";
 import {
     Spinner
 } from "@/components/ui";
 import {
-    useTownOccupancy
+    useDiscordTown
 } from "./hooks";
 import {
     useAppStore
@@ -14,10 +14,10 @@ import {
 
 function DiscordTownPanel() {
     const {
-        townOccupancy,
+        discordTown,
         isLoading,
         error
-    } = useTownOccupancy();
+    } = useDiscordTown();
     const gameId = useAppStore((state) => state.gameId);
 
     return (
@@ -30,11 +30,17 @@ function DiscordTownPanel() {
                 <Spinner/>}
             {error &&
                 <p className="text-red-500 text-sm">{error}</p>}
-            {townOccupancy &&
+            {discordTown &&
                 <div
+                    id="discord-town"
                     className="mb-auto">
-                    <DiscordTown
-                        townOccupancy={townOccupancy}/>
+                    {
+                        discordTown?.channelCategories.map(category =>
+                            <DiscordTownCategory
+                                key={category.id}
+                                category={category}/>
+                        )
+                    }
                 </div>
             }
             {gameId &&

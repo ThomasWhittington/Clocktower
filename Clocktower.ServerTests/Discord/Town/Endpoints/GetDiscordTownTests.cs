@@ -6,7 +6,7 @@ using Clocktower.Server.Discord.Town.Services;
 namespace Clocktower.ServerTests.Discord.Town.Endpoints;
 
 [TestClass]
-public class GetTownOccupancyTests
+public class GetDiscordTownTests
 {
     private Mock<IDiscordTownService> _mockDiscordTownService = null!;
 
@@ -21,11 +21,11 @@ public class GetTownOccupancyTests
     {
         var builder = EndpointFactory.CreateBuilder();
 
-        GetTownOccupancy.Map(builder);
+        GetDiscordTown.Map(builder);
 
         builder.GetEndpoint("/{guildId}/occupancy")
             .ShouldHaveMethod(HttpMethod.Get)
-            .ShouldHaveOperationId("getTownOccupancyApi")
+            .ShouldHaveOperationId("getDiscordTownApi")
             .ShouldHaveSummary("Get occupancy of town")
             .ShouldHaveDescription("Gets user presense in the town")
             .ShouldHaveValidation();
@@ -36,11 +36,11 @@ public class GetTownOccupancyTests
     {
         const string responseMessage = "response message";
         var request = new GuildIdRequest(CommonMethods.GetRandomSnowflakeStringId());
-        _mockDiscordTownService.Setup(o => o.GetTownOccupancy(ulong.Parse(request.GuildId))).ReturnsAsync((false, null, responseMessage));
+        _mockDiscordTownService.Setup(o => o.GetDiscordTown(ulong.Parse(request.GuildId))).ReturnsAsync((false, null, responseMessage));
 
-        var result = await GetTownOccupancy.Handle(request, _mockDiscordTownService.Object);
+        var result = await GetDiscordTown.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.GetTownOccupancy(ulong.Parse(request.GuildId)), Times.Once);
+        _mockDiscordTownService.Verify(o => o.GetDiscordTown(ulong.Parse(request.GuildId)), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
@@ -52,15 +52,15 @@ public class GetTownOccupancyTests
     {
         const string responseMessage = "response message";
         var request = new GuildIdRequest(CommonMethods.GetRandomSnowflakeStringId());
-        var townOccupants = new TownOccupants([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
-        _mockDiscordTownService.Setup(o => o.GetTownOccupancy(ulong.Parse(request.GuildId))).ReturnsAsync((true, townOccupants, responseMessage));
+        var discordTown = new DiscordTown([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
+        _mockDiscordTownService.Setup(o => o.GetDiscordTown(ulong.Parse(request.GuildId))).ReturnsAsync((true, discordTown, responseMessage));
 
-        var result = await GetTownOccupancy.Handle(request, _mockDiscordTownService.Object);
+        var result = await GetDiscordTown.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.GetTownOccupancy(ulong.Parse(request.GuildId)), Times.Once);
+        _mockDiscordTownService.Verify(o => o.GetDiscordTown(ulong.Parse(request.GuildId)), Times.Once);
 
-        var response = result.Result.Should().BeOfType<Ok<TownOccupants>>().Subject;
+        var response = result.Result.Should().BeOfType<Ok<DiscordTown>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);
-        response.Value.Should().Be(townOccupants);
+        response.Value.Should().Be(discordTown);
     }
 }

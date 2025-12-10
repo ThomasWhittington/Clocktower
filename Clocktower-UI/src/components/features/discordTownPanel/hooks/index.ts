@@ -1,4 +1,4 @@
 ﻿export *
-    from './useTownOccupancy'
+    from './useDiscordTown.ts'
 export *
     from './useUserPresenceStatus'

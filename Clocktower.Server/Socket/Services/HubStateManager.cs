@@ -3,7 +3,7 @@ using Clocktower.Server.Data.Extensions;
 
 namespace Clocktower.Server.Socket.Services;
 
-public class HubStateManager(IGameStateStore gameStateStore, ITownOccupancyStore townOccupancyStore, IJwtWriter jwtWriter) : IHubStateManager
+public class HubStateManager(IGameStateStore gameStateStore, IDiscordTownStore discordTownStore, IJwtWriter jwtWriter) : IHubStateManager
 {
     public SessionSyncState? GetState(string gameId, string userId)
     {
@@ -15,7 +15,7 @@ public class HubStateManager(IGameStateStore gameStateStore, ITownOccupancyStore
         {
             GameTime = currentGameState.GameTime,
             Jwt = jwtWriter.GetJwtToken(gameUser),
-            TownOccupancy = townOccupancyStore.Get(currentGameState.GuildId)
+            DiscordTown = discordTownStore.Get(currentGameState.GuildId)
         };
         return currentState;
     }

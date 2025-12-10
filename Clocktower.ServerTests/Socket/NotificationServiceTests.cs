@@ -27,18 +27,18 @@ public class NotificationServiceTests
     }
 
     [TestMethod]
-    public async Task BroadcastTownOccupancyUpdate_CallsCorrectGroup()
+    public async Task BroadcastDiscordTownUpdate_CallsCorrectGroup()
     {
         const string gameId = "test-game-123";
-        var occupants = new TownOccupants([
+        var discordTown = new DiscordTown([
             new MiniCategory(CommonMethods.GetRandomString(), CommonMethods.GetRandomString(), [])
         ]);
         _mockClients.Setup(c => c.Group("game:test-game-123")).Returns(_mockClientProxy.Object);
 
-        await Sut.BroadcastTownOccupancyUpdate(gameId, occupants);
+        await Sut.BroadcastDiscordTownUpdate(gameId, discordTown);
 
         _mockClients.Verify(c => c.Group("game:test-game-123"), Times.Once);
-        _mockClientProxy.Verify(cp => cp.TownOccupancyUpdated(occupants), Times.Once);
+        _mockClientProxy.Verify(cp => cp.DiscordTownUpdated(discordTown), Times.Once);
     }
 
     [TestMethod]

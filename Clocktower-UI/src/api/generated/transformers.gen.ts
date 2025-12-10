@@ -3,13 +3,13 @@
 import type {
     CheckGuildApiResponse,
     GetAuthDataApiResponse,
+    GetDiscordTownApiResponse,
     GetGameApiResponse,
     GetGamesApiResponse,
     GetGuildsWithUserApiResponse,
     GetJoinDataApiResponse,
     GetPlayerGamesApiResponse,
     GetRolesApiResponse,
-    GetTownOccupancyApiResponse,
     GetTownStatusApiResponse,
     HealthApiResponse,
     StartGameApiResponse
@@ -65,26 +65,7 @@ export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetA
     return data;
 };
 
-const clocktowerServerDataTypesJoinDataSchemaResponseTransformer = (data: any) => {
-    if (data.user) {
-        data.user = clocktowerServerDataGameUserSchemaResponseTransformer(data.user);
-    }
-    return data;
-};
-
-const clocktowerServerDataGameUserSchemaResponseTransformer = (data: any) => {
-    if (data.userType) {
-        data.userType = clocktowerServerDataTypesEnumUserTypeSchemaResponseTransformer(data.userType);
-    }
-    return data;
-};
-
-export const getJoinDataApiResponseTransformer = async (data: any): Promise<GetJoinDataApiResponse> => {
-    data = clocktowerServerDataTypesJoinDataSchemaResponseTransformer(data);
-    return data;
-};
-
-const clocktowerServerDataTownOccupantsSchemaResponseTransformer = (data: any) => {
+const clocktowerServerDataDiscordTownSchemaResponseTransformer = (data: any) => {
     if (data.channelCategories) {
         data.channelCategories = data.channelCategories.map((item: any) => {
             return clocktowerServerDataMiniCategorySchemaResponseTransformer(item);
@@ -119,8 +100,27 @@ const clocktowerServerDataChannelOccupantsSchemaResponseTransformer = (data: any
     return data;
 };
 
-export const getTownOccupancyApiResponseTransformer = async (data: any): Promise<GetTownOccupancyApiResponse> => {
-    data = clocktowerServerDataTownOccupantsSchemaResponseTransformer(data);
+export const getDiscordTownApiResponseTransformer = async (data: any): Promise<GetDiscordTownApiResponse> => {
+    data = clocktowerServerDataDiscordTownSchemaResponseTransformer(data);
+    return data;
+};
+
+const clocktowerServerDataTypesJoinDataSchemaResponseTransformer = (data: any) => {
+    if (data.user) {
+        data.user = clocktowerServerDataGameUserSchemaResponseTransformer(data.user);
+    }
+    return data;
+};
+
+const clocktowerServerDataGameUserSchemaResponseTransformer = (data: any) => {
+    if (data.userType) {
+        data.userType = clocktowerServerDataTypesEnumUserTypeSchemaResponseTransformer(data.userType);
+    }
+    return data;
+};
+
+export const getJoinDataApiResponseTransformer = async (data: any): Promise<GetJoinDataApiResponse> => {
+    data = clocktowerServerDataTypesJoinDataSchemaResponseTransformer(data);
     return data;
 };
 

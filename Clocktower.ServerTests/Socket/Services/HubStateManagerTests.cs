@@ -10,7 +10,7 @@ namespace Clocktower.ServerTests.Socket.Services;
 public class HubStateManagerTests
 {
     private Mock<IGameStateStore> _mockGameStateStore = null!;
-    private Mock<ITownOccupancyStore> _mockTownOccupancyStore = null!;
+    private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
     private Mock<IJwtWriter> _mockJwtWriter = null!;
     private IHubStateManager _sut = null!;
 
@@ -18,9 +18,9 @@ public class HubStateManagerTests
     public void SetUp()
     {
         _mockGameStateStore = new Mock<IGameStateStore>();
-        _mockTownOccupancyStore = new Mock<ITownOccupancyStore>();
+        _mockDiscordTownStore = new Mock<IDiscordTownStore>();
         _mockJwtWriter = new Mock<IJwtWriter>();
-        _sut = new HubStateManager(_mockGameStateStore.Object, _mockTownOccupancyStore.Object, _mockJwtWriter.Object);
+        _sut = new HubStateManager(_mockGameStateStore.Object, _mockDiscordTownStore.Object, _mockJwtWriter.Object);
     }
 
     [TestMethod]
@@ -63,20 +63,20 @@ public class HubStateManagerTests
             Users = [gameUser],
             GuildId = guildId
         };
-        var townOccupancy = new TownOccupants([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
+        var discordTown = new DiscordTown([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
         const string expectedJwt = "jwt-token-123";
         _mockGameStateStore.Setup(s => s.Get(gameId)).Returns(gameState);
-        _mockTownOccupancyStore.Setup(s => s.Get(guildId)).Returns(townOccupancy);
+        _mockDiscordTownStore.Setup(s => s.Get(guildId)).Returns(discordTown);
         _mockJwtWriter.Setup(j => j.GetJwtToken(gameUser)).Returns(expectedJwt);
 
         var result = _sut.GetState(gameId, userId);
 
         _mockGameStateStore.Verify(o => o.Get(gameId), Times.Once);
-        _mockTownOccupancyStore.Verify(o => o.Get(guildId), Times.Once);
+        _mockDiscordTownStore.Verify(o => o.Get(guildId), Times.Once);
         _mockJwtWriter.Verify(o => o.GetJwtToken(gameUser), Times.Once);
         result.Should().NotBeNull();
         result!.GameTime.Should().Be(GameTime.Day);
         result.Jwt.Should().Be(expectedJwt);
-        result.TownOccupancy.Should().Be(townOccupancy);
+        result.DiscordTown.Should().Be(discordTown);
     }
 }
