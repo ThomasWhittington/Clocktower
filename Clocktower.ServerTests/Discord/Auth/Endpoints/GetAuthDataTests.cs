@@ -33,7 +33,7 @@ public class GetAuthDataTests
     public void Handle_ReturnsOk_WhenAuthDataIsFound()
     {
         var key = CommonMethods.GetRandomString();
-        var user = new GameUser(CommonMethods.GetRandomString(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString());
+        var user = CommonMethods.GetRandomTownUser();
         var authData = new UserAuthData(user, CommonMethods.GetRandomString());
 
         _mockDiscordAuthService.Setup(o => o.GetAuthData(key)).Returns(authData);

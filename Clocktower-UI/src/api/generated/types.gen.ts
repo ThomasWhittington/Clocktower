@@ -15,7 +15,7 @@ export type ClocktowerServerAdminEndpointsHealthResponse = {
 
 export type ClocktowerServerDataChannelOccupants = {
     channel?: ClocktowerServerDataMiniChannel;
-    occupants?: Array<ClocktowerServerDataGameUser> | null;
+    occupants?: Array<ClocktowerServerDataTownUser> | null;
 };
 
 export type ClocktowerServerDataGameState = {
@@ -34,12 +34,8 @@ export type ClocktowerServerDataGameState = {
 
 export type ClocktowerServerDataGameUser = {
     id?: string | null;
-    name?: string | null;
-    avatarUrl?: string | null;
     isPlaying?: boolean;
-    isPresent?: boolean;
     userType?: ClocktowerServerDataTypesEnumUserType;
-    voiceState?: ClocktowerServerDataVoiceState;
 };
 
 export type ClocktowerServerDataMiniCategory = {
@@ -67,6 +63,15 @@ export type ClocktowerServerDataMiniGuild = {
 export type ClocktowerServerDataTownOccupants = {
     channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
     readonly userCount?: number;
+    readonly townUsers?: Array<ClocktowerServerDataTownUser> | null;
+};
+
+export type ClocktowerServerDataTownUser = {
+    id?: string | null;
+    name?: string | null;
+    avatarUrl?: string | null;
+    voiceState?: ClocktowerServerDataVoiceState;
+    isPresent?: boolean;
 };
 
 export type ClocktowerServerDataTypesEnumEdition = 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
@@ -92,7 +97,7 @@ export type ClocktowerServerDataTypesRoleRole = {
 };
 
 export type ClocktowerServerDataUserAuthData = {
-    gameUser?: ClocktowerServerDataGameUser;
+    townUser?: ClocktowerServerDataTownUser;
     jwt?: string | null;
 };
 

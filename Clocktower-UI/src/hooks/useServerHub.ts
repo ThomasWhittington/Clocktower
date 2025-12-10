@@ -8,25 +8,18 @@ import * as signalR
 import {
     HubConnectionState
 } from '@microsoft/signalr';
-import type {
-    TownOccupants
+import {
+    GameTime,
+    type TownOccupants,
+    type VoiceState
 } from '@/types';
 import {
     useAppStore
 } from "@/store";
-import type {
-    VoiceState
-} from "@/types/voiceState.ts";
 
 type UserPresenceStates = Record<string, boolean>;
 type UserVoiceStates = Record<string, VoiceState>;
 
-export enum GameTime {
-    Unknown = 0,
-    Day = 1,
-    Evening = 2,
-    Night = 3,
-}
 
 export type SessionSyncState = {
     gameTime: GameTime,
@@ -100,7 +93,7 @@ const createConnection = async () => {
     globalConnection.on('PingUser', (message: string) => {
         console.log(`ping from server: ${message}`);
     });
-    
+
     globalConnection.onclose(() => setState({connectionState: signalR.HubConnectionState.Disconnected}));
     globalConnection.onreconnecting(() => setState({connectionState: signalR.HubConnectionState.Reconnecting}));
     globalConnection.onreconnected(() => setState({connectionState: signalR.HubConnectionState.Connected}));

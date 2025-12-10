@@ -1,12 +1,12 @@
 ﻿import type {
-    GameUser
+    TownUser
 } from "@/types";
 import {
     DiscordUserVoiceStatus
 } from "@/components/ui";
 
 function DiscordTownUser({user}: Readonly<{
-    user: GameUser
+    user: TownUser
 }>) {
     return (
         <div
@@ -17,7 +17,6 @@ function DiscordTownUser({user}: Readonly<{
                     alt={user.name}/>
             }
             <p>{user.name}</p>
-
             {
                 user.voiceState &&
                 <DiscordUserVoiceStatus voiceState={user.voiceState}/>

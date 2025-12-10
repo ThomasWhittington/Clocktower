@@ -10,35 +10,40 @@ public class TownOccupantManagerTests
 {
     private Mock<ITownOccupancyStore> _mockTownOccupancyStore = null!;
     private ITownOccupantManager _sut = null!;
+    private const ulong GuildId = 1L;
+    private TownOccupants _capturedTownOccupants = null!;
 
     [TestInitialize]
     public void SetUp()
     {
-        _mockTownOccupancyStore = new Mock<ITownOccupancyStore>();
+        _mockTownOccupancyStore = StrictMockFactory.Create<ITownOccupancyStore>();
         _sut = new TownOccupantManager(_mockTownOccupancyStore.Object);
     }
 
-    private static TownOccupants GetDummyTownOccupants()
+    private TownOccupants GetDummyTownOccupants()
     {
         var channelCategories = new List<MiniCategory> { DayCategory, NightCategory };
         var townOccupants = new TownOccupants(channelCategories);
+
+        _mockTownOccupancyStore.Setup(o => o.Set(GuildId, It.IsAny<TownOccupants>(), true)).Returns(true)
+            .Callback<ulong, TownOccupants, bool>((_, callbackTown, _) => _capturedTownOccupants = callbackTown);
         return townOccupants;
     }
 
     private static readonly MiniCategory DayCategory = new("1001", "Day Category", [
         new ChannelOccupants(new MiniChannel("2001", "Day Channel 1"), [
-            new GameUser("3001", "User3001", string.Empty)
+            CommonMethods.GetRandomTownUser("3001")
         ]),
         new ChannelOccupants(new MiniChannel("2002", "Day Channel 2"), [
-            new GameUser("3002", "User3002", string.Empty),
-            new GameUser("3003", "User3003", string.Empty)
+            CommonMethods.GetRandomTownUser("3002"),
+            CommonMethods.GetRandomTownUser("3003")
         ])
     ]);
 
     private static readonly MiniCategory NightCategory = new("1002", "Night Category", [
         new ChannelOccupants(new MiniChannel("2203", "Night Channel 1"), []),
         new ChannelOccupants(new MiniChannel("2204", "Night Channel 2"), [
-            new GameUser("3004", "User3004", string.Empty)
+            CommonMethods.GetRandomTownUser("3004")
         ]),
         new ChannelOccupants(new MiniChannel("2205", "Night Channel 3"), []),
     ]);
@@ -315,19 +320,123 @@ public class TownOccupantManagerTests
 
     #endregion
 
+    #region GetTownOccupancy
+
+    [TestMethod]
+    public void GetTownOccupancy_ReturnsTown()
+    {
+        var town = GetDummyTownOccupants();
+        _mockTownOccupancyStore.Setup(o => o.Get(GuildId)).Returns(town);
+
+        var result = _sut.GetTownOccupancy(GuildId);
+
+        result.Should().Be(town);
+        _mockTownOccupancyStore.Verify(o => o.Get(GuildId), Times.Once);
+    }
+
+    #endregion
+
+    #region GetTownUser
+
+    private void Setup_GetTownUser(string userId, TownOccupants? townOccupants)
+    {
+        _mockTownOccupancyStore.Setup(o => o.GetTownByUser(userId)).Returns(townOccupants);
+    }
+
+    [TestMethod]
+    public void GetTownUser_ReturnsNull_WhenNoTownFound()
+    {
+        const string userId = "3003";
+        Setup_GetTownUser(userId, null);
+
+        var result = _sut.GetTownUser(userId);
+
+        result.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void GetTownUser_ReturnsUser_WhenTownContainsUser()
+    {
+        const string userId = "3003";
+        var town = GetDummyTownOccupants();
+        Setup_GetTownUser(userId, town);
+
+        var result = _sut.GetTownUser(userId);
+
+        result.Should().NotBeNull();
+        result.Id.Should().Be(userId);
+    }
+
+    [TestMethod]
+    public void GetTownUser_ReturnsNull_WhenTownNotContainUser()
+    {
+        const string userId = "9999";
+        var town = GetDummyTownOccupants();
+        Setup_GetTownUser(userId, town);
+
+        var result = _sut.GetTownUser(userId);
+
+        result.Should().BeNull();
+    }
+
+    #endregion
+
+    #region UpdateUserStatus
+
+    private void Setup_UpdateUserStatus(TownOccupants? townOccupants)
+    {
+        _mockTownOccupancyStore.Setup(o => o.Get(GuildId)).Returns(townOccupants);
+    }
+
+    [TestMethod]
+    public void UpdateUserStatus_ReturnsFalse_WhenNoTownFound()
+    {
+        const string userId = "3003";
+        const bool isPresent = true;
+        VoiceState voiceState = new VoiceState(true, false, true, false);
+        Setup_UpdateUserStatus(null);
+
+        var result = _sut.UpdateUserStatus(GuildId, userId, isPresent, voiceState);
+
+        result.Should().BeFalse();
+    }
+
+
+    [TestMethod]
+    public void UpdateUserStatus_CallsSetState_WhenTownFound()
+    {
+        const string userId = "3003";
+        const bool isPresent = true;
+        VoiceState voiceState = new VoiceState(true, false, true, false);
+        var town = GetDummyTownOccupants();
+        Setup_UpdateUserStatus(town);
+
+        var result = _sut.UpdateUserStatus(GuildId, userId, isPresent, voiceState);
+
+        result.Should().BeTrue();
+        var updatedUser = _capturedTownOccupants.TownUsers.FirstOrDefault(townUser => townUser.Id == userId);
+
+        updatedUser.Should().NotBeNull();
+        updatedUser.IsPresent.Should().Be(isPresent);
+        updatedUser.VoiceState.Should().Be(voiceState);
+    }
+
+    #endregion
+
     private static IDiscordGuildUser CreateMockDiscordUser(string id)
     {
-        var mockUser = new Mock<IDiscordGuildUser>();
+        var mockUser = StrictMockFactory.Create<IDiscordGuildUser>();
         mockUser.Setup(u => u.Id).Returns(ulong.Parse(id));
+        mockUser.Setup(u => u.GuildId).Returns(GuildId);
         mockUser.Setup(u => u.DisplayName).Returns(string.Empty);
         mockUser.Setup(u => u.DisplayAvatarUrl).Returns(string.Empty);
-        mockUser.Setup(u => u.AsGameUser()).Returns(new GameUser(id, string.Empty, string.Empty));
+        mockUser.Setup(u => u.AsTownUser()).Returns(CommonMethods.GetRandomTownUser(id));
         return mockUser.Object;
     }
 
     private static IDiscordVoiceChannel CreateMockDiscordVoiceChannel(string id)
     {
-        var mockChannel = new Mock<IDiscordVoiceChannel>();
+        var mockChannel = StrictMockFactory.Create<IDiscordVoiceChannel>();
         mockChannel.Setup(c => c.Id).Returns(ulong.Parse(id));
         return mockChannel.Object;
     }

@@ -2,5 +2,9 @@
 
 public record TownOccupants(List<MiniCategory> ChannelCategories)
 {
-    public int UserCount => ChannelCategories.Sum(c => c.Channels.Sum(ch => ch.Occupants.Count()));
+    public int UserCount => TownUsers.Count();
+
+    public IEnumerable<TownUser> TownUsers => ChannelCategories
+        .SelectMany(cat => cat.Channels)
+        .SelectMany(ch => ch.Occupants);
 }

@@ -1,7 +1,4 @@
-﻿namespace Clocktower.Server.Data.Types.Enum;
-
-public enum UserType
-{
+﻿export enum UserType {
     Unknown = 0,
     Player = 1,
     StoryTeller = 2,

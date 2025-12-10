@@ -1,5 +1,4 @@
 ﻿using Clocktower.Server.Common.Services;
-using Clocktower.Server.Data.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -48,9 +47,9 @@ public class DiscordAuthService(IOptions<Secrets> secretsOptions, IJwtWriter jwt
             var userInfo = await discordAuthApiService.GetDiscordUserInfo(tokenResponse.AccessToken, httpClient);
             if (userInfo == null) return errorUrl + Uri.EscapeDataString("Failed to get user information");
 
-            var response = userInfo.AsGameUser();
-            var jwt = jwtWriter.GetJwtToken(response);
-            var userAuthData = new UserAuthData(response, jwt);
+            var townUser = userInfo.AsTownUser();
+            var jwt = jwtWriter.GetJwtToken(townUser);
+            var userAuthData = new UserAuthData(townUser, jwt);
             var tempKey = idGenerator.GenerateId();
             cache.Set($"auth_data_{tempKey}", userAuthData, TimeSpan.FromMinutes(5));
 

@@ -10,7 +10,7 @@ public class HubStateManager(IGameStateStore gameStateStore, ITownOccupancyStore
         var currentGameState = gameStateStore.Get(gameId);
         var gameUser = currentGameState?.GetUser(userId);
         if (currentGameState is null || gameUser is null) return null;
-
+            
         var currentState = new SessionSyncState
         {
             GameTime = currentGameState.GameTime,

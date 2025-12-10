@@ -14,11 +14,7 @@ public class TownOccupancyStore : ITownOccupancyStore
         return _store.TryGetValue(guildId, out var state) ? state : null;
     }
 
-    public TownOccupants? Get(ulong? guildId)
-    {
-        if (guildId is null) return null;
-        return Get(guildId.ToString());
-    }
+    public TownOccupants? Get(ulong? guildId) => Get(guildId.ToString());
 
     public bool Remove(string guildId) => _store.TryRemove(guildId, out _);
     public bool Remove(ulong guildId) => Remove(guildId.ToString());
@@ -42,4 +38,14 @@ public class TownOccupancyStore : ITownOccupancyStore
     }
 
     public bool TryUpdate(ulong guildId, Func<TownOccupants, TownOccupants> updateFn) => TryUpdate(guildId.ToString(), updateFn);
+
+    public TownOccupants? GetTownByUser(string userId)
+    {
+        return _store.Values
+            .FirstOrDefault(town => 
+                town.ChannelCategories
+                    .SelectMany(category => category.Channels)
+                    .SelectMany(channel => channel.Occupants)
+                    .Any(occupant => occupant.Id == userId));
+    }
 }

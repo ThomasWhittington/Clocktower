@@ -200,15 +200,17 @@ public class GameStateStoreTests
     #region UpdateUser
 
     [TestMethod]
-    public void UpdateUser_ReturnsOriginal_WhenNoUserFound()
+    public void UpdateUser_DoesNotChange_WhenNoUserFound()
     {
         const ulong userId = 1L;
         var game1 = NewGame("game1");
         _sut.Set(game1);
 
         var result = _sut.UpdateUser(game1.Id, userId);
-        result.Should().NotBeNull();
-        result.Should().BeEquivalentTo(game1);
+        var val = _sut.Get(game1.Id);
+        result.Should().BeTrue();
+        val.Should().NotBeNull();
+        val.Should().BeEquivalentTo(game1);
     }
 
     [TestMethod]
@@ -221,8 +223,10 @@ public class GameStateStoreTests
         _sut.AddUserToGame("game1", user);
 
         var result = _sut.UpdateUser(game1.Id, userId);
-        result.Should().NotBeNull();
-        result.Should().BeEquivalentTo(game1);
+        var val = _sut.Get(game1.Id);
+        result.Should().BeTrue();
+        val.Should().NotBeNull();
+        val.Should().BeEquivalentTo(game1);
     }
 
     [TestMethod]
@@ -236,8 +240,11 @@ public class GameStateStoreTests
         _sut.AddUserToGame("game1", user);
 
         var result = _sut.UpdateUser(game1.Id, userId, userType: userType);
-        result.Should().NotBeNull();
-        var thisUser = result.GetUser(userId.ToString());
+       
+        var val = _sut.Get(game1.Id);
+        result.Should().BeTrue();
+        val.Should().NotBeNull();
+        var thisUser = val.GetUser(userId.ToString());
         thisUser.Should().NotBeNull();
         thisUser.UserType.Should().Be(userType);
     }
@@ -254,53 +261,18 @@ public class GameStateStoreTests
         _sut.AddUserToGame("game1", user);
 
         var result = _sut.UpdateUser(game1.Id, userId, isPlaying: isPlaying);
-        result.Should().NotBeNull();
-        var thisUser = result.GetUser(userId.ToString());
+      
+        var val = _sut.Get(game1.Id);
+        result.Should().BeTrue();
+        val.Should().NotBeNull();    
+        var thisUser = val.GetUser(userId.ToString());
         thisUser.Should().NotBeNull();
         thisUser.IsPlaying.Should().Be(isPlaying);
     }
     
-    [TestMethod]
-    [DataRow(true)]
-    [DataRow(false)]
-    public void UpdateUser_Updates_IsPresent(bool isPresent)
-    {
-        const ulong userId = 1L;
-        var game1 = NewGame("game1");
-        _sut.Set(game1);
-        var user = CommonMethods.GetRandomGameUser(userId.ToString());
-        _sut.AddUserToGame("game1", user);
-
-        var result = _sut.UpdateUser(game1.Id, userId, isPresent: isPresent);
-        result.Should().NotBeNull();
-        var thisUser = result.GetUser(userId.ToString());
-        thisUser.Should().NotBeNull();
-        thisUser.IsPresent.Should().Be(isPresent);
-    }
-    
-    [TestMethod]
-    [DynamicData(nameof(GetVoiceStateCombinations))]
-    public void UpdateUser_Updates_VoiceState(bool isServerMuted, bool isSelfMuted, bool isServerDeafened, bool isSelfDeafened)
-    {
-        const ulong userId = 1L;
-        var game1 = NewGame("game1");
-        _sut.Set(game1);
-        var user = CommonMethods.GetRandomGameUser(userId.ToString());
-        _sut.AddUserToGame("game1", user);
-        var voiceState = new VoiceState(isServerMuted, isServerDeafened, isSelfMuted, isSelfDeafened);
-        
-        
-        var result = _sut.UpdateUser(game1.Id, userId, voiceState: voiceState);
-        result.Should().NotBeNull();
-        var thisUser = result.GetUser(userId.ToString());
-        thisUser.Should().NotBeNull();
-        thisUser.VoiceState.Should().Be(voiceState);
-    }
     #endregion
 
 
     private static IEnumerable<object[]> GetGameTimeValues() => TestDataProvider.GetAllEnumValues<GameTime>();
     private static IEnumerable<object[]> GetUserTypeValues() => TestDataProvider.GetAllEnumValues<UserType>();
-    public static IEnumerable<object[]> GetVoiceStateCombinations() => TestDataProvider.GenerateBooleanCombinations(4);
-
 }

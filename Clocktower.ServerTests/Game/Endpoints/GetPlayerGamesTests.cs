@@ -39,11 +39,7 @@ public class GetPlayerGamesTests
         var userId = CommonMethods.GetRandomString();
         var playerGames = new MiniGameState[]
         {
-            new(CommonMethods.GetRandomString(), new GameUser(
-                CommonMethods.GetRandomString(),
-                CommonMethods.GetRandomString(),
-                CommonMethods.GetRandomString()
-            ), DateTime.UtcNow),
+            new(CommonMethods.GetRandomString(), CommonMethods.GetRandomGameUser(), DateTime.UtcNow),
         };
 
         MockResponse(userId, playerGames);

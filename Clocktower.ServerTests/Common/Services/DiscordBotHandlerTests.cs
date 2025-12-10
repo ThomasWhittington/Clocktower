@@ -21,6 +21,7 @@ public class DiscordBotHandlerTests
     private Mock<DiscordBotHandler> _mockHandler = null!;
     private Mock<IGameStateStore> _mockGameStateStore = null!;
     private Mock<ITownOccupantManager> _mockTownOccupantManager = null!;
+    private Mock<IUserService> _mockUserService = null!;
     private Mock<INotificationService> _mockNotificationService = null!;
     private Mock<IServiceScopeFactory> _mockServiceScopeFactory = null!;
     private Mock<IServiceScope> _mockScope = null!;
@@ -39,6 +40,7 @@ public class DiscordBotHandlerTests
     {
         _mockGameStateStore = new Mock<IGameStateStore>();
         _mockTownOccupantManager = new Mock<ITownOccupantManager>();
+        _mockUserService = new Mock<IUserService>();
         _mockNotificationService = new Mock<INotificationService>();
         _mockServiceScopeFactory = new Mock<IServiceScopeFactory>();
         _mockScope = new Mock<IServiceScope>();
@@ -63,6 +65,7 @@ public class DiscordBotHandlerTests
         (
             _mockGameStateStore.Object,
             _mockTownOccupantManager.Object,
+            _mockUserService.Object,
             _mockNotificationService.Object,
             _mockServiceScopeFactory.Object)
         {
@@ -81,7 +84,7 @@ public class DiscordBotHandlerTests
         }
     }
 
-    private void Setup_UpdateVoiceStatus(bool isServerMuted, bool isSelfMuted, bool isServerDeafened, bool isSelfDeafened, bool inVoice, TownOccupants? updateUserTownOccupants = null)
+    private void Setup_UpdateVoiceStatus(bool isServerMuted, bool isSelfMuted, bool isServerDeafened, bool isSelfDeafened, bool inVoice, bool updateUserResult = true, TownOccupants? getTownOccupantsResult = null)
     {
         Setup_Mocks();
         _after.Setup(o => o.IsMuted).Returns(isServerMuted);
@@ -89,12 +92,13 @@ public class DiscordBotHandlerTests
         _after.Setup(o => o.IsDeafened).Returns(isServerDeafened);
         _after.Setup(o => o.IsSelfDeafened).Returns(isSelfDeafened);
         _after.Setup(o => o.VoiceChannel).Returns(inVoice ? _voiceChannel2.Object : null);
-        _mockTownOccupantManager.Setup(o => o.UpdateUserStatus(GuildId, UserId, inVoice, It.Is<VoiceState>(ms =>
+        _mockTownOccupantManager.Setup(o => o.UpdateUserStatus(GuildId, UserId.ToString(), inVoice, It.Is<VoiceState>(ms =>
             ms.IsSelfMuted == isSelfMuted &&
             ms.IsSelfDeafened == isSelfDeafened &&
             ms.IsServerDeafened == isServerDeafened &&
             ms.IsServerMuted == isServerMuted
-        ))).Returns(updateUserTownOccupants);
+        ))).Returns(updateUserResult);
+        _mockTownOccupantManager.Setup(o => o.GetTownOccupancy(GuildId)).Returns(getTownOccupantsResult);
     }
 
 
@@ -269,19 +273,18 @@ public class DiscordBotHandlerTests
     {
         const string gameId = "game-id";
         var townOccupancy = new TownOccupants([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
-        Setup_UpdateVoiceStatus(isServerMuted, isSelfMuted, isServerDeafened, isSelfDeafened, inVoice, townOccupancy);
+        Setup_UpdateVoiceStatus(isServerMuted, isSelfMuted, isServerDeafened, isSelfDeafened, inVoice, updateUserResult: true, getTownOccupantsResult: townOccupancy);
 
         await Sut.UpdateVoiceStatus(_guildUser.Object, _after.Object, gameId, GuildId);
 
-        _mockGameStateStore.Verify(o => o.UpdateUser(gameId, UserId, null, null,
-            isPresent: inVoice,
-            voiceState: It.Is<VoiceState>(ms =>
-                ms.IsSelfMuted == isSelfMuted &&
-                ms.IsSelfDeafened == isSelfDeafened &&
-                ms.IsServerDeafened == isServerDeafened &&
-                ms.IsServerMuted == isServerMuted
-            )
-        ), Times.Once);
+        _mockUserService.Verify(o => o.UpdateDiscordPresence(UserId.ToString(), GuildId.ToString(),
+            inVoice,
+            It.Is<VoiceState>(voiceState =>
+                voiceState.IsServerMuted == isServerMuted &&
+                voiceState.IsSelfMuted == isSelfMuted &&
+                voiceState.IsSelfDeafened == isSelfDeafened &&
+                voiceState.IsServerDeafened == isServerDeafened
+            )));
         _mockNotificationService.Verify(o => o.BroadcastTownOccupancyUpdate(gameId, townOccupancy), Times.Once);
     }
 
@@ -294,18 +297,18 @@ public class DiscordBotHandlerTests
 
     private static readonly MiniCategory DayCategory = new("day-category", "Day Category", [
         new ChannelOccupants(new MiniChannel("day-channel-1", "Day Channel 1"), [
-            CommonMethods.GetRandomGameUser(),
+            CommonMethods.GetRandomTownUser(),
         ]),
         new ChannelOccupants(new MiniChannel("day-channel-2", "Day Channel 2"), [
-            CommonMethods.GetRandomGameUser(),
-            CommonMethods.GetRandomGameUser()
+            CommonMethods.GetRandomTownUser(),
+            CommonMethods.GetRandomTownUser()
         ])
     ]);
 
     private static readonly MiniCategory NightCategory = new("night-category", "Night Category", [
         new ChannelOccupants(new MiniChannel("night-channel-1", "Night Channel 1"), []),
         new ChannelOccupants(new MiniChannel("night-channel-2", "Night Channel 2"), [
-            CommonMethods.GetRandomGameUser(),
+            CommonMethods.GetRandomTownUser(),
         ]),
         new ChannelOccupants(new MiniChannel("night-channel-3", "Night Channel 3"), []),
     ]);

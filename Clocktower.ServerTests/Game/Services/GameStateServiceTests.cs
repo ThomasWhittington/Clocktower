@@ -82,7 +82,7 @@ public class GameStateServiceTests
     public void GetPlayerGames_CallsGameStateStore()
     {
         var userId = CommonMethods.GetRandomSnowflakeStringId();
-        var user = new GameUser(userId, CommonMethods.GetRandomString(), CommonMethods.GetRandomString());
+        var user = CommonMethods.GetRandomGameUser(userId);
         GameState[] allGames =
         [
             new() { Id = CommonMethods.GetRandomString(), CreatedDate = DateTime.UtcNow, CreatedBy = user },
@@ -191,7 +191,7 @@ public class GameStateServiceTests
         var userName = CommonMethods.GetRandomString();
         var userAvatarUrl = CommonMethods.GetRandomString();
 
-        var expectedGameUser = new GameUser(userId.ToString(), userName, userAvatarUrl)
+        var expectedGameUser = new GameUser(userId.ToString())
         {
             UserType = UserType.StoryTeller
         };

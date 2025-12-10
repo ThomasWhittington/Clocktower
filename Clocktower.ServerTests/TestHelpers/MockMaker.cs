@@ -11,7 +11,7 @@ public static class MockMaker
             u.Id == id &&
             u.GlobalName == globalName &&
             u.DisplayAvatarUrl == avatarUrl &&
-            u.AsGameUser() == new GameUser(id.ToString(), globalName, avatarUrl));
+            u.AsGameUser() == new GameUser(id.ToString()));
         return mockUser;
     }
 

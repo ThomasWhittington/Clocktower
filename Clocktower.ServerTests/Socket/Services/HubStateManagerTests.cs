@@ -55,7 +55,7 @@ public class HubStateManagerTests
         const string gameId = "test-game";
         const string guildId = "1";
         const string userId = "user-123";
-        var gameUser = new GameUser(userId, "TestUser", "avatar-url");
+        var gameUser = new GameUser(userId);
         var gameState = new GameState
         {
             Id = gameId,

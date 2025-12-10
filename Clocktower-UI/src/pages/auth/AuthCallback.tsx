@@ -40,9 +40,9 @@ const AuthCallback = () => {
                         globalThis.location.href = '/login?error=auth_data_failed';
                     } else {
                         setCurrentUser({
-                            id: data?.gameUser?.id ?? '',
-                            name: data?.gameUser?.name ?? '',
-                            avatarUrl: data?.gameUser?.avatarUrl ?? ''
+                            id: data?.townUser?.id ?? '',
+                            name: data?.townUser?.name ?? '',
+                            avatarUrl: data?.townUser?.avatarUrl ?? ''
                         });
                         setJwt(data?.jwt ?? undefined);
 

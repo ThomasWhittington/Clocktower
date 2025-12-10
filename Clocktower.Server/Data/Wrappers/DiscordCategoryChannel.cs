@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Clocktower.Server.Data.Extensions;
 using Discord;
 using Discord.WebSocket;
 
@@ -36,7 +35,7 @@ public class DiscordCategoryChannel(SocketCategoryChannel channel) : IDiscordCat
         var channels = VoiceChannels.OrderBy(o => o.Position);
         return (from discordChannel in channels
             let miniChannel = new MiniChannel(discordChannel.Id.ToString(), discordChannel.Name)
-            let occupants = discordChannel.ConnectedUsers.Select(discordChannelUser => discordChannelUser.AsGameUser()).ToList()
+            let occupants = discordChannel.ConnectedUsers.Select(discordChannelUser => discordChannelUser.AsTownUser()).ToList()
             select new ChannelOccupants(miniChannel, occupants)).ToList();
     }
 }

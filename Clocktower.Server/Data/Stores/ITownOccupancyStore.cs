@@ -7,8 +7,9 @@ public interface ITownOccupancyStore
     TownOccupants? Get(ulong? guildId);
     bool Remove(string guildId);
     bool Remove(ulong guildId);
-    bool Set(string guildId, TownOccupants state,bool force = false);
-    bool Set(ulong guildId, TownOccupants state,bool force = false);
+    bool Set(string guildId, TownOccupants state, bool force = false);
+    bool Set(ulong guildId, TownOccupants state, bool force = false);
     bool TryUpdate(string guildId, Func<TownOccupants, TownOccupants> updateFn);
     bool TryUpdate(ulong guildId, Func<TownOccupants, TownOccupants> updateFn);
+    TownOccupants? GetTownByUser(string userId);
 }

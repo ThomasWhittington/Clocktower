@@ -11,12 +11,10 @@ public class AdminServiceTests
     private IAdminService _sut = null!;
     private Mock<IJwtWriter> _mockJwtWriter = null!;
 
-    private void SetUpJwtWriter(string username, string jwt)
+    private void SetUpJwtWriter(string jwt)
     {
         _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(user =>
             user.Id == "0" &&
-            user.Name == username &&
-            user.AvatarUrl == "avatar" &&
             user.UserType == UserType.StoryTeller
         ), isTest: true)).Returns(jwt);
     }
@@ -33,14 +31,12 @@ public class AdminServiceTests
     {
         const string username = "username";
         const string jwt = "this-jwt";
-        SetUpJwtWriter(username, jwt);
+        SetUpJwtWriter(jwt);
 
         var (success, result) = _sut.GenerateJwtToken(username);
 
         _mockJwtWriter.Verify(o => o.GetJwtToken(It.Is<GameUser>(user =>
             user.Id == "0" &&
-            user.Name == username &&
-            user.AvatarUrl == "avatar" &&
             user.UserType == UserType.StoryTeller
         ), isTest: true), Times.Once);
         success.Should().BeTrue();
