@@ -3,10 +3,6 @@
 }
     from './DiscordAdminPanel.tsx';
 export {
-    default as DiscordTown
-}
-    from './DiscordTown.tsx';
-export {
     default as DiscordTownCategory
 }
     from './DiscordTownCategory.tsx';

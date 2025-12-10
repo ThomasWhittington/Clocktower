@@ -9,8 +9,8 @@ import {
     HubConnectionState
 } from '@microsoft/signalr';
 import {
+    type DiscordTown,
     GameTime,
-    type TownOccupants,
     type VoiceState
 } from '@/types';
 import {
@@ -24,10 +24,10 @@ type UserVoiceStates = Record<string, VoiceState>;
 export type SessionSyncState = {
     gameTime: GameTime,
     jwt: string,
-    townOccupancy?: TownOccupants;
+    discordTown?: DiscordTown;
 };
 type HubState = {
-    townOccupancy?: TownOccupants;
+    discordTown?: DiscordTown;
     userPresenceStates: UserPresenceStates;
     userVoiceStates: UserVoiceStates;
     connectionState: signalR.HubConnectionState;
@@ -82,8 +82,8 @@ const createConnection = async () => {
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
-    globalConnection.on('TownOccupancyUpdated', (occupants: TownOccupants) => {
-        setState({townOccupancy: occupants});
+    globalConnection.on('DiscordTownUpdated', (discordTown: DiscordTown) => {
+        setState({discordTown: discordTown});
     });
 
     globalConnection.on('TownTimeChanged', (gameTime: number) => {
@@ -216,7 +216,7 @@ export const joinGameGroup = async (gameId: string) => {
     if (snapshot) {
         setState({
             gameTime: snapshot.gameTime,
-            townOccupancy: snapshot.townOccupancy
+            discordTown: snapshot.discordTown
         });
         const currentJwt = useAppStore.getState().jwt;
         if (snapshot.jwt !== currentJwt) {

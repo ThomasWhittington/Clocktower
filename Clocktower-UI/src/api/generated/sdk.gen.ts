@@ -32,6 +32,9 @@ import type {
     GetAuthDataApiResponses,
     GetAuthTokenApiData,
     GetAuthTokenApiErrors,
+    GetDiscordTownApiData,
+    GetDiscordTownApiErrors,
+    GetDiscordTownApiResponses,
     GetGameApiData,
     GetGameApiErrors,
     GetGameApiResponses,
@@ -47,9 +50,6 @@ import type {
     GetPlayerGamesApiResponses,
     GetRolesApiData,
     GetRolesApiResponses,
-    GetTownOccupancyApiData,
-    GetTownOccupancyApiErrors,
-    GetTownOccupancyApiResponses,
     GetTownStatusApiData,
     GetTownStatusApiErrors,
     GetTownStatusApiResponses,
@@ -343,6 +343,24 @@ export const createTownApi = <ThrowOnError extends boolean = false>(options: Opt
 };
 
 /**
+ * Get occupancy of town
+ *
+ * Gets user presense in the town
+ */
+export const getDiscordTownApi = <ThrowOnError extends boolean = false>(options: Options<GetDiscordTownApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetDiscordTownApiResponses, GetDiscordTownApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/discord/town/{guildId}/occupancy',
+        ...options
+    });
+};
+
+/**
  * Get temporary join data
  *
  * Retrieves temporary join data by key
@@ -356,24 +374,6 @@ export const getJoinDataApi = <ThrowOnError extends boolean = false>(options: Op
             }
         ],
         url: '/api/discord/town/join/{key}',
-        ...options
-    });
-};
-
-/**
- * Get occupancy of town
- *
- * Gets user presense in the town
- */
-export const getTownOccupancyApi = <ThrowOnError extends boolean = false>(options: Options<GetTownOccupancyApiData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetTownOccupancyApiResponses, GetTownOccupancyApiErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/discord/town/{guildId}/occupancy',
         ...options
     });
 };

@@ -14,7 +14,7 @@ export *
     from './gameUser.ts'
 
 export *
-    from './townOccupants.ts'
+    from './discordTown.ts'
 
 export *
     from './player.ts'
