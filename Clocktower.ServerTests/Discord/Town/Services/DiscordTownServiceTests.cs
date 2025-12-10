@@ -302,7 +302,7 @@ public class DiscordTownServiceTests
             GuildId = GuildId.ToString(),
             Users =
             [
-                new GameUser(UserId.ToString(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString())
+                CommonMethods.GetRandomGameUser(UserId.ToString())
             ]
         };
         _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
@@ -333,7 +333,7 @@ public class DiscordTownServiceTests
             GuildId = GuildId.ToString(),
             Users =
             [
-                new GameUser(UserId.ToString(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString())
+                CommonMethods.GetRandomGameUser(UserId.ToString())
             ]
         };
 
@@ -369,7 +369,7 @@ public class DiscordTownServiceTests
             GuildId = GuildId.ToString(),
             Users =
             [
-                new GameUser(UserId.ToString(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString())
+                CommonMethods.GetRandomGameUser(UserId.ToString())
             ]
         };
 
@@ -1100,18 +1100,18 @@ public class DiscordTownServiceTests
 
     private static readonly MiniCategory DayCategory = new("day-category", "Day Category", [
         new ChannelOccupants(new MiniChannel("day-channel-1", "Day Channel 1"), [
-            CommonMethods.GetRandomGameUser(),
+            CommonMethods.GetRandomTownUser()
         ]),
         new ChannelOccupants(new MiniChannel("day-channel-2", "Day Channel 2"), [
-            CommonMethods.GetRandomGameUser(),
-            CommonMethods.GetRandomGameUser()
+            CommonMethods.GetRandomTownUser(),
+            CommonMethods.GetRandomTownUser()
         ])
     ]);
 
     private static readonly MiniCategory NightCategory = new("night-category", "Night Category", [
         new ChannelOccupants(new MiniChannel("night-channel-1", "Night Channel 1"), []),
         new ChannelOccupants(new MiniChannel("night-channel-2", "Night Channel 2"), [
-            CommonMethods.GetRandomGameUser(),
+            CommonMethods.GetRandomTownUser()
         ]),
         new ChannelOccupants(new MiniChannel("night-channel-3", "Night Channel 3"), []),
     ]);

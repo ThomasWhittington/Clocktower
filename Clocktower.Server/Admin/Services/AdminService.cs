@@ -9,7 +9,7 @@ public class AdminService(IJwtWriter jwtWriter) : IAdminService
     {
         try
         {
-            var gameUser = new GameUser("0", username, "avatar")
+            var gameUser = new GameUser("0")
             {
                 UserType = UserType.StoryTeller
             };

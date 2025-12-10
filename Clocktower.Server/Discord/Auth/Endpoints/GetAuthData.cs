@@ -17,7 +17,7 @@ public class GetAuthData : IEndpoint
         string key,
         [FromServices] IDiscordAuthService discordAuthService)
     {
-        var gameUser = discordAuthService.GetAuthData(key);
-        return gameUser != null ? TypedResults.Ok(gameUser) : TypedResults.NotFound();
+        var userAuthData = discordAuthService.GetAuthData(key);
+        return userAuthData != null ? TypedResults.Ok(userAuthData) : TypedResults.NotFound();
     }
 }

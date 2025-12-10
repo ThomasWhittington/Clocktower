@@ -153,7 +153,7 @@ public class DiscordAuthServiceTests
     public void GetAuthData_CallsCacheRemove_ReturnsData_WhenCacheValueFound()
     {
         const string key = "this-key";
-        object authData = new UserAuthData(CommonMethods.GetRandomGameUser(), CommonMethods.GetRandomString());
+        object authData = new UserAuthData(CommonMethods.GetRandomTownUser(), CommonMethods.GetRandomString());
         _mockCache.Setup(o => o.TryGetValue($"auth_data_{key}", out authData!)).Returns(true);
 
         var result = Sut.GetAuthData(key);
@@ -289,7 +289,7 @@ public class DiscordAuthServiceTests
 
         _ = await Sut.HandleCallback(error, code);
 
-        _mockJwtWriter.Verify(o => o.GetJwtToken(It.IsAny<GameUser>()), Times.Once);
+        _mockJwtWriter.Verify(o => o.GetJwtToken(It.IsAny<TownUser>()), Times.Once);
     }
 
 
@@ -364,7 +364,7 @@ public class DiscordAuthServiceTests
         _mockDiscordAuthApiService.Setup(o => o.ExchangeCodeForToken(code, _testHttpClient)).ReturnsAsync(tokenResponse);
         _mockDiscordAuthApiService.Setup(x => x.GetDiscordUserInfo(tokenResponse.AccessToken, _testHttpClient))
             .ReturnsAsync(userInfo);
-        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == userInfo.Id))).Returns(jwt);
+        _mockJwtWriter.Setup(o => o.GetJwtToken(It.Is<TownUser>(g => g.Id == userInfo.Id))).Returns(jwt);
         _mockIdGenerator.Setup(o => o.GenerateId()).Returns(key);
         var mockCacheEntry = new Mock<ICacheEntry>();
         _mockCache.Setup(o => o.CreateEntry(It.IsAny<object>()))
@@ -374,7 +374,7 @@ public class DiscordAuthServiceTests
 
         result.Should().Contain(feUri);
         _mockCache.Verify(o => o.CreateEntry(It.Is<object>(e => e.ToString()!.Equals($"auth_data_{key}"))), Times.Once);
-        mockCacheEntry.VerifySet(entry => entry.Value = It.Is<UserAuthData>(u => u.Jwt == jwt && u.GameUser.Id == userInfo.Id), Times.Once);
+        mockCacheEntry.VerifySet(entry => entry.Value = It.Is<UserAuthData>(u => u.Jwt == jwt && u.TownUser.Id == userInfo.Id), Times.Once);
         mockCacheEntry.VerifySet(entry => entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5), Times.Once);
     }
 

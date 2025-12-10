@@ -1,8 +1,8 @@
-﻿import {
-    GameTime
-} from "@/hooks";
-import React
+﻿import React
     from "react";
+import {
+    GameTime
+} from "@/types/GameTime.ts";
 
 export const BackgroundImage = ({ gameTime, children }: { gameTime: GameTime, children?: React.ReactNode }) => {
     const backgrounds = {

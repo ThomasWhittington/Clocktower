@@ -6,23 +6,30 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Clocktower.Server.Common.Services;
 
-public interface IJwtWriter
-{
-    string GetJwtToken(GameUser gameUser, bool isTest = false);
-}
-
-public class JwtWriter(IOptions<Secrets> secretsOptions) : IJwtWriter
+public class JwtWriter(IOptions<Secrets> secretsOptions, IUserService userService) : IJwtWriter
 {
     private readonly Secrets _secrets = secretsOptions.Value;
 
     public string GetJwtToken(GameUser gameUser, bool isTest = false)
     {
+        var userName = userService.GetUserName(gameUser.Id) ?? gameUser.Id;
+        var isStoryTeller = gameUser.UserType == UserType.StoryTeller;
+        return GetJwtToken(gameUser.Id, userName, isStoryTeller, isTest);
+    }
+
+    public string GetJwtToken(TownUser townUser, bool isTest = false)
+    {
+        return GetJwtToken(townUser.Id, townUser.Name, false, isTest);
+    }
+
+    public virtual string GetJwtToken(string id, string name, bool isStoryTeller, bool testBypass = false)
+    {
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, gameUser.Id),
-            new Claim(ClaimTypes.Name, gameUser.Name),
-            new Claim("is_storyteller", gameUser.UserType == UserType.StoryTeller ? "true" : "false"),
-            new Claim("test_bypass", isTest ? "true" : "false")
+            new Claim(ClaimTypes.NameIdentifier, id),
+            new Claim(ClaimTypes.Name, name),
+            new Claim("is_storyteller", isStoryTeller ? "true" : "false"),
+            new Claim("test_bypass", testBypass ? "true" : "false")
         };
 
         var key = new SymmetricSecurityKey(

@@ -1,5 +1,4 @@
-﻿using Clocktower.Server.Data;
-using Clocktower.Server.Data.Types;
+﻿using Clocktower.Server.Data.Types;
 using Clocktower.Server.Discord.Town.Endpoints;
 using Clocktower.Server.Discord.Town.Services;
 
@@ -34,7 +33,7 @@ public class GetJoinDataTests
     public void Handle_ReturnsOk_WhenJoinDataIsFound()
     {
         var key = CommonMethods.GetRandomString();
-        var user = new GameUser(CommonMethods.GetRandomString(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString());
+        var user =CommonMethods.GetRandomGameUser();
         var joinData = new JoinData(CommonMethods.GetRandomSnowflakeStringId(), user, CommonMethods.GetRandomString(), CommonMethods.GetRandomString());
 
         _mockDiscordTownService.Setup(o => o.GetJoinData(key)).Returns(joinData);

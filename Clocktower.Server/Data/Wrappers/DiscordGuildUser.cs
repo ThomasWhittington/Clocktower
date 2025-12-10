@@ -56,11 +56,7 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
 
     public GameUser AsGameUser(GameState? gameState = null)
     {
-        var result = new GameUser(user.Id.ToString(), user.DisplayName, DisplayAvatarUrl)
-        {
-            VoiceState = new VoiceState(IsServerMuted, IsServerDeafened, IsSelfMuted, IsSelfDeafened),
-            IsPresent = VoiceState?.VoiceChannel != null
-        };
+        var result = new GameUser(user.Id.ToString());
         if (gameState is not null)
         {
             result.UserType = gameState.GetUserType(user.Id.ToString());
@@ -69,8 +65,14 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
         return result;
     }
 
-    public async Task SetIsServerDeafened(bool isDeafened)
+    public TownUser AsTownUser()
     {
-        await user.ModifyAsync(o => o.Deaf = isDeafened);
+        var result = new TownUser(user.Id.ToString(), user.DisplayName, DisplayAvatarUrl)
+        {
+            VoiceState = new VoiceState(IsServerMuted, IsServerDeafened, IsSelfMuted, IsSelfDeafened),
+            IsPresent = VoiceState?.VoiceChannel != null
+        };
+
+        return result;
     }
 }

@@ -47,16 +47,13 @@ export const getGuildsWithUserApiResponseTransformer = async (data: any): Promis
 };
 
 const clocktowerServerDataUserAuthDataSchemaResponseTransformer = (data: any) => {
-    if (data.gameUser) {
-        data.gameUser = clocktowerServerDataGameUserSchemaResponseTransformer(data.gameUser);
+    if (data.townUser) {
+        data.townUser = clocktowerServerDataTownUserSchemaResponseTransformer(data.townUser);
     }
     return data;
 };
 
-const clocktowerServerDataGameUserSchemaResponseTransformer = (data: any) => {
-    if (data.userType) {
-        data.userType = clocktowerServerDataTypesEnumUserTypeSchemaResponseTransformer(data.userType);
-    }
+const clocktowerServerDataTownUserSchemaResponseTransformer = (data: any) => {
     if (data.voiceState) {
         data.voiceState = clocktowerServerDataVoiceStateSchemaResponseTransformer(data.voiceState);
     }
@@ -75,6 +72,13 @@ const clocktowerServerDataTypesJoinDataSchemaResponseTransformer = (data: any) =
     return data;
 };
 
+const clocktowerServerDataGameUserSchemaResponseTransformer = (data: any) => {
+    if (data.userType) {
+        data.userType = clocktowerServerDataTypesEnumUserTypeSchemaResponseTransformer(data.userType);
+    }
+    return data;
+};
+
 export const getJoinDataApiResponseTransformer = async (data: any): Promise<GetJoinDataApiResponse> => {
     data = clocktowerServerDataTypesJoinDataSchemaResponseTransformer(data);
     return data;
@@ -84,6 +88,11 @@ const clocktowerServerDataTownOccupantsSchemaResponseTransformer = (data: any) =
     if (data.channelCategories) {
         data.channelCategories = data.channelCategories.map((item: any) => {
             return clocktowerServerDataMiniCategorySchemaResponseTransformer(item);
+        });
+    }
+    if (data.townUsers) {
+        data.townUsers = data.townUsers.map((item: any) => {
+            return clocktowerServerDataTownUserSchemaResponseTransformer(item);
         });
     }
     return data;
@@ -104,7 +113,7 @@ const clocktowerServerDataChannelOccupantsSchemaResponseTransformer = (data: any
     }
     if (data.occupants) {
         data.occupants = data.occupants.map((item: any) => {
-            return clocktowerServerDataGameUserSchemaResponseTransformer(item);
+            return clocktowerServerDataTownUserSchemaResponseTransformer(item);
         });
     }
     return data;

@@ -489,7 +489,7 @@
     "tags": [],
     "title": "Seperate user data",
     "description": "Users currently all are GameUsers, split off /adapt a TownUser and a GameUser with a central user control for common data",
-    "status": "TODO",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,
@@ -501,6 +501,28 @@
         "minute": 53,
         "second": 6,
         "nano": 15970500
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_254",
+    "priority": "HIGH",
+    "tags": [],
+    "title": "Add userViewModel ",
+    "description": "Create new model that the FE uses for it\u0027s users, should be the combined game and town users",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 10
+      },
+      "time": {
+        "hour": 13,
+        "minute": 45,
+        "second": 33,
+        "nano": 118572700
       }
     },
     "isImported": false

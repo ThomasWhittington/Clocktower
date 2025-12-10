@@ -3,7 +3,7 @@
 } from "@/services";
 import {
     GameTime
-} from "@/hooks";
+} from "@/types";
 import {
     useAppStore
 } from "@/store";

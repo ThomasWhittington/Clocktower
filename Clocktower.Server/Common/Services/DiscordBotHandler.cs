@@ -7,6 +7,7 @@ namespace Clocktower.Server.Common.Services;
 public class DiscordBotHandler(
     IGameStateStore gameStateStore,
     ITownOccupantManager townOccupantManager,
+    IUserService userService,
     INotificationService notificationService,
     IServiceScopeFactory serviceScopeFactory
 ) : IDiscordBotHandler
@@ -50,9 +51,9 @@ public class DiscordBotHandler(
         bool inVoice = after.VoiceChannel != null;
         var discordVoiceState = new VoiceState(after.IsMuted, after.IsDeafened, after.IsSelfMuted, after.IsSelfDeafened);
 
-        gameStateStore.UpdateUser(gameId, user.Id, isPresent: inVoice, voiceState: discordVoiceState);
+        userService.UpdateDiscordPresence(user.Id.ToString(), guildId.ToString(), inVoice, discordVoiceState);
 
-        var townOccupants = townOccupantManager.UpdateUserStatus(guildId, user.Id, inVoice, discordVoiceState);
+        var townOccupants = townOccupantManager.GetTownOccupancy(guildId);
         if (townOccupants is not null)
         {
             await notificationService.BroadcastTownOccupancyUpdate(gameId, townOccupants);

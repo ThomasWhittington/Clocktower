@@ -12,6 +12,7 @@
     setTimeApi
 } from '@/api';
 import {
+    GameTime,
     mapToMiniGuild,
     mapToTownOccupants,
     type MiniGuild,
@@ -20,9 +21,6 @@ import {
 import {
     apiClient
 } from "@/api/api-client.ts";
-import {
-    GameTime
-} from "@/hooks";
 
 async function getTownStatus(id: string): Promise<GetTownStatusApiResponse> {
     const {

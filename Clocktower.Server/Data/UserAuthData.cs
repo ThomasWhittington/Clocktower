@@ -1,3 +1,3 @@
 ﻿namespace Clocktower.Server.Data;
 
-public record UserAuthData(GameUser GameUser, string Jwt);
+public record UserAuthData(TownUser TownUser, string Jwt);

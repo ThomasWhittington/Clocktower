@@ -5,7 +5,8 @@ namespace Clocktower.Server.Discord.GameAction.Services;
 
 public class DiscordGameActionService(
     IDiscordBot bot,
-    IGameStateStore gameStateStore
+    IGameStateStore gameStateStore,
+    IUserService userService
 ) : IDiscordGameActionService
 {
     public async Task<(SetMuteAllPlayersOutcome outcome, string message)> SetMuteAllPlayersAsync(string gameId, bool muted)
@@ -16,10 +17,15 @@ public class DiscordGameActionService(
         var guild = bot.GetGuild(guildId);
         if (guild is null) return (SetMuteAllPlayersOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
 
-        var toBeMuted = gameState.StoryTellers.Where(o =>
-            o.IsPresent &&
-            o.VoiceState.IsServerMuted == !muted
+
+        var toBeMuted = userService.GetTownUsersForGameUsers(
+            gameState.StoryTellers,
+            guildId.ToString(),
+            user =>
+                user.IsPresent &&
+                user.VoiceState.IsServerMuted == !muted
         );
+
         var discordUserToBeMuted = guild.GetGuildUsers(toBeMuted.GetIds());
 
         var mutedPlayers = 0;

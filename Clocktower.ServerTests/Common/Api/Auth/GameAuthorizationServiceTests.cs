@@ -33,7 +33,7 @@ public class GameAuthorizationServiceTests
 
         foreach ((string userId, UserType userType) in users)
         {
-            gameUsers.Add(new GameUser(userId, It.IsAny<string>(), It.IsAny<string>())
+            gameUsers.Add(new GameUser(userId)
             {
                 UserType = userType
             });

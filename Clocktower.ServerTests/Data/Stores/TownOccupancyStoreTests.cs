@@ -25,18 +25,18 @@ public class TownOccupancyStoreTests
 
     private static readonly MiniCategory DayCategory = new("1001", "Day Category", [
         new ChannelOccupants(new MiniChannel("2001", "Day Channel 1"), [
-            new GameUser("3001", "User3001", string.Empty)
+            new TownUser("3001", "User3001", string.Empty)
         ]),
         new ChannelOccupants(new MiniChannel("2002", "Day Channel 2"), [
-            new GameUser("3002", "User3002", string.Empty),
-            new GameUser("3003", "User3003", string.Empty)
+            new TownUser("3002", "User3002", string.Empty),
+            new TownUser("3003", "User3003", string.Empty)
         ])
     ]);
 
     private static readonly MiniCategory NightCategory = new("1002", "Night Category", [
         new ChannelOccupants(new MiniChannel("2203", "Night Channel 1"), []),
         new ChannelOccupants(new MiniChannel("2204", "Night Channel 2"), [
-            new GameUser("3004", "User3004", string.Empty)
+            new TownUser("3004", "User3004", string.Empty)
         ]),
         new ChannelOccupants(new MiniChannel("2205", "Night Channel 3"), []),
     ]);
@@ -62,9 +62,17 @@ public class TownOccupancyStoreTests
     }
 
     [TestMethod]
-    public void Get_WhenGuildDoesNotExist_ReturnsNull()
+    public void Get_ReturnsNull_WhenGuildDoesNotExist()
     {
         var result = _sut.Get("nonexistent");
+
+        result.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void Get_ReturnsNull_WhenNoGuildId()
+    {
+        var result = _sut.Get((string?)null);
 
         result.Should().BeNull();
     }
@@ -106,6 +114,7 @@ public class TownOccupancyStoreTests
         const ulong guildId = 123456789UL;
 
         _sut.Set(guildId, _dummyOccupants).Should().BeTrue();
+        _sut.Get((ulong?)null).Should().BeNull();
         _sut.Get(guildId).Should().Be(_dummyOccupants);
         _sut.TryUpdate(guildId, _ => _dummyOccupants);
         _sut.Remove(guildId).Should().BeTrue();
@@ -121,5 +130,63 @@ public class TownOccupancyStoreTests
 
         _sut.Get("guild1").Should().BeNull();
         _sut.Get("guild2").Should().BeNull();
+    }
+    
+    [TestMethod]
+    public void GetTownByUser_UserNotInTown_ReturnsNull()
+    {
+        var store = new TownOccupancyStore();
+        const string userId = "user123";
+        const string guildId = "guild456";
+        var townOccupants = GetDummyTownOccupants();
+        store.Set(guildId, townOccupants);
+
+        var result = store.GetTownByUser(userId);
+
+        result.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void GetTownByUser_UserExistsInTown_ReturnsTownOccupants()
+    {
+        var store = new TownOccupancyStore();
+        const string userId = "user123";
+        const string guildId = "guild456";
+        var townOccupants = CreateTownWithUser(userId);
+        store.Set(guildId, townOccupants);
+
+        var result = store.GetTownByUser(userId);
+
+        result.Should().NotBeNull();
+        result.Should().Be(townOccupants);
+    }
+
+    [TestMethod]
+    public void GetTownByUser_UserInMultipleTowns_ReturnsFirstMatch()
+    {
+        var store = new TownOccupancyStore();
+        const string userId = "user123";
+        var town1 = CreateTownWithUser(userId);
+        var town2 = CreateTownWithUser(userId);
+        store.Set("guild1", town1);
+        store.Set("guild2", town2);
+        
+        var result = store.GetTownByUser(userId);
+        
+        result.Should().NotBeNull();
+        result.Should().BeOneOf(town1, town2);
+    }
+
+    private static TownOccupants CreateTownWithUser(string userId)
+    {
+        return new TownOccupants([
+            new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [
+                new ChannelOccupants(new MiniChannel(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString()),
+                    [
+                        new TownUser(userId, "User", "Avatar")
+                    ]
+                )
+            ])
+        ]);
     }
 }

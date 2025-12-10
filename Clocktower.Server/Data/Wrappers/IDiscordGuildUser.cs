@@ -20,4 +20,5 @@ public interface IDiscordGuildUser
     bool DoesUserHaveRole(ulong roleId);
     Task SetIsServerMuted(bool isMuted);
     GameUser AsGameUser(GameState? gameState = null);
+    TownUser AsTownUser();
 }
