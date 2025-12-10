@@ -2,7 +2,7 @@
     from "react";
 import {
     GameTime
-} from "@/types/GameTime.ts";
+} from "@/types";
 
 export const BackgroundImage = ({ gameTime, children }: { gameTime: GameTime, children?: React.ReactNode }) => {
     const backgrounds = {
