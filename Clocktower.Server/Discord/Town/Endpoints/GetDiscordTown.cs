@@ -17,6 +17,6 @@ public class GetDiscordTown : IEndpoint
         [FromServices] IDiscordTownService discordTownService)
     {
         var (success, discordTownDto, message) = await discordTownService.GetDiscordTownDto(request.GameId);
-        return success ? TypedResults.Ok(discordTownDto) : TypedResults.BadRequest(message);
+        return success && discordTownDto is not null ? TypedResults.Ok(discordTownDto) : TypedResults.BadRequest(message);
     }
 }

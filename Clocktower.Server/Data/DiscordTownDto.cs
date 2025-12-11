@@ -7,7 +7,7 @@ public record DiscordTownDto(string GameId, List<MiniCategoryDto> ChannelCategor
 {
     [UsedImplicitly] public int UserCount => TownUsers.Count();
 
-    public IEnumerable<UserDto> TownUsers => ChannelCategories
+    public IEnumerable<UserDto> TownUsers { get; } = ChannelCategories
         .SelectMany(cat => cat.Channels)
-        .SelectMany(ch => ch.Occupants);
+        .SelectMany(ch => ch.Occupants).ToArray();
 }

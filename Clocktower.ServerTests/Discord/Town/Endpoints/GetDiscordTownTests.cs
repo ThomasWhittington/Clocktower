@@ -27,7 +27,7 @@ public class GetDiscordTownTests
             .ShouldHaveMethod(HttpMethod.Get)
             .ShouldHaveOperationId("getDiscordTownApi")
             .ShouldHaveSummary("Get occupancy of town")
-            .ShouldHaveDescription("Gets user presense in the town")
+            .ShouldHaveDescription("Gets user presence in the town")
             .ShouldHaveValidation();
     }
 
