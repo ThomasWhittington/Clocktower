@@ -345,7 +345,7 @@ export const createTownApi = <ThrowOnError extends boolean = false>(options: Opt
 /**
  * Get occupancy of town
  *
- * Gets user presense in the town
+ * Gets user presence in the town
  */
 export const getDiscordTownApi = <ThrowOnError extends boolean = false>(options: Options<GetDiscordTownApiData, ThrowOnError>) => {
     return (options.client ?? client).get<GetDiscordTownApiResponses, GetDiscordTownApiErrors, ThrowOnError>({
@@ -355,7 +355,7 @@ export const getDiscordTownApi = <ThrowOnError extends boolean = false>(options:
                 type: 'http'
             }
         ],
-        url: '/api/discord/town/{guildId}/occupancy',
+        url: '/api/discord/town/{gameId}/occupancy',
         ...options
     });
 };

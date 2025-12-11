@@ -13,15 +13,16 @@ export type ClocktowerServerAdminEndpointsHealthResponse = {
     timeStamp?: Date;
 };
 
-export type ClocktowerServerDataChannelOccupants = {
+export type ClocktowerServerDataChannelOccupantsDto = {
     channel?: ClocktowerServerDataMiniChannel;
-    occupants?: Array<ClocktowerServerDataTownUser> | null;
+    occupants?: Array<ClocktowerServerDataUserDto> | null;
 };
 
-export type ClocktowerServerDataDiscordTown = {
-    channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
+export type ClocktowerServerDataDiscordTownDto = {
+    gameId?: string | null;
+    channelCategories?: Array<ClocktowerServerDataMiniCategoryDto> | null;
     readonly userCount?: number;
-    readonly townUsers?: Array<ClocktowerServerDataTownUser> | null;
+    readonly townUsers?: Array<ClocktowerServerDataUserDto> | null;
 };
 
 export type ClocktowerServerDataGameState = {
@@ -44,10 +45,10 @@ export type ClocktowerServerDataGameUser = {
     userType?: ClocktowerServerDataTypesEnumUserType;
 };
 
-export type ClocktowerServerDataMiniCategory = {
+export type ClocktowerServerDataMiniCategoryDto = {
     id?: string | null;
     name?: string | null;
-    channels?: Array<ClocktowerServerDataChannelOccupants> | null;
+    channels?: Array<ClocktowerServerDataChannelOccupantsDto> | null;
 };
 
 export type ClocktowerServerDataMiniChannel = {
@@ -101,6 +102,16 @@ export type ClocktowerServerDataUserAuthData = {
     jwt?: string | null;
 };
 
+export type ClocktowerServerDataUserDto = {
+    id?: string | null;
+    name?: string | null;
+    avatarUrl?: string | null;
+    voiceState?: ClocktowerServerDataVoiceState;
+    isPresent?: boolean;
+    isPlaying?: boolean;
+    userType?: ClocktowerServerDataTypesEnumUserType;
+};
+
 export type ClocktowerServerDataVoiceState = {
     isServerMuted?: boolean;
     isServerDeafened?: boolean;
@@ -146,8 +157,9 @@ export type MicrosoftAspNetCoreHttpHttpValidationProblemDetails = {
     } | null | undefined;
 };
 
-export type ClocktowerServerDataDiscordTownWritable = {
-    channelCategories?: Array<ClocktowerServerDataMiniCategory> | null;
+export type ClocktowerServerDataDiscordTownDtoWritable = {
+    gameId?: string | null;
+    channelCategories?: Array<ClocktowerServerDataMiniCategoryDto> | null;
 };
 
 export type ClocktowerServerDataGameStateWritable = {
@@ -450,10 +462,10 @@ export type CreateTownApiResponse = CreateTownApiResponses[keyof CreateTownApiRe
 export type GetDiscordTownApiData = {
     body?: never;
     path: {
-        guildId: string;
+        gameId: string;
     };
     query?: never;
-    url: '/api/discord/town/{guildId}/occupancy';
+    url: '/api/discord/town/{gameId}/occupancy';
 };
 
 export type GetDiscordTownApiErrors = {
@@ -469,7 +481,7 @@ export type GetDiscordTownApiResponses = {
     /**
      * OK
      */
-    200: ClocktowerServerDataDiscordTown;
+    200: ClocktowerServerDataDiscordTownDto;
 };
 
 export type GetDiscordTownApiResponse = GetDiscordTownApiResponses[keyof GetDiscordTownApiResponses];

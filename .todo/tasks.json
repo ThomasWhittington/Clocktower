@@ -347,7 +347,7 @@
   },
   {
     "id": "TASK_117",
-    "priority": "MEDIUM",
+    "priority": "LOW",
     "tags": [],
     "title": "Look into testing the react/js logic",
     "description": "See what testing is possible for the react components and the logic in the FE",
@@ -511,7 +511,7 @@
     "tags": [],
     "title": "Add userViewModel ",
     "description": "Create new model that the FE uses for it\u0027s users, should be the combined game and town users",
-    "status": "TODO",
+    "status": "DONE",
     "date": {
       "date": {
         "year": 2025,
@@ -523,6 +523,19 @@
         "minute": 45,
         "second": 33,
         "nano": 118572700
+      }
+    },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 11
+      },
+      "time": {
+        "hour": 19,
+        "minute": 12,
+        "second": 58,
+        "nano": 559439900
       }
     },
     "isImported": false
@@ -545,6 +558,107 @@
         "minute": 36,
         "second": 56,
         "nano": 756605100
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_293",
+    "priority": "MEDIUM",
+    "tags": [],
+    "title": "Toggle storyteller should update clients",
+    "description": "Currently updating story teller does not inform clients. It should send out a new town update",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 11
+      },
+      "time": {
+        "hour": 17,
+        "minute": 33,
+        "second": 15,
+        "nano": 718739800
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_314",
+    "priority": "MEDIUM",
+    "tags": [],
+    "title": "Only storytellers should be able to see night channels",
+    "description": "Currently all users can see all channels. Players should only see the day channels and the cottage they are currently in",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 11
+      },
+      "time": {
+        "hour": 18,
+        "minute": 3,
+        "second": 22,
+        "nano": 931906300
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_357",
+    "priority": "HIGH",
+    "tags": [],
+    "title": "Add dto creation layer for GetDiscordTown",
+    "description": "GetDiscordTown endpoint has got too much logic in. create new layer that takes a game id and returns a DiscordTownDto",
+    "status": "DONE",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 11
+      },
+      "time": {
+        "hour": 18,
+        "minute": 6,
+        "second": 10,
+        "nano": 532960600
+      }
+    },
+    "finishDate": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 11
+      },
+      "time": {
+        "hour": 19,
+        "minute": 12,
+        "second": 55,
+        "nano": 289758600
+      }
+    },
+    "isImported": false
+  },
+  {
+    "id": "TASK_424",
+    "priority": "MEDIUM",
+    "tags": [],
+    "title": "Use UserDto in gameState",
+    "description": "",
+    "status": "TODO",
+    "date": {
+      "date": {
+        "year": 2025,
+        "month": 12,
+        "day": 11
+      },
+      "time": {
+        "hour": 18,
+        "minute": 9,
+        "second": 34,
+        "nano": 265138000
       }
     },
     "isImported": false

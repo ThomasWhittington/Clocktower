@@ -22,7 +22,7 @@ export *
 export *
     from './miniGuild.ts'
 
-export * from './townUser.ts'
+export * from './user.ts'
 export * from './gameTime.ts'
 export * from './userType.ts'
 export * from './voiceState.ts'

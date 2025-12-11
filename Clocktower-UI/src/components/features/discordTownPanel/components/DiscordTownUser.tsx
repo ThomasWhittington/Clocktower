@@ -1,13 +1,15 @@
-﻿import type {
-    TownUser
+﻿import {
+    type User,
+    UserType
 } from "@/types";
 import {
     DiscordUserVoiceStatus
 } from "@/components/ui";
 
 function DiscordTownUser({user}: Readonly<{
-    user: TownUser
+    user: User
 }>) {
+    const userType = user.userType? UserType[user.userType]: UserType.Unknown;
     return (
         <div
             className="town-user-status">
@@ -16,7 +18,7 @@ function DiscordTownUser({user}: Readonly<{
                     src={user.avatarUrl}
                     alt={user.name}/>
             }
-            <p>{user.name}</p>
+            <p>({userType}) {user.name}</p>
             {
                 user.voiceState &&
                 <DiscordUserVoiceStatus voiceState={user.voiceState}/>

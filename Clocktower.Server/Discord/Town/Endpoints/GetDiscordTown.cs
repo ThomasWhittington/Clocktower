@@ -6,17 +6,17 @@ namespace Clocktower.Server.Discord.Town.Endpoints;
 public class GetDiscordTown : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapGet("/{guildId}/occupancy", Handle)
+        .MapGet("/{gameId}/occupancy", Handle)
         .SetOpenApiOperationId<GetDiscordTown>()
         .WithSummary("Get occupancy of town")
-        .WithDescription("Gets user presense in the town")
-        .WithRequestValidation<GuildIdRequest>();
+        .WithDescription("Gets user presence in the town")
+        .WithRequestValidation<GameIdRequest>();
 
-    internal static async Task<Results<Ok<DiscordTown>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, [FromServices]IDiscordTownService discordTownService)
+    internal static async Task<Results<Ok<DiscordTownDto>, BadRequest<string>>> Handle(
+        [AsParameters] GameIdRequest request,
+        [FromServices] IDiscordTownService discordTownService)
     {
-        var guildId = ulong.Parse(request.GuildId);
-
-        var (success, discordTown, message) = await discordTownService.GetDiscordTown(guildId);
-        return success ? TypedResults.Ok(discordTown) : TypedResults.BadRequest(message);
+        var (success, discordTownDto, message) = await discordTownService.GetDiscordTownDto(request.GameId);
+        return success && discordTownDto is not null ? TypedResults.Ok(discordTownDto) : TypedResults.BadRequest(message);
     }
 }
