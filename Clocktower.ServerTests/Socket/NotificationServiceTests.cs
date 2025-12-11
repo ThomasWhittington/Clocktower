@@ -1,4 +1,5 @@
 ﻿using Clocktower.Server.Data;
+using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Socket;
 using Microsoft.AspNetCore.SignalR;
@@ -9,18 +10,22 @@ namespace Clocktower.ServerTests.Socket;
 public class NotificationServiceTests
 {
     private Mock<IHubContext<DiscordNotificationHub, IDiscordNotificationClient>> _mockHubContext = null!;
+    private Mock<IGameStateStore> _gameStateStore = null!;
     private Mock<IHubCallerClients<IDiscordNotificationClient>> _mockClients = null!;
     private Mock<IDiscordNotificationClient> _mockClientProxy = null!;
     private Mock<IGroupManager> _mockGroups = null!;
-    private NotificationService Sut => new(_mockHubContext.Object);
+    private INotificationService _sut = null!;
 
     [TestInitialize]
     public void Setup()
     {
         _mockHubContext = new Mock<IHubContext<DiscordNotificationHub, IDiscordNotificationClient>>();
+        _gameStateStore = new Mock<IGameStateStore>();
         _mockClients = new Mock<IHubCallerClients<IDiscordNotificationClient>>();
         _mockClientProxy = new Mock<IDiscordNotificationClient>();
         _mockGroups = new Mock<IGroupManager>();
+
+        _sut = new NotificationService(_mockHubContext.Object, _gameStateStore.Object);
 
         _mockHubContext.Setup(h => h.Clients).Returns(_mockClients.Object);
         _mockHubContext.Setup(h => h.Groups).Returns(_mockGroups.Object);
@@ -33,12 +38,13 @@ public class NotificationServiceTests
         var discordTown = new DiscordTown([
             new MiniCategory(CommonMethods.GetRandomString(), CommonMethods.GetRandomString(), [])
         ]);
+
         _mockClients.Setup(c => c.Group("game:test-game-123")).Returns(_mockClientProxy.Object);
 
-        await Sut.BroadcastDiscordTownUpdate(gameId, discordTown);
+        await _sut.BroadcastDiscordTownUpdate(gameId, discordTown);
 
         _mockClients.Verify(c => c.Group("game:test-game-123"), Times.Once);
-        _mockClientProxy.Verify(cp => cp.DiscordTownUpdated(discordTown), Times.Once);
+        _mockClientProxy.Verify(cp => cp.DiscordTownUpdated(It.Is<DiscordTownDto>(town =>town.GameId==gameId)), Times.Once);
     }
 
     [TestMethod]
@@ -51,7 +57,7 @@ public class NotificationServiceTests
 
         _mockClients.Setup(c => c.Group("game:test-game-456")).Returns(_mockClientProxy.Object);
 
-        await Sut.BroadcastUserVoiceStateChanged(gameId, userId, inVoice, voiceState);
+        await _sut.BroadcastUserVoiceStateChanged(gameId, userId, inVoice, voiceState);
 
         _mockClients.Verify(c => c.Group("game:test-game-456"), Times.Once);
         _mockClientProxy.Verify(cp => cp.UserVoiceStateChanged(userId, inVoice, voiceState), Times.Once);
@@ -64,7 +70,7 @@ public class NotificationServiceTests
         const string message = "Test ping message";
         _mockClients.Setup(c => c.User(targetUserId)).Returns(_mockClientProxy.Object);
 
-        await Sut.PingUser(targetUserId, message);
+        await _sut.PingUser(targetUserId, message);
 
         _mockClients.Verify(c => c.User(targetUserId), Times.Once);
         _mockClientProxy.Verify(cp => cp.PingUser(message), Times.Once);
@@ -77,7 +83,7 @@ public class NotificationServiceTests
         const GameTime gameTime = GameTime.Day;
         _mockClients.Setup(c => c.Group("game:test-game-789")).Returns(_mockClientProxy.Object);
 
-        await Sut.BroadcastTownTime(gameId, gameTime);
+        await _sut.BroadcastTownTime(gameId, gameTime);
 
         _mockClients.Verify(c => c.Group("game:test-game-789"), Times.Once);
         _mockClientProxy.Verify(cp => cp.TownTimeChanged((int)gameTime), Times.Once);

@@ -10,12 +10,13 @@ public class HubStateManager(IGameStateStore gameStateStore, IDiscordTownStore d
         var currentGameState = gameStateStore.Get(gameId);
         var gameUser = currentGameState?.GetUser(userId);
         if (currentGameState is null || gameUser is null) return null;
-            
+        var discordTown = discordTownStore.Get(currentGameState.GuildId);
+        var enhancedTown = discordTown?.ToDiscordTownDto(currentGameState.Id, currentGameState.Users);
         var currentState = new SessionSyncState
         {
             GameTime = currentGameState.GameTime,
             Jwt = jwtWriter.GetJwtToken(gameUser),
-            DiscordTown = discordTownStore.Get(currentGameState.GuildId)
+            DiscordTown = enhancedTown
         };
         return currentState;
     }

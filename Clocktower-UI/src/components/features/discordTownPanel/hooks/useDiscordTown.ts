@@ -12,9 +12,6 @@ import {
 import {
     discordService
 } from '@/services';
-import {
-    ValidationUtils
-} from '@/utils';
 import type {
     DiscordTown
 } from '@/types';
@@ -23,7 +20,7 @@ type DiscordTownState = {
     discordTown?: DiscordTown;
     isLoading: boolean;
     error: string;
-    guildId?: string;
+    gameId?: string;
 };
 
 let globalTownState: DiscordTownState = {
@@ -42,29 +39,19 @@ const setTownState = (updates: Partial<DiscordTownState>) => {
     notifyTownListeners();
 };
 
-const initializeDiscordTown = async (guildId: string) => {
-    if (isInitializing || globalTownState.guildId === guildId) return;
+const initializeDiscordTown = async (gameId: string) => {
+    if (isInitializing || globalTownState.gameId === gameId) return;
 
     isInitializing = true;
-
-    if (!ValidationUtils.isValidDiscordId(guildId)) {
-        console.error('guildId was not valid');
-        setTownState({
-            error: 'Invalid guild ID',
-            isLoading: false
-        });
-        isInitializing = false;
-        return;
-    }
-
+    
     setTownState({
         isLoading: true,
         error: "",
-        guildId
+        gameId: gameId
     });
 
     try {
-        const data = await discordService.getDiscordTown(guildId);
+        const data = await discordService.getDiscordTown(gameId);
         setTownState({
             discordTown: data,
             isLoading: false
@@ -83,7 +70,7 @@ const resetDiscordTownState = () => {
     globalTownState = {
         isLoading: false,
         error: "",
-        guildId: undefined,
+        gameId: undefined,
         discordTown: undefined
     };
     notifyTownListeners();
@@ -93,7 +80,7 @@ export const useDiscordTown = () => {
     const [state, setState] = useState<DiscordTownState>(globalTownState);
     const listenerRef = useRef<(state: DiscordTownState) => void>(null);
 
-    const guildId = useAppStore((state) => state.guildId);
+    const currentGameId = useAppStore((state) => state.gameId);
     const {discordTown: realtimeDiscordTown} = useServerHub();
 
     useEffect(() => {
@@ -101,8 +88,8 @@ export const useDiscordTown = () => {
         listenerRef.current = listener;
         globalTownListeners.add(listener);
 
-        if (guildId && guildId !== globalTownState.guildId) {
-            initializeDiscordTown(guildId).then(_ => {
+        if (currentGameId && currentGameId !== globalTownState.gameId) {
+            initializeDiscordTown(currentGameId).then(_ => {
             });
         }
 
@@ -111,7 +98,7 @@ export const useDiscordTown = () => {
                 globalTownListeners.delete(listenerRef.current);
             }
         };
-    }, [guildId]);
+    }, [currentGameId]);
 
     useEffect(() => {
         if (realtimeDiscordTown) {

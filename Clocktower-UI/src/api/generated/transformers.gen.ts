@@ -65,43 +65,53 @@ export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetA
     return data;
 };
 
-const clocktowerServerDataDiscordTownSchemaResponseTransformer = (data: any) => {
+const clocktowerServerDataDiscordTownDtoSchemaResponseTransformer = (data: any) => {
     if (data.channelCategories) {
         data.channelCategories = data.channelCategories.map((item: any) => {
-            return clocktowerServerDataMiniCategorySchemaResponseTransformer(item);
+            return clocktowerServerDataMiniCategoryDtoSchemaResponseTransformer(item);
         });
     }
     if (data.townUsers) {
         data.townUsers = data.townUsers.map((item: any) => {
-            return clocktowerServerDataTownUserSchemaResponseTransformer(item);
+            return clocktowerServerDataUserDtoSchemaResponseTransformer(item);
         });
     }
     return data;
 };
 
-const clocktowerServerDataMiniCategorySchemaResponseTransformer = (data: any) => {
+const clocktowerServerDataMiniCategoryDtoSchemaResponseTransformer = (data: any) => {
     if (data.channels) {
         data.channels = data.channels.map((item: any) => {
-            return clocktowerServerDataChannelOccupantsSchemaResponseTransformer(item);
+            return clocktowerServerDataChannelOccupantsDtoSchemaResponseTransformer(item);
         });
     }
     return data;
 };
 
-const clocktowerServerDataChannelOccupantsSchemaResponseTransformer = (data: any) => {
+const clocktowerServerDataChannelOccupantsDtoSchemaResponseTransformer = (data: any) => {
     if (data.channel) {
         data.channel = clocktowerServerDataMiniChannelSchemaResponseTransformer(data.channel);
     }
     if (data.occupants) {
         data.occupants = data.occupants.map((item: any) => {
-            return clocktowerServerDataTownUserSchemaResponseTransformer(item);
+            return clocktowerServerDataUserDtoSchemaResponseTransformer(item);
         });
     }
     return data;
 };
 
+const clocktowerServerDataUserDtoSchemaResponseTransformer = (data: any) => {
+    if (data.voiceState) {
+        data.voiceState = clocktowerServerDataVoiceStateSchemaResponseTransformer(data.voiceState);
+    }
+    if (data.userType) {
+        data.userType = clocktowerServerDataTypesEnumUserTypeSchemaResponseTransformer(data.userType);
+    }
+    return data;
+};
+
 export const getDiscordTownApiResponseTransformer = async (data: any): Promise<GetDiscordTownApiResponse> => {
-    data = clocktowerServerDataDiscordTownSchemaResponseTransformer(data);
+    data = clocktowerServerDataDiscordTownDtoSchemaResponseTransformer(data);
     return data;
 };
 

@@ -43,14 +43,14 @@ async function getTownStatus(id: string): Promise<GetTownStatusApiResponse> {
     };
 }
 
-async function getDiscordTown(id: string): Promise<DiscordTown> {
+async function getDiscordTown(gameId: string): Promise<DiscordTown> {
     const {
         data,
         error
     } = await getDiscordTownApi({
         client: apiClient,
         path: {
-            guildId: id
+            gameId: gameId
         }
     });
 
@@ -64,6 +64,7 @@ async function getDiscordTown(id: string): Promise<DiscordTown> {
         return mapToDiscordTown(data);
     }
     return {
+        gameId:'',
         userCount: 0,
         channelCategories: []
     };

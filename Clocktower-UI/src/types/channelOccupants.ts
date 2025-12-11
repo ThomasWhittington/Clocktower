@@ -1,5 +1,5 @@
 ﻿import type {
-    ClocktowerServerDataChannelOccupants,
+    ClocktowerServerDataChannelOccupantsDto,
 } from "@/api";
 import {
     mapToMiniChannel,
@@ -7,18 +7,18 @@ import {
 } from "./miniChannel.ts";
 
 import {
-    mapToTownUser,
-    type TownUser
+    mapToUser,
+    type User
 } from "@/types";
 
 export type ChannelOccupants = {
     channel: MiniChannel;
-    occupants: TownUser[]
+    occupants: User[]
 }
 
-export function mapToChannelOccupants(apiChannelOccupants: ClocktowerServerDataChannelOccupants): ChannelOccupants {
-    const channel = mapToMiniChannel(apiChannelOccupants.channel);
-    const occupants = (apiChannelOccupants.occupants ?? []).map(user => mapToTownUser(user));
+export function mapToChannelOccupants(channelOccupantsDto: ClocktowerServerDataChannelOccupantsDto): ChannelOccupants {
+    const channel = mapToMiniChannel(channelOccupantsDto.channel);
+    const occupants = (channelOccupantsDto.occupants ?? []).map(user => mapToUser(user));
     return {
         channel: channel,
         occupants: occupants

@@ -908,6 +908,66 @@ public class DiscordTownServiceTests
 
     #endregion
 
+    #region GetDiscordTownDto
+
+    private void Setup_GetDiscordTownDto(bool hasGameState, bool hasGuild = true, bool hasUsers = false, string gameId = GameId, ulong guildId = GuildId, DiscordTown? discordTown = null)
+    {
+        var users = hasUsers
+            ? new List<GameUser>
+            {
+                new(UserId.ToString())
+            }
+            : [];
+
+        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(hasGameState ? new GameState { Id = gameId, GuildId = guildId.ToString(), Users = users } : null);
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns(discordTown);
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? new Mock<IDiscordGuild>().Object : null);
+    }
+
+    [TestMethod]
+    public async Task GetDiscordTownDto_ReturnsFalse_WhenNoGameFound()
+    {
+        Setup_GetDiscordTownDto(false);
+
+        var result = await Sut.GetDiscordTownDto(GameId);
+
+        result.success.Should().BeFalse();
+        result.discordTown.Should().BeNull();
+        result.message.Should().Be($"Game not found for id: {GameId}");
+    }
+
+    [TestMethod]
+    public async Task GetDiscordTownDto_ReturnsFalse_NoDiscordGuild()
+    {
+        Setup_GetDiscordTownDto(hasGameState: true, hasGuild: false, discordTown: null);
+
+        var result = await Sut.GetDiscordTownDto(GameId);
+
+        result.success.Should().BeFalse();
+        result.discordTown.Should().BeNull();
+        result.message.Should().Be(GuildNotFoundMessage);
+        _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
+        _mockBot.Verify(o => o.GetGuild(GuildId), Times.Once);
+    }
+
+    [TestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public async Task GetDiscordTownDto_ReturnsTrue_WhenGotData(bool hasUsers)
+    {
+        var discordTown = GetDummyDiscordTown();
+        Setup_GetDiscordTownDto(hasGameState: true, hasGuild: true, hasUsers: hasUsers, discordTown: discordTown);
+
+        var result = await Sut.GetDiscordTownDto(GameId);
+
+        result.success.Should().BeTrue();
+        result.discordTown.Should().NotBeNull();
+        result.discordTown.GameId.Should().Be(GameId);
+        result.message.Should().Be("Got from store");
+    }
+
+    #endregion
+
     #region InviteUser
 
     [TestMethod]

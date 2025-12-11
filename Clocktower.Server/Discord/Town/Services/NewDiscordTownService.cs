@@ -167,6 +167,22 @@ public class DiscordTownService(
         }
     }
 
+    public async Task<(bool success, DiscordTownDto? discordTown, string message)> GetDiscordTownDto(string gameId)
+    {
+        var gameState = gameStateStore.Get(gameId);
+        if (gameState is null) return (false, null, $"Game not found for id: {gameId}");
+        var guildId = ulong.Parse(gameState.GuildId);
+
+        var (success, discordTown, message) = await GetDiscordTown(guildId);
+        if (success && discordTown != null)
+        {
+            var discordTownDto = discordTown.ToDiscordTownDto(gameId, gameState.Users);
+            return (true, discordTownDto, message);
+        }
+
+        return (success, null, message);
+    }
+
     public JoinData? GetJoinData(string key)
     {
         if (cache.TryGetValue($"join_data_{key}", out var joinData) && joinData is JoinData response)
@@ -178,7 +194,7 @@ public class DiscordTownService(
 
         return null;
     }
-    
+
     public async Task PingUser(string userId)
     {
         await notificationService.PingUser(userId, "Ping!");
@@ -207,8 +223,8 @@ public class DiscordTownService(
             var url = _secrets.FeUri + $"/join?key={tempKey}";
 
             await dmChannel.SendMessageAsync($"[Join here]({url})");
-            
-            gameStateStore.AddUserToGame(gameId,thisGameUser);
+
+            gameStateStore.AddUserToGame(gameId, thisGameUser);
             return (InviteUserOutcome.InviteSent, "Sent message to user");
         }
         catch (Exception)

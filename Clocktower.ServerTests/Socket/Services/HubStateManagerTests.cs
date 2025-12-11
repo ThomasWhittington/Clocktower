@@ -77,6 +77,7 @@ public class HubStateManagerTests
         result.Should().NotBeNull();
         result!.GameTime.Should().Be(GameTime.Day);
         result.Jwt.Should().Be(expectedJwt);
-        result.DiscordTown.Should().Be(discordTown);
+        result.DiscordTown.Should().NotBeNull();
+        result.DiscordTown.GameId.Should().Be(gameId);
     }
 }

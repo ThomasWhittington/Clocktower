@@ -355,7 +355,7 @@ export const getDiscordTownApi = <ThrowOnError extends boolean = false>(options:
                 type: 'http'
             }
         ],
-        url: '/api/discord/town/{guildId}/occupancy',
+        url: '/api/discord/town/{gameId}/occupancy',
         ...options
     });
 };

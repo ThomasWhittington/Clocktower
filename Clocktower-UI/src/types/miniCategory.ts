@@ -1,5 +1,5 @@
 ﻿import type {
-    ClocktowerServerDataMiniCategory,
+    ClocktowerServerDataMiniCategoryDto,
 } from "@/api";
 import {
     type ChannelOccupants,
@@ -12,13 +12,13 @@ export type MiniCategory = {
     channels: ChannelOccupants[];
 }
 
-export function mapToMiniCategory(apiMiniCategory: ClocktowerServerDataMiniCategory): MiniCategory {
-    const channels = (apiMiniCategory.channels ?? [])
+export function mapToMiniCategory(miniCategoryDto: ClocktowerServerDataMiniCategoryDto): MiniCategory {
+    const channels = (miniCategoryDto.channels ?? [])
         .map(channel => mapToChannelOccupants(channel));
 
     return {
-        id: apiMiniCategory.id ?? '',
-        name: apiMiniCategory.name ?? '',
+        id: miniCategoryDto.id ?? '',
+        name: miniCategoryDto.name ?? '',
         channels: channels
     };
 }

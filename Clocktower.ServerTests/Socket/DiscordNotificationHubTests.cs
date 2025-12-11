@@ -9,6 +9,7 @@ namespace Clocktower.ServerTests.Socket;
 [TestClass]
 public class DiscordNotificationHubTests
 {
+    private const string GameId = "game-id";
     private Mock<IGroupManager> _mockGroups = null!;
     private Mock<HubCallerContext> _mockContext = null!;
     private Mock<IHubStateManager> _mockHubStateManager = null!;
@@ -31,7 +32,7 @@ public class DiscordNotificationHubTests
 
     private static SessionSyncState GetSessionSyncState(string jwt)
     {
-        var discordTown = new DiscordTown([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
+        var discordTown = new DiscordTownDto(GameId, [new MiniCategoryDto(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
         var result = new SessionSyncState
         {
             GameTime = GameTime.Day,
