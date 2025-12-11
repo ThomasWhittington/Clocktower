@@ -6,5 +6,5 @@ public record DiscordTown(List<MiniCategory> ChannelCategories)
 
     public IEnumerable<TownUser> TownUsers { get; } = ChannelCategories
         .SelectMany(cat => cat.Channels)
-        .SelectMany(ch => ch.Occupants);
+        .SelectMany(ch => ch.Occupants).ToArray();
 }
