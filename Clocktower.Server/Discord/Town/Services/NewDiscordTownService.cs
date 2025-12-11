@@ -171,8 +171,8 @@ public class DiscordTownService(
     {
         var gameState = gameStateStore.Get(gameId);
         if (gameState is null) return (false, null, $"Game not found for id: {gameId}");
-        var guildId = ulong.Parse(gameState.GuildId);
-
+        if (!ulong.TryParse(gameState.GuildId, out var guildId)) return (false, null, "GameState contained a guildId that is not valid");
+        
         var (success, discordTown, message) = await GetDiscordTown(guildId);
         if (success && discordTown != null)
         {
