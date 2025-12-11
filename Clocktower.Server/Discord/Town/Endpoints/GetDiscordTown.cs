@@ -9,7 +9,7 @@ public class GetDiscordTown : IEndpoint
         .MapGet("/{gameId}/occupancy", Handle)
         .SetOpenApiOperationId<GetDiscordTown>()
         .WithSummary("Get occupancy of town")
-        .WithDescription("Gets user presense in the town")
+        .WithDescription("Gets user presence in the town")
         .WithRequestValidation<GameIdRequest>();
 
     internal static async Task<Results<Ok<DiscordTownDto>, BadRequest<string>>> Handle(
