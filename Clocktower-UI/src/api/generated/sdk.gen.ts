@@ -72,6 +72,12 @@ import type {
     SendMessageApiData,
     SendMessageApiErrors,
     SendMessageApiResponses,
+    SendToCottagesApiData,
+    SendToCottagesApiErrors,
+    SendToCottagesApiResponses,
+    SendToTownSquareApiData,
+    SendToTownSquareApiErrors,
+    SendToTownSquareApiResponses,
     SetMuteAllPlayersApiData,
     SetMuteAllPlayersApiErrors,
     SetMuteAllPlayersApiResponses,
@@ -284,6 +290,42 @@ export const loginApi = <ThrowOnError extends boolean = false>(options?: Options
             }
         ],
         url: '/api/discord/auth',
+        ...options
+    });
+};
+
+/**
+ * Sends all users to cottages
+ *
+ * Sends all users to cottages and storytellers to consultation
+ */
+export const sendToCottagesApi = <ThrowOnError extends boolean = false>(options: Options<SendToCottagesApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SendToCottagesApiResponses, SendToCottagesApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/discord-game-action/send-to-cottages/{gameId}',
+        ...options
+    });
+};
+
+/**
+ * Sends all users to townsquare
+ *
+ * Sends all users to townsquare
+ */
+export const sendToTownSquareApi = <ThrowOnError extends boolean = false>(options: Options<SendToTownSquareApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SendToTownSquareApiResponses, SendToTownSquareApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/discord-game-action/send-to-townsquare/{gameId}',
         ...options
     });
 };

@@ -1,4 +1,5 @@
-﻿using Clocktower.Server.Common;
+﻿global using Clocktower.Server.Common.Types;
+using Clocktower.Server.Common;
 using Clocktower.Server.Data;
 using Microsoft.Extensions.Options;
 
@@ -10,7 +11,7 @@ public static class CommonMethods
     public static string GetRandomSnowflakeStringId() => GetRandomSnowflakeNumberId().ToString();
     public static ulong GetRandomSnowflakeNumberId() => (ulong)new Random((int)DateTime.Now.Ticks).NextInt64();
     public static GameUser GetRandomGameUser(string? id = null) => new(id ?? GetRandomSnowflakeStringId());
-    public static TownUser GetRandomTownUser(string? id = null, string? name=null) => new(id ?? GetRandomSnowflakeStringId(), name??GetRandomString(), GetRandomString());
+    public static TownUser GetRandomTownUser(string? id = null, string? name = null) => new(id ?? GetRandomSnowflakeStringId(), name ?? GetRandomString(), GetRandomString());
 
 
     public static Secrets SetUpMockSecrets(

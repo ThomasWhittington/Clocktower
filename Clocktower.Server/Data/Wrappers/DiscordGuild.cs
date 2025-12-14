@@ -55,6 +55,11 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         return new DiscordVoiceChannel(guild.GetVoiceChannel(channelId));
     }
 
+    public IDiscordVoiceChannel GetVoiceChannel(string channelId)
+    {
+        return GetVoiceChannel(ulong.Parse(channelId));
+    }
+
     public IDiscordRole? GetRole(string roleName)
     {
         var role = guild.Roles.FirstOrDefault(o => o.Name == roleName);
@@ -121,9 +126,21 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         var miniCategory = new MiniCategory(categoryChannel.Id.ToString(), categoryChannel.Name, categoryChannel.GetChannelOccupancy());
         return miniCategory;
     }
-    
+
     public IEnumerable<IDiscordGuildUser> GetGuildUsers(IEnumerable<string> userIds)
     {
         return Users.Where(o => userIds.Contains(o.Id.ToString()));
+    }
+
+    public IEnumerable<IDiscordGuildUser> GetGuildUsers(IEnumerable<IIdentifiable> identifiables)
+    {
+        return GetGuildUsers(identifiables.Select(o => o.Id));
+    }
+
+    public IEnumerable<IDiscordGuildUser> GetUsersInVoiceChannels(List<ulong>? excludedChannels = null)
+    {
+        excludedChannels ??= [];
+        return VoiceChannels.Where(voiceChannel => !excludedChannels.Contains(voiceChannel.Id))
+            .SelectMany(voiceChannel => voiceChannel.ConnectedUsers);
     }
 }

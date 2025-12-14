@@ -70,11 +70,24 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore) : IDiscordTo
 
     public DiscordTown? GetDiscordTown(ulong guildId) => discordTownStore.Get(guildId);
 
+    public ulong? GetVoiceChannelIdByName(ulong guildId, string voiceChannelName)
+    {
+        var town = GetDiscordTown(guildId);
+
+        var channelIdStr = town?.ChannelCategories
+            .SelectMany(category => category.Channels)
+            .FirstOrDefault(ch => ch.Channel.Name == voiceChannelName)
+            ?.Channel.Id;
+
+        return ulong.TryParse(channelIdStr, out var result) ? result : null;
+    }
+
+
     public TownUser? GetTownUser(string userId)
     {
         var discordTown = discordTownStore.GetTownByUser(userId);
         if (discordTown is null) return null;
-        
+
         foreach (var category in discordTown.ChannelCategories)
         {
             foreach (var channel in category.Channels)
@@ -86,6 +99,17 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore) : IDiscordTo
                 }
             }
         }
+
         return null;
+    }
+
+    public IEnumerable<MiniChannel> GetNightChannels(ulong guildId, string categoryName)
+    {
+        var town = GetDiscordTown(guildId);
+        if (town is null) return [];
+        var nightCategory = town.ChannelCategories.FirstOrDefault(o => o.Name == categoryName);
+        if (nightCategory is null) return [];
+        var cottages = nightCategory.Channels.Select(channel => channel.Channel).ToList();
+        return cottages;
     }
 }

@@ -13,6 +13,11 @@ export type ClocktowerServerAdminEndpointsHealthResponse = {
     timeStamp?: Date;
 };
 
+export type ClocktowerServerCommonTypesErrorResponse = {
+    code?: string | null;
+    message?: string | null;
+};
+
 export type ClocktowerServerDataChannelOccupantsDto = {
     channel?: ClocktowerServerDataMiniChannel;
     occupants?: Array<ClocktowerServerDataUserDto> | null;
@@ -373,6 +378,68 @@ export type LoginApiErrors = {
 
 export type LoginApiError = LoginApiErrors[keyof LoginApiErrors];
 
+export type SendToCottagesApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/discord-game-action/send-to-cottages/{gameId}';
+};
+
+export type SendToCottagesApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SendToCottagesApiError = SendToCottagesApiErrors[keyof SendToCottagesApiErrors];
+
+export type SendToCottagesApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SendToCottagesApiResponse = SendToCottagesApiResponses[keyof SendToCottagesApiResponses];
+
+export type SendToTownSquareApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/discord-game-action/send-to-townsquare/{gameId}';
+};
+
+export type SendToTownSquareApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SendToTownSquareApiError = SendToTownSquareApiErrors[keyof SendToTownSquareApiErrors];
+
+export type SendToTownSquareApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SendToTownSquareApiResponse = SendToTownSquareApiResponses[keyof SendToTownSquareApiResponses];
+
 export type SetMuteAllPlayersApiData = {
     body?: never;
     path: {
@@ -387,11 +454,11 @@ export type SetMuteAllPlayersApiErrors = {
     /**
      * Bad Request
      */
-    400: string;
+    400: ClocktowerServerCommonTypesErrorResponse;
     /**
      * Not Found
      */
-    404: string;
+    404: ClocktowerServerCommonTypesErrorResponse;
 };
 
 export type SetMuteAllPlayersApiError = SetMuteAllPlayersApiErrors[keyof SetMuteAllPlayersApiErrors];

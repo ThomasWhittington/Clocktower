@@ -1,59 +1,31 @@
 ﻿import {
-    useState
-} from "react";
-import {
-    discordService
-} from "@/services";
-import {
-    Spinner,
-    StatusIcon
+    Spinner
 } from "@/components/ui";
-import type {
-    GetTownStatusApiResponse
-} from "@/api";
 import {
-    useAppStore
-} from "@/store";
-import {
-    ValidationUtils
-} from "@/utils";
+    useDiscordActions
+} from "@/components/features/discordTownPanel/hooks";
 
 function DiscordAdminPanel() {
-    const [isLoading, setIsLoading] = useState(false);
-    const guildId = useAppStore((state) => state.guildId);
-    const [error, setError] = useState<string>("");
-    const [townStatus, setTownStatus] = useState<GetTownStatusApiResponse>();
-
-    const handleGetStatus = async () => {
-        if (!ValidationUtils.isValidDiscordId(guildId)) {
-            console.error('guildId was not valid');
-            return;
-        }
-        setIsLoading(true);
-        await discordService.getTownStatus(guildId)
-            .then((data) => setTownStatus(data))
-            .catch((err) => setError(err.message))
-            .finally(() => setIsLoading(false));
-    }
+    const { sendToCottages, sendToTownSquare, error, result, isLoading, canRun } = useDiscordActions();
 
     return (
         <div
             className="flex flex-col space-y-2">
             {isLoading &&
                 <Spinner/>}
+            {result &&
+                <p className="text-green-500 text-sm">{result}</p>}
             {error &&
                 <p className="text-red-500 text-sm">{error}</p>}
-            {(guildId != '') &&
+            {canRun &&
                 <div>
-                    <h2 className="text-2xl">{guildId}</h2>
-                    {townStatus &&
-                        <StatusIcon
-                            status={townStatus.exists ?? false}/>
-                    }
                     <button
                         className="btn-primary"
-                        onClick={handleGetStatus}>
-                        Get Status
+                        onClick={sendToTownSquare}>⛲
+                    </button>
+                    <button
+                        className="btn-secondary"
+                        onClick={sendToCottages}>🛌
                     </button>
                 </div>
             }

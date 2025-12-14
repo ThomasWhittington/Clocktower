@@ -10,6 +10,7 @@ public interface IDiscordGuildUser
     public bool IsServerDeafened { get; }
     public bool IsSelfMuted { get; }
     public bool IsSelfDeafened { get; }
+    public bool IsConnectedToVoice { get; }
     IDiscordVoiceState? VoiceState { get; }
     IEnumerable<IDiscordRole> Roles { get; }
     bool IsAdministrator();

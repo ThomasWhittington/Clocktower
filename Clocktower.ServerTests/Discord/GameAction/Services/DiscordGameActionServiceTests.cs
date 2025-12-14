@@ -3,6 +3,7 @@ using Clocktower.Server.Data;
 using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Data.Wrappers;
+using Clocktower.Server.Discord;
 using Clocktower.Server.Discord.GameAction.Services;
 
 namespace Clocktower.ServerTests.Discord.GameAction.Services;
@@ -15,10 +16,12 @@ public class DiscordGameActionServiceTests
     private IDiscordGameActionService _sut = null!;
     private Mock<IDiscordBot> _mockBot = null!;
     private Mock<IGameStateStore> _mockGameStateStore = null!;
+    private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
+    private Mock<IDiscordConstantsService> _mockDiscordConstantsService = null!;
     private Mock<IUserService> _mockUserService = null!;
     private Mock<IDiscordGuild> _guild = null!;
     private GameState _gameState = null!;
-    Func<TownUser, bool> capturedPredicate = null!;
+    private Func<TownUser, bool> _capturedPredicate = null!;
 
 
     private void SetUp_Bot(bool hasGuild)
@@ -45,7 +48,7 @@ public class DiscordGameActionServiceTests
 
             _gameState.Users.AddRange(gameUsers);
             _mockUserService.Setup(o => o.GetTownUsersForGameUsers(_gameState.StoryTellers, guildId, It.IsAny<Func<TownUser, bool>>()))
-                .Callback<IEnumerable<GameUser>, string, Func<TownUser, bool>>((_, _, predicate) => { capturedPredicate = predicate; })
+                .Callback<IEnumerable<GameUser>, string, Func<TownUser, bool>>((_, _, predicate) => { _capturedPredicate = predicate; })
                 .Returns(townUsers);
         }
     }
@@ -56,10 +59,19 @@ public class DiscordGameActionServiceTests
         _mockBot = new Mock<IDiscordBot>();
         _mockGameStateStore = new Mock<IGameStateStore>();
         _mockUserService = new Mock<IUserService>();
+        _mockDiscordTownManager = StrictMockFactory.Create<IDiscordTownManager>();
+        _mockDiscordConstantsService = StrictMockFactory.Create<IDiscordConstantsService>();
+
         _gameState = new GameState();
         _guild = new Mock<IDiscordGuild>();
 
-        _sut = new DiscordGameActionService(_mockBot.Object, _mockGameStateStore.Object, _mockUserService.Object);
+        _sut = new DiscordGameActionService(
+            _mockBot.Object,
+            _mockGameStateStore.Object,
+            _mockDiscordTownManager.Object,
+            _mockDiscordConstantsService.Object,
+            _mockUserService.Object
+        );
     }
 
     [TestMethod]
@@ -68,10 +80,13 @@ public class DiscordGameActionServiceTests
         const bool muted = false;
         SetUp_GameStateStore(false);
 
-        var (outcome, message) = await _sut.SetMuteAllPlayersAsync(GameId, muted);
+        var result = await _sut.SetMuteAllPlayersAsync(GameId, muted);
 
-        outcome.Should().Be(SetMuteAllPlayersOutcome.GameDoesNotExistError);
-        message.Should().Be($"Couldn't find game with id: {GameId}");
+        result.ShouldFailWith(
+            ErrorKind.NotFound,
+            "game.not_found",
+            $"Couldn't find game with id: {GameId}"
+        );
     }
 
 
@@ -81,10 +96,9 @@ public class DiscordGameActionServiceTests
         const bool muted = false;
         SetUp_GameStateStore(true, guildId: "invalid");
 
-        var (outcome, message) = await _sut.SetMuteAllPlayersAsync(GameId, muted);
+        var result = await _sut.SetMuteAllPlayersAsync(GameId, muted);
 
-        outcome.Should().Be(SetMuteAllPlayersOutcome.InvalidGuildError);
-        message.Should().Be("GameState contained a guildId that is not valid");
+        result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
     }
 
     [TestMethod]
@@ -94,10 +108,9 @@ public class DiscordGameActionServiceTests
         SetUp_GameStateStore(true);
         SetUp_Bot(false);
 
-        var (outcome, message) = await _sut.SetMuteAllPlayersAsync(GameId, muted);
+        var result = await _sut.SetMuteAllPlayersAsync(GameId, muted);
 
-        outcome.Should().Be(SetMuteAllPlayersOutcome.InvalidGuildError);
-        message.Should().Be("GameState contained a guildId that could not be found");
+        result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
     }
 
     [TestMethod]
@@ -170,35 +183,33 @@ public class DiscordGameActionServiceTests
         var user3 = new Mock<IDiscordGuildUser>();
         _guild.Setup(o => o.GetGuildUsers(userIds)).Returns([user1.Object, user2.Object, user3.Object]);
 
-        var (outcome, message) = await _sut.SetMuteAllPlayersAsync(GameId, muted);
+        var result = await _sut.SetMuteAllPlayersAsync(GameId, muted);
 
         user1.Verify(o => o.SetIsServerMuted(muted), Times.Once);
         user2.Verify(o => o.SetIsServerMuted(muted), Times.Once);
         user3.Verify(o => o.SetIsServerMuted(muted), Times.Once);
 
         var mutedString = muted ? "Muted" : "UnMuted";
-        outcome.Should().Be(SetMuteAllPlayersOutcome.PlayersUpdated);
-        message.Should().Be($"{mutedString}: {userIds.Length}");
-        
-        
-        capturedPredicate.Should().NotBeNull();
+        result.ShouldSucceedWith($"{mutedString}: {userIds.Length}");
+
+        _capturedPredicate.Should().NotBeNull();
         var defaultUser = CommonMethods.GetRandomTownUser();
 
-        var  presentMutedUser = defaultUser with { IsPresent = true, VoiceState = new VoiceState(true, false, false ,false) };
-        var presentUnmutedUser =  defaultUser with { IsPresent = true, VoiceState = new VoiceState(false, false, false ,false) };
-        var absentUser =  defaultUser with { IsPresent = false, VoiceState = new VoiceState(false, false, false ,false) };
+        var presentMutedUser = defaultUser with { IsPresent = true, VoiceState = new VoiceState(true, false, false, false) };
+        var presentUnmutedUser = defaultUser with { IsPresent = true, VoiceState = new VoiceState(false, false, false, false) };
+        var absentUser = defaultUser with { IsPresent = false, VoiceState = new VoiceState(false, false, false, false) };
 
         if (muted)
         {
-            capturedPredicate(presentMutedUser).Should().BeFalse("present muted user should be filtered out when checkMuted=true");
-            capturedPredicate(presentUnmutedUser).Should().BeTrue("present unmuted user should pass when checkMuted=true");
+            _capturedPredicate(presentMutedUser).Should().BeFalse("present muted user should be filtered out when checkMuted=true");
+            _capturedPredicate(presentUnmutedUser).Should().BeTrue("present unmuted user should pass when checkMuted=true");
         }
         else
         {
-            capturedPredicate(presentMutedUser).Should().BeTrue("present muted user should pass when checkMuted=false");
-            capturedPredicate(presentUnmutedUser).Should().BeFalse("present unmuted user should be filtered out when checkMuted=false");
+            _capturedPredicate(presentMutedUser).Should().BeTrue("present muted user should pass when checkMuted=false");
+            _capturedPredicate(presentUnmutedUser).Should().BeFalse("present unmuted user should be filtered out when checkMuted=false");
         }
 
-        capturedPredicate(absentUser).Should().BeFalse("absent user should always be filtered out");
+        _capturedPredicate(absentUser).Should().BeFalse("absent user should always be filtered out");
     }
 }

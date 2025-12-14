@@ -18,10 +18,13 @@ public interface IDiscordGuild
     IDiscordGuildUser? GetUser(ulong userId);
     Task MoveAsync(IDiscordGuildUser member, IDiscordVoiceChannel channel);
     IDiscordVoiceChannel GetVoiceChannel(ulong channelId);
+    IDiscordVoiceChannel GetVoiceChannel(string channelId);
     IDiscordRole? GetRole(string roleName);
     Task<bool> CreateVoiceChannelsForCategoryAsync(string[] channelNames, ulong categoryId);
     Task<IDiscordRestCategoryChannel> CreateCategoryAsync(string categoryName, bool everyoneCanSee, IDiscordRole? roleToSeeChannel = null);
     IDiscordCategoryChannel? GetCategoryChannelByName(string name);
     MiniCategory? GetMiniCategory(string categoryName);
     IEnumerable<IDiscordGuildUser> GetGuildUsers(IEnumerable<string> userIds);
+    IEnumerable<IDiscordGuildUser> GetGuildUsers(IEnumerable<IIdentifiable> identifiables);
+    IEnumerable<IDiscordGuildUser> GetUsersInVoiceChannels(List<ulong>? excludedChannels = null);
 }

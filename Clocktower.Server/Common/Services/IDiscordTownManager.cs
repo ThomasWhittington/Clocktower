@@ -8,5 +8,7 @@ public interface IDiscordTownManager
     ChannelOccupants? FindUserChannel(DiscordTown occupants, string userId);
     bool UpdateUserStatus(ulong guildId, string userId, bool isPresent, VoiceState discordVoiceState);
     DiscordTown? GetDiscordTown(ulong guildId);
+    ulong? GetVoiceChannelIdByName(ulong guildId, string voiceChannelName);
     TownUser? GetTownUser(string userId);
+    IEnumerable<MiniChannel> GetNightChannels(ulong guildId, string categoryName);
 }

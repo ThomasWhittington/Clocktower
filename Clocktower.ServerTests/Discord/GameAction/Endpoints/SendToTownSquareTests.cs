@@ -1,10 +1,11 @@
 ﻿using Clocktower.Server.Discord.GameAction.Endpoints;
 using Clocktower.Server.Discord.GameAction.Services;
+using Clocktower.Server.Discord.Town.Endpoints.Validation;
 
 namespace Clocktower.ServerTests.Discord.GameAction.Endpoints;
 
 [TestClass]
-public class SetMuteAllPlayersTests
+public class SendToTownSquareTests
 {
     private Mock<IDiscordGameActionService> _mockDiscordGameActionService = null!;
 
@@ -19,46 +20,47 @@ public class SetMuteAllPlayersTests
     {
         var builder = EndpointFactory.CreateBuilder();
 
-        SetMuteAllPlayers.Map(builder);
+        SendToTownSquare.Map(builder);
 
-        builder.GetEndpoint("/set-mute-players/{gameId}/{muted:bool}")
+        builder.GetEndpoint("/send-to-townsquare/{gameId}")
             .ShouldHaveMethod(HttpMethod.Post)
             .ShouldHaveStorytellerAuthorization()
-            .ShouldHaveOperationId("setMuteAllPlayersApi")
-            .ShouldHaveSummary("Sets muted status for players in game")
-            .ShouldHaveDescription("Sets muted status for players (not storytellers/ spectators) connected to voice for game");
+            .ShouldHaveOperationId("sendToTownSquareApi")
+            .ShouldHaveSummary("Sends all users to townsquare")
+            .ShouldHaveDescription("Sends all users to townsquare")
+            .ShouldHaveValidation();
     }
 
-
     [TestMethod]
-    public async Task Handle_ReturnsBadRequest_WhenServiceFails()
+    [DataRow(GameActionOutcome.InvalidGuildError)]
+    public async Task Handle_ReturnsBadRequest_WhenServiceReturnsBadRequestError(GameActionOutcome gameActionOutcome)
     {
         const string gameId = "game-id";
-        const bool muted = false;
+        var request = new GameIdRequest(gameId);
         var error = Result.Fail<string>(ErrorKind.Invalid, "error code", "error message");
-        _mockDiscordGameActionService.Setup(o => o.SetMuteAllPlayersAsync(gameId, muted)).ReturnsAsync(error);
+        _mockDiscordGameActionService.Setup(o => o.SendToTownSquareAsync(gameId)).ReturnsAsync(error);
 
-        var result = await SetMuteAllPlayers.Handle(gameId, muted, _mockDiscordGameActionService.Object);
+        var result = await SendToTownSquare.Handle(request, _mockDiscordGameActionService.Object);
 
-        _mockDiscordGameActionService.Verify(o => o.SetMuteAllPlayersAsync(gameId, muted), Times.Once);
-
+        _mockDiscordGameActionService.Verify(o => o.SendToTownSquareAsync(gameId), Times.Once);
         var response = result.Result.Should().BeOfType<BadRequest<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
     }
 
 
     [TestMethod]
+    [DataRow(GameActionOutcome.ChannelNotFound)]
     [DataRow(GameActionOutcome.GameDoesNotExistError)]
     public async Task Handle_ReturnsNotFound_WhenServiceReturnsNotFoundError(GameActionOutcome gameActionOutcome)
     {
         const string gameId = "game-id";
-        const bool muted = false;
+        var request = new GameIdRequest(gameId);
         var error = Result.Fail<string>(ErrorKind.NotFound, "error code", "error message");
-        _mockDiscordGameActionService.Setup(o => o.SetMuteAllPlayersAsync(gameId, muted)).ReturnsAsync(error);
+        _mockDiscordGameActionService.Setup(o => o.SendToTownSquareAsync(gameId)).ReturnsAsync(error);
 
-        var result = await SetMuteAllPlayers.Handle(gameId, muted, _mockDiscordGameActionService.Object);
+        var result = await SendToTownSquare.Handle(request, _mockDiscordGameActionService.Object);
 
-        _mockDiscordGameActionService.Verify(o => o.SetMuteAllPlayersAsync(gameId, muted), Times.Once);
+        _mockDiscordGameActionService.Verify(o => o.SendToTownSquareAsync(gameId), Times.Once);
         var response = result.Result.Should().BeOfType<NotFound<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
     }
@@ -67,15 +69,14 @@ public class SetMuteAllPlayersTests
     public async Task Handle_ReturnsOk_WhenServiceSendsInvite()
     {
         const string gameId = "game-id";
-        const bool muted = false;
+        var request = new GameIdRequest(gameId);
         var success = Result.Ok("response message");
-        _mockDiscordGameActionService.Setup(o => o.SetMuteAllPlayersAsync(gameId, muted)).ReturnsAsync(success);
+        _mockDiscordGameActionService.Setup(o => o.SendToTownSquareAsync(gameId)).ReturnsAsync(success);
 
-        var result = await SetMuteAllPlayers.Handle(gameId, muted, _mockDiscordGameActionService.Object);
+        var result = await SendToTownSquare.Handle(request, _mockDiscordGameActionService.Object);
 
-        _mockDiscordGameActionService.Verify(o => o.SetMuteAllPlayersAsync(gameId, muted), Times.Once);
+        _mockDiscordGameActionService.Verify(o => o.SendToTownSquareAsync(gameId), Times.Once);
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
-        response.StatusCode.Should().Be((int)HttpStatusCode.OK);
         response.Value.Should().Be(success.Value);
     }
 }

@@ -6,11 +6,15 @@ import {
     Spinner
 } from "@/components/ui";
 import {
-    useDiscordTown
+    useDiscordTown,
+    useUser
 } from "./hooks";
 import {
     useAppStore
 } from "@/store";
+import {
+    UserType
+} from "@/types";
 
 function DiscordTownPanel() {
     const {
@@ -18,13 +22,16 @@ function DiscordTownPanel() {
         isLoading,
         error
     } = useDiscordTown();
-    const gameId = useAppStore((state) => state.gameId);
+    const {gameId, currentUser} = useAppStore();
+    const {thisUser} = useUser(currentUser?.id);
 
     return (
         <div
             id="discord-town-panel"
             className="bg-discord h-full flex flex-col justify-between pr-4">
-            <DiscordAdminPanel/>
+
+            {thisUser?.userType == UserType.StoryTeller &&
+                <DiscordAdminPanel/>}
 
             {isLoading &&
                 <Spinner/>}

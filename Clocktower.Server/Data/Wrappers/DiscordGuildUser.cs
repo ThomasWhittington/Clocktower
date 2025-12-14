@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Clocktower.Server.Data.Extensions;
 using Discord.WebSocket;
 
 namespace Clocktower.Server.Data.Wrappers;
@@ -15,6 +14,7 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
     public bool IsServerDeafened => user.IsDeafened;
     public bool IsSelfMuted => user.IsSelfMuted;
     public bool IsSelfDeafened => user.IsSelfDeafened;
+    public bool IsConnectedToVoice => VoiceState?.VoiceChannel != null;
     public IDiscordVoiceState? VoiceState => user.VoiceState.HasValue ? new DiscordVoiceState(user.VoiceState.Value) : null;
     public IEnumerable<IDiscordRole> Roles => user.Roles.Select(r => new DiscordRole(r));
 
