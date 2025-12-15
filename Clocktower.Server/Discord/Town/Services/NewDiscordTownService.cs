@@ -1,5 +1,4 @@
 using Clocktower.Server.Common.Services;
-using Clocktower.Server.Data.Extensions;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Socket;
 using Discord;
@@ -23,7 +22,7 @@ public class DiscordTownService(
     private readonly Secrets _secrets = secretsOptions.Value;
     private const string GuildNotFoundMessage = "Guild not found";
 
-    public async Task<(bool success, string message)> MoveUser(ulong guildId, ulong userId, ulong channelId)
+    public async Task<(bool success, string message)> MoveUser(string guildId, string userId, string channelId)
     {
         try
         {
@@ -39,7 +38,7 @@ public class DiscordTownService(
         }
     }
 
-    public (bool success, bool exists, string message) GetTownStatus(ulong guildId)
+    public (bool success, bool exists, string message) GetTownStatus(string guildId)
     {
         try
         {
@@ -65,7 +64,7 @@ public class DiscordTownService(
         }
     }
 
-    public async Task<(bool success, string message)> DeleteTown(ulong guildId)
+    public async Task<(bool success, string message)> DeleteTown(string guildId)
     {
         try
         {
@@ -85,7 +84,7 @@ public class DiscordTownService(
         }
     }
 
-    public async Task<(bool success, string message)> CreateTown(ulong guildId)
+    public async Task<(bool success, string message)> CreateTown(string guildId)
     {
         try
         {
@@ -114,7 +113,7 @@ public class DiscordTownService(
         }
     }
 
-    public async Task<(bool success, string message)> ToggleStoryTeller(string gameId, ulong userId)
+    public async Task<(bool success, string message)> ToggleStoryTeller(string gameId, string userId)
     {
         try
         {
@@ -137,7 +136,7 @@ public class DiscordTownService(
         }
     }
 
-    public async Task<(bool success, DiscordTown? discordTown, string message)> GetDiscordTown(ulong guildId)
+    public async Task<(bool success, DiscordTown? discordTown, string message)> GetDiscordTown(string guildId)
     {
         try
         {
@@ -171,9 +170,8 @@ public class DiscordTownService(
     {
         var gameState = gameStateStore.Get(gameId);
         if (gameState is null) return (false, null, $"Game not found for id: {gameId}");
-        if (!ulong.TryParse(gameState.GuildId, out var guildId)) return (false, null, "GameState contained a guildId that is not valid");
-        
-        var (success, discordTown, message) = await GetDiscordTown(guildId);
+
+        var (success, discordTown, message) = await GetDiscordTown(gameState.GuildId);
         if (success && discordTown != null)
         {
             var discordTownDto = discordTown.ToDiscordTownDto(gameId, gameState.Users);
@@ -187,7 +185,7 @@ public class DiscordTownService(
     {
         if (cache.TryGetValue($"join_data_{key}", out var joinData) && joinData is JoinData response)
         {
-            gameStateStore.UpdateUser(response.GameId, ulong.Parse(response.User.Id), isPlaying: true);
+            gameStateStore.UpdateUser(response.GameId, response.User.Id, isPlaying: true);
             cache.Remove($"join_data_{key}");
             return response;
         }
@@ -200,15 +198,15 @@ public class DiscordTownService(
         await notificationService.PingUser(userId, "Ping!");
     }
 
-    public async Task<(InviteUserOutcome outcome, string message)> InviteUser(string gameId, ulong userId)
+    public async Task<(InviteUserOutcome outcome, string message)> InviteUser(string gameId, string userId)
     {
         try
         {
             var gameState = gameStateStore.Get(gameId);
             if (gameState is null) return (InviteUserOutcome.GameDoesNotExistError, $"Couldn't find game with id: {gameId}");
-            if (!ulong.TryParse(gameState.GuildId, out var guildId)) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
-            var guild = bot.GetGuild(guildId);
+            var guild = bot.GetGuild(gameState.GuildId);
             if (guild is null) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
+
             var user = guild.GetUser(userId);
             if (user is null) return (InviteUserOutcome.UserNotFoundError, $"Couldn't find user: {userId}");
             var dmChannel = await user.CreateDmChannelAsync();
@@ -217,7 +215,7 @@ public class DiscordTownService(
             var thisGameUser = user.AsGameUser(gameState);
             thisGameUser.UserType = UserType.Player;
             var jwt = jwtWriter.GetJwtToken(thisGameUser);
-            var response = new JoinData(guildId.ToString(), thisGameUser, gameId, jwt);
+            var response = new JoinData(guild.Id, thisGameUser, gameId, jwt);
             var tempKey = idGenerator.GenerateId();
             cache.Set($"join_data_{tempKey}", response, TimeSpan.FromMinutes(5));
             var url = _secrets.FeUri + $"/join?key={tempKey}";
@@ -233,14 +231,12 @@ public class DiscordTownService(
         }
     }
 
-    private ((bool success, string message) status, (IDiscordRole role, IDiscordGuildUser user) data) ValidateToggleStoryTellerRequest(string gameId, ulong userId)
+    private ((bool success, string message) status, (IDiscordRole role, IDiscordGuildUser user) data) ValidateToggleStoryTellerRequest(string gameId, string userId)
     {
         var gameState = gameStateStore.Get(gameId);
         if (gameState is null) return ((false, $"Couldn't find game with id: {gameId}"), default);
-
-        if (!ulong.TryParse(gameState.GuildId, out var guildId)) return ((false, "GameState contained a guildId that is not valid"), default);
-
-        var guild = bot.GetGuild(guildId);
+        
+        var guild = bot.GetGuild(gameState.GuildId);
         if (guild is null) return ((false, GuildNotFoundMessage), default);
 
         var role = guild.GetRole(discordConstants.StoryTellerRoleName);
@@ -273,7 +269,7 @@ public class DiscordTownService(
         return (true, $"User {user.DisplayName} is now a {discordConstants.StoryTellerRoleName}");
     }
 
-    private ((bool success, string message) status, (IDiscordGuildUser user, IDiscordVoiceChannel channel) data) ValidateMoveUserRequest(ulong guildId, ulong userId, ulong channelId)
+    private ((bool success, string message) status, (IDiscordGuildUser user, IDiscordVoiceChannel channel) data) ValidateMoveUserRequest(string guildId, string userId, string channelId)
     {
         var guild = bot.GetGuild(guildId);
         if (guild == null) return ((false, GuildNotFoundMessage), default);

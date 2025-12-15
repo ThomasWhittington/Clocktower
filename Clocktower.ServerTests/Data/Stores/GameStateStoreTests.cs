@@ -8,6 +8,7 @@ namespace Clocktower.ServerTests.Data.Stores;
 [TestClass]
 public class GameStateStoreTests
 {
+    private const string UserId = "123";
     private IGameStateStore _sut = null!;
 
     [TestInitialize]
@@ -20,6 +21,26 @@ public class GameStateStoreTests
     {
         return new GameState { Id = id, GuildId = CommonMethods.GetRandomSnowflakeStringId() };
     }
+
+    [TestMethod]
+    public void GameExists_ReturnsFalse_WhenGameNotFound()
+    {
+        var result = _sut.GameExists("missing-game");
+
+        result.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void GameExists_ReturnsTrue_WhenGameFound()
+    {
+        var game1 = NewGame("game1");
+        _sut.Set(game1);
+
+        var result = _sut.GameExists(game1.Id);
+
+        result.Should().BeTrue();
+    }
+
 
     [TestMethod]
     public void Set_WhenGameDoesNotExist_ReturnsTrue()
@@ -115,16 +136,15 @@ public class GameStateStoreTests
     [TestMethod]
     public void AddUserToGame_AddsUser()
     {
-        const string userId = "user-id";
         var game1 = NewGame("game1");
         _sut.Set(game1);
-        var user = CommonMethods.GetRandomGameUser(userId);
+        var user = CommonMethods.GetRandomGameUser(UserId);
 
         _sut.AddUserToGame("game1", user);
 
         var output = _sut.Get("game1");
         output.Should().NotBeNull();
-        output.Users.Should().Contain(o => o.Id == userId);
+        output.Users.Should().Contain(o => o.Id == UserId);
     }
 
     [TestMethod]
@@ -167,34 +187,22 @@ public class GameStateStoreTests
     [TestMethod]
     public void GetUserGames_ReturnsUserGames()
     {
-        const string userId = "user-id";
         var game1 = NewGame("game1");
         var game2 = NewGame("game2");
         var game3 = NewGame("game3");
         game1.Users.Add(CommonMethods.GetRandomGameUser());
-        game2.Users.Add(CommonMethods.GetRandomGameUser(userId));
+        game2.Users.Add(CommonMethods.GetRandomGameUser(UserId));
         game2.Users.Add(CommonMethods.GetRandomGameUser());
-        game3.Users.Add(CommonMethods.GetRandomGameUser(userId));
+        game3.Users.Add(CommonMethods.GetRandomGameUser(UserId));
         _sut.Set(game1);
         _sut.Set(game2);
         _sut.Set(game3);
 
-        var result = _sut.GetUserGames(userId).ToList();
+        var result = _sut.GetUserGames(UserId).ToList();
 
         result.Should().HaveCount(2);
         result.Should().Contain(o => o.Id == "game2");
         result.Should().Contain(o => o.Id == "game3");
-    }
-
-    [TestMethod]
-    public void UlongOverloads_WorkCorrectly()
-    {
-        const ulong guildId = 123456789UL;
-        var game1 = NewGame("game1");
-        game1.GuildId = guildId.ToString();
-        _sut.Set(game1).Should().BeTrue();
-
-        _sut.GetGuildGames(guildId).Should().Contain(game1);
     }
 
     #region UpdateUser
@@ -202,11 +210,10 @@ public class GameStateStoreTests
     [TestMethod]
     public void UpdateUser_DoesNotChange_WhenNoUserFound()
     {
-        const ulong userId = 1L;
         var game1 = NewGame("game1");
         _sut.Set(game1);
 
-        var result = _sut.UpdateUser(game1.Id, userId);
+        var result = _sut.UpdateUser(game1.Id, UserId);
         var val = _sut.Get(game1.Id);
         result.Should().BeTrue();
         val.Should().NotBeNull();
@@ -216,13 +223,12 @@ public class GameStateStoreTests
     [TestMethod]
     public void UpdateUser_ReturnsOriginal_NoChangesRequested()
     {
-        const ulong userId = 1L;
         var game1 = NewGame("game1");
         _sut.Set(game1);
-        var user = CommonMethods.GetRandomGameUser(userId.ToString());
+        var user = CommonMethods.GetRandomGameUser(UserId);
         _sut.AddUserToGame("game1", user);
 
-        var result = _sut.UpdateUser(game1.Id, userId);
+        var result = _sut.UpdateUser(game1.Id, UserId);
         var val = _sut.Get(game1.Id);
         result.Should().BeTrue();
         val.Should().NotBeNull();
@@ -233,18 +239,17 @@ public class GameStateStoreTests
     [DynamicData(nameof(GetUserTypeValues))]
     public void UpdateUser_Updates_UserType(UserType userType)
     {
-        const ulong userId = 1L;
         var game1 = NewGame("game1");
         _sut.Set(game1);
-        var user = CommonMethods.GetRandomGameUser(userId.ToString());
+        var user = CommonMethods.GetRandomGameUser(UserId);
         _sut.AddUserToGame("game1", user);
 
-        var result = _sut.UpdateUser(game1.Id, userId, userType: userType);
-       
+        var result = _sut.UpdateUser(game1.Id, UserId, userType: userType);
+
         var val = _sut.Get(game1.Id);
         result.Should().BeTrue();
         val.Should().NotBeNull();
-        var thisUser = val.GetUser(userId.ToString());
+        var thisUser = val.GetUser(UserId);
         thisUser.Should().NotBeNull();
         thisUser.UserType.Should().Be(userType);
     }
@@ -254,22 +259,21 @@ public class GameStateStoreTests
     [DataRow(false)]
     public void UpdateUser_Updates_IsPlaying(bool isPlaying)
     {
-        const ulong userId = 1L;
         var game1 = NewGame("game1");
         _sut.Set(game1);
-        var user = CommonMethods.GetRandomGameUser(userId.ToString());
+        var user = CommonMethods.GetRandomGameUser(UserId);
         _sut.AddUserToGame("game1", user);
 
-        var result = _sut.UpdateUser(game1.Id, userId, isPlaying: isPlaying);
-      
+        var result = _sut.UpdateUser(game1.Id, UserId, isPlaying: isPlaying);
+
         var val = _sut.Get(game1.Id);
         result.Should().BeTrue();
-        val.Should().NotBeNull();    
-        var thisUser = val.GetUser(userId.ToString());
+        val.Should().NotBeNull();
+        var thisUser = val.GetUser(UserId);
         thisUser.Should().NotBeNull();
         thisUser.IsPlaying.Should().Be(isPlaying);
     }
-    
+
     #endregion
 
 

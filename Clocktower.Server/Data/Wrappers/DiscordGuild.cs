@@ -7,7 +7,7 @@ namespace Clocktower.Server.Data.Wrappers;
 [ExcludeFromCodeCoverage(Justification = "Discord.NET wrapper")]
 public class DiscordGuild(SocketGuild guild) : IDiscordGuild
 {
-    public ulong Id => guild.Id;
+    public string Id => guild.Id.ToString();
     public string Name => guild.Name;
     public IEnumerable<IDiscordGuildUser> Users => guild.Users.Select(user => new DiscordGuildUser(user));
     public IEnumerable<IDiscordRole> Roles => guild.Roles.Select(role => new DiscordRole(role));
@@ -39,9 +39,11 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         }
     }
 
-    public IDiscordGuildUser? GetUser(ulong userId)
+    public IDiscordGuildUser? GetUser(string userId)
     {
-        var user = guild.GetUser(userId);
+        if (!ulong.TryParse(userId, out var id))
+            throw new ArgumentException($"Invalid user ID format: {userId}", nameof(userId));
+        var user = guild.GetUser(id);
         return user != null ? new DiscordGuildUser(user) : null;
     }
 
@@ -50,9 +52,13 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         await member.MoveAsync(channel);
     }
 
-    public IDiscordVoiceChannel GetVoiceChannel(ulong channelId)
+    public IDiscordVoiceChannel? GetVoiceChannel(string channelId)
     {
-        return new DiscordVoiceChannel(guild.GetVoiceChannel(channelId));
+        if (!ulong.TryParse(channelId, out var id))
+            throw new ArgumentException($"Invalid channel ID format: {channelId}", nameof(channelId));
+
+        var channel = guild.GetVoiceChannel(id);
+        return channel is null ? null : new DiscordVoiceChannel(guild.GetVoiceChannel(id));
     }
 
     public IDiscordRole? GetRole(string roleName)
@@ -61,11 +67,13 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         return role != null ? new DiscordRole(role) : null;
     }
 
-    public async Task<bool> CreateVoiceChannelsForCategoryAsync(string[] channelNames, ulong categoryId)
+    public async Task<bool> CreateVoiceChannelsForCategoryAsync(string[] channelNames, string categoryId)
     {
+        if (!ulong.TryParse(categoryId, out var id))
+            throw new ArgumentException($"Invalid category ID format: {categoryId}", nameof(categoryId));
         foreach (var channelName in channelNames)
         {
-            var result = await guild.CreateVoiceChannelAsync(channelName, properties => properties.CategoryId = categoryId);
+            var result = await guild.CreateVoiceChannelAsync(channelName, properties => properties.CategoryId = id);
             if (result is null) return false;
         }
 
@@ -97,7 +105,9 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
 
             if (roleToSeeChannel != null)
             {
-                permissions = permissions.Append(new Overwrite(roleToSeeChannel.Id, PermissionTarget.Role,
+                if (!ulong.TryParse(roleToSeeChannel.Id, out var id))
+                    throw new ArgumentException($"Invalid role ID format: {roleToSeeChannel.Id}", nameof(roleToSeeChannel));
+                permissions = permissions.Append(new Overwrite(id, PermissionTarget.Role,
                     new OverwritePermissions(viewChannel: PermValue.Allow)
                 ));
             }
@@ -118,12 +128,24 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
     {
         var categoryChannel = GetCategoryChannelByName(categoryName);
         if (categoryChannel == null) return null;
-        var miniCategory = new MiniCategory(categoryChannel.Id.ToString(), categoryChannel.Name, categoryChannel.GetChannelOccupancy());
+        var miniCategory = new MiniCategory(categoryChannel.Id, categoryChannel.Name, categoryChannel.GetChannelOccupancy());
         return miniCategory;
     }
-    
+
     public IEnumerable<IDiscordGuildUser> GetGuildUsers(IEnumerable<string> userIds)
     {
         return Users.Where(o => userIds.Contains(o.Id.ToString()));
+    }
+
+    public IEnumerable<IDiscordGuildUser> GetInVoiceGuildUsers(IEnumerable<string> userIds)
+    {
+        return GetGuildUsers(userIds).Where(user => user.IsConnectedToVoice);
+    }
+
+    public IEnumerable<IDiscordGuildUser> GetUsersInVoiceChannelsExcluding(IEnumerable<string>? excludedChannelsIds = null)
+    {
+        excludedChannelsIds ??= [];
+        return VoiceChannels.Where(voiceChannel => !excludedChannelsIds.Contains(voiceChannel.Id.ToString()))
+            .SelectMany(voiceChannel => voiceChannel.ConnectedUsers);
     }
 }

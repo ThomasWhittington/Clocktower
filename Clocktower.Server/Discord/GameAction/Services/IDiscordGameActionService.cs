@@ -2,12 +2,7 @@
 
 public interface IDiscordGameActionService
 {
-    Task<(SetMuteAllPlayersOutcome outcome, string message)> SetMuteAllPlayersAsync(string gameId, bool muted);
-}
-
-public enum SetMuteAllPlayersOutcome
-{
-    GameDoesNotExistError,
-    InvalidGuildError,
-    PlayersUpdated
+    Task<Result<string>> SetMuteAllPlayersAsync(string gameId, bool muted);
+    Task<Result<string>> SendToCottagesAsync(string gameId);
+    Task<Result<string>> SendToTownSquareAsync(string gameId);
 }

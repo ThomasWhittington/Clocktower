@@ -29,54 +29,52 @@ public class SetMuteAllPlayersTests
             .ShouldHaveDescription("Sets muted status for players (not storytellers/ spectators) connected to voice for game");
     }
 
+
     [TestMethod]
-    [DataRow(SetMuteAllPlayersOutcome.InvalidGuildError)]
-    public async Task Handle_ReturnsBadRequest_WhenServiceReturnsBadRequestError(SetMuteAllPlayersOutcome inviteUserOutcome)
+    public async Task Handle_ReturnsBadRequest_WhenServiceFails()
     {
-        const string responseMessage = "response message";
         const string gameId = "game-id";
         const bool muted = false;
-        _mockDiscordGameActionService.Setup(o => o.SetMuteAllPlayersAsync(gameId.Trim(), muted)).ReturnsAsync((inviteUserOutcome, responseMessage));
+        var error = Result.Fail<string>(ErrorKind.Invalid, "error code", "error message");
+        _mockDiscordGameActionService.Setup(o => o.SetMuteAllPlayersAsync(gameId, muted)).ReturnsAsync(error);
 
         var result = await SetMuteAllPlayers.Handle(gameId, muted, _mockDiscordGameActionService.Object);
 
-        _mockDiscordGameActionService.Verify(o => o.SetMuteAllPlayersAsync(gameId.Trim(), muted), Times.Once);
-        var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
-        response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
-        response.Value.Should().Be(responseMessage);
+        _mockDiscordGameActionService.Verify(o => o.SetMuteAllPlayersAsync(gameId, muted), Times.Once);
+
+        var response = result.Result.Should().BeOfType<BadRequest<ErrorResponse>>().Subject;
+        response.Value.ShouldBeError(error);
     }
 
 
     [TestMethod]
-    [DataRow(SetMuteAllPlayersOutcome.GameDoesNotExistError)]
-    public async Task Handle_ReturnsNotFound_WhenServiceReturnsNotFoundError(SetMuteAllPlayersOutcome inviteUserOutcome)
+    public async Task Handle_ReturnsNotFound_WhenServiceReturnsNotFoundError()
     {
-        const string responseMessage = "response message";
         const string gameId = "game-id";
         const bool muted = false;
-        _mockDiscordGameActionService.Setup(o => o.SetMuteAllPlayersAsync(gameId.Trim(), muted)).ReturnsAsync((inviteUserOutcome, responseMessage));
+        var error = Result.Fail<string>(ErrorKind.NotFound, "error code", "error message");
+        _mockDiscordGameActionService.Setup(o => o.SetMuteAllPlayersAsync(gameId, muted)).ReturnsAsync(error);
 
         var result = await SetMuteAllPlayers.Handle(gameId, muted, _mockDiscordGameActionService.Object);
 
-        _mockDiscordGameActionService.Verify(o => o.SetMuteAllPlayersAsync(gameId.Trim(), muted), Times.Once);
-        var response = result.Result.Should().BeOfType<NotFound<string>>().Subject;
-        response.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
-        response.Value.Should().Be(responseMessage);
+        _mockDiscordGameActionService.Verify(o => o.SetMuteAllPlayersAsync(gameId, muted), Times.Once);
+        var response = result.Result.Should().BeOfType<NotFound<ErrorResponse>>().Subject;
+        response.Value.ShouldBeError(error);
     }
 
     [TestMethod]
     public async Task Handle_ReturnsOk_WhenServiceSendsInvite()
     {
-        const string responseMessage = "response message";
         const string gameId = "game-id";
         const bool muted = false;
-        _mockDiscordGameActionService.Setup(o => o.SetMuteAllPlayersAsync(gameId.Trim(), muted)).ReturnsAsync((SetMuteAllPlayersOutcome.PlayersUpdated, responseMessage));
+        var success = Result.Ok("response message");
+        _mockDiscordGameActionService.Setup(o => o.SetMuteAllPlayersAsync(gameId, muted)).ReturnsAsync(success);
 
         var result = await SetMuteAllPlayers.Handle(gameId, muted, _mockDiscordGameActionService.Object);
 
-        _mockDiscordGameActionService.Verify(o => o.SetMuteAllPlayersAsync(gameId.Trim(), muted), Times.Once);
+        _mockDiscordGameActionService.Verify(o => o.SetMuteAllPlayersAsync(gameId, muted), Times.Once);
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);
-        response.Value.Should().Be(responseMessage);
+        response.Value.Should().Be(success.Value);
     }
 }

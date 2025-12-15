@@ -4,9 +4,8 @@ namespace Clocktower.Server.Common.Services;
 
 public interface IDiscordBot : IHostedService
 {
-    IDiscordGuild? GetGuild(ulong guildId);
+    IDiscordGuild? GetGuild(string guildId);
     IEnumerable<IDiscordGuild> GetGuilds();
-
-    Task<IDiscordUser?> GetUserAsync(ulong userId);
-    IDiscordUser? GetUser(ulong userId);
+    Task<IDiscordUser?> GetUserAsync(string userId);
+    IDiscordUser? GetUser(string userId);
 }

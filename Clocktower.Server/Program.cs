@@ -13,6 +13,8 @@ global using Clocktower.Server.Common.Api.Extensions;
 global using Clocktower.Server.Common;
 global using Clocktower.Server.Data.Stores;
 global using Microsoft.AspNetCore.Mvc;
+global using Clocktower.Server.Data.Extensions;
+global using Clocktower.Server.Common.Types;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;

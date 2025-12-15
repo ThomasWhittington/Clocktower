@@ -6,4 +6,5 @@ public interface IDiscordNotificationClient
     Task UserVoiceStateChanged(string userId, bool isInVoice, VoiceState voiceState);
     Task TownTimeChanged(int gameTime);
     Task PingUser(string message);
+    Task TimerUpdated(TimerState timer);
 }

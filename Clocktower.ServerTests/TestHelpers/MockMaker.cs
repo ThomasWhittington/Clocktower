@@ -5,7 +5,7 @@ namespace Clocktower.ServerTests.TestHelpers;
 
 public static class MockMaker
 {
-    public static IDiscordUser CreateMockDiscordUser(ulong id, string globalName, string avatarUrl)
+    public static IDiscordUser CreateMockDiscordUser(string id, string globalName, string avatarUrl)
     {
         var mockUser = Mock.Of<IDiscordUser>(u =>
             u.Id == id &&
@@ -15,7 +15,7 @@ public static class MockMaker
         return mockUser;
     }
 
-    public static IDiscordGuildUser CreateMockDiscordGuildUser(ulong id, bool isAdmin = false)
+    public static IDiscordGuildUser CreateMockDiscordGuildUser(string id, bool isAdmin = false)
     {
         return Mock.Of<IDiscordGuildUser>(u =>
             u.Id == id &&
@@ -23,7 +23,7 @@ public static class MockMaker
         );
     }
 
-    public static IDiscordGuild CreateMockDiscordGuild(ulong id, string name, IEnumerable<IDiscordGuildUser>? users = null)
+    public static IDiscordGuild CreateMockDiscordGuild(string id, string name, IEnumerable<IDiscordGuildUser>? users = null)
     {
         users ??= [];
         return Mock.Of<IDiscordGuild>(g =>

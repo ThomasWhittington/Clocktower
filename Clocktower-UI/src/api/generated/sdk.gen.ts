@@ -15,6 +15,9 @@ import type {
     BotCallbackApiResponses,
     CallbackApiData,
     CallbackApiResponses,
+    CancelTimerApiData,
+    CancelTimerApiErrors,
+    CancelTimerApiResponses,
     CheckGuildApiData,
     CheckGuildApiErrors,
     CheckGuildApiResponses,
@@ -50,6 +53,8 @@ import type {
     GetPlayerGamesApiResponses,
     GetRolesApiData,
     GetRolesApiResponses,
+    GetTimerApiData,
+    GetTimerApiResponses,
     GetTownStatusApiData,
     GetTownStatusApiErrors,
     GetTownStatusApiResponses,
@@ -72,6 +77,12 @@ import type {
     SendMessageApiData,
     SendMessageApiErrors,
     SendMessageApiResponses,
+    SendToCottagesApiData,
+    SendToCottagesApiErrors,
+    SendToCottagesApiResponses,
+    SendToTownSquareApiData,
+    SendToTownSquareApiErrors,
+    SendToTownSquareApiResponses,
     SetMuteAllPlayersApiData,
     SetMuteAllPlayersApiErrors,
     SetMuteAllPlayersApiResponses,
@@ -81,6 +92,9 @@ import type {
     StartGameApiData,
     StartGameApiErrors,
     StartGameApiResponses,
+    StartOrEditTimerApiData,
+    StartOrEditTimerApiErrors,
+    StartOrEditTimerApiResponses,
     ToggleStoryTellerApiData,
     ToggleStoryTellerApiErrors,
     ToggleStoryTellerApiResponses
@@ -284,6 +298,42 @@ export const loginApi = <ThrowOnError extends boolean = false>(options?: Options
             }
         ],
         url: '/api/discord/auth',
+        ...options
+    });
+};
+
+/**
+ * Sends all users to cottages
+ *
+ * Sends all users to cottages and storytellers to consultation
+ */
+export const sendToCottagesApi = <ThrowOnError extends boolean = false>(options: Options<SendToCottagesApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SendToCottagesApiResponses, SendToCottagesApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/discord-game-action/send-to-cottages/{gameId}',
+        ...options
+    });
+};
+
+/**
+ * Sends all users to townsquare
+ *
+ * Sends all users to townsquare
+ */
+export const sendToTownSquareApi = <ThrowOnError extends boolean = false>(options: Options<SendToTownSquareApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SendToTownSquareApiResponses, SendToTownSquareApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/discord-game-action/send-to-townsquare/{gameId}',
         ...options
     });
 };
@@ -609,5 +659,63 @@ export const getRolesApi = <ThrowOnError extends boolean = false>(options?: Opti
         ],
         url: '/api/roles',
         ...options
+    });
+};
+
+/**
+ * Cancels the timer for game
+ *
+ * Cancels the timer for game
+ */
+export const cancelTimerApi = <ThrowOnError extends boolean = false>(options: Options<CancelTimerApiData, ThrowOnError>) => {
+    return (options.client ?? client).delete<CancelTimerApiResponses, CancelTimerApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/timer/{gameId}',
+        ...options
+    });
+};
+
+/**
+ * Gets the timer state for game
+ *
+ * Gets the timer state for game
+ */
+export const getTimerApi = <ThrowOnError extends boolean = false>(options: Options<GetTimerApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetTimerApiResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/timer/{gameId}',
+        ...options
+    });
+};
+
+/**
+ * Start or edit the timer for a game
+ *
+ * Start or edit the timer for a game
+ */
+export const startOrEditTimerApi = <ThrowOnError extends boolean = false>(options: Options<StartOrEditTimerApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<StartOrEditTimerApiResponses, StartOrEditTimerApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/timer/{gameId}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
     });
 };

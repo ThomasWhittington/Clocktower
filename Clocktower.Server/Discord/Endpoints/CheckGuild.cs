@@ -1,5 +1,4 @@
 ﻿using Clocktower.Server.Discord.Services;
-using Clocktower.Server.Discord.Town.Endpoints.Validation;
 
 namespace Clocktower.Server.Discord.Endpoints;
 
@@ -15,9 +14,7 @@ public class CheckGuild : IEndpoint
 
     internal static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] GuildIdRequest request, [FromServices] IDiscordService discordService)
     {
-        var guildId = ulong.Parse(request.GuildId);
-
-        var (success, name, message) = discordService.CheckGuildId(guildId);
+        var (success, name, message) = discordService.CheckGuildId(request.GuildId);
         return success ? TypedResults.Ok(new Response(success, name, message)) : TypedResults.BadRequest(message);
     }
 

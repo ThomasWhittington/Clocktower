@@ -16,9 +16,7 @@ public class ToggleStoryTeller : IEndpoint
         [AsParameters] GameAndUserRequest request,
         [FromServices] IDiscordTownService discordTownService)
     {
-        var userId = ulong.Parse(request.UserId);
-
-        var (success, message) = await discordTownService.ToggleStoryTeller(request.GameId.Trim(), userId);
+        var (success, message) = await discordTownService.ToggleStoryTeller(request.GameId.Trim(), request.UserId);
         return success ? TypedResults.Ok(message) : TypedResults.BadRequest(message);
     }
 }

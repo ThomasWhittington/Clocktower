@@ -72,7 +72,7 @@ public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, I
             : (false, $"Game ID '{gameId}' failed to be deleted");
     }
 
-    public (bool success, GameState? gameState, string message) StartNewGame(string guildId, string gameId, ulong userId)
+    public (bool success, GameState? gameState, string message) StartNewGame(string guildId, string gameId, string userId)
     {
         var user = bot.GetUser(userId);
         if (user is null) return (false, null, "Couldn't find user");

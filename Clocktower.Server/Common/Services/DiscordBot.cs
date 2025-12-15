@@ -41,9 +41,10 @@ public class DiscordBot(
         await Task.Delay(Timeout.Infinite, stoppingToken);
     }
 
-    public IDiscordGuild? GetGuild(ulong guildId)
+    public IDiscordGuild? GetGuild(string guildId)
     {
-        var guild = _client.GetGuild(guildId);
+        if (!ulong.TryParse(guildId, out var id)) return null;
+        var guild = _client.GetGuild(id);
         return guild != null ? new DiscordGuild(guild) : null;
     }
 
@@ -52,15 +53,17 @@ public class DiscordBot(
         return _client.Guilds.Select(g => new DiscordGuild(g)).ToArray<IDiscordGuild>();
     }
 
-    public async Task<IDiscordUser?> GetUserAsync(ulong userId)
+    public async Task<IDiscordUser?> GetUserAsync(string userId)
     {
-        var user = await _client.GetUserAsync(userId);
+        if (!ulong.TryParse(userId, out var id)) return null;
+        var user = await _client.GetUserAsync(id);
         return user != null ? new DiscordUser(user) : null;
     }
 
-    public IDiscordUser? GetUser(ulong userId)
+    public IDiscordUser? GetUser(string userId)
     {
-        var user = _client.GetUser(userId);
+        if (!ulong.TryParse(userId, out var id)) return null;
+        var user = _client.GetUser(id);
         return user != null ? new DiscordUser(user) : null;
     }
 

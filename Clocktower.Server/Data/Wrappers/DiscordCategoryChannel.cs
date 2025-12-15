@@ -7,7 +7,7 @@ namespace Clocktower.Server.Data.Wrappers;
 [ExcludeFromCodeCoverage(Justification = "Discord.NET wrapper")]
 public class DiscordCategoryChannel(SocketCategoryChannel channel) : IDiscordCategoryChannel
 {
-    public ulong Id => channel.Id;
+    public string Id => channel.Id.ToString();
     public string Name => channel.Name;
     public IEnumerable<IDiscordChannel> Channels => channel.Channels.Select(c => new DiscordChannel(c));
 
@@ -34,7 +34,7 @@ public class DiscordCategoryChannel(SocketCategoryChannel channel) : IDiscordCat
     {
         var channels = VoiceChannels.OrderBy(o => o.Position);
         return (from discordChannel in channels
-            let miniChannel = new MiniChannel(discordChannel.Id.ToString(), discordChannel.Name)
+            let miniChannel = new MiniChannel(discordChannel.Id, discordChannel.Name)
             let occupants = discordChannel.ConnectedUsers.Select(discordChannelUser => discordChannelUser.AsTownUser()).ToList()
             select new ChannelOccupants(miniChannel, occupants)).ToList();
     }

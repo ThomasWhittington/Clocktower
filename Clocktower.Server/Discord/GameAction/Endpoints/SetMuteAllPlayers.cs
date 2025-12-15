@@ -12,21 +12,9 @@ public class SetMuteAllPlayers : IEndpoint
         .WithSummary("Sets muted status for players in game")
         .WithDescription("Sets muted status for players (not storytellers/ spectators) connected to voice for game");
 
-    internal static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle(string gameId, bool muted, [FromServices] IDiscordGameActionService discordGameActionService)
+    internal static async Task<Results<Ok<string>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle(string gameId, bool muted, [FromServices] IDiscordGameActionService discordGameActionService)
     {
-        var (outcome, message) = await discordGameActionService.SetMuteAllPlayersAsync(gameId.Trim(), muted);
-
-        switch (outcome)
-        {
-            case SetMuteAllPlayersOutcome.PlayersUpdated:
-                return TypedResults.Ok(message);
-            case SetMuteAllPlayersOutcome.GameDoesNotExistError:
-                return TypedResults.NotFound(message);
-
-            case SetMuteAllPlayersOutcome.InvalidGuildError:
-            default:
-                return TypedResults.BadRequest(message);
-        }
+        var result = await discordGameActionService.SetMuteAllPlayersAsync(gameId, muted);
+        return result.ToHttpResult();
     }
-    
 }

@@ -18,9 +18,7 @@ public class InviteUser : IEndpoint
        [FromServices] IDiscordTownService discordTownService)
     {
         var gameId = request.GameId.Trim();
-        var userId = ulong.Parse(request.UserId);
-
-        var (outcome, message) = await discordTownService.InviteUser(gameId, userId);
+        var (outcome, message) = await discordTownService.InviteUser(gameId, request.UserId);
 
         switch (outcome)
         {

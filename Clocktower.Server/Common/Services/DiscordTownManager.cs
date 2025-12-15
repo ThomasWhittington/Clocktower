@@ -6,9 +6,9 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore) : IDiscordTo
 {
     public DiscordTown MoveUser(DiscordTown current, IDiscordGuildUser user, IDiscordVoiceChannel? newChannel)
     {
-        var currentChannel = FindUserChannel(current, user.Id.ToString());
+        var currentChannel = FindUserChannel(current, user.Id);
         if (currentChannel is not null && newChannel is not null &&
-            currentChannel.Channel.Id == newChannel.Id.ToString())
+            currentChannel.Channel.Id == newChannel.Id)
             return current;
 
         var newChannelCategories = current.ChannelCategories.Select(category =>
@@ -17,10 +17,10 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore) : IDiscordTo
                 Channels = category.Channels.Select(channel =>
                 {
                     var occupantsList = channel.Occupants
-                        .Where(o => o.Id != user.Id.ToString())
+                        .Where(o => o.Id != user.Id)
                         .ToList();
 
-                    if (newChannel?.Id.ToString() == channel.Channel.Id)
+                    if (newChannel?.Id == channel.Channel.Id)
                     {
                         occupantsList.Add(user.AsTownUser());
                     }
@@ -42,7 +42,7 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore) : IDiscordTo
             .FirstOrDefault(channel => channel.Occupants.Any(occupant => occupant.Id == userId));
     }
 
-    public bool UpdateUserStatus(ulong guildId, string userId, bool isPresent, VoiceState discordVoiceState)
+    public bool UpdateUserStatus(string guildId, string userId, bool isPresent, VoiceState discordVoiceState)
     {
         var discordTown = discordTownStore.Get(guildId);
         if (discordTown is null) return false;
@@ -68,13 +68,26 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore) : IDiscordTo
         return true;
     }
 
-    public DiscordTown? GetDiscordTown(ulong guildId) => discordTownStore.Get(guildId);
+    public DiscordTown? GetDiscordTown(string guildId) => discordTownStore.Get(guildId);
+
+    public string? GetVoiceChannelIdByName(string guildId, string voiceChannelName)
+    {
+        var town = GetDiscordTown(guildId);
+
+        var channelId = town?.ChannelCategories
+            .SelectMany(category => category.Channels)
+            .FirstOrDefault(ch => ch.Channel.Name == voiceChannelName)
+            ?.Channel.Id;
+
+        return channelId;
+    }
+
 
     public TownUser? GetTownUser(string userId)
     {
         var discordTown = discordTownStore.GetTownByUser(userId);
         if (discordTown is null) return null;
-        
+
         foreach (var category in discordTown.ChannelCategories)
         {
             foreach (var channel in category.Channels)
@@ -86,6 +99,17 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore) : IDiscordTo
                 }
             }
         }
+
         return null;
+    }
+
+    public IEnumerable<MiniChannel> GetNightChannels(string guildId, string categoryName)
+    {
+        var town = GetDiscordTown(guildId);
+        if (town is null) return [];
+        var nightCategory = town.ChannelCategories.FirstOrDefault(o => o.Name == categoryName);
+        if (nightCategory is null) return [];
+        var cottages = nightCategory.Channels.Select(channel => channel.Channel).ToList();
+        return cottages;
     }
 }

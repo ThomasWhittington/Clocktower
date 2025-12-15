@@ -7,7 +7,7 @@ namespace Clocktower.Server.Data.Wrappers;
 [ExcludeFromCodeCoverage(Justification = "Discord.NET wrapper")]
 public class DiscordUser(IUser user) : IDiscordUser
 {
-    public ulong Id => user.Id;
+    public string Id => user.Id.ToString();
     public string GlobalName => user.GlobalName;
     public string DisplayAvatarUrl => user.GetDisplayAvatarUrl();
 

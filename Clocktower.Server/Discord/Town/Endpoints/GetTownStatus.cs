@@ -14,9 +14,7 @@ public class GetTownStatus : IEndpoint
 
     internal static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] GuildIdRequest request, [FromServices] IDiscordTownService discordTownService)
     {
-        var guildId = ulong.Parse(request.GuildId);
-
-        var (success, exists, message) = discordTownService.GetTownStatus(guildId);
+        var (success, exists, message) = discordTownService.GetTownStatus(request.GuildId);
         return success ? TypedResults.Ok(new Response(exists, message)) : TypedResults.BadRequest(message);
     }
 

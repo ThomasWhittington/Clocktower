@@ -19,7 +19,7 @@ public class StartGameTests
     private void MockResponse(bool success, GameState? gameState)
     {
         _mockGameStateService.Setup(o =>
-                o.StartNewGame(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ulong>()))
+                o.StartNewGame(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns((success, gameState, ResponseMessage));
     }
 
@@ -51,7 +51,7 @@ public class StartGameTests
 
         var result = StartGame.Handle(request, _mockGameStateService.Object);
 
-        _mockGameStateService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), ulong.Parse(request.UserId)), Times.Once);
+        _mockGameStateService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), request.UserId), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
@@ -70,7 +70,7 @@ public class StartGameTests
 
         var result = StartGame.Handle(request, _mockGameStateService.Object);
 
-        _mockGameStateService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), ulong.Parse(request.UserId)), Times.Once);
+        _mockGameStateService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), request.UserId), Times.Once);
 
         var response = result.Result.Should().BeOfType<Created<GameState>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.Created);

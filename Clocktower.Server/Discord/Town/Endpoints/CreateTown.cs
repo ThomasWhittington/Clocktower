@@ -14,9 +14,7 @@ public class CreateTown : IEndpoint
 
     internal static async Task<Results<Ok<string>, BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, [FromServices] IDiscordTownService discordTownService)
     {
-        var guildId = ulong.Parse(request.GuildId);
-
-        var (success, message) = await discordTownService.CreateTown(guildId);
+        var (success, message) = await discordTownService.CreateTown(request.GuildId);
         return success ? TypedResults.Ok(message) : TypedResults.BadRequest(message);
     }
 }

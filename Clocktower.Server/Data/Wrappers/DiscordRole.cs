@@ -6,7 +6,7 @@ namespace Clocktower.Server.Data.Wrappers;
 [ExcludeFromCodeCoverage(Justification = "Discord.NET wrapper")]
 public class DiscordRole(IRole role) : IDiscordRole
 {
-    public ulong Id => role.Id;
+    public string Id => role.Id.ToString();
     public string Name => role.Name;
 
     public async Task DeleteAsync()

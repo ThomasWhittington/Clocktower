@@ -13,11 +13,8 @@ public class DiscordTownStore : IDiscordTownStore
         if (guildId is null) return null;
         return _store.TryGetValue(guildId, out var state) ? state : null;
     }
-
-    public DiscordTown? Get(ulong? guildId) => Get(guildId.ToString());
-
+    
     public bool Remove(string guildId) => _store.TryRemove(guildId, out _);
-    public bool Remove(ulong guildId) => Remove(guildId.ToString());
 
     public bool Set(string guildId, DiscordTown state, bool force = false)
     {
@@ -27,7 +24,6 @@ public class DiscordTownStore : IDiscordTownStore
         return true;
     }
 
-    public bool Set(ulong guildId, DiscordTown state, bool force = false) => Set(guildId.ToString(), state, force);
 
     public bool TryUpdate(string guildId, Func<DiscordTown, DiscordTown> updateFn)
     {
@@ -37,12 +33,10 @@ public class DiscordTownStore : IDiscordTownStore
         return true;
     }
 
-    public bool TryUpdate(ulong guildId, Func<DiscordTown, DiscordTown> updateFn) => TryUpdate(guildId.ToString(), updateFn);
-
     public DiscordTown? GetTownByUser(string userId)
     {
         return _store.Values
-            .FirstOrDefault(town => 
+            .FirstOrDefault(town =>
                 town.ChannelCategories
                     .SelectMany(category => category.Channels)
                     .SelectMany(channel => channel.Occupants)

@@ -2,7 +2,7 @@
 
 public interface IDiscordUser
 {
-    ulong Id { get; }
+    string Id { get; }
     string GlobalName { get; }
     string DisplayAvatarUrl { get; }
 

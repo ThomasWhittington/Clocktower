@@ -12,6 +12,7 @@ using Clocktower.Server.Discord.Town.Services;
 using Clocktower.Server.Roles.Services;
 using Clocktower.Server.Socket;
 using Clocktower.Server.Socket.Services;
+using Clocktower.Server.Timer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
@@ -48,7 +49,7 @@ public static class ConfigureServices
 
             builder.AddSerilog();
             builder.AddSwagger();
-            builder.AddSignalR();
+            builder.Services.AddSignalR();
             builder.ConfigureJson();
             builder.Services.AddHttpClient();
             builder.Services.AddHttpContextAccessor();
@@ -60,6 +61,7 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IUserService, UserService>();
             builder.Services.AddSingleton<IJwtWriter, JwtWriter>();
             builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
+            builder.Services.AddSingleton<ITimerCoordinator, TimerCoordinator>();
             builder.Services.AddSingleton<IHubStateManager, HubStateManager>();
             builder.Services.AddSingleton<IGameStateStore, GameStateStore>();
             builder.Services.AddSingleton<IDiscordTownStore, DiscordTownStore>();
@@ -81,7 +83,8 @@ public static class ConfigureServices
             builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddScoped<IGameAuthorizationService, GameAuthorizationService>();
             builder.Services.AddScoped<IAuthorizationHandler, StoryTellerForGameHandler>();
-
+            builder.Services.AddScoped<ITimerService, TimerService>();
+            
             builder.Services.AddHostedService(provider => provider.GetRequiredService<IDiscordBot>());
         }
 
@@ -90,7 +93,6 @@ public static class ConfigureServices
             builder.Services.ConfigureHttpJsonOptions(options =>
             {
                 options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                options.SerializerOptions.Converters.Add(new ULongToStringConverter());
             });
             builder.Services.Configure<JsonOptions>(options => { options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
         }
@@ -129,13 +131,7 @@ public static class ConfigureServices
                 });
             });
         }
-
-        private void AddSignalR()
-        {
-            builder.Services.AddSignalR()
-                .AddJsonProtocol(options => { options.PayloadSerializerOptions.Converters.Add(new ULongToStringConverter()); });
-        }
-
+        
         private void AddSerilog()
         {
             builder.Host.UseSerilog((context, configuration) => { configuration.ReadFrom.Configuration(context.Configuration); });

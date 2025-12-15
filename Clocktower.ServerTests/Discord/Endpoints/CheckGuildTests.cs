@@ -35,8 +35,8 @@ public class CheckGuildTests
     [TestMethod]
     public void Handle_ReturnsBadRequest_WhenServiceCheckGuildReturnsFalse()
     {
-        var guildId = CommonMethods.GetRandomSnowflakeNumberId();
-        var request = new GuildIdRequest(guildId.ToString());
+        var guildId = CommonMethods.GetRandomSnowflakeStringId();
+        var request = new GuildIdRequest(guildId);
 
         _mockDiscordService.Setup(o => o.CheckGuildId(guildId)).Returns((false, ResponseName, ResponseMessage));
 
@@ -52,8 +52,8 @@ public class CheckGuildTests
     [TestMethod]
     public void Handle_ReturnsOk_WhenServiceGetGameReturnsTrue_Valid()
     {
-        var guildId = CommonMethods.GetRandomSnowflakeNumberId();
-        var request = new GuildIdRequest(guildId.ToString());
+        var guildId = CommonMethods.GetRandomSnowflakeStringId();
+        var request = new GuildIdRequest(guildId);
 
         _mockDiscordService.Setup(o => o.CheckGuildId(guildId)).Returns((true, ResponseName, ResponseMessage));
 

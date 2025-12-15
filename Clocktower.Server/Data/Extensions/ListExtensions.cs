@@ -8,10 +8,5 @@ public static class ListExtensions
         {
             return identifiableArr.FirstOrDefault(o => o.Id == id);
         }
-
-        public T? GetById(ulong id)
-        {
-            return identifiableArr.GetById(id.ToString());
-        }
     }
 }

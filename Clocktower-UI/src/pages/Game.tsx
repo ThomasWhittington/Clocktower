@@ -16,6 +16,9 @@ import {
     BackgroundImage,
     Spinner
 } from "@/components/ui";
+import {
+    Timer
+} from "@/components/ui/Timer.tsx";
 
 function Game() {
     const {
@@ -41,6 +44,7 @@ function Game() {
                                 className="flex justify-center align-center">
                                 <BackgroundImage
                                     gameTime={gameTime}>
+                                    <Timer/>
                                 </BackgroundImage>
                             </Panel>
                         </PanelGroup>

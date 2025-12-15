@@ -4,7 +4,7 @@ namespace Clocktower.Server.Data.Wrappers;
 
 public interface IDiscordGuild
 {
-    ulong Id { get; }
+    string Id { get; }
     string Name { get; }
     IEnumerable<IDiscordGuildUser> Users { get; }
     IEnumerable<IDiscordRole> Roles { get; }
@@ -15,13 +15,15 @@ public interface IDiscordGuild
     Task<IDiscordRestVoiceChannel> CreateVoiceChannelAsync(string channelName, Action<VoiceChannelProperties> func);
     Task<IDiscordRole> CreateRoleAsync(string roleName, Color color);
     Task DeleteRoleAsync(string roleName);
-    IDiscordGuildUser? GetUser(ulong userId);
+    IDiscordGuildUser? GetUser(string userId);
     Task MoveAsync(IDiscordGuildUser member, IDiscordVoiceChannel channel);
-    IDiscordVoiceChannel GetVoiceChannel(ulong channelId);
+    IDiscordVoiceChannel? GetVoiceChannel(string channelId);
     IDiscordRole? GetRole(string roleName);
-    Task<bool> CreateVoiceChannelsForCategoryAsync(string[] channelNames, ulong categoryId);
+    Task<bool> CreateVoiceChannelsForCategoryAsync(string[] channelNames, string categoryId);
     Task<IDiscordRestCategoryChannel> CreateCategoryAsync(string categoryName, bool everyoneCanSee, IDiscordRole? roleToSeeChannel = null);
     IDiscordCategoryChannel? GetCategoryChannelByName(string name);
     MiniCategory? GetMiniCategory(string categoryName);
     IEnumerable<IDiscordGuildUser> GetGuildUsers(IEnumerable<string> userIds);
+    IEnumerable<IDiscordGuildUser> GetInVoiceGuildUsers(IEnumerable<string> userIds);
+    IEnumerable<IDiscordGuildUser> GetUsersInVoiceChannelsExcluding(IEnumerable<string>? excludedChannelsIds = null);
 }

@@ -10,7 +10,7 @@ public class DiscordTownManagerTests
 {
     private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
     private IDiscordTownManager _sut = null!;
-    private const ulong GuildId = 1L;
+    private const string GuildId = "1";
     private DiscordTown _capturedDiscordTown = null!;
 
     [TestInitialize]
@@ -26,7 +26,7 @@ public class DiscordTownManagerTests
         var discordTown = new DiscordTown(channelCategories);
 
         _mockDiscordTownStore.Setup(o => o.Set(GuildId, It.IsAny<DiscordTown>(), true)).Returns(true)
-            .Callback<ulong, DiscordTown, bool>((_, callbackTown, _) => _capturedDiscordTown = callbackTown);
+            .Callback<string, DiscordTown, bool>((_, callbackTown, _) => _capturedDiscordTown = callbackTown);
         return discordTown;
     }
 
@@ -423,10 +423,129 @@ public class DiscordTownManagerTests
 
     #endregion
 
+    #region GetNightChannels
+
+    [TestMethod]
+    public void GetNightChannels_ReturnsEmpty_WhenTownIsNull()
+    {
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns((DiscordTown?)null);
+
+        var result = _sut.GetNightChannels(GuildId, "Night Category").ToArray();
+
+        result.Should().NotBeNull();
+        result.Should().BeEmpty();
+        _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
+    }
+
+    [TestMethod]
+    public void GetNightChannels_ReturnsEmpty_WhenCategoryNotFound()
+    {
+        var town = GetDummyDiscordTown();
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns(town);
+
+        var result = _sut.GetNightChannels(GuildId, "Does Not Exist").ToArray();
+
+        result.Should().NotBeNull();
+        result.Should().BeEmpty();
+        _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
+    }
+
+    [TestMethod]
+    public void GetNightChannels_ReturnsChannelsFromMatchingCategory()
+    {
+        var town = GetDummyDiscordTown();
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns(town);
+
+        var result = _sut.GetNightChannels(GuildId, "Night Category").ToList();
+
+        result.Should().HaveCount(3);
+        result.Select(c => c.Id).Should().BeEquivalentTo("2203", "2204", "2205");
+        result.Select(c => c.Name).Should().BeEquivalentTo("Night Channel 1", "Night Channel 2", "Night Channel 3");
+        _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
+    }
+
+    #endregion
+
+    #region GetVoiceChannelIdByName
+
+    [TestMethod]
+    public void GetVoiceChannelIdByName_ReturnsNull_WhenTownIsNull()
+    {
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns((DiscordTown?)null);
+
+        var result = _sut.GetVoiceChannelIdByName(GuildId, "Night Channel 1");
+
+        result.Should().BeNull();
+        _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
+    }
+
+    [TestMethod]
+    public void GetVoiceChannelIdByName_ReturnsNull_WhenChannelNameNotFound()
+    {
+        var town = GetDummyDiscordTown();
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns(town);
+
+        var result = _sut.GetVoiceChannelIdByName(GuildId, "Does Not Exist");
+
+        result.Should().BeNull();
+        _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
+    }
+
+    [TestMethod]
+    public void GetVoiceChannelIdByName_ReturnsChannelId_WhenChannelExistsInDayCategory()
+    {
+        var town = GetDummyDiscordTown();
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns(town);
+
+        var result = _sut.GetVoiceChannelIdByName(GuildId, "Day Channel 2");
+
+        result.Should().Be("2002");
+        _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
+    }
+
+    [TestMethod]
+    public void GetVoiceChannelIdByName_ReturnsChannelId_WhenChannelExistsInNightCategory()
+    {
+        var town = GetDummyDiscordTown();
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns(town);
+
+        var result = _sut.GetVoiceChannelIdByName(GuildId, "Night Channel 2");
+
+        result.Should().Be("2204");
+        _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
+    }
+
+    [TestMethod]
+    public void GetVoiceChannelIdByName_ReturnsNull_WhenVoiceChannelNameIsEmpty()
+    {
+        var town = GetDummyDiscordTown();
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns(town);
+
+        var result = _sut.GetVoiceChannelIdByName(GuildId, "");
+
+        result.Should().BeNull();
+        _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
+    }
+
+    [TestMethod]
+    public void GetVoiceChannelIdByName_ReturnsNull_WhenVoiceChannelNameIsNull()
+    {
+        var town = GetDummyDiscordTown();
+        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns(town);
+        string voiceChannelName = null!;
+
+        var result = _sut.GetVoiceChannelIdByName(GuildId, voiceChannelName);
+
+        result.Should().BeNull();
+        _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
+    }
+
+    #endregion
+
     private static IDiscordGuildUser CreateMockDiscordUser(string id)
     {
         var mockUser = StrictMockFactory.Create<IDiscordGuildUser>();
-        mockUser.Setup(u => u.Id).Returns(ulong.Parse(id));
+        mockUser.Setup(u => u.Id).Returns(id);
         mockUser.Setup(u => u.GuildId).Returns(GuildId);
         mockUser.Setup(u => u.DisplayName).Returns(string.Empty);
         mockUser.Setup(u => u.DisplayAvatarUrl).Returns(string.Empty);
@@ -437,7 +556,7 @@ public class DiscordTownManagerTests
     private static IDiscordVoiceChannel CreateMockDiscordVoiceChannel(string id)
     {
         var mockChannel = StrictMockFactory.Create<IDiscordVoiceChannel>();
-        mockChannel.Setup(c => c.Id).Returns(ulong.Parse(id));
+        mockChannel.Setup(c => c.Id).Returns(id);
         return mockChannel.Object;
     }
 }

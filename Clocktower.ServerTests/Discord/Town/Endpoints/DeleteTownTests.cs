@@ -36,11 +36,11 @@ public class DeleteTownTests
         const string responseMessage = "response message";
         var request = new GuildIdRequest(CommonMethods.GetRandomSnowflakeStringId());
 
-        _mockDiscordTownService.Setup(o => o.DeleteTown(ulong.Parse(request.GuildId))).ReturnsAsync((false, responseMessage));
+        _mockDiscordTownService.Setup(o => o.DeleteTown(request.GuildId)).ReturnsAsync((false, responseMessage));
 
         var result = await DeleteTown.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.DeleteTown(ulong.Parse(request.GuildId)), Times.Once);
+        _mockDiscordTownService.Verify(o => o.DeleteTown(request.GuildId), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
@@ -53,11 +53,11 @@ public class DeleteTownTests
         const string responseMessage = "response message";
         var request = new GuildIdRequest(CommonMethods.GetRandomSnowflakeStringId());
 
-        _mockDiscordTownService.Setup(o => o.DeleteTown(ulong.Parse(request.GuildId))).ReturnsAsync((true, responseMessage));
+        _mockDiscordTownService.Setup(o => o.DeleteTown(request.GuildId)).ReturnsAsync((true, responseMessage));
 
         var result = await DeleteTown.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.DeleteTown(ulong.Parse(request.GuildId)), Times.Once);
+        _mockDiscordTownService.Verify(o => o.DeleteTown(request.GuildId), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);

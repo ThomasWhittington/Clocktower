@@ -17,9 +17,9 @@ namespace Clocktower.ServerTests.Discord.Town.Services;
 [TestClass]
 public class DiscordTownServiceTests
 {
-    private const ulong GuildId = 1L;
-    private const ulong UserId = 2L;
-    private const ulong ChannelId = 3L;
+    private const string GuildId = "1";
+    private const string UserId = "2";
+    private const string ChannelId = "3";
     private const string GameId = "this-game";
     private const string Jwt = "jwt-token";
     private const string Key = "this-key";
@@ -184,20 +184,9 @@ public class DiscordTownServiceTests
     }
 
     [TestMethod]
-    public async Task ToggleStoryTeller_ReturnsFalse_WhenGuildIdInvalid()
-    {
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "invalid-guild" });
-
-        var result = await Sut.ToggleStoryTeller(GameId, UserId);
-
-        result.success.Should().BeFalse();
-        result.message.Should().Be("GameState contained a guildId that is not valid");
-    }
-
-    [TestMethod]
     public async Task ToggleStoryTeller_ReturnsFalse_WhenGuildNotFound()
     {
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId.ToString() });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId });
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns((IDiscordGuild?)null);
 
         var result = await Sut.ToggleStoryTeller(GameId, UserId);
@@ -211,7 +200,7 @@ public class DiscordTownServiceTests
     public async Task ToggleStoryTeller_ReturnsFalse_WhenRoleNotFound()
     {
         var guild = new Mock<IDiscordGuild>();
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId.ToString() });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId });
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns((IDiscordRole?)null);
@@ -228,7 +217,7 @@ public class DiscordTownServiceTests
     {
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId.ToString() });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId });
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
@@ -244,11 +233,11 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task ToggleStoryTeller_CallsDoesUserHaveRole_WhenDataGood()
     {
-        const ulong roleId = 3L;
+        const string roleId = "3";
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId.ToString() });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId });
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
@@ -264,16 +253,16 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task ToggleStoryTeller_AddsUserToGame_WhenUserNotInGameState()
     {
-        const ulong roleId = 3L;
+        const string roleId = "3";
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
         var gameState = new GameState
         {
-            GuildId = GuildId.ToString(),
+            GuildId = GuildId,
             Users = []
         };
-        var gameUser = CommonMethods.GetRandomGameUser(UserId.ToString());
+        var gameUser = CommonMethods.GetRandomGameUser(UserId);
         _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
@@ -293,16 +282,16 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task ToggleStoryTeller_DoesNotUserToGame_WhenUserIsInGameState()
     {
-        const ulong roleId = 3L;
+        const string roleId = "3";
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
         var gameState = new GameState
         {
-            GuildId = GuildId.ToString(),
+            GuildId = GuildId,
             Users =
             [
-                CommonMethods.GetRandomGameUser(UserId.ToString())
+                CommonMethods.GetRandomGameUser(UserId)
             ]
         };
         _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
@@ -324,16 +313,16 @@ public class DiscordTownServiceTests
     public async Task ToggleStoryTeller_AddsStoryTellerRole_WhenUserIsNotStoryTeller()
     {
         const string displayName = "displayName";
-        const ulong roleId = 3L;
+        const string roleId = "3";
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
         var gameState = new GameState
         {
-            GuildId = GuildId.ToString(),
+            GuildId = GuildId,
             Users =
             [
-                CommonMethods.GetRandomGameUser(UserId.ToString())
+                CommonMethods.GetRandomGameUser(UserId)
             ]
         };
 
@@ -360,16 +349,16 @@ public class DiscordTownServiceTests
     public async Task ToggleStoryTeller_RemovesStoryTellerRole_WhenUserIsStoryTeller()
     {
         const string displayName = "displayName";
-        const ulong roleId = 3L;
+        const string roleId = "3";
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
         var gameState = new GameState
         {
-            GuildId = GuildId.ToString(),
+            GuildId = GuildId,
             Users =
             [
-                CommonMethods.GetRandomGameUser(UserId.ToString())
+                CommonMethods.GetRandomGameUser(UserId)
             ]
         };
 
@@ -441,7 +430,7 @@ public class DiscordTownServiceTests
 
         var result = Sut.GetJoinData(Key);
 
-        _mockGameStateStore.Verify(o => o.UpdateUser(joinData.GameId, ulong.Parse(joinData.User.Id), null, true), Times.Once());
+        _mockGameStateStore.Verify(o => o.UpdateUser(joinData.GameId, joinData.User.Id, null, true), Times.Once());
         _mockCache.Verify(o => o.Remove($"join_data_{Key}"), Times.Once);
         result.Should().Be(joinData);
     }
@@ -453,9 +442,9 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task PingUser_PingsUser()
     {
-        await Sut.PingUser(UserId.ToString());
+        await Sut.PingUser(UserId);
 
-        _mockNotificationService.Verify(o => o.PingUser(UserId.ToString(), "Ping!"), Times.Once);
+        _mockNotificationService.Verify(o => o.PingUser(UserId, "Ping!"), Times.Once);
     }
 
     #endregion
@@ -554,7 +543,7 @@ public class DiscordTownServiceTests
     public async Task CreateTown_ReturnsFalse_WhenDayChannelsNotCreated()
     {
         var roleColor = Color.Gold;
-        const ulong dayCategoryId = 10L;
+        const string dayCategoryId = "10";
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var dayCategory = new Mock<IDiscordRestCategoryChannel>();
@@ -579,8 +568,8 @@ public class DiscordTownServiceTests
     public async Task CreateTown_ReturnsFalse_WhenNightChannelsNotCreated()
     {
         var roleColor = Color.Gold;
-        const ulong dayCategoryId = 10L;
-        const ulong nightCategoryId = 20L;
+        const string dayCategoryId = "10";
+        const string nightCategoryId = "20";
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var dayCategory = new Mock<IDiscordRestCategoryChannel>();
@@ -611,8 +600,8 @@ public class DiscordTownServiceTests
     public async Task CreateTown_ReturnsTrue_WhenChannelsCreated()
     {
         var roleColor = Color.Gold;
-        const ulong dayCategoryId = 10L;
-        const ulong nightCategoryId = 20L;
+        const string dayCategoryId = "10";
+        const string nightCategoryId = "20";
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var dayCategory = new Mock<IDiscordRestCategoryChannel>();
@@ -912,20 +901,17 @@ public class DiscordTownServiceTests
 
     private void Setup_GetDiscordTownDto(bool hasGameState, bool hasGuild = true, bool hasUsers = false, string gameId = GameId, string? guildId = null, DiscordTown? discordTown = null)
     {
-        guildId ??= GuildId.ToString();
+        guildId ??= GuildId;
         var users = hasUsers
             ? new List<GameUser>
             {
-                new(UserId.ToString())
+                new(UserId)
             }
             : [];
 
         _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(hasGameState ? new GameState { Id = gameId, GuildId = guildId, Users = users } : null);
-        if (ulong.TryParse(guildId, out var guildIdUlong))
-        {
-            _mockDiscordTownStore.Setup(o => o.Get(guildIdUlong)).Returns(discordTown);
-            _mockBot.Setup(o => o.GetGuild(guildIdUlong)).Returns(hasGuild ? new Mock<IDiscordGuild>().Object : null);
-        }
+        _mockDiscordTownStore.Setup(o => o.Get(guildId)).Returns(discordTown);
+        _mockBot.Setup(o => o.GetGuild(guildId)).Returns(hasGuild ? new Mock<IDiscordGuild>().Object : null);
     }
 
     [TestMethod]
@@ -970,20 +956,6 @@ public class DiscordTownServiceTests
         result.message.Should().Be("Got from store");
     }
 
-    [TestMethod]
-    public async Task GetDiscordTownDto_ReturnsFalse_WhenGuildIdInvalid()
-    {
-        var discordTown = GetDummyDiscordTown();
-        const bool hasUsers = true;
-        Setup_GetDiscordTownDto(hasGameState: true, hasGuild: true, guildId: "invalid", hasUsers: hasUsers, discordTown: discordTown);
-
-        var result = await Sut.GetDiscordTownDto(GameId);
-
-        result.success.Should().BeFalse();
-        result.discordTown.Should().BeNull();
-        result.message.Should().Be("GameState contained a guildId that is not valid");
-    }
-
     #endregion
 
     #region InviteUser
@@ -1011,9 +983,11 @@ public class DiscordTownServiceTests
     }
 
     [TestMethod]
-    public async Task InviteUser_ReturnsError_WhenGuildIdInvalid()
+    [DataRow(null)]
+    [DataRow("invalid-guild")]
+    public async Task InviteUser_ReturnsError_WhenGuildIdInvalid(string? guildId)
     {
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "invalid-guild" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = guildId! });
 
         var (outcome, message) = await Sut.InviteUser(GameId, UserId);
 
@@ -1071,7 +1045,7 @@ public class DiscordTownServiceTests
     public async Task InviteUser_GetsJwtToken_WhenDataGood()
     {
         var gameState = new GameState { GuildId = "1" };
-        var gameUser = CommonMethods.GetRandomGameUser(UserId.ToString());
+        var gameUser = CommonMethods.GetRandomGameUser(UserId);
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();
@@ -1085,14 +1059,14 @@ public class DiscordTownServiceTests
 
         _ = await Sut.InviteUser(GameId, UserId);
 
-        _mockJwtWriter.Verify(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player)), Times.Once);
+        _mockJwtWriter.Verify(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId && g.UserType == UserType.Player)), Times.Once);
     }
 
     [TestMethod]
     public async Task InviteUser_GeneratesId_WhenGotJwt()
     {
         var gameState = new GameState { GuildId = "1" };
-        var gameUser = CommonMethods.GetRandomGameUser(UserId.ToString());
+        var gameUser = CommonMethods.GetRandomGameUser(UserId);
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();
@@ -1116,7 +1090,7 @@ public class DiscordTownServiceTests
         const string feUri = "fe-uri";
         CommonMethods.SetUpMockSecrets(_mockSecrets, feUri: feUri);
         var gameState = new GameState { GuildId = "1" };
-        var gameUser = CommonMethods.GetRandomGameUser(UserId.ToString());
+        var gameUser = CommonMethods.GetRandomGameUser(UserId);
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();
@@ -1133,8 +1107,8 @@ public class DiscordTownServiceTests
 
         _ = await Sut.InviteUser(GameId, UserId);
 
-        _mockCache.Verify(o => o.CreateEntry(It.Is<object>(e => e.ToString() == $"join_data_{Key}")), Times.Once);
-        mockCacheEntry.VerifySet(entry => entry.Value = It.Is<JoinData>(u => u.Jwt == Jwt && u.User.Id == UserId.ToString()), Times.Once);
+        _mockCache.Verify(o => o.CreateEntry(It.Is<object>(e => (string)e == $"join_data_{Key}")), Times.Once);
+        mockCacheEntry.VerifySet(entry => entry.Value = It.Is<JoinData>(u => u.Jwt == Jwt && u.User.Id == UserId), Times.Once);
         mockCacheEntry.VerifySet(entry => entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5), Times.Once);
     }
 
@@ -1144,7 +1118,7 @@ public class DiscordTownServiceTests
         const string feUri = "fe-uri";
         CommonMethods.SetUpMockSecrets(_mockSecrets, feUri: feUri);
         var gameState = new GameState { GuildId = "1" };
-        var gameUser = CommonMethods.GetRandomGameUser(UserId.ToString());
+        var gameUser = CommonMethods.GetRandomGameUser(UserId);
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
         var dmChannel = new Mock<IDiscordDmChannel>();
@@ -1162,7 +1136,7 @@ public class DiscordTownServiceTests
         var (outcome, message) = await Sut.InviteUser(GameId, UserId);
 
         dmChannel.Verify(o => o.SendMessageAsync($"[Join here]({feUri + $"/join?key={Key}"})"), Times.Once);
-        _mockGameStateStore.Verify(o => o.AddUserToGame(GameId, It.Is<GameUser>(g => g.Id == UserId.ToString() && g.UserType == UserType.Player)), Times.Once);
+        _mockGameStateStore.Verify(o => o.AddUserToGame(GameId, It.Is<GameUser>(g => g.Id == UserId && g.UserType == UserType.Player)), Times.Once);
         outcome.Should().Be(InviteUserOutcome.InviteSent);
         message.Should().Be("Sent message to user");
     }

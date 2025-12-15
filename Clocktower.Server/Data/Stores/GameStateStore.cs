@@ -1,11 +1,12 @@
 ﻿using System.Collections.Concurrent;
-using Clocktower.Server.Data.Extensions;
 
 namespace Clocktower.Server.Data.Stores;
 
 public class GameStateStore : IGameStateStore
 {
     private readonly ConcurrentDictionary<string, GameState> _store = new();
+
+    public bool GameExists(string gameId) => _store.ContainsKey(gameId);
 
     public void Clear() => _store.Clear();
 
@@ -35,9 +36,7 @@ public class GameStateStore : IGameStateStore
     {
         return GetAll().Where(game => game.GuildId == guildId);
     }
-
-    public IEnumerable<GameState> GetGuildGames(ulong guildId) => GetGuildGames(guildId.ToString());
-
+    
     public IEnumerable<GameState> GetUserGames(string userId)
     {
         return GetAll().Where(game => game.Users.Select(o => o.Id).Contains(userId));
@@ -64,7 +63,7 @@ public class GameStateStore : IGameStateStore
     }
 
     public bool UpdateUser(string gameId,
-        ulong userId,
+        string userId,
         UserType? userType = null,
         bool? isPlaying = null)
     {

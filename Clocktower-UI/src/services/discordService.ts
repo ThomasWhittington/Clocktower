@@ -4,11 +4,11 @@
     getDiscordTownApi,
     getGuildsWithUserApi,
     getJoinDataApi,
-    getTownStatusApi,
-    type GetTownStatusApiResponse,
     inviteUserApi,
     moveUserToChannelApi,
     pingUserApi,
+    sendToCottagesApi,
+    sendToTownSquareApi,
     setTimeApi
 } from '@/api';
 import {
@@ -21,27 +21,6 @@ import {
 import {
     apiClient
 } from "@/api/api-client.ts";
-
-async function getTownStatus(id: string): Promise<GetTownStatusApiResponse> {
-    const {
-        data,
-        error
-    } = await getTownStatusApi({
-        client: apiClient,
-        path: {
-            guildId: id,
-        }
-    });
-
-    if (error) {
-        console.error('Failed to get town status:', error);
-        throw new Error(error.toString());
-    }
-    return data ?? {
-        exists: false,
-        message: "Failed to get town status"
-    };
-}
 
 async function getDiscordTown(gameId: string): Promise<DiscordTown> {
     const {
@@ -64,7 +43,7 @@ async function getDiscordTown(gameId: string): Promise<DiscordTown> {
         return mapToDiscordTown(data);
     }
     return {
-        gameId:'',
+        gameId: '',
         userCount: 0,
         channelCategories: []
     };
@@ -169,6 +148,44 @@ async function setTime(gameId: string, gameTime: GameTime) {
     }
 }
 
+async function sendToCottages(gameId: string) {
+    const {
+        data,
+        error
+    } = await sendToCottagesApi({
+        client: apiClient,
+        path: {
+            gameId: gameId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to send users to cottages:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
+
+async function sendToTownSquare(gameId: string) {
+    const {
+        data,
+        error
+    } = await sendToTownSquareApi({
+        client: apiClient,
+        path: {
+            gameId: gameId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to send users to town square:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
+
 async function pingUser(userId: string): Promise<boolean> {
     const {
         error
@@ -199,14 +216,21 @@ const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGame
             throw new Error(`Unknown GameTime value: ${gameTime}`);
     }
 };
+
+const getMessage = (err: unknown): string =>
+    err instanceof Error ? err.message
+        : typeof err === "object" && err && typeof (err as any).message === "string" ? (err as any).message
+            : "Unknown error";
+
 export const discordService = {
     getGuildsWithUser,
-    getTownStatus,
     getDiscordTown,
     moveUserToChannel,
     getAuthData,
     inviteUser,
     getJoinData,
     setTime,
-    pingUser
+    pingUser,
+    sendToCottages,
+    sendToTownSquare
 }

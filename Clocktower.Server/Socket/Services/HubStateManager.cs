@@ -1,9 +1,8 @@
 ﻿using Clocktower.Server.Common.Services;
-using Clocktower.Server.Data.Extensions;
 
 namespace Clocktower.Server.Socket.Services;
 
-public class HubStateManager(IGameStateStore gameStateStore, IDiscordTownStore discordTownStore, IJwtWriter jwtWriter) : IHubStateManager
+public class HubStateManager(IGameStateStore gameStateStore, IDiscordTownStore discordTownStore, IJwtWriter jwtWriter, ITimerCoordinator timerCoordinator) : IHubStateManager
 {
     public SessionSyncState? GetState(string gameId, string userId)
     {
@@ -12,11 +11,14 @@ public class HubStateManager(IGameStateStore gameStateStore, IDiscordTownStore d
         if (currentGameState is null || gameUser is null) return null;
         var discordTown = discordTownStore.Get(currentGameState.GuildId);
         var enhancedTown = discordTown?.ToDiscordTownDto(currentGameState.Id, currentGameState.Users);
+        var timer = timerCoordinator.Get(gameId);
+
         var currentState = new SessionSyncState
         {
             GameTime = currentGameState.GameTime,
             Jwt = jwtWriter.GetJwtToken(gameUser),
-            DiscordTown = enhancedTown
+            DiscordTown = enhancedTown,
+            Timer = timer
         };
         return currentState;
     }

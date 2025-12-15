@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Clocktower.Server.Data.Extensions;
 using Discord.WebSocket;
 
 namespace Clocktower.Server.Data.Wrappers;
@@ -7,14 +6,15 @@ namespace Clocktower.Server.Data.Wrappers;
 [ExcludeFromCodeCoverage(Justification = "Discord.NET wrapper")]
 public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
 {
-    public ulong Id => user.Id;
-    public ulong GuildId => user.Guild.Id;
+    public string Id => user.Id.ToString();
+    public string GuildId => user.Guild.Id.ToString();
     public string DisplayName => user.DisplayName;
     public string DisplayAvatarUrl => user.GetDisplayAvatarUrl();
     public bool IsServerMuted => user.IsMuted;
     public bool IsServerDeafened => user.IsDeafened;
     public bool IsSelfMuted => user.IsSelfMuted;
     public bool IsSelfDeafened => user.IsSelfDeafened;
+    public bool IsConnectedToVoice => VoiceState?.VoiceChannel != null;
     public IDiscordVoiceState? VoiceState => user.VoiceState.HasValue ? new DiscordVoiceState(user.VoiceState.Value) : null;
     public IEnumerable<IDiscordRole> Roles => user.Roles.Select(r => new DiscordRole(r));
 
@@ -31,20 +31,26 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
 
     public async Task MoveAsync(IDiscordVoiceChannel channel)
     {
-        await user.ModifyAsync(x => x.ChannelId = channel.Id);
+        if (!ulong.TryParse(channel.Id, out var id))
+            throw new ArgumentException($"Invalid channel ID format: {channel.Id}", nameof(channel));
+        await user.ModifyAsync(x => x.ChannelId = id);
     }
 
     public async Task RemoveRoleAsync(IDiscordRole role)
     {
-        await user.RemoveRoleAsync(role.Id);
+        if (!ulong.TryParse(role.Id, out var id))
+            throw new ArgumentException($"Invalid role ID format: {role.Id}", nameof(role));
+        await user.RemoveRoleAsync(id);
     }
 
     public async Task AddRoleAsync(IDiscordRole role)
     {
-        await user.AddRoleAsync(role.Id);
+        if (!ulong.TryParse(role.Id, out var id))
+            throw new ArgumentException($"Invalid role ID format: {role.Id}", nameof(role));
+        await user.AddRoleAsync(id);
     }
 
-    public bool DoesUserHaveRole(ulong roleId)
+    public bool DoesUserHaveRole(string roleId)
     {
         return Roles.Any(o => o.Id == roleId);
     }
