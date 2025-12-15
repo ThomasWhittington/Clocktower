@@ -16,24 +16,24 @@ export const apiClient =
             const jwt = useAppStore.getState().jwt;
             if (input instanceof Request) {
                 const headers = new Headers(input.headers);
-                
+
                 if (jwt) {
                     headers.set('Authorization', `Bearer ${jwt}`);
                 }
-                
+
                 const hasBody = input.body !== null;
                 const hasContentType = headers.has('Content-Type');
-
-                if (hasBody && !hasContentType) {
+                const isFormData = hasContentType && headers.get('Content-Type')?.includes('multipart/form-data');
+                if (hasBody && !hasContentType && !isFormData) {
                     headers.set('Content-Type', 'application/json');
                 }
 
-                const patchedRequest = new Request(input, { headers });
+                const patchedRequest = new Request(input, {headers});
                 return fetch(patchedRequest);
             }
 
             const headers = new Headers(init?.headers);
-            
+
             if (jwt) {
                 headers.set('Authorization', `Bearer ${jwt}`);
             }

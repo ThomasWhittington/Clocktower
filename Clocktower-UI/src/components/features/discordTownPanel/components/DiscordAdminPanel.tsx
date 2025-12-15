@@ -32,11 +32,11 @@ function DiscordAdminPanel() {
 
     const [timerSeconds, setTimerSeconds] = useState<number>(300);
     const [timerLabel, setTimerLabel] = useState<string>("");
-  
+
     const canSubmitTimer = useMemo(() => {
         return timerActionsCanRun && !isTimerLoading && Number.isFinite(timerSeconds) && timerSeconds > 0;
     }, [timerActionsCanRun, isTimerLoading, timerSeconds]);
-    
+
     return (
         <div
             className="flex flex-col space-y-2">
@@ -51,17 +51,22 @@ function DiscordAdminPanel() {
                     <>
                         <button
                             className="btn-primary"
+                            aria-label="Send to Town Square"
                             onClick={sendToTownSquare}>⛲
                         </button>
                         <button
                             className="btn-secondary"
+                            aria-label="Send to Cottages"
                             onClick={sendToCottages}>🛌
                         </button>
                     </>
                 }
-                {isTimerLoading && <Spinner/>}
-                {timerResult && <p className="text-green-500 text-sm">{timerResult}</p>}
-                {timerError && <p className="text-red-500 text-sm">{timerError}</p>}
+                {isTimerLoading &&
+                    <Spinner/>}
+                {timerResult &&
+                    <p className="text-green-500 text-sm">{timerResult}</p>}
+                {timerError &&
+                    <p className="text-red-500 text-sm">{timerError}</p>}
 
                 {timerActionsCanRun &&
                     <>
@@ -82,6 +87,7 @@ function DiscordAdminPanel() {
                         />
                         <button
                             className="btn-primary"
+                            aria-label="Start or edit timer"
                             disabled={!canSubmitTimer}
                             onClick={() => startOrEditTimer(timerSeconds, timerLabel.trim() || undefined)}
                         >
@@ -89,6 +95,7 @@ function DiscordAdminPanel() {
                         </button>
                         <button
                             className="btn-danger"
+                            aria-label="Cancel timer"
                             disabled={!timerActionsCanRun || isTimerLoading}
                             onClick={cancelTimer}
                         >

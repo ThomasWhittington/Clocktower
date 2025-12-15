@@ -4,7 +4,6 @@
     useState
 } from 'react';
 import {
-    type TimerState,
     useServerHub
 } from "@/hooks/useServerHub.ts";
 import {
@@ -15,7 +14,7 @@ import {
 const parseUtcMs = (iso?: string | null) => (iso ? Date.parse(iso) : Number.NaN);
 
 export type TimerView = {
-    status: TimerState['status'] | 'None';
+    status: TimerStatus;
     remainingMs: number | null;
     isRunning: boolean;
     label?: string | null;
@@ -27,7 +26,7 @@ export function useTimer(): TimerView {
     const baseline = useMemo(() => {
         if (!timer) {
             return {
-                status: 'None' as const,
+                status: TimerStatus.None,
                 remainingMs: null,
                 isRunning: false,
                 endUtcMs: null,

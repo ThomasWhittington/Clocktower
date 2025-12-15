@@ -180,7 +180,7 @@ async function sendToTownSquare(gameId: string) {
 
     if (error) {
         console.error('Failed to send users to town square:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     return data;
