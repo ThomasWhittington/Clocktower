@@ -171,7 +171,7 @@ public class GameStateServiceTests
     {
         var guildId = CommonMethods.GetRandomSnowflakeStringId();
         var gameId = CommonMethods.GetRandomString();
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
 
         _mockBot.Setup(o => o.GetUser(userId)).Returns((IDiscordUser)null!);
 
@@ -187,7 +187,7 @@ public class GameStateServiceTests
     {
         var guildId = CommonMethods.GetRandomSnowflakeStringId();
         var gameId = CommonMethods.GetRandomString();
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
         var userName = CommonMethods.GetRandomString();
         var userAvatarUrl = CommonMethods.GetRandomString();
 
@@ -222,7 +222,7 @@ public class GameStateServiceTests
     {
         var guildId = CommonMethods.GetRandomSnowflakeStringId();
         var gameId = CommonMethods.GetRandomString();
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
         var userName = CommonMethods.GetRandomString();
         var userAvatarUrl = CommonMethods.GetRandomString();
 

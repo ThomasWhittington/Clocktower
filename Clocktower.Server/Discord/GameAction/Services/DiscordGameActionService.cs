@@ -13,15 +13,12 @@ public class DiscordGameActionService(
 {
     public async Task<Result<string>> SetMuteAllPlayersAsync(string gameId, bool muted)
     {
-        var gameState = gameStateStore.Get(gameId);
-        if (gameState is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
-        if (!ulong.TryParse(gameState.GuildId, out var guildId)) return Result.Fail<string>(Errors.InvalidGuildId());
-        var guild = bot.GetGuild(guildId);
-        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var (status, (guild, gameState)) = ValidateFromGameId(gameId);
+        if (!status.IsSuccess) return status;
 
         var toBeMuted = userService.GetTownUsersForGameUsers(
             gameState.StoryTellers,
-            guildId.ToString(),
+            guild.Id,
             user =>
                 user.IsPresent &&
                 user.VoiceState.IsServerMuted == !muted
@@ -61,7 +58,7 @@ public class DiscordGameActionService(
 
             for (int i = 0; i < players.Length; i++) await players[i].MoveAsync(cottages[i + 1]);
             foreach (var storyTeller in storyTellers) await storyTeller.MoveAsync(storyTellersCottage);
-            
+
             return Result.Ok("Moved players to cottages");
         }
         catch (Exception ex)
@@ -78,8 +75,8 @@ public class DiscordGameActionService(
             if (!status.IsSuccess) return status;
 
             var channelId = discordTownManager.GetVoiceChannelIdByName(guild!.Id, discordConstantsService.TownSquareName);
-            if (!channelId.HasValue) return Result.Fail<string>(Errors.ChannelNotFound(channelId));
-            var channel = guild.GetVoiceChannel(channelId.Value);
+            if (channelId is null) return Result.Fail<string>(Errors.ChannelNotFound(channelId));
+            var channel = guild.GetVoiceChannel(channelId);
             if (channel is null) return Result.Fail<string>(Errors.ChannelNotFound(channelId));
 
             var usersInChannels = guild.GetUsersInVoiceChannels([channel.Id]).ToList();
@@ -103,8 +100,8 @@ public class DiscordGameActionService(
     {
         var gameState = gameStateStore.Get(gameId);
         if (gameState is null) return (Result.Fail<string>(Errors.GameNotFound(gameId)), default);
-        if (!ulong.TryParse(gameState.GuildId, out var guildId)) return (Result.Fail<string>(Errors.InvalidGuildId()), default);
-        var guild = bot.GetGuild(guildId);
+        if (gameState.GuildId is null) return (Result.Fail<string>(Errors.InvalidGuildId()), default);
+        var guild = bot.GetGuild(gameState.GuildId);
         if (guild is null) return (Result.Fail<string>(Errors.InvalidGuildId()), default);
         return (Result.Ok(string.Empty), (guild, gameState));
     }

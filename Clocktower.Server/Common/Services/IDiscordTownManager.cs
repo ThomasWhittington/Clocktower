@@ -6,9 +6,9 @@ public interface IDiscordTownManager
 {
     DiscordTown MoveUser(DiscordTown current, IDiscordGuildUser user, IDiscordVoiceChannel? newChannel);
     ChannelOccupants? FindUserChannel(DiscordTown occupants, string userId);
-    bool UpdateUserStatus(ulong guildId, string userId, bool isPresent, VoiceState discordVoiceState);
-    DiscordTown? GetDiscordTown(ulong guildId);
-    ulong? GetVoiceChannelIdByName(ulong guildId, string voiceChannelName);
+    bool UpdateUserStatus(string guildId, string userId, bool isPresent, VoiceState discordVoiceState);
+    DiscordTown? GetDiscordTown(string guildId);
+    string? GetVoiceChannelIdByName(string guildId, string voiceChannelName);
     TownUser? GetTownUser(string userId);
-    IEnumerable<MiniChannel> GetNightChannels(ulong guildId, string categoryName);
+    IEnumerable<MiniChannel> GetNightChannels(string guildId, string categoryName);
 }

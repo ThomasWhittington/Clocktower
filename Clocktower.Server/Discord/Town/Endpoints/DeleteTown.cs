@@ -14,9 +14,7 @@ public class DeleteTown : IEndpoint
 
     internal static async Task<Results<Ok<string>,  BadRequest<string>>> Handle([AsParameters] GuildIdRequest request, [FromServices] IDiscordTownService discordTownService)
     {
-        var guildId = ulong.Parse(request.GuildId);
-
-        var (success, message) = await discordTownService.DeleteTown(guildId);
+        var (success, message) = await discordTownService.DeleteTown(request.GuildId);
         return success ? TypedResults.Ok(message) : TypedResults.BadRequest(message);
     }
 }

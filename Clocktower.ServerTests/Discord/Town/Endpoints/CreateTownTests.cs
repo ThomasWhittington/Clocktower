@@ -36,11 +36,11 @@ public class CreateTownTests
         const string responseMessage = "response message";
         var request = new GuildIdRequest(CommonMethods.GetRandomSnowflakeStringId());
 
-        _mockDiscordTownService.Setup(o => o.CreateTown(ulong.Parse(request.GuildId))).ReturnsAsync((false, responseMessage));
+        _mockDiscordTownService.Setup(o => o.CreateTown(request.GuildId)).ReturnsAsync((false, responseMessage));
 
         var result = await CreateTown.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.CreateTown(ulong.Parse(request.GuildId)), Times.Once);
+        _mockDiscordTownService.Verify(o => o.CreateTown(request.GuildId), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
@@ -53,11 +53,11 @@ public class CreateTownTests
         const string responseMessage = "response message";
         var request = new GuildIdRequest(CommonMethods.GetRandomSnowflakeStringId());
 
-        _mockDiscordTownService.Setup(o => o.CreateTown(ulong.Parse(request.GuildId))).ReturnsAsync((true, responseMessage));
+        _mockDiscordTownService.Setup(o => o.CreateTown(request.GuildId)).ReturnsAsync((true, responseMessage));
 
         var result = await CreateTown.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.CreateTown(ulong.Parse(request.GuildId)), Times.Once);
+        _mockDiscordTownService.Verify(o => o.CreateTown(request.GuildId), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);

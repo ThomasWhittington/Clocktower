@@ -36,11 +36,11 @@ public class ToggleStoryTellerTests
         const string responseMessage = "response message";
         var request = new GameAndUserRequest(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId());
 
-        _mockDiscordTownService.Setup(o => o.ToggleStoryTeller(request.GameId.Trim(), ulong.Parse(request.UserId))).ReturnsAsync((false, responseMessage));
+        _mockDiscordTownService.Setup(o => o.ToggleStoryTeller(request.GameId.Trim(), request.UserId)).ReturnsAsync((false, responseMessage));
 
         var result = await ToggleStoryTeller.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.ToggleStoryTeller(request.GameId.Trim(), ulong.Parse(request.UserId)), Times.Once);
+        _mockDiscordTownService.Verify(o => o.ToggleStoryTeller(request.GameId.Trim(), request.UserId), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
@@ -53,11 +53,11 @@ public class ToggleStoryTellerTests
         const string responseMessage = "response message";
         var request = new GameAndUserRequest(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId());
 
-        _mockDiscordTownService.Setup(o => o.ToggleStoryTeller(request.GameId.Trim(), ulong.Parse(request.UserId))).ReturnsAsync((true, responseMessage));
+        _mockDiscordTownService.Setup(o => o.ToggleStoryTeller(request.GameId.Trim(), request.UserId)).ReturnsAsync((true, responseMessage));
 
         var result = await ToggleStoryTeller.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.ToggleStoryTeller(request.GameId.Trim(), ulong.Parse(request.UserId)), Times.Once);
+        _mockDiscordTownService.Verify(o => o.ToggleStoryTeller(request.GameId.Trim(), request.UserId), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);

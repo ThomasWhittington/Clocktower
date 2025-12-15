@@ -49,7 +49,7 @@ public static class ConfigureServices
 
             builder.AddSerilog();
             builder.AddSwagger();
-            builder.AddSignalR();
+            builder.Services.AddSignalR();
             builder.ConfigureJson();
             builder.Services.AddHttpClient();
             builder.Services.AddHttpContextAccessor();
@@ -93,7 +93,6 @@ public static class ConfigureServices
             builder.Services.ConfigureHttpJsonOptions(options =>
             {
                 options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                options.SerializerOptions.Converters.Add(new ULongToStringConverter());
             });
             builder.Services.Configure<JsonOptions>(options => { options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
         }
@@ -132,13 +131,7 @@ public static class ConfigureServices
                 });
             });
         }
-
-        private void AddSignalR()
-        {
-            builder.Services.AddSignalR()
-                .AddJsonProtocol(options => { options.PayloadSerializerOptions.Converters.Add(new ULongToStringConverter()); });
-        }
-
+        
         private void AddSerilog()
         {
             builder.Host.UseSerilog((context, configuration) => { configuration.ReadFrom.Configuration(context.Configuration); });

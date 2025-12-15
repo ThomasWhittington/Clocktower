@@ -33,13 +33,11 @@ public class MoveUserToChannelTests
     {
         const string responseMessage = "response message";
         var request = new MoveUserToChannel.Request(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomSnowflakeStringId());
-
-        _mockDiscordTownService.Setup(o => o.MoveUser(ulong.Parse(request.GuildId),ulong.Parse(request.UserId),ulong.Parse(request.ChannelId))).ReturnsAsync((false, responseMessage));
+        _mockDiscordTownService.Setup(o => o.MoveUser(request.GuildId,request.UserId,request.ChannelId)).ReturnsAsync((false, responseMessage));
 
         var result = await MoveUserToChannel.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.MoveUser(ulong.Parse(request.GuildId),ulong.Parse(request.UserId),ulong.Parse(request.ChannelId)), Times.Once);
-
+        _mockDiscordTownService.Verify(o => o.MoveUser(request.GuildId,request.UserId,request.ChannelId), Times.Once);
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
         response.Value.Should().Be(responseMessage);
@@ -50,13 +48,11 @@ public class MoveUserToChannelTests
     {
         const string responseMessage = "response message";
         var request = new MoveUserToChannel.Request(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomSnowflakeStringId());
-
-        _mockDiscordTownService.Setup(o => o.MoveUser(ulong.Parse(request.GuildId),ulong.Parse(request.UserId),ulong.Parse(request.ChannelId))).ReturnsAsync((true, responseMessage));
+        _mockDiscordTownService.Setup(o => o.MoveUser(request.GuildId,request.UserId,request.ChannelId)).ReturnsAsync((true, responseMessage));
 
         var result = await MoveUserToChannel.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.MoveUser(ulong.Parse(request.GuildId),ulong.Parse(request.UserId),ulong.Parse(request.ChannelId)), Times.Once);
-
+        _mockDiscordTownService.Verify(o => o.MoveUser(request.GuildId,request.UserId,request.ChannelId), Times.Once);
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);
         response.Value.Should().Be(responseMessage);

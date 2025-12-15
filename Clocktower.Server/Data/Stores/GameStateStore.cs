@@ -36,9 +36,7 @@ public class GameStateStore : IGameStateStore
     {
         return GetAll().Where(game => game.GuildId == guildId);
     }
-
-    public IEnumerable<GameState> GetGuildGames(ulong guildId) => GetGuildGames(guildId.ToString());
-
+    
     public IEnumerable<GameState> GetUserGames(string userId)
     {
         return GetAll().Where(game => game.Users.Select(o => o.Id).Contains(userId));
@@ -65,7 +63,7 @@ public class GameStateStore : IGameStateStore
     }
 
     public bool UpdateUser(string gameId,
-        ulong userId,
+        string userId,
         UserType? userType = null,
         bool? isPlaying = null)
     {

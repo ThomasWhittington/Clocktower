@@ -2,7 +2,7 @@
 
 public interface IDiscordCategoryChannel
 {
-    ulong Id { get; }
+    string Id { get; }
     string Name { get; }
     IEnumerable<IDiscordChannel> Channels { get; }
     IEnumerable<IDiscordVoiceChannel> VoiceChannels { get; }

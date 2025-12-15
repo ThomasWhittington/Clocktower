@@ -64,7 +64,7 @@ public class UserServiceTests
 
     #region UpdateGameUser
 
-    private void SetUp_UpdateGameUser(string gameId, ulong userId, UserType userType, bool? isPlaying, bool updateReturn)
+    private void SetUp_UpdateGameUser(string gameId, string userId, UserType userType, bool? isPlaying, bool updateReturn)
     {
         _mockGameStateStore.Setup(o => o.UpdateUser(gameId, userId, userType, isPlaying)).Returns(updateReturn);
     }
@@ -73,13 +73,13 @@ public class UserServiceTests
     public void UpdateGameUser_PassesParametersToStore_AndReturnsStoreResult()
     {
         const string gameId = "test-game";
-        const ulong userId = 123456L;
+        const string userId = "123456";
         const UserType userType = UserType.Player;
         const bool isPlaying = true;
         const bool updateReturn = false;
         SetUp_UpdateGameUser(gameId, userId, userType, isPlaying, updateReturn);
 
-        var result = _sut.UpdateGameUser(gameId, userId.ToString(), userType, isPlaying);
+        var result = _sut.UpdateGameUser(gameId, userId, userType, isPlaying);
 
         result.Should().Be(updateReturn);
     }
@@ -89,7 +89,7 @@ public class UserServiceTests
 
     #region UpdateDiscordPresence
 
-    private void SetUp_UpdateDiscordPresence(string userId, ulong guildId, bool isPresent, VoiceState voiceState, bool updateReturn)
+    private void SetUp_UpdateDiscordPresence(string userId, string guildId, bool isPresent, VoiceState voiceState, bool updateReturn)
     {
         _mockDiscordTownManager.Setup(o => o.UpdateUserStatus(guildId, userId, isPresent, voiceState)).Returns(updateReturn);
     }
@@ -98,17 +98,17 @@ public class UserServiceTests
     public void UpdateDiscordPresence_PassesParametersToStore_AndReturnsStoreResult()
     {
         const string userId = "123456";
-        const ulong guildId = 987654L;
+        const string guildId = "987654";
         const bool isPresent = true;
         var voiceState = new VoiceState(true, false, true, false);
         const bool updateReturn = true;
         SetUp_UpdateDiscordPresence(userId, guildId, isPresent, voiceState, updateReturn);
 
-        var result = _sut.UpdateDiscordPresence(userId, guildId.ToString(), isPresent, voiceState);
+        var result = _sut.UpdateDiscordPresence(userId, guildId, isPresent, voiceState);
 
         result.Should().Be(updateReturn);
     }
-    
+
     #endregion
 
     #region GetTownUsersForGameUsers
@@ -118,7 +118,7 @@ public class UserServiceTests
     {
         var gameUsers = new[] { new GameUser("user1") };
         const string guildId = "guild123";
-        
+
         _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns((DiscordTown?)null);
 
         var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId);
@@ -132,7 +132,7 @@ public class UserServiceTests
         var gameUsers = Array.Empty<GameUser>();
         const string guildId = "guild123";
         var discordTown = CreateDiscordTown();
-        
+
         _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
         var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId);
@@ -143,17 +143,17 @@ public class UserServiceTests
     [TestMethod]
     public void GetTownUsersForGameUsers_ReturnsMatchingUsers_WhenUsersFound()
     {
-        var gameUsers = new[] 
-        { 
-            new GameUser("user1"), 
-            new GameUser("user2") 
+        var gameUsers = new[]
+        {
+            new GameUser("user1"),
+            new GameUser("user2")
         };
         const string guildId = "guild123";
-        
+
         var townUser1 = new TownUser("user1", "User One", "Avatar1");
         var townUser2 = new TownUser("user2", "User Two", "Avatar2");
         var townUser3 = new TownUser("user3", "User Three", "Avatar3");
-        
+
         var discordTown = CreateDiscordTown(townUser1, townUser2, townUser3);
         _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
@@ -168,16 +168,16 @@ public class UserServiceTests
     [TestMethod]
     public void GetTownUsersForGameUsers_AppliesFilter_WhenFilterProvided()
     {
-        var gameUsers = new[] 
-        { 
-            new GameUser("user1"), 
-            new GameUser("user2") 
+        var gameUsers = new[]
+        {
+            new GameUser("user1"),
+            new GameUser("user2")
         };
         const string guildId = "guild123";
-        
+
         var townUser1 = new TownUser("user1", "User One", "Avatar1") { IsPresent = true };
         var townUser2 = new TownUser("user2", "User Two", "Avatar2") { IsPresent = false };
-        
+
         var discordTown = CreateDiscordTown(townUser1, townUser2);
         _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
@@ -193,7 +193,7 @@ public class UserServiceTests
     {
         var gameUsers = new[] { new GameUser("user1") };
         const string guildId = "guild123";
-        
+
         var townUser1 = new TownUser("user1", "User One", "Avatar1") { IsPresent = false };
         var discordTown = CreateDiscordTown(townUser1);
         _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
@@ -206,22 +206,22 @@ public class UserServiceTests
     [TestMethod]
     public void GetTownUsersForGameUsers_ReturnsUsersFromMultipleChannels()
     {
-        var gameUsers = new[] 
-        { 
-            new GameUser("user1"), 
-            new GameUser("user2") 
+        var gameUsers = new[]
+        {
+            new GameUser("user1"),
+            new GameUser("user2")
         };
         const string guildId = "guild123";
-        
+
         var townUser1 = new TownUser("user1", "User One", "Avatar1");
         var townUser2 = new TownUser("user2", "User Two", "Avatar2");
-        
+
         var channel1 = new ChannelOccupants(new MiniChannel("ch1", "Channel 1"), [townUser1]);
         var channel2 = new ChannelOccupants(new MiniChannel("ch2", "Channel 2"), [townUser2]);
-        
+
         var category = new MiniCategory("cat1", "Test Category", [channel1, channel2]);
         var discordTown = new DiscordTown([category]);
-        
+
         _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
         var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId).ToArray();
@@ -234,24 +234,24 @@ public class UserServiceTests
     [TestMethod]
     public void GetTownUsersForGameUsers_ReturnsUsersFromMultipleCategories()
     {
-        var gameUsers = new[] 
-        { 
-            new GameUser("user1"), 
-            new GameUser("user2") 
+        var gameUsers = new[]
+        {
+            new GameUser("user1"),
+            new GameUser("user2")
         };
         const string guildId = "guild123";
-        
+
         var townUser1 = new TownUser("user1", "User One", "Avatar1");
         var townUser2 = new TownUser("user2", "User Two", "Avatar2");
-        
+
         var channel1 = new ChannelOccupants(new MiniChannel("ch1", "Channel 1"), [townUser1]);
         var channel2 = new ChannelOccupants(new MiniChannel("ch2", "Channel 2"), [townUser2]);
-        
+
         var category1 = new MiniCategory("cat1", "Category 1", [channel1]);
         var category2 = new MiniCategory("cat2", "Category 2", [channel2]);
-        
+
         var discordTown = new DiscordTown([category1, category2]);
-        
+
         _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
         var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId).ToArray();
@@ -266,7 +266,7 @@ public class UserServiceTests
     {
         var gameUsers = new[] { new GameUser("user1") };
         const string guildId = "specific-guild-123";
-        
+
         _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns((DiscordTown?)null);
 
         _ = _sut.GetTownUsersForGameUsers(gameUsers, guildId).ToList();
@@ -277,12 +277,13 @@ public class UserServiceTests
     private static DiscordTown CreateDiscordTown(params TownUser[] users)
     {
         var channel = new ChannelOccupants(
-            new MiniChannel("channel1", "Test Channel"), 
+            new MiniChannel("channel1", "Test Channel"),
             users);
-        
+
         var category = new MiniCategory("category1", "Test Category", [channel]);
-        
+
         return new DiscordTown([category]);
     }
+
     #endregion
 }

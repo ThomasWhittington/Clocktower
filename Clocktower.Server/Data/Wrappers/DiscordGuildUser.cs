@@ -6,8 +6,8 @@ namespace Clocktower.Server.Data.Wrappers;
 [ExcludeFromCodeCoverage(Justification = "Discord.NET wrapper")]
 public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
 {
-    public ulong Id => user.Id;
-    public ulong GuildId => user.Guild.Id;
+    public string Id => user.Id.ToString();
+    public string GuildId => user.Guild.Id.ToString();
     public string DisplayName => user.DisplayName;
     public string DisplayAvatarUrl => user.GetDisplayAvatarUrl();
     public bool IsServerMuted => user.IsMuted;
@@ -31,20 +31,23 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
 
     public async Task MoveAsync(IDiscordVoiceChannel channel)
     {
-        await user.ModifyAsync(x => x.ChannelId = channel.Id);
+        var id = ulong.Parse(channel.Id);
+        await user.ModifyAsync(x => x.ChannelId = id);
     }
 
     public async Task RemoveRoleAsync(IDiscordRole role)
     {
-        await user.RemoveRoleAsync(role.Id);
+        var id = ulong.Parse(role.Id);
+        await user.RemoveRoleAsync(id);
     }
 
     public async Task AddRoleAsync(IDiscordRole role)
     {
-        await user.AddRoleAsync(role.Id);
+        var id = ulong.Parse(role.Id);
+        await user.AddRoleAsync(id);
     }
 
-    public bool DoesUserHaveRole(ulong roleId)
+    public bool DoesUserHaveRole(string roleId)
     {
         return Roles.Any(o => o.Id == roleId);
     }

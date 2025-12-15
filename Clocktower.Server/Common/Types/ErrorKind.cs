@@ -38,6 +38,6 @@ public static class Errors
     public static AppError InvalidGuildId() =>
         new(ErrorKind.Invalid, "guild.invalid_id", "GameState contained a guildId that is not valid");
 
-    public static AppError ChannelNotFound(ulong? channelId) =>
+    public static AppError ChannelNotFound(string? channelId) =>
         new(ErrorKind.Invalid, "channel.not_found", $"The required channel could not be found: '{channelId}'");
 }

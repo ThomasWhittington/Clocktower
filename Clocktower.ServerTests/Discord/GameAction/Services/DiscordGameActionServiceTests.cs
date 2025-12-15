@@ -26,11 +26,12 @@ public class DiscordGameActionServiceTests
 
     private void SetUp_Bot(bool hasGuild)
     {
-        _mockBot.Setup(o => o.GetGuild(ulong.Parse(GuildId))).Returns(hasGuild ? _guild.Object : null);
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? _guild.Object : null);
     }
 
     private void SetUp_GameStateStore(bool hasGame, bool checkMuted = false, string guildId = GuildId, (string userId, bool isPresent, bool muted, UserType userType)[]? users = null)
     {
+        _guild.Setup(o => o.Id).Returns(guildId);
         _gameState.Id = GameId;
         _gameState.GuildId = guildId;
         _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(hasGame ? _gameState : null);

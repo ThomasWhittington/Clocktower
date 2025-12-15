@@ -2,7 +2,7 @@
 
 public interface IDiscordRole
 {
+    string Id { get; }
     string Name { get; }
-    ulong Id { get; }
     Task DeleteAsync();
 }

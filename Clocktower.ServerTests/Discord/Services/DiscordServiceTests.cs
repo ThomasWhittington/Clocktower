@@ -23,7 +23,7 @@ public class DiscordServiceTests
     [TestMethod]
     public async Task SendMessage_ReturnsFalse_WhenUserNotFound()
     {
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
         var message = CommonMethods.GetRandomString();
 
         _mockBot.Setup(o => o.GetUserAsync(userId)).ReturnsAsync((IDiscordUser)null!);
@@ -37,7 +37,7 @@ public class DiscordServiceTests
     [TestMethod]
     public async Task SendMessage_ReturnsFalse_WhenDmChannelFailed()
     {
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
         var message = CommonMethods.GetRandomString();
 
         var mockUser = new Mock<IDiscordUser>();
@@ -58,7 +58,7 @@ public class DiscordServiceTests
     [TestMethod]
     public async Task SendMessage_ReturnsTrue_WhenMessageIsSent()
     {
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
         var message = CommonMethods.GetRandomString();
 
         var mockUser = new Mock<IDiscordUser>();
@@ -80,7 +80,7 @@ public class DiscordServiceTests
     [TestMethod]
     public async Task SendMessage_ReturnsFalse_WhenExceptionThrown()
     {
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
         var message = CommonMethods.GetRandomString();
 
         _mockBot.Setup(o => o.GetUserAsync(userId)).Throws<Exception>();
@@ -98,7 +98,7 @@ public class DiscordServiceTests
     [TestMethod]
     public void CheckGuildId_ReturnsFalse_WhenGuildNotFound()
     {
-        var guildId = CommonMethods.GetRandomSnowflakeNumberId();
+        var guildId = CommonMethods.GetRandomSnowflakeStringId();
         _mockBot.Setup(o => o.GetGuild(guildId)).Returns((DiscordGuild)null!);
 
         var result = Sut.CheckGuildId(guildId);
@@ -111,7 +111,7 @@ public class DiscordServiceTests
     [TestMethod]
     public void CheckGuildId_ReturnsTrue_WhenGuildFound()
     {
-        var guildId = CommonMethods.GetRandomSnowflakeNumberId();
+        var guildId = CommonMethods.GetRandomSnowflakeStringId();
         var guildName = CommonMethods.GetRandomString();
 
         var mockGuild = MockMaker.CreateMockDiscordGuild(guildId, guildName);
@@ -130,7 +130,7 @@ public class DiscordServiceTests
     [TestMethod]
     public void CheckGuildId_ReturnsFalse_WhenExceptionThrown()
     {
-        var guildId = CommonMethods.GetRandomSnowflakeNumberId();
+        var guildId = CommonMethods.GetRandomSnowflakeStringId();
         _mockBot.Setup(o => o.GetGuild(guildId)).Throws<Exception>();
 
         var result = Sut.CheckGuildId(guildId);
@@ -147,7 +147,7 @@ public class DiscordServiceTests
     [TestMethod]
     public void GetGuildsWithUser_ReturnsEmpty_WhenNoGuildsReturned()
     {
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
 
         _mockBot.Setup(o => o.GetGuilds()).Returns([]);
 
@@ -161,14 +161,14 @@ public class DiscordServiceTests
     [TestMethod]
     public void GetGuildsWithUser_ReturnsEmpty_WhenUserNotAdministrator()
     {
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
         var user = MockMaker.CreateMockDiscordGuildUser(userId);
 
 
         var guilds = new List<IDiscordGuild>
         {
-            MockMaker.CreateMockDiscordGuild(CommonMethods.GetRandomSnowflakeNumberId(), CommonMethods.GetRandomString(), [user]),
-            MockMaker.CreateMockDiscordGuild(CommonMethods.GetRandomSnowflakeNumberId(), CommonMethods.GetRandomString(), [user])
+            MockMaker.CreateMockDiscordGuild(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [user]),
+            MockMaker.CreateMockDiscordGuild(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [user])
         };
 
         _mockBot.Setup(o => o.GetGuilds()).Returns(guilds);
@@ -183,20 +183,20 @@ public class DiscordServiceTests
     [TestMethod]
     public void GetGuildsWithUser_ReturnsGuilds_WhenUserIsAdministrator()
     {
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
-        
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
+
         var guilds = new List<IDiscordGuild>
         {
-            MockMaker.CreateMockDiscordGuild(1UL, "guild1", [
+            MockMaker.CreateMockDiscordGuild("1", "guild1", [
                 MockMaker.CreateMockDiscordGuildUser(userId, true)
             ]),
-            MockMaker.CreateMockDiscordGuild(2UL, "guild2", [
+            MockMaker.CreateMockDiscordGuild("2", "guild2", [
                 MockMaker.CreateMockDiscordGuildUser(userId)
             ]),
-            MockMaker.CreateMockDiscordGuild(3UL, "guild3", [
+            MockMaker.CreateMockDiscordGuild("3", "guild3", [
                 MockMaker.CreateMockDiscordGuildUser(userId, true)
             ]),
-            MockMaker.CreateMockDiscordGuild(4UL, "guild4")
+            MockMaker.CreateMockDiscordGuild("4", "guild4")
         };
 
         var expectedArr = new List<IDiscordGuild> { guilds[0], guilds[2] };
@@ -215,7 +215,7 @@ public class DiscordServiceTests
     [TestMethod]
     public void GetGuildsWithUser_ReturnsFalse_WhenExceptionThrown()
     {
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
         _mockBot.Setup(o => o.GetGuilds()).Throws<Exception>();
 
         var result = Sut.GetGuildsWithUser(userId);

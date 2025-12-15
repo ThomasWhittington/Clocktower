@@ -12,9 +12,7 @@ public class StartGame : IEndpoint
     internal static Results<Created<GameState>, BadRequest<string>> Handle([AsParameters] Request request, [FromServices] IGameStateService gameStateService)
     {
         var gameId = request.GameId.Trim();
-        var userId = ulong.Parse(request.UserId);
-
-        var result = gameStateService.StartNewGame(request.GuildId, gameId, userId);
+        var result = gameStateService.StartNewGame(request.GuildId, gameId, request.UserId);
 
         return result.success ? TypedResults.Created($"/games/{result.gameState!.Id}", result.gameState) : TypedResults.BadRequest(result.message);
     }

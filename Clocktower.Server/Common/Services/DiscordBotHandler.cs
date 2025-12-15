@@ -15,29 +15,29 @@ public class DiscordBotHandler(
     public async Task HandleUserVoiceStateUpdate(IDiscordUser user, IDiscordVoiceState before, IDiscordVoiceState after)
     {
         var guildId = after.GuildId ?? before.GuildId;
-        if (!guildId.HasValue) return;
+        if (guildId is null) return;
         var guildUser = user.GetGuildUser();
         if (guildUser is null) return;
-        var gameStates = gameStateStore.GetGuildGames(guildId.Value);
+        var gameStates = gameStateStore.GetGuildGames(guildId);
 
         var channelsAreSame = before.VoiceChannel?.Id == after.VoiceChannel?.Id;
         if (channelsAreSame)
         {
             foreach (var gameState in gameStates)
             {
-                await UpdateVoiceStatus(guildUser, after, gameState.Id, guildId.Value);
+                await UpdateVoiceStatus(guildUser, after, gameState.Id, guildId);
             }
         }
         else
         {
             foreach (var gameState in gameStates)
             {
-                await UpdateDiscordTown(guildUser, after, gameState.Id, guildId.Value);
+                await UpdateDiscordTown(guildUser, after, gameState.Id, guildId);
             }
         }
     }
 
-    public virtual async Task UpdateDiscordTown(IDiscordGuildUser user, IDiscordVoiceState after, string gameId, ulong guildId)
+    public virtual async Task UpdateDiscordTown(IDiscordGuildUser user, IDiscordVoiceState after, string gameId, string guildId)
     {
         using var scope = serviceScopeFactory.CreateScope();
         var townService = scope.ServiceProvider.GetRequiredService<IDiscordTownService>();
@@ -48,12 +48,12 @@ public class DiscordBotHandler(
         await notificationService.BroadcastDiscordTownUpdate(gameId, newDiscordTown);
     }
 
-    public virtual async Task UpdateVoiceStatus(IDiscordGuildUser user, IDiscordVoiceState after, string gameId, ulong guildId)
+    public virtual async Task UpdateVoiceStatus(IDiscordGuildUser user, IDiscordVoiceState after, string gameId, string guildId)
     {
         bool inVoice = after.VoiceChannel != null;
         var discordVoiceState = new VoiceState(after.IsMuted, after.IsDeafened, after.IsSelfMuted, after.IsSelfDeafened);
 
-        userService.UpdateDiscordPresence(user.Id.ToString(), guildId.ToString(), inVoice, discordVoiceState);
+        userService.UpdateDiscordPresence(user.Id.ToString(), guildId, inVoice, discordVoiceState);
 
         var discordTown = discordDiscordTownManager.GetDiscordTown(guildId);
         if (discordTown is not null)

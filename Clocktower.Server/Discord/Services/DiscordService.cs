@@ -4,7 +4,7 @@ namespace Clocktower.Server.Discord.Services;
 
 public class DiscordService(IDiscordBot bot) : IDiscordService
 {
-    public (bool success, string guildName, string message) CheckGuildId(ulong guildId)
+    public (bool success, string guildName, string message) CheckGuildId(string guildId)
     {
         try
         {
@@ -22,7 +22,7 @@ public class DiscordService(IDiscordBot bot) : IDiscordService
         }
     }
 
-    public (bool success, List<MiniGuild> guilds, string message) GetGuildsWithUser(ulong userId)
+    public (bool success, List<MiniGuild> guilds, string message) GetGuildsWithUser(string userId)
     {
         try
         {
@@ -36,7 +36,7 @@ public class DiscordService(IDiscordBot bot) : IDiscordService
                 if (member == null) continue;
                 if (member.IsAdministrator())
                 {
-                    miniGuilds.Add(new MiniGuild(discordGuild.Id.ToString(), discordGuild.Name));
+                    miniGuilds.Add(new MiniGuild(discordGuild.Id, discordGuild.Name));
                 }
             }
 
@@ -48,7 +48,7 @@ public class DiscordService(IDiscordBot bot) : IDiscordService
         }
     }
 
-    public async Task<(bool success, string message)> SendMessage(ulong userId, string message)
+    public async Task<(bool success, string message)> SendMessage(string userId, string message)
     {
         try
         {

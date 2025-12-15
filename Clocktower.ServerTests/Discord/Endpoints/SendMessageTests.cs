@@ -32,9 +32,9 @@ public class SendMessageTests
     [TestMethod]
     public async Task Handle_ReturnsBadRequest_WhenServiceSendMessageReturnsFalse()
     {
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
         const string message = "send this";
-        var request = new SendMessage.Request(userId.ToString(), message);
+        var request = new SendMessage.Request(userId, message);
         _mockDiscordService.Setup(o => o.SendMessage(userId, message)).ReturnsAsync((false, ResponseMessage));
 
         var result = await SendMessage.Handle(request, _mockDiscordService.Object);
@@ -49,9 +49,9 @@ public class SendMessageTests
     [TestMethod]
     public async Task Handle_ReturnsOk_WhenServiceSendMessageReturnsTrue()
     {
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
         const string message = "send this";
-        var request = new SendMessage.Request(userId.ToString(), message);
+        var request = new SendMessage.Request(userId, message);
         _mockDiscordService.Setup(o => o.SendMessage(userId, message)).ReturnsAsync((true, ResponseMessage));
 
         var result = await SendMessage.Handle(request, _mockDiscordService.Object);

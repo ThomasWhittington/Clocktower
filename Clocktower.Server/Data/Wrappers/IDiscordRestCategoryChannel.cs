@@ -2,5 +2,5 @@
 
 public interface IDiscordRestCategoryChannel
 {
-    ulong Id { get; }
+    string Id { get; }
 }

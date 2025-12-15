@@ -6,5 +6,5 @@ namespace Clocktower.Server.Data.Wrappers;
 [ExcludeFromCodeCoverage(Justification = "Discord.NET wrapper")]
 public class DiscordRestCategoryChannel(RestCategoryChannel channel) : IDiscordRestCategoryChannel
 {
-    public ulong Id => channel.Id;
+    public string Id => channel.Id.ToString();
 }

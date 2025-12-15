@@ -13,10 +13,10 @@ public class DiscordBotHandlerTests
 {
     private IDiscordBotHandler Sut => _mockHandler.Object;
 
-    private const ulong ChannelId1 = 1L;
-    private const ulong ChannelId2 = 2L;
-    private const ulong GuildId = 3L;
-    private const ulong UserId = 4L;
+    private const string ChannelId1 = "1";
+    private const string ChannelId2 = "2";
+    private const string GuildId = "3";
+    private const string UserId = "4";
 
     private Mock<DiscordBotHandler> _mockHandler = null!;
     private Mock<IGameStateStore> _mockGameStateStore = null!;
@@ -58,7 +58,7 @@ public class DiscordBotHandlerTests
         _mockScope.Setup(s => s.ServiceProvider).Returns(_mockServiceProvider.Object);
 
         _mockServiceProvider.Setup(sp => sp.GetService(typeof(IDiscordTownService))).Returns(_mockTownService.Object);
-        _mockTownService.Setup(ts => ts.GetDiscordTown(It.IsAny<ulong>()))
+        _mockTownService.Setup(ts => ts.GetDiscordTown(It.IsAny<string>()))
             .ReturnsAsync((false, null, "Test failure"));
 
         _mockHandler = new Mock<DiscordBotHandler>
@@ -92,7 +92,7 @@ public class DiscordBotHandlerTests
         _after.Setup(o => o.IsDeafened).Returns(isServerDeafened);
         _after.Setup(o => o.IsSelfDeafened).Returns(isSelfDeafened);
         _after.Setup(o => o.VoiceChannel).Returns(inVoice ? _voiceChannel2.Object : null);
-        _mockDiscordTownManager.Setup(o => o.UpdateUserStatus(GuildId, UserId.ToString(), inVoice, It.Is<VoiceState>(ms =>
+        _mockDiscordTownManager.Setup(o => o.UpdateUserStatus(GuildId, UserId, inVoice, It.Is<VoiceState>(ms =>
             ms.IsSelfMuted == isSelfMuted &&
             ms.IsSelfDeafened == isSelfDeafened &&
             ms.IsServerDeafened == isServerDeafened &&
@@ -102,7 +102,7 @@ public class DiscordBotHandlerTests
     }
 
 
-    private void Setup_Mocks(ulong? beforeGuildId = GuildId, ulong? afterGuildId = GuildId, bool hasGuildUser = true, string[]? gameIds = null, Mock<IDiscordVoiceChannel>? beforeChannel = null, Mock<IDiscordVoiceChannel>? afterChannel = null)
+    private void Setup_Mocks(string? beforeGuildId = GuildId, string? afterGuildId = GuildId, bool hasGuildUser = true, string[]? gameIds = null, Mock<IDiscordVoiceChannel>? beforeChannel = null, Mock<IDiscordVoiceChannel>? afterChannel = null)
     {
         _before.Setup(o => o.GuildId).Returns(beforeGuildId);
         _after.Setup(o => o.GuildId).Returns(afterGuildId);
@@ -252,7 +252,7 @@ public class DiscordBotHandlerTests
     public async Task UpdateDiscordTown_NotifiesClients_WhenNoGame()
     {
         var dummyDiscordTown = GetDummyDiscordTown();
-        Setup_UpdateDiscordTown( getDiscordTownValue: dummyDiscordTown);
+        Setup_UpdateDiscordTown(getDiscordTownValue: dummyDiscordTown);
 
         await Sut.UpdateDiscordTown(_guildUser.Object, _after.Object, string.Empty, GuildId);
 
@@ -285,7 +285,7 @@ public class DiscordBotHandlerTests
 
         await Sut.UpdateVoiceStatus(_guildUser.Object, _after.Object, gameId, GuildId);
 
-        _mockUserService.Verify(o => o.UpdateDiscordPresence(UserId.ToString(), GuildId.ToString(),
+        _mockUserService.Verify(o => o.UpdateDiscordPresence(UserId, GuildId,
             inVoice,
             It.Is<VoiceState>(voiceState =>
                 voiceState.IsServerMuted == isServerMuted &&

@@ -2,10 +2,10 @@
 
 public interface IDiscordVoiceChannel
 {
-    ulong Id { get; }
+    string Id { get; }
     string Name { get; }
     IEnumerable<IDiscordGuildUser> ConnectedUsers { get; }
-    ulong? CategoryId { get; }
+    string? CategoryId { get; }
     int Position { get; }
     IDiscordGuild Guild { get; }
 }

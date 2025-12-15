@@ -27,10 +27,10 @@ public class UserService(IDiscordTownStore discordTownStore, IGameStateStore gam
     }
 
     public bool UpdateDiscordPresence(string userId, string guildId, bool isPresent, VoiceState voiceState) =>
-        discordTownManager.UpdateUserStatus(ulong.Parse(guildId), userId, isPresent: isPresent, discordVoiceState: voiceState);
+        discordTownManager.UpdateUserStatus(guildId, userId, isPresent: isPresent, discordVoiceState: voiceState);
 
     public bool UpdateGameUser(string gameId, string userId, UserType? userType = null, bool? isPlaying = null) =>
-        gameStore.UpdateUser(gameId, ulong.Parse(userId), userType: userType, isPlaying: isPlaying);
+        gameStore.UpdateUser(gameId, userId, userType: userType, isPlaying: isPlaying);
 
     public string? GetUserName(string userId) => discordTownManager.GetTownUser(userId)?.Name;
 }

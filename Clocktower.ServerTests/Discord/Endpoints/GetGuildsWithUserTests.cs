@@ -36,8 +36,8 @@ public class GetGuildsWithUserTests
     [TestMethod]
     public void Handle_ReturnsBadRequest_WhenServiceGetGuildsWithUserReturnsFalse()
     {
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
-        var request = new UserIdRequest(userId.ToString());
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
+        var request = new UserIdRequest(userId);
 
         var guilds = new List<MiniGuild>
         {
@@ -59,8 +59,8 @@ public class GetGuildsWithUserTests
     [TestMethod]
     public void Handle_ReturnsOk_WhenServiceGetGuildsWithUserReturnsTrue()
     {
-        var userId = CommonMethods.GetRandomSnowflakeNumberId();
-        var request = new UserIdRequest(userId.ToString());
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
+        var request = new UserIdRequest(userId);
 
         var guilds = new List<MiniGuild>
         {

@@ -13,11 +13,7 @@ public class MoveUserToChannel : IEndpoint
 
     internal static async Task<Results<Ok<string>, BadRequest<string>>> Handle([AsParameters] Request request, IDiscordTownService discordTownService)
     {
-        var guildId = ulong.Parse(request.GuildId);
-        var userId = ulong.Parse(request.UserId);
-        var channelId = ulong.Parse(request.ChannelId);
-
-        var (success, message) = await discordTownService.MoveUser(guildId, userId, channelId);
+        var (success, message) = await discordTownService.MoveUser(request.GuildId, request.UserId, request.ChannelId);
         return success ? TypedResults.Ok(message) : TypedResults.BadRequest(message);
     }
 

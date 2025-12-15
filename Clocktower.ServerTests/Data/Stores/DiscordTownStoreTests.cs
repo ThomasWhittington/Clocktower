@@ -44,27 +44,27 @@ public class DiscordTownStoreTests
     [TestMethod]
     public void Set_WhenGuildDoesNotExist_ReturnsTrue()
     {
-        var result = _sut.Set("guild1", _dummy);
+        var result = _sut.Set("1", _dummy);
 
         result.Should().BeTrue();
-        _sut.Get("guild1").Should().Be(_dummy);
+        _sut.Get("1").Should().Be(_dummy);
     }
 
     [TestMethod]
     public void Set_WhenGuildAlreadyExists_ReturnsFalse()
     {
-        _sut.Set("guild1", _dummy);
+        _sut.Set("1", _dummy);
 
-        var result = _sut.Set("guild1", new DiscordTown([]));
+        var result = _sut.Set("1", new DiscordTown([]));
 
         result.Should().BeFalse();
-        _sut.Get("guild1").Should().BeEquivalentTo(_dummy);
+        _sut.Get("1").Should().BeEquivalentTo(_dummy);
     }
 
     [TestMethod]
     public void Get_ReturnsNull_WhenGuildDoesNotExist()
     {
-        var result = _sut.Get("nonexistent");
+        var result = _sut.Get("9999");
 
         result.Should().BeNull();
     }
@@ -72,7 +72,7 @@ public class DiscordTownStoreTests
     [TestMethod]
     public void Get_ReturnsNull_WhenNoGuildId()
     {
-        var result = _sut.Get((string?)null);
+        var result = _sut.Get(null);
 
         result.Should().BeNull();
     }
@@ -80,19 +80,19 @@ public class DiscordTownStoreTests
     [TestMethod]
     public void TryUpdate_WhenGuildExists_UpdatesAndReturnsTrue()
     {
-        _sut.Set("guild1", _dummy);
+        _sut.Set("1", _dummy);
         var newOccupants = new DiscordTown([]);
 
-        var result = _sut.TryUpdate("guild1", _ => newOccupants);
+        var result = _sut.TryUpdate("1", _ => newOccupants);
 
         result.Should().BeTrue();
-        _sut.Get("guild1").Should().Be(newOccupants);
+        _sut.Get("1").Should().Be(newOccupants);
     }
 
     [TestMethod]
     public void TryUpdate_WhenGuildDoesNotExist_ReturnsFalse()
     {
-        var result = _sut.TryUpdate("nonexistent", _ => _dummy);
+        var result = _sut.TryUpdate("9999", _ => _dummy);
 
         result.Should().BeFalse();
     }
@@ -100,44 +100,32 @@ public class DiscordTownStoreTests
     [TestMethod]
     public void Remove_WhenGuildExists_RemovesAndReturnsTrue()
     {
-        _sut.Set("guild1", _dummy);
+        _sut.Set("1", _dummy);
 
-        var result = _sut.Remove("guild1");
+        var result = _sut.Remove("1");
 
         result.Should().BeTrue();
-        _sut.Get("guild1").Should().BeNull();
+        _sut.Get("1").Should().BeNull();
     }
-
-    [TestMethod]
-    public void UlongOverloads_WorkCorrectly()
-    {
-        const ulong guildId = 123456789UL;
-
-        _sut.Set(guildId, _dummy).Should().BeTrue();
-        _sut.Get((ulong?)null).Should().BeNull();
-        _sut.Get(guildId).Should().Be(_dummy);
-        _sut.TryUpdate(guildId, _ => _dummy);
-        _sut.Remove(guildId).Should().BeTrue();
-    }
-
+    
     [TestMethod]
     public void Clear_RemovesAllEntries()
     {
-        _sut.Set("guild1", _dummy);
-        _sut.Set("guild2", _dummy);
+        _sut.Set("1", _dummy);
+        _sut.Set("2", _dummy);
 
         _sut.Clear();
 
-        _sut.Get("guild1").Should().BeNull();
-        _sut.Get("guild2").Should().BeNull();
+        _sut.Get("1").Should().BeNull();
+        _sut.Get("2").Should().BeNull();
     }
-    
+
     [TestMethod]
     public void GetTownByUser_UserNotInTown_ReturnsNull()
     {
         var store = new DiscordTownStore();
-        const string userId = "user123";
-        const string guildId = "guild456";
+        const string userId = "123";
+        const string guildId = "456";
         var discordTown = GetDummyDiscordTown();
         store.Set(guildId, discordTown);
 
@@ -150,8 +138,8 @@ public class DiscordTownStoreTests
     public void GetTownByUser_UserExistsInTown_ReturnsDiscordTown()
     {
         var store = new DiscordTownStore();
-        const string userId = "user123";
-        const string guildId = "guild456";
+        const string userId = "123";
+        const string guildId = "456";
         var discordTown = CreateTownWithUser(userId);
         store.Set(guildId, discordTown);
 
@@ -165,14 +153,14 @@ public class DiscordTownStoreTests
     public void GetTownByUser_UserInMultipleTowns_ReturnsFirstMatch()
     {
         var store = new DiscordTownStore();
-        const string userId = "user123";
+        const string userId = "123";
         var town1 = CreateTownWithUser(userId);
         var town2 = CreateTownWithUser(userId);
-        store.Set("guild1", town1);
-        store.Set("guild2", town2);
-        
+        store.Set("1", town1);
+        store.Set("2", town2);
+
         var result = store.GetTownByUser(userId);
-        
+
         result.Should().NotBeNull();
         result.Should().BeOneOf(town1, town2);
     }

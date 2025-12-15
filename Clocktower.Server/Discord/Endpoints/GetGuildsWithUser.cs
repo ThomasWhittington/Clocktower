@@ -14,9 +14,8 @@ public class GetGuildsWithUser : IEndpoint
 
     internal static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] UserIdRequest request, [FromServices] IDiscordService discordService)
     {
-        var userId = ulong.Parse(request.UserId);
 
-        var (success, guilds, message) = discordService.GetGuildsWithUser(userId);
+        var (success, guilds, message) = discordService.GetGuildsWithUser(request.UserId);
         return success ? TypedResults.Ok(new Response(guilds)) : TypedResults.BadRequest(message);
     }
 

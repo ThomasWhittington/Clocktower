@@ -14,9 +14,7 @@ public class SendMessage : IEndpoint
 
     internal static async Task<Results<Ok, BadRequest<string>>> Handle([FromBody] Request request, [FromServices] IDiscordService discordService)
     {
-        var userId = ulong.Parse(request.UserId);
-
-        var (success, message) = await discordService.SendMessage(userId, request.Message);
+        var (success, message) = await discordService.SendMessage(request.UserId, request.Message);
         return success ? TypedResults.Ok() : TypedResults.BadRequest(message);
     }
 

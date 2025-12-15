@@ -7,7 +7,7 @@ namespace Clocktower.Server.Data.Wrappers;
 [ExcludeFromCodeCoverage(Justification = "Discord.NET wrapper")]
 public class DiscordGuild(SocketGuild guild) : IDiscordGuild
 {
-    public ulong Id => guild.Id;
+    public string Id => guild.Id.ToString();
     public string Name => guild.Name;
     public IEnumerable<IDiscordGuildUser> Users => guild.Users.Select(user => new DiscordGuildUser(user));
     public IEnumerable<IDiscordRole> Roles => guild.Roles.Select(role => new DiscordRole(role));
@@ -39,9 +39,10 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         }
     }
 
-    public IDiscordGuildUser? GetUser(ulong userId)
+    public IDiscordGuildUser? GetUser(string userId)
     {
-        var user = guild.GetUser(userId);
+        var id = ulong.Parse(userId);
+        var user = guild.GetUser(id);
         return user != null ? new DiscordGuildUser(user) : null;
     }
 
@@ -50,14 +51,10 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         await member.MoveAsync(channel);
     }
 
-    public IDiscordVoiceChannel GetVoiceChannel(ulong channelId)
-    {
-        return new DiscordVoiceChannel(guild.GetVoiceChannel(channelId));
-    }
-
     public IDiscordVoiceChannel GetVoiceChannel(string channelId)
     {
-        return GetVoiceChannel(ulong.Parse(channelId));
+        var id = ulong.Parse(channelId);
+        return new DiscordVoiceChannel(guild.GetVoiceChannel(id));
     }
 
     public IDiscordRole? GetRole(string roleName)
@@ -66,11 +63,12 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         return role != null ? new DiscordRole(role) : null;
     }
 
-    public async Task<bool> CreateVoiceChannelsForCategoryAsync(string[] channelNames, ulong categoryId)
+    public async Task<bool> CreateVoiceChannelsForCategoryAsync(string[] channelNames, string categoryId)
     {
+        var id = ulong.Parse(categoryId);
         foreach (var channelName in channelNames)
         {
-            var result = await guild.CreateVoiceChannelAsync(channelName, properties => properties.CategoryId = categoryId);
+            var result = await guild.CreateVoiceChannelAsync(channelName, properties => properties.CategoryId = id);
             if (result is null) return false;
         }
 
@@ -102,7 +100,8 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
 
             if (roleToSeeChannel != null)
             {
-                permissions = permissions.Append(new Overwrite(roleToSeeChannel.Id, PermissionTarget.Role,
+                var id = ulong.Parse(roleToSeeChannel.Id);
+                permissions = permissions.Append(new Overwrite(id, PermissionTarget.Role,
                     new OverwritePermissions(viewChannel: PermValue.Allow)
                 ));
             }
@@ -123,7 +122,7 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
     {
         var categoryChannel = GetCategoryChannelByName(categoryName);
         if (categoryChannel == null) return null;
-        var miniCategory = new MiniCategory(categoryChannel.Id.ToString(), categoryChannel.Name, categoryChannel.GetChannelOccupancy());
+        var miniCategory = new MiniCategory(categoryChannel.Id, categoryChannel.Name, categoryChannel.GetChannelOccupancy());
         return miniCategory;
     }
 
@@ -137,10 +136,10 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         return GetGuildUsers(identifiables.Select(o => o.Id));
     }
 
-    public IEnumerable<IDiscordGuildUser> GetUsersInVoiceChannels(List<ulong>? excludedChannels = null)
+    public IEnumerable<IDiscordGuildUser> GetUsersInVoiceChannels(List<string>? excludedChannelsIds = null)
     {
-        excludedChannels ??= [];
-        return VoiceChannels.Where(voiceChannel => !excludedChannels.Contains(voiceChannel.Id))
+        excludedChannelsIds ??= [];
+        return VoiceChannels.Where(voiceChannel => !excludedChannelsIds.Contains(voiceChannel.Id.ToString()))
             .SelectMany(voiceChannel => voiceChannel.ConnectedUsers);
     }
 }

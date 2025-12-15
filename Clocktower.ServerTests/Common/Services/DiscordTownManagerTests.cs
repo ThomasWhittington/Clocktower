@@ -10,7 +10,7 @@ public class DiscordTownManagerTests
 {
     private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
     private IDiscordTownManager _sut = null!;
-    private const ulong GuildId = 1L;
+    private const string GuildId = "1";
     private DiscordTown _capturedDiscordTown = null!;
 
     [TestInitialize]
@@ -26,7 +26,7 @@ public class DiscordTownManagerTests
         var discordTown = new DiscordTown(channelCategories);
 
         _mockDiscordTownStore.Setup(o => o.Set(GuildId, It.IsAny<DiscordTown>(), true)).Returns(true)
-            .Callback<ulong, DiscordTown, bool>((_, callbackTown, _) => _capturedDiscordTown = callbackTown);
+            .Callback<string, DiscordTown, bool>((_, callbackTown, _) => _capturedDiscordTown = callbackTown);
         return discordTown;
     }
 
@@ -426,7 +426,7 @@ public class DiscordTownManagerTests
     private static IDiscordGuildUser CreateMockDiscordUser(string id)
     {
         var mockUser = StrictMockFactory.Create<IDiscordGuildUser>();
-        mockUser.Setup(u => u.Id).Returns(ulong.Parse(id));
+        mockUser.Setup(u => u.Id).Returns(id);
         mockUser.Setup(u => u.GuildId).Returns(GuildId);
         mockUser.Setup(u => u.DisplayName).Returns(string.Empty);
         mockUser.Setup(u => u.DisplayAvatarUrl).Returns(string.Empty);
@@ -437,7 +437,7 @@ public class DiscordTownManagerTests
     private static IDiscordVoiceChannel CreateMockDiscordVoiceChannel(string id)
     {
         var mockChannel = StrictMockFactory.Create<IDiscordVoiceChannel>();
-        mockChannel.Setup(c => c.Id).Returns(ulong.Parse(id));
+        mockChannel.Setup(c => c.Id).Returns(id);
         return mockChannel.Object;
     }
 }
