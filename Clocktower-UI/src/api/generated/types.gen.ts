@@ -18,6 +18,16 @@ export type ClocktowerServerCommonTypesErrorResponse = {
     message?: string | null;
 };
 
+export type ClocktowerServerCommonTypesTimerState = {
+    gameId: string | null;
+    status: ClocktowerServerCommonTypesTimerStatus;
+    serverNowUtc: Date;
+    endUtc: Date | null;
+    label?: string | null;
+};
+
+export type ClocktowerServerCommonTypesTimerStatus = 'None' | 'Running' | 'Cancelled' | 'Finished';
+
 export type ClocktowerServerDataChannelOccupantsDto = {
     channel?: ClocktowerServerDataMiniChannel;
     occupants?: Array<ClocktowerServerDataUserDto> | null;
@@ -146,6 +156,11 @@ export type ClocktowerServerDiscordTownEndpointsGetTownStatusResponse = {
 
 export type ClocktowerServerRolesEndpointsGetRolesResponse = {
     roles?: Array<ClocktowerServerDataTypesRoleRole> | null;
+};
+
+export type ClocktowerServerTimerEndpointsStartOrEditTimerRequest = {
+    durationSeconds?: number;
+    label?: string | null;
 };
 
 export type MicrosoftAspNetCoreHttpHttpValidationProblemDetails = {
@@ -908,3 +923,83 @@ export type GetRolesApiResponses = {
 };
 
 export type GetRolesApiResponse = GetRolesApiResponses[keyof GetRolesApiResponses];
+
+export type CancelTimerApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/timer/{gameId}';
+};
+
+export type CancelTimerApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: ClocktowerServerCommonTypesErrorResponse;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type CancelTimerApiError = CancelTimerApiErrors[keyof CancelTimerApiErrors];
+
+export type CancelTimerApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerCommonTypesTimerState;
+};
+
+export type CancelTimerApiResponse = CancelTimerApiResponses[keyof CancelTimerApiResponses];
+
+export type GetTimerApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/timer/{gameId}';
+};
+
+export type GetTimerApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerCommonTypesTimerState;
+};
+
+export type GetTimerApiResponse = GetTimerApiResponses[keyof GetTimerApiResponses];
+
+export type StartOrEditTimerApiData = {
+    body: ClocktowerServerTimerEndpointsStartOrEditTimerRequest;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/timer/{gameId}';
+};
+
+export type StartOrEditTimerApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type StartOrEditTimerApiError = StartOrEditTimerApiErrors[keyof StartOrEditTimerApiErrors];
+
+export type StartOrEditTimerApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerCommonTypesTimerState;
+};
+
+export type StartOrEditTimerApiResponse = StartOrEditTimerApiResponses[keyof StartOrEditTimerApiResponses];

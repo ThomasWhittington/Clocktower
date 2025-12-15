@@ -1,11 +1,12 @@
 ﻿using System.Collections.Concurrent;
-using Clocktower.Server.Data.Extensions;
 
 namespace Clocktower.Server.Data.Stores;
 
 public class GameStateStore : IGameStateStore
 {
     private readonly ConcurrentDictionary<string, GameState> _store = new();
+
+    public bool GameExists(string gameId) => _store.ContainsKey(gameId);
 
     public void Clear() => _store.Clear();
 

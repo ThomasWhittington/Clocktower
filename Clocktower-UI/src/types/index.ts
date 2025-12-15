@@ -24,5 +24,6 @@ export *
 
 export * from './user.ts'
 export * from './gameTime.ts'
+export * from './timerStatus.ts'
 export * from './userType.ts'
 export * from './voiceState.ts'

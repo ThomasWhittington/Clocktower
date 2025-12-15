@@ -11,6 +11,7 @@ import {
 import {
     type DiscordTown,
     GameTime,
+    TimerStatus,
     type VoiceState
 } from '@/types';
 import {
@@ -20,18 +21,27 @@ import {
 type UserPresenceStates = Record<string, boolean>;
 type UserVoiceStates = Record<string, VoiceState>;
 
+export type TimerState = {
+    gameId: string;
+    status: TimerStatus;
+    serverNowUtc: string;
+    endUtc?: string | null;
+    label?: string | null;
+};
 
 export type SessionSyncState = {
     gameTime: GameTime,
     jwt: string,
     discordTown?: DiscordTown;
+    timer?: TimerState;
 };
 type HubState = {
     discordTown?: DiscordTown;
     userPresenceStates: UserPresenceStates;
     userVoiceStates: UserVoiceStates;
     connectionState: signalR.HubConnectionState;
-    gameTime: GameTime
+    gameTime: GameTime;
+    timer?: TimerState;
 };
 
 let joinedGameId: string | null = null;
@@ -40,7 +50,8 @@ let globalState: HubState = {
     userPresenceStates: {},
     userVoiceStates: {},
     connectionState: signalR.HubConnectionState.Disconnected,
-    gameTime: GameTime.Night
+    gameTime: GameTime.Night,
+    timer: undefined
 };
 const globalListeners = new Set<(state: HubState) => void>();
 
@@ -90,6 +101,11 @@ const createConnection = async () => {
     globalConnection.on('TownTimeChanged', (gameTime: number) => {
         console.log(`⏰ Received TownTimeChanged for game ${joinedGameId}: ${gameTime}`);
         setState({gameTime: gameTime as GameTime});
+    });
+
+    globalConnection.on('TimerUpdated', (timer: TimerState) => {
+        console.log(`⏱️ Received TimerUpdated for game ${joinedGameId}:`, timer);
+        setState({timer});
     });
 
     globalConnection.on('PingUser', (message: string) => {
@@ -231,7 +247,7 @@ export const joinGameGroup = async (gameId: string): Promise<void> => {
             if (joinedGameId && joinedGameId !== gameId) {
                 console.log(`Leaving game : ${joinedGameId}`);
                 try {
-                    await globalConnection!.invoke('LeaveGameGroup', joinedGameId);
+                    await globalConnection.invoke('LeaveGameGroup', joinedGameId);
                     console.log(`Successfully left game : ${joinedGameId}`);
                 } catch (error) {
                     console.error(`Failed to leave game ${joinedGameId}:`, error);
@@ -239,14 +255,15 @@ export const joinGameGroup = async (gameId: string): Promise<void> => {
             }
 
             console.log(`Calling join game : ${gameId}`);
-            const snapshot = await globalConnection!.invoke<SessionSyncState | null>('JoinGameGroup', gameId, currentUser?.id);
+            const snapshot = await globalConnection.invoke<SessionSyncState | null>('JoinGameGroup', gameId, currentUser?.id);
             joinedGameId = gameId;
             console.log(`Successfully joined game : ${gameId}`);
 
             if (snapshot) {
                 setState({
                     gameTime: snapshot.gameTime,
-                    discordTown: snapshot.discordTown
+                    discordTown: snapshot.discordTown,
+                    timer: snapshot.timer
                 });
 
                 const currentJwt = useAppStore.getState().jwt;

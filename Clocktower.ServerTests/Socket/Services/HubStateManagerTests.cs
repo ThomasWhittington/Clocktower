@@ -12,16 +12,24 @@ public class HubStateManagerTests
     private Mock<IGameStateStore> _mockGameStateStore = null!;
     private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
     private Mock<IJwtWriter> _mockJwtWriter = null!;
+    private Mock<ITimerCoordinator> _mockTimerCoordinator = null!;
     private IHubStateManager _sut = null!;
 
     [TestInitialize]
     public void SetUp()
     {
-        _mockGameStateStore = new Mock<IGameStateStore>();
-        _mockDiscordTownStore = new Mock<IDiscordTownStore>();
-        _mockJwtWriter = new Mock<IJwtWriter>();
-        _sut = new HubStateManager(_mockGameStateStore.Object, _mockDiscordTownStore.Object, _mockJwtWriter.Object);
+        _mockGameStateStore = StrictMockFactory.Create<IGameStateStore>();
+        _mockDiscordTownStore = StrictMockFactory.Create<IDiscordTownStore>();
+        _mockJwtWriter = StrictMockFactory.Create<IJwtWriter>();
+        _mockTimerCoordinator = StrictMockFactory.Create<ITimerCoordinator>();
+
+        _sut = new HubStateManager(_mockGameStateStore.Object,
+            _mockDiscordTownStore.Object,
+            _mockJwtWriter.Object,
+            _mockTimerCoordinator.Object
+        );
     }
+
 
     [TestMethod]
     public void GetState_ReturnsNull_WhenGameStateNotFound()
@@ -63,11 +71,19 @@ public class HubStateManagerTests
             Users = [gameUser],
             GuildId = guildId
         };
+        var timer = new TimerState
+        {
+            GameId = gameId,
+            Status = TimerStatus.Running,
+            ServerNowUtc = DateTime.UtcNow,
+            EndUtc = DateTime.Now.AddSeconds(30)
+        };
         var discordTown = new DiscordTown([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
         const string expectedJwt = "jwt-token-123";
         _mockGameStateStore.Setup(s => s.Get(gameId)).Returns(gameState);
         _mockDiscordTownStore.Setup(s => s.Get(guildId)).Returns(discordTown);
         _mockJwtWriter.Setup(j => j.GetJwtToken(gameUser)).Returns(expectedJwt);
+        _mockTimerCoordinator.Setup(t => t.Get(gameId)).Returns(timer);
 
         var result = _sut.GetState(gameId, userId);
 
@@ -79,5 +95,6 @@ public class HubStateManagerTests
         result.Jwt.Should().Be(expectedJwt);
         result.DiscordTown.Should().NotBeNull();
         result.DiscordTown.GameId.Should().Be(gameId);
+        result.Timer.Should().Be(timer);
     }
 }

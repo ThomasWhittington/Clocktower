@@ -19,6 +19,7 @@ public static class Endpoints
         endpoints.MapDiscordGameActionEndpoints();
         endpoints.MapDiscordAuthEndpoints();
         endpoints.MapDiscordTownEndpoints();
+        endpoints.MapTimerEndpoints();
     }
 
     extension(IEndpointRouteBuilder app)
@@ -84,6 +85,15 @@ public static class Endpoints
 
             endpoints.MapPublicGroup()
                 .MapEndpointsFromNamespace("Clocktower.Server.Discord.Town.Endpoints");
+        }
+        
+        private void MapTimerEndpoints()
+        {
+            var endpoints = app.MapGroup("/timer")
+                .WithTags("Timer");
+
+            endpoints.MapPublicGroup()
+                .MapEndpointsFromNamespace("Clocktower.Server.Timer.Endpoints");
         }
 
         private RouteGroupBuilder MapPublicGroup(string? prefix = null)

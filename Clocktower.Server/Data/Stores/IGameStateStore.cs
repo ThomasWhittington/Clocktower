@@ -2,6 +2,7 @@
 
 public interface IGameStateStore
 {
+    bool GameExists(string gameId);
     void Clear();
     GameState? Get(string gameId);
     bool Set(GameState state);

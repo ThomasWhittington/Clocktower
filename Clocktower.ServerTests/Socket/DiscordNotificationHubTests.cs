@@ -37,7 +37,14 @@ public class DiscordNotificationHubTests
         {
             GameTime = GameTime.Day,
             Jwt = jwt,
-            DiscordTown = discordTown
+            DiscordTown = discordTown,
+            Timer = new TimerState
+            {
+                GameId = GameId,
+                Status = TimerStatus.Running,
+                ServerNowUtc = DateTime.UtcNow,
+                EndUtc = DateTime.Now.AddSeconds(30)
+            }
         };
         return result;
     }
