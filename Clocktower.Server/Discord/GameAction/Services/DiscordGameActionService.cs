@@ -47,7 +47,7 @@ public class DiscordGameActionService(
         var storyTellers = guild.GetInVoiceGuildUsers(gameState.StoryTellers.GetIds()).ToArray();
 
         var nightChannels = discordTownManager.GetNightChannels(guild.Id, discordConstantsService.NightCategoryName);
-        var cottages = nightChannels.Select(channel => guild.GetVoiceChannel(channel.Id)).ToArray();
+        var cottages = nightChannels.Select(channel => guild.GetVoiceChannel(channel.Id)).Where(o => o != null).Cast<IDiscordVoiceChannel>().ToArray();
 
         if (!cottages.Any()) return Result.Fail<string>(ErrorKind.NotFound, "category.not_found", "Night channels could not be found in the town");
         if (players.Length == 0 && storyTellers.Length == 0) return Result.Ok("No users available to move");

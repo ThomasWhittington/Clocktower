@@ -17,7 +17,7 @@ public interface IDiscordGuild
     Task DeleteRoleAsync(string roleName);
     IDiscordGuildUser? GetUser(string userId);
     Task MoveAsync(IDiscordGuildUser member, IDiscordVoiceChannel channel);
-    IDiscordVoiceChannel GetVoiceChannel(string channelId);
+    IDiscordVoiceChannel? GetVoiceChannel(string channelId);
     IDiscordRole? GetRole(string roleName);
     Task<bool> CreateVoiceChannelsForCategoryAsync(string[] channelNames, string categoryId);
     Task<IDiscordRestCategoryChannel> CreateCategoryAsync(string categoryName, bool everyoneCanSee, IDiscordRole? roleToSeeChannel = null);

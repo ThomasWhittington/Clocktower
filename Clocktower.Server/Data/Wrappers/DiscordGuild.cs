@@ -52,11 +52,13 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         await member.MoveAsync(channel);
     }
 
-    public IDiscordVoiceChannel GetVoiceChannel(string channelId)
+    public IDiscordVoiceChannel? GetVoiceChannel(string channelId)
     {
         if (!ulong.TryParse(channelId, out var id))
             throw new ArgumentException($"Invalid channel ID format: {channelId}", nameof(channelId));
-        return new DiscordVoiceChannel(guild.GetVoiceChannel(id));
+
+        var channel = guild.GetVoiceChannel(id);
+        return channel is null ? null : new DiscordVoiceChannel(guild.GetVoiceChannel(id));
     }
 
     public IDiscordRole? GetRole(string roleName)
