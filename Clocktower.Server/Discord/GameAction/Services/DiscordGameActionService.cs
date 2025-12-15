@@ -66,11 +66,11 @@ public class DiscordGameActionService(
         if (!status.IsSuccess) return status;
 
         var channelId = discordTownManager.GetVoiceChannelIdByName(guild.Id, discordConstantsService.TownSquareName);
-        if (channelId is null) return Result.Fail<string>(Errors.ChannelNotFound(channelId));
+        if (channelId is null) return Result.Fail<string>(Errors.ChannelNotFound(discordConstantsService.TownSquareName));
         var channel = guild.GetVoiceChannel(channelId);
-        if (channel is null) return Result.Fail<string>(Errors.ChannelNotFound(channelId));
+        if (channel is null) return Result.Fail<string>(Errors.ChannelNotFound(discordConstantsService.TownSquareName));
 
-        var usersInChannels = guild.GetUsersInVoiceChannels([channel.Id]).ToArray();
+        var usersInChannels = guild.GetUsersInVoiceChannelsExcluding([channel.Id]).ToArray();
 
         if (!usersInChannels.Any()) return Result.Ok($"No users available to move to {channel.Name}");
 

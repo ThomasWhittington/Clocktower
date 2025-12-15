@@ -136,7 +136,7 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         return GetGuildUsers(userIds).Where(user => user.IsConnectedToVoice);
     }
 
-    public IEnumerable<IDiscordGuildUser> GetUsersInVoiceChannels(IEnumerable<string>? excludedChannelsIds = null)
+    public IEnumerable<IDiscordGuildUser> GetUsersInVoiceChannelsExcluding(IEnumerable<string>? excludedChannelsIds = null)
     {
         excludedChannelsIds ??= [];
         return VoiceChannels.Where(voiceChannel => !excludedChannelsIds.Contains(voiceChannel.Id.ToString()))

@@ -418,7 +418,7 @@ public class DiscordGameActionServiceTests
                     usersInChannels.Add(mock.Object);
                 }
 
-                _guild.Setup(o => o.GetUsersInVoiceChannels(new[] { townSquareChannelId })).Returns(usersInChannels);
+                _guild.Setup(o => o.GetUsersInVoiceChannelsExcluding(new[] { townSquareChannelId })).Returns(usersInChannels);
             }
         }
     }
