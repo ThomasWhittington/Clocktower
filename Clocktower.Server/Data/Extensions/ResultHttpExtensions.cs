@@ -6,7 +6,7 @@ public static class ResultHttpExtensions
     {
         public Results<Ok<T>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>> ToHttpResult()
         {
-            if (result.IsSuccess) return TypedResults.Ok(result.Value ?? default);
+            if (result is { IsSuccess: true }) return TypedResults.Ok(result.Value);
 
             var error = result.Error!;
             var errorResponse = new ErrorResponse(error.Code, error.Message);

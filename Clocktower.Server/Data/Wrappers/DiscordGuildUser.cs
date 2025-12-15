@@ -31,19 +31,22 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
 
     public async Task MoveAsync(IDiscordVoiceChannel channel)
     {
-        var id = ulong.Parse(channel.Id);
+        if (!ulong.TryParse(channel.Id, out var id))
+            throw new ArgumentException($"Invalid channel ID format: {channel.Id}", nameof(channel));
         await user.ModifyAsync(x => x.ChannelId = id);
     }
 
     public async Task RemoveRoleAsync(IDiscordRole role)
     {
-        var id = ulong.Parse(role.Id);
+        if (!ulong.TryParse(role.Id, out var id))
+            throw new ArgumentException($"Invalid role ID format: {role.Id}", nameof(role));
         await user.RemoveRoleAsync(id);
     }
 
     public async Task AddRoleAsync(IDiscordRole role)
     {
-        var id = ulong.Parse(role.Id);
+        if (!ulong.TryParse(role.Id, out var id))
+            throw new ArgumentException($"Invalid role ID format: {role.Id}", nameof(role));
         await user.AddRoleAsync(id);
     }
 

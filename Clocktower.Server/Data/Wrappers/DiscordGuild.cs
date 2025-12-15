@@ -41,7 +41,8 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
 
     public IDiscordGuildUser? GetUser(string userId)
     {
-        var id = ulong.Parse(userId);
+        if (!ulong.TryParse(userId, out var id))
+            throw new ArgumentException($"Invalid user ID format: {userId}", nameof(userId));
         var user = guild.GetUser(id);
         return user != null ? new DiscordGuildUser(user) : null;
     }
@@ -53,7 +54,8 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
 
     public IDiscordVoiceChannel GetVoiceChannel(string channelId)
     {
-        var id = ulong.Parse(channelId);
+        if (!ulong.TryParse(channelId, out var id))
+            throw new ArgumentException($"Invalid channel ID format: {channelId}", nameof(channelId));
         return new DiscordVoiceChannel(guild.GetVoiceChannel(id));
     }
 
@@ -65,7 +67,8 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
 
     public async Task<bool> CreateVoiceChannelsForCategoryAsync(string[] channelNames, string categoryId)
     {
-        var id = ulong.Parse(categoryId);
+        if (!ulong.TryParse(categoryId, out var id))
+            throw new ArgumentException($"Invalid category ID format: {categoryId}", nameof(categoryId));
         foreach (var channelName in channelNames)
         {
             var result = await guild.CreateVoiceChannelAsync(channelName, properties => properties.CategoryId = id);
@@ -100,7 +103,8 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
 
             if (roleToSeeChannel != null)
             {
-                var id = ulong.Parse(roleToSeeChannel.Id);
+                if (!ulong.TryParse(roleToSeeChannel.Id, out var id))
+                    throw new ArgumentException($"Invalid role ID format: {roleToSeeChannel.Id}", nameof(roleToSeeChannel));
                 permissions = permissions.Append(new Overwrite(id, PermissionTarget.Role,
                     new OverwritePermissions(viewChannel: PermValue.Allow)
                 ));

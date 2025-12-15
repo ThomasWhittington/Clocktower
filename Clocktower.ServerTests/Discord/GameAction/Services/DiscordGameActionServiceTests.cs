@@ -467,7 +467,7 @@ public class DiscordGameActionServiceTests
 
         var result = await _sut.SendToTownSquareAsync(GameId);
 
-        result.ShouldFailWith(ErrorKind.Invalid, "channel.not_found");
+        result.ShouldFailWith(ErrorKind.NotFound, "channel.not_found");
     }
 
     [TestMethod]
@@ -477,7 +477,7 @@ public class DiscordGameActionServiceTests
 
         var result = await _sut.SendToTownSquareAsync(GameId);
 
-        result.ShouldFailWith(ErrorKind.Invalid, "channel.not_found");
+        result.ShouldFailWith(ErrorKind.NotFound, "channel.not_found");
     }
 
 
