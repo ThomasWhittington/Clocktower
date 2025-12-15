@@ -14,7 +14,7 @@ public class StartOrEditTimer : IEndpoint
 
     internal static async Task<Results<Ok<TimerState>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle(string gameId, [FromBody] Request request, [FromServices] ITimerService timerService, CancellationToken ct)
     {
-        var result = await timerService.StartOrEditAsync(gameId, request.DurationSeconds, request.Label,ct);
+        var result = await timerService.StartOrEditTimerAsync(gameId, request.DurationSeconds, request.Label,ct);
         return result.ToHttpResult();
     }
 

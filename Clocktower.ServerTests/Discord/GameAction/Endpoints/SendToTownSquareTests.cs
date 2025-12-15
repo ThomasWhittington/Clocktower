@@ -32,51 +32,48 @@ public class SendToTownSquareTests
     }
 
     [TestMethod]
-    [DataRow(GameActionOutcome.InvalidGuildError)]
-    public async Task Handle_ReturnsBadRequest_WhenServiceReturnsBadRequestError(GameActionOutcome gameActionOutcome)
-    {
-        const string gameId = "game-id";
-        var request = new GameIdRequest(gameId);
-        var error = Result.Fail<string>(ErrorKind.Invalid, "error code", "error message");
-        _mockDiscordGameActionService.Setup(o => o.SendToTownSquareAsync(gameId)).ReturnsAsync(error);
-
-        var result = await SendToTownSquare.Handle(request, _mockDiscordGameActionService.Object);
-
-        _mockDiscordGameActionService.Verify(o => o.SendToTownSquareAsync(gameId), Times.Once);
-        var response = result.Result.Should().BeOfType<BadRequest<ErrorResponse>>().Subject;
-        response.Value.ShouldBeError(error);
-    }
-
-
-    [TestMethod]
-    [DataRow(GameActionOutcome.ChannelNotFound)]
-    [DataRow(GameActionOutcome.GameDoesNotExistError)]
-    public async Task Handle_ReturnsNotFound_WhenServiceReturnsNotFoundError(GameActionOutcome gameActionOutcome)
-    {
-        const string gameId = "game-id";
-        var request = new GameIdRequest(gameId);
-        var error = Result.Fail<string>(ErrorKind.NotFound, "error code", "error message");
-        _mockDiscordGameActionService.Setup(o => o.SendToTownSquareAsync(gameId)).ReturnsAsync(error);
-
-        var result = await SendToTownSquare.Handle(request, _mockDiscordGameActionService.Object);
-
-        _mockDiscordGameActionService.Verify(o => o.SendToTownSquareAsync(gameId), Times.Once);
-        var response = result.Result.Should().BeOfType<NotFound<ErrorResponse>>().Subject;
-        response.Value.ShouldBeError(error);
-    }
-
-    [TestMethod]
-    public async Task Handle_ReturnsOk_WhenServiceSendsInvite()
-    {
-        const string gameId = "game-id";
-        var request = new GameIdRequest(gameId);
-        var success = Result.Ok("response message");
-        _mockDiscordGameActionService.Setup(o => o.SendToTownSquareAsync(gameId)).ReturnsAsync(success);
-
-        var result = await SendToTownSquare.Handle(request, _mockDiscordGameActionService.Object);
-
-        _mockDiscordGameActionService.Verify(o => o.SendToTownSquareAsync(gameId), Times.Once);
-        var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
-        response.Value.Should().Be(success.Value);
-    }
+         public async Task Handle_ReturnsBadRequest_WhenServiceReturnsBadRequestError()
+         {
+             const string gameId = "game-id";
+             var request = new GameIdRequest(gameId);
+             var error = Result.Fail<string>(ErrorKind.Invalid, "error code", "error message");
+             _mockDiscordGameActionService.Setup(o => o.SendToTownSquareAsync(gameId)).ReturnsAsync(error);
+     
+             var result = await SendToTownSquare.Handle(request, _mockDiscordGameActionService.Object);
+     
+             _mockDiscordGameActionService.Verify(o => o.SendToTownSquareAsync(gameId), Times.Once);
+             var response = result.Result.Should().BeOfType<BadRequest<ErrorResponse>>().Subject;
+             response.Value.ShouldBeError(error);
+         }
+     
+     
+         [TestMethod]
+         public async Task Handle_ReturnsNotFound_WhenServiceReturnsNotFoundError()
+         {
+             const string gameId = "game-id";
+             var request = new GameIdRequest(gameId);
+             var error = Result.Fail<string>(ErrorKind.NotFound, "error code", "error message");
+             _mockDiscordGameActionService.Setup(o => o.SendToTownSquareAsync(gameId)).ReturnsAsync(error);
+     
+             var result = await SendToTownSquare.Handle(request, _mockDiscordGameActionService.Object);
+     
+             _mockDiscordGameActionService.Verify(o => o.SendToTownSquareAsync(gameId), Times.Once);
+             var response = result.Result.Should().BeOfType<NotFound<ErrorResponse>>().Subject;
+             response.Value.ShouldBeError(error);
+         }
+     
+         [TestMethod]
+         public async Task Handle_ReturnsOk_WhenServiceSendsInvite()
+         {
+             const string gameId = "game-id";
+             var request = new GameIdRequest(gameId);
+             var success = Result.Ok("response message");
+             _mockDiscordGameActionService.Setup(o => o.SendToTownSquareAsync(gameId)).ReturnsAsync(success);
+     
+             var result = await SendToTownSquare.Handle(request, _mockDiscordGameActionService.Object);
+     
+             _mockDiscordGameActionService.Verify(o => o.SendToTownSquareAsync(gameId), Times.Once);
+             var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
+             response.Value.Should().Be(success.Value);
+         }
 }

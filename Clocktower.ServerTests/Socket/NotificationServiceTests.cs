@@ -44,7 +44,28 @@ public class NotificationServiceTests
         await _sut.BroadcastDiscordTownUpdate(gameId, discordTown);
 
         _mockClients.Verify(c => c.Group("game:test-game-123"), Times.Once);
-        _mockClientProxy.Verify(cp => cp.DiscordTownUpdated(It.Is<DiscordTownDto>(town =>town.GameId==gameId)), Times.Once);
+        _mockClientProxy.Verify(cp => cp.DiscordTownUpdated(It.Is<DiscordTownDto>(town => town.GameId == gameId)), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task BroadcastTimerUpdate_CallsCorrectGroup()
+    {
+        const string gameId = "test-game-123";
+        var timer = new TimerState
+        {
+            GameId = gameId,
+            Status = TimerStatus.Running,
+            ServerNowUtc = DateTime.UtcNow,
+            EndUtc = DateTime.UtcNow.AddSeconds(30),
+            Label = "label"
+        };
+
+        _mockClients.Setup(c => c.Group("game:test-game-123")).Returns(_mockClientProxy.Object);
+
+        await _sut.BroadcastTimerUpdate(gameId, timer);
+
+        _mockClients.Verify(c => c.Group("game:test-game-123"), Times.Once);
+        _mockClientProxy.Verify(cp => cp.TimerUpdated(timer), Times.Once);
     }
 
     [TestMethod]

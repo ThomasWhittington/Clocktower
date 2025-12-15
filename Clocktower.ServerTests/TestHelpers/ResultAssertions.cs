@@ -2,7 +2,7 @@
 
 public static class ResultAssertions
 {
-    extension(Result<string> result)
+    extension<T>(Result<T> result)
     {
         public void ShouldFailWith(ErrorKind kind, string code, string? message = null)
         {
@@ -15,7 +15,7 @@ public static class ResultAssertions
                 result.Error.Message.Should().Be(message);
         }
 
-        public void ShouldSucceedWith(string expectedValue)
+        public void ShouldSucceedWith(T expectedValue)
         {
             result.IsSuccess.Should().BeTrue();
             result.Error.Should().BeNull();
@@ -23,9 +23,9 @@ public static class ResultAssertions
         }
     }
 
-    extension(ErrorResponse? error)
+    extension<T>(ErrorResponse? error)
     {
-        public void ShouldBeError(Result<string> result)
+        public void ShouldBeError(Result<T> result)
         {
             error.Should().NotBeNull();
             error.Code.Should().Be(result.Error!.Code);

@@ -6,12 +6,3 @@ public interface IDiscordGameActionService
     Task<Result<string>> SendToCottagesAsync(string gameId);
     Task<Result<string>> SendToTownSquareAsync(string gameId);
 }
-
-public enum GameActionOutcome
-{
-    GameDoesNotExistError,
-    InvalidGuildError,
-    ActionCompleted,
-    ChannelNotFound,
-    NotEnoughChannels
-}

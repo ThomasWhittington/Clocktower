@@ -5,7 +5,7 @@ namespace Clocktower.Server.Common.Services;
 
 public class TimerCoordinator(ILogger<TimerCoordinator> logger, INotificationService notifications) : ITimerCoordinator
 {
-    private sealed class TimerInstance
+    internal sealed class TimerInstance
     {
         public required TimerState State { get; set; }
         public required CancellationTokenSource Cts { get; init; }
@@ -90,7 +90,7 @@ public class TimerCoordinator(ILogger<TimerCoordinator> logger, INotificationSer
 
             if (!_timers.TryGetValue(gameId, out var inst))
                 return;
-
+            
             if (inst.State.Status != TimerStatus.Running || inst.State.EndUtc != endUtc)
                 return;
 
@@ -103,25 +103,17 @@ public class TimerCoordinator(ILogger<TimerCoordinator> logger, INotificationSer
             inst.State = finished;
             await notifications.BroadcastTimerUpdate(gameId, finished);
         }
-        catch (OperationCanceledException ex)
-        {
-            logger.LogInformation(ex, "Tried to finish timer but found it already finished for game {GameId}", gameId);
-        }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error finishing timer for game {GameId}", gameId);
         }
     }
 
-    private async Task CancelAndDisposeAsync(CancellationTokenSource cts)
+    private static async Task CancelAndDisposeAsync(CancellationTokenSource cts)
     {
         try
         {
             await cts.CancelAsync();
-        }
-        catch (ObjectDisposedException ex)
-        {
-            logger.LogInformation(ex, "Timer for game is already cancelled");
         }
         finally
         {

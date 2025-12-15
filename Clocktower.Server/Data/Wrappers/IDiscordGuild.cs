@@ -24,6 +24,6 @@ public interface IDiscordGuild
     IDiscordCategoryChannel? GetCategoryChannelByName(string name);
     MiniCategory? GetMiniCategory(string categoryName);
     IEnumerable<IDiscordGuildUser> GetGuildUsers(IEnumerable<string> userIds);
-    IEnumerable<IDiscordGuildUser> GetGuildUsers(IEnumerable<IIdentifiable> identifiables);
-    IEnumerable<IDiscordGuildUser> GetUsersInVoiceChannels(List<string>? excludedChannelsIds = null);
+    IEnumerable<IDiscordGuildUser> GetInVoiceGuildUsers(IEnumerable<string> userIds);
+    IEnumerable<IDiscordGuildUser> GetUsersInVoiceChannels(IEnumerable<string>? excludedChannelsIds = null);
 }

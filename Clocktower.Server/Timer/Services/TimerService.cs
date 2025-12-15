@@ -4,12 +4,9 @@ namespace Clocktower.Server.Timer.Services;
 
 public class TimerService(ITimerCoordinator timerCoordinator, IGameStateStore gameStateStore) : ITimerService
 {
-    public TimerState GetTimer(string gameId)
-    {
-        return timerCoordinator.Get(gameId);
-    }
+    public TimerState GetTimer(string gameId) => timerCoordinator.Get(gameId);
 
-    public async Task<Result<TimerState>> StartOrEditAsync(string gameId, int durationSeconds, string? label = null, CancellationToken ct = default)
+    public async Task<Result<TimerState>> StartOrEditTimerAsync(string gameId, int durationSeconds, string? label = null, CancellationToken ct = default)
     {
         if (!gameStateStore.GameExists(gameId)) return Result.Fail<TimerState>(Errors.GameNotFound(gameId));
         var duration = TimeSpan.FromSeconds(durationSeconds);

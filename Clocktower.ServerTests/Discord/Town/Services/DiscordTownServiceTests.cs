@@ -182,7 +182,7 @@ public class DiscordTownServiceTests
         result.success.Should().BeFalse();
         result.message.Should().Be($"Couldn't find game with id: {GameId}");
     }
-    
+
     [TestMethod]
     public async Task ToggleStoryTeller_ReturnsFalse_WhenGuildNotFound()
     {
@@ -983,9 +983,11 @@ public class DiscordTownServiceTests
     }
 
     [TestMethod]
-    public async Task InviteUser_ReturnsError_WhenGuildIdInvalid()
+    [DataRow(null)]
+    [DataRow("invalid-guild")]
+    public async Task InviteUser_ReturnsError_WhenGuildIdInvalid(string? guildId)
     {
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "invalid-guild" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = guildId! });
 
         var (outcome, message) = await Sut.InviteUser(GameId, UserId);
 

@@ -131,12 +131,12 @@ public class DiscordGuild(SocketGuild guild) : IDiscordGuild
         return Users.Where(o => userIds.Contains(o.Id.ToString()));
     }
 
-    public IEnumerable<IDiscordGuildUser> GetGuildUsers(IEnumerable<IIdentifiable> identifiables)
+    public IEnumerable<IDiscordGuildUser> GetInVoiceGuildUsers(IEnumerable<string> userIds)
     {
-        return GetGuildUsers(identifiables.Select(o => o.Id));
+        return GetGuildUsers(userIds).Where(user => user.IsConnectedToVoice);
     }
 
-    public IEnumerable<IDiscordGuildUser> GetUsersInVoiceChannels(List<string>? excludedChannelsIds = null)
+    public IEnumerable<IDiscordGuildUser> GetUsersInVoiceChannels(IEnumerable<string>? excludedChannelsIds = null)
     {
         excludedChannelsIds ??= [];
         return VoiceChannels.Where(voiceChannel => !excludedChannelsIds.Contains(voiceChannel.Id.ToString()))

@@ -32,8 +32,7 @@ public class SendToCottagesTests
     }
 
     [TestMethod]
-    [DataRow(GameActionOutcome.InvalidGuildError)]
-    public async Task Handle_ReturnsBadRequest_WhenServiceReturnsBadRequestError(GameActionOutcome gameActionOutcome)
+    public async Task Handle_ReturnsBadRequest_WhenServiceReturnsBadRequestError()
     {
         const string gameId = "game-id";
         var request = new GameIdRequest(gameId);
@@ -49,8 +48,7 @@ public class SendToCottagesTests
 
 
     [TestMethod]
-    [DataRow(GameActionOutcome.GameDoesNotExistError)]
-    public async Task Handle_ReturnsNotFound_WhenServiceReturnsNotFoundError(GameActionOutcome gameActionOutcome)
+    public async Task Handle_ReturnsNotFound_WhenServiceReturnsNotFoundError()
     {
         const string gameId = "game-id";
         var request = new GameIdRequest(gameId);

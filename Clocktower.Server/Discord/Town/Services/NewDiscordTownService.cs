@@ -170,7 +170,6 @@ public class DiscordTownService(
     {
         var gameState = gameStateStore.Get(gameId);
         if (gameState is null) return (false, null, $"Game not found for id: {gameId}");
-        if (gameState.GuildId is null) return (false, null, "GameState contained a guildId that is not valid");
 
         var (success, discordTown, message) = await GetDiscordTown(gameState.GuildId);
         if (success && discordTown != null)
@@ -205,7 +204,6 @@ public class DiscordTownService(
         {
             var gameState = gameStateStore.Get(gameId);
             if (gameState is null) return (InviteUserOutcome.GameDoesNotExistError, $"Couldn't find game with id: {gameId}");
-            if (gameState.GuildId is null) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
             var guild = bot.GetGuild(gameState.GuildId);
             if (guild is null) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
 
@@ -237,9 +235,7 @@ public class DiscordTownService(
     {
         var gameState = gameStateStore.Get(gameId);
         if (gameState is null) return ((false, $"Couldn't find game with id: {gameId}"), default);
-
-        if (gameState.GuildId is null) return ((false, "GameState contained a guildId that is not valid"), default);
-
+        
         var guild = bot.GetGuild(gameState.GuildId);
         if (guild is null) return ((false, GuildNotFoundMessage), default);
 

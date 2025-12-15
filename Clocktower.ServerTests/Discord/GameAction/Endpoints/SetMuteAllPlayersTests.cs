@@ -48,8 +48,7 @@ public class SetMuteAllPlayersTests
 
 
     [TestMethod]
-    [DataRow(GameActionOutcome.GameDoesNotExistError)]
-    public async Task Handle_ReturnsNotFound_WhenServiceReturnsNotFoundError(GameActionOutcome gameActionOutcome)
+    public async Task Handle_ReturnsNotFound_WhenServiceReturnsNotFoundError()
     {
         const string gameId = "game-id";
         const bool muted = false;
