@@ -14,16 +14,17 @@ public class NotificationService(IHubContext<DiscordNotificationHub, IDiscordNot
         if (discordTown is null) return;
         var users = thisGame.Users;
 
-        var storyTellerUserIds = users.Where(u => u.UserType is UserType.StoryTeller or UserType.Spectator).GetIds().ToArray();
+        var fullAccessUserIds = users.Where(u => u.UserType is UserType.StoryTeller or UserType.Spectator).GetIds().ToArray();
         var playerUserIds = users.Where(u => u.UserType is UserType.Player).GetIds().ToArray();
 
         var fullTown = discordTown.ToDiscordTownDto(gameId, users);
-        await hub.Clients.Users(storyTellerUserIds).DiscordTownUpdated(fullTown);
-        foreach (var playerId in playerUserIds)
+        await hub.Clients.Users(fullAccessUserIds).DiscordTownUpdated(fullTown);
+        var playerTasks = playerUserIds.Select(playerId =>
         {
-            var perPlayerTown = discordTownManager.RedactTownDto( fullTown,playerId);
-            await hub.Clients.User(playerId).DiscordTownUpdated(perPlayerTown);
-        }
+            var perPlayerTown = discordTownManager.RedactTownDto(fullTown, playerId);
+            return hub.Clients.User(playerId).DiscordTownUpdated(perPlayerTown);
+        });
+        await Task.WhenAll(playerTasks);
     }
 
     public Task BroadcastUserVoiceStateChanged(string gameId, string userId, bool inVoice, VoiceState voiceState) => hub.Clients.Group(GetGameGroupName(gameId)).UserVoiceStateChanged(userId, inVoice, voiceState);

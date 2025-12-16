@@ -84,7 +84,7 @@ public class StartGameTests
         response.Location.Should().Be($"/games/{gameState.Id}");
         response.Value.Should().Be(gameState);
     }
-    
+
     [TestMethod]
     public async Task Handle_LogsWarning_WhenTownNotFound()
     {
