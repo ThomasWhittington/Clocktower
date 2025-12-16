@@ -43,7 +43,7 @@ public class DiscordNotificationHubTests
                 GameId = GameId,
                 Status = TimerStatus.Running,
                 ServerNowUtc = DateTime.UtcNow,
-                EndUtc = DateTime.Now.AddSeconds(30)
+                EndUtc = DateTime.UtcNow.AddSeconds(30)
             }
         };
         return result;

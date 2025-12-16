@@ -11,11 +11,12 @@ public class StartGame : IEndpoint
         .WithSummaryAndDescription("Starts new game state for id")
         .WithRequestValidation<Request>();
 
-    internal static async Task<Results<Created<GameState>, BadRequest<string>>> Handle([AsParameters] Request request, [FromServices] IGameStateService gameStateService, [FromServices] IDiscordTownService discordTownService)
+    internal static async Task<Results<Created<GameState>, BadRequest<string>>> Handle([AsParameters] Request request, [FromServices] IGameStateService gameStateService, [FromServices] IDiscordTownService discordTownService, ILogger<StartGame> logger)
     {
         var gameId = request.GameId.Trim();
         var result = gameStateService.StartNewGame(request.GuildId, gameId, request.UserId);
-         await discordTownService.GetDiscordTown(request.GuildId);
+        var (townSuccess, _, townMessage) = await discordTownService.GetDiscordTown(request.GuildId);
+        if (!townSuccess) logger.LogWarning("Failed to fetch Discord town: {Message}", townMessage);
         return result.success ? TypedResults.Created($"/games/{result.gameState!.Id}", result.gameState) : TypedResults.BadRequest(result.message);
     }
 
