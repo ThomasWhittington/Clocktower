@@ -136,6 +136,16 @@ public class DiscordTownService(
         }
     }
 
+    /// <summary>
+    /// Retrieves the DiscordTown representation for the specified guild, creating and caching it if absent, and triggers a town update notification for any active game in that guild.
+    /// </summary>
+    /// <param name="guildId">The ID of the Discord guild to retrieve the town for.</param>
+    /// <returns>
+    /// A tuple (success, discordTown, message):
+    /// - `success`: `true` if the operation completed and a DiscordTown was obtained or created, `false` otherwise.
+    /// - `discordTown`: the cached or newly constructed DiscordTown, or `null` if not found or on failure.
+    /// - `message`: a short description of the outcome or error.
+    /// </returns>
     public async Task<(bool success, DiscordTown? discordTown, string message)> GetDiscordTown(string guildId)
     {
         try
@@ -231,6 +241,16 @@ public class DiscordTownService(
         }
     }
 
+    /// <summary>
+    /// Validates that the game, guild, storyteller role, and specified user exist for toggling StoryTeller status.
+    /// </summary>
+    /// <param name="gameId">The game identifier used to locate the game state and its guild.</param>
+    /// <param name="userId">The Discord user identifier to validate within the guild.</param>
+    /// <returns>
+    /// A tuple where the first element is a status (success flag and message) and the second element is data (the StoryTeller role and the guild user).
+    /// `success` is `true` when all validations pass and `message` is empty; otherwise `success` is `false` and `message` explains the failure.
+    /// When `success` is `true`, `data.role` is the StoryTeller role and `data.user` is the guild user; otherwise `data` is `default`.
+    /// </returns>
     private ((bool success, string message) status, (IDiscordRole role, IDiscordGuildUser user) data) ValidateToggleStoryTellerRequest(string gameId, string userId)
     {
         var gameState = gameStateStore.Get(gameId);
@@ -255,6 +275,13 @@ public class DiscordTownService(
         if (thisUser is null) gameStateStore.AddUserToGame(gameId, user.AsGameUser());
     }
 
+    /// <summary>
+    /// Remove the StoryTeller role from a guild user, mark them as a spectator in the game state, and broadcast a town update.
+    /// </summary>
+    /// <param name="gameId">The identifier of the game whose state should be updated and notified.</param>
+    /// <param name="user">The guild user to remove the StoryTeller role from.</param>
+    /// <param name="role">The StoryTeller role to remove.</param>
+    /// <returns>`true` and a confirmation message indicating the user is no longer the StoryTeller.</returns>
     private async Task<(bool success, string message)> RemoveStoryTellerRole(string gameId, IDiscordGuildUser user, IDiscordRole role)
     {
         await user.RemoveRoleAsync(role);
@@ -263,6 +290,13 @@ public class DiscordTownService(
         return (true, $"User {user.DisplayName} is no longer a {discordConstants.StoryTellerRoleName}");
     }
 
+    /// <summary>
+    /// Grants the StoryTeller role to the specified guild user, updates the user's type in the game state, and broadcasts a town update.
+    /// </summary>
+    /// <param name="gameId">The identifier of the game whose state should be updated.</param>
+    /// <param name="user">The guild user to receive the StoryTeller role.</param>
+    /// <param name="role">The StoryTeller role to assign to the user.</param>
+    /// <returns>`(true, message)` where `true` indicates the role was added and `message` is a confirmation containing the user's display name and role name.</returns>
     private async Task<(bool success, string message)> AddStoryTellerRole(string gameId, IDiscordGuildUser user, IDiscordRole role)
     {
         await user.AddRoleAsync(role);
