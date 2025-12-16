@@ -77,7 +77,7 @@ public class HubStateManagerTests
             GameId = gameId,
             Status = TimerStatus.Running,
             ServerNowUtc = DateTime.UtcNow,
-            EndUtc = DateTime.Now.AddSeconds(30)
+            EndUtc = DateTime.UtcNow.AddSeconds(30)
         };
         var discordTown = new DiscordTown([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
         const string expectedJwt = "jwt-token-123";
@@ -121,7 +121,7 @@ public class HubStateManagerTests
             GameId = gameId,
             Status = TimerStatus.Running,
             ServerNowUtc = DateTime.UtcNow,
-            EndUtc = DateTime.Now.AddSeconds(30)
+            EndUtc = DateTime.UtcNow.AddSeconds(30)
         };
         var discordTown = new DiscordTown([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
         const string expectedJwt = "jwt-token-123";
