@@ -858,7 +858,6 @@ public class DiscordTownServiceTests
     public async Task GetDiscordTown_NotifiesClients_WhenGameFound()
     {
         var guild = new Mock<IDiscordGuild>();
-        var expectedDiscordTown = GetDummyDiscordTown();
         _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategory.Name);
         _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategory.Name);
         _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns((DiscordTown?)null);
@@ -867,15 +866,9 @@ public class DiscordTownServiceTests
         guild.Setup(o => o.GetMiniCategory(NightCategory.Name)).Returns(NightCategory);
         _mockGameStateStore.Setup(o => o.GetGuildGames(GuildId)).Returns([new GameState { Id = GameId }]);
 
-        DiscordTown? capturedDiscordTown = null;
-        _mockNotificationService.Setup(o =>
-            o.BroadcastDiscordTownUpdate(It.IsAny<string>(), It.IsAny<DiscordTown>())
-        ).Callback<string, DiscordTown>((_, town) => capturedDiscordTown = town);
-
         _ = await Sut.GetDiscordTown(GuildId);
 
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId, It.IsAny<DiscordTown>()), Times.Once);
-        capturedDiscordTown.Should().BeEquivalentTo(expectedDiscordTown);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     [TestMethod]
@@ -892,7 +885,7 @@ public class DiscordTownServiceTests
 
         _ = await Sut.GetDiscordTown(GuildId);
 
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId, It.IsAny<DiscordTown>()), Times.Never);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
     }
 
     #endregion

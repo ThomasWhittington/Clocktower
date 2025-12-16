@@ -2,13 +2,18 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Socket;
 
-public class NotificationService(IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hub, IGameStateStore gameStateStore)
+public class NotificationService(IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hub, IGameStateStore gameStateStore, IDiscordTownStore discordTownStore)
     : INotificationService
 {
-    public Task BroadcastDiscordTownUpdate(string gameId, DiscordTown discordTown)
+    public Task BroadcastDiscordTownUpdate(string gameId)
     {
         var thisGame = gameStateStore.Get(gameId);
-        var users = thisGame?.Users;
+        if (thisGame is null)
+            return Task.CompletedTask;
+        var discordTown = discordTownStore.Get(thisGame.GuildId);
+        if (discordTown is null)
+            return Task.CompletedTask;
+        var users = thisGame.Users;
         var enhancedTown = discordTown.ToDiscordTownDto(gameId, users);
         return hub.Clients.Group(GetGameGroupName(gameId)).DiscordTownUpdated(enhancedTown);
     }

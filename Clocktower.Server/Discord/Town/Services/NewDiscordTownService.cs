@@ -157,7 +157,7 @@ public class DiscordTownService(
             discordTownStore.Set(guildId, discordTown);
 
             var gameState = gameStateStore.GetGuildGames(guildId).FirstOrDefault();
-            if (gameState is not null) await notificationService.BroadcastDiscordTownUpdate(gameState.Id, discordTown);
+            if (gameState is not null) await notificationService.BroadcastDiscordTownUpdate(gameState.Id);
             return (true, discordTown, $"Discord town {discordTown.UserCount}");
         }
         catch (Exception ex)
@@ -235,7 +235,7 @@ public class DiscordTownService(
     {
         var gameState = gameStateStore.Get(gameId);
         if (gameState is null) return ((false, $"Couldn't find game with id: {gameId}"), default);
-        
+
         var guild = bot.GetGuild(gameState.GuildId);
         if (guild is null) return ((false, GuildNotFoundMessage), default);
 
@@ -259,6 +259,7 @@ public class DiscordTownService(
     {
         await user.RemoveRoleAsync(role);
         gameStateStore.UpdateUser(gameId, user.Id, UserType.Spectator);
+        await notificationService.BroadcastDiscordTownUpdate(gameId);
         return (true, $"User {user.DisplayName} is no longer a {discordConstants.StoryTellerRoleName}");
     }
 
@@ -266,6 +267,7 @@ public class DiscordTownService(
     {
         await user.AddRoleAsync(role);
         gameStateStore.UpdateUser(gameId, user.Id, UserType.StoryTeller);
+        await notificationService.BroadcastDiscordTownUpdate(gameId);
         return (true, $"User {user.DisplayName} is now a {discordConstants.StoryTellerRoleName}");
     }
 
