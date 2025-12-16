@@ -1,4 +1,5 @@
 ﻿using Clocktower.Server.Data;
+using Clocktower.Server.Discord.Town.Services;
 using Clocktower.Server.Game.Endpoints;
 using Clocktower.Server.Game.Services;
 
@@ -8,6 +9,7 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 public class StartGameTests
 {
     private Mock<IGameStateService> _mockGameStateService = null!;
+    private Mock<IDiscordTownService> _mockDiscordTownService = null!;
     private const string ResponseMessage = "Response";
 
     private static StartGame.Request GetRandomRequest() => new(
@@ -21,12 +23,14 @@ public class StartGameTests
         _mockGameStateService.Setup(o =>
                 o.StartNewGame(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns((success, gameState, ResponseMessage));
+        _mockDiscordTownService.Setup(o => o.GetDiscordTown(It.IsAny<string>())).ReturnsAsync((true, null, string.Empty));
     }
 
     [TestInitialize]
     public void Setup()
     {
-        _mockGameStateService = new Mock<IGameStateService>();
+        _mockGameStateService = StrictMockFactory.Create<IGameStateService>();
+        _mockDiscordTownService = StrictMockFactory.Create<IDiscordTownService>();
     }
 
     [TestMethod]
@@ -44,12 +48,12 @@ public class StartGameTests
     }
 
     [TestMethod]
-    public void Handle_ReturnsBadRequest_WhenServiceStartNewGameReturnsFalse()
+    public async Task Handle_ReturnsBadRequest_WhenServiceStartNewGameReturnsFalse()
     {
         var request = GetRandomRequest();
         MockResponse(false, null);
 
-        var result = StartGame.Handle(request, _mockGameStateService.Object);
+        var result = await StartGame.Handle(request, _mockGameStateService.Object, _mockDiscordTownService.Object);
 
         _mockGameStateService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), request.UserId), Times.Once);
 
@@ -59,7 +63,7 @@ public class StartGameTests
     }
 
     [TestMethod]
-    public void Handle_ReturnsCreated_WhenServiceStartNewGameReturnsTrue()
+    public async Task Handle_ReturnsCreated_WhenServiceStartNewGameReturnsTrue()
     {
         var request = GetRandomRequest();
         var gameState = new GameState
@@ -68,7 +72,7 @@ public class StartGameTests
         };
         MockResponse(true, gameState);
 
-        var result = StartGame.Handle(request, _mockGameStateService.Object);
+        var result =await  StartGame.Handle(request, _mockGameStateService.Object, _mockDiscordTownService.Object);
 
         _mockGameStateService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), request.UserId), Times.Once);
 

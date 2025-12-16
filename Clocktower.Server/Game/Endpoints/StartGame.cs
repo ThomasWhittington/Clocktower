@@ -1,4 +1,6 @@
-﻿namespace Clocktower.Server.Game.Endpoints;
+﻿using Clocktower.Server.Discord.Town.Services;
+
+namespace Clocktower.Server.Game.Endpoints;
 
 [UsedImplicitly]
 public class StartGame : IEndpoint
@@ -9,11 +11,11 @@ public class StartGame : IEndpoint
         .WithSummaryAndDescription("Starts new game state for id")
         .WithRequestValidation<Request>();
 
-    internal static Results<Created<GameState>, BadRequest<string>> Handle([AsParameters] Request request, [FromServices] IGameStateService gameStateService)
+    internal static async Task<Results<Created<GameState>, BadRequest<string>>> Handle([AsParameters] Request request, [FromServices] IGameStateService gameStateService, [FromServices] IDiscordTownService discordTownService)
     {
         var gameId = request.GameId.Trim();
         var result = gameStateService.StartNewGame(request.GuildId, gameId, request.UserId);
-
+         await discordTownService.GetDiscordTown(request.GuildId);
         return result.success ? TypedResults.Created($"/games/{result.gameState!.Id}", result.gameState) : TypedResults.BadRequest(result.message);
     }
 

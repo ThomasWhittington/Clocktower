@@ -2,6 +2,7 @@
 using Clocktower.Server.Data;
 using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Wrappers;
+using Clocktower.Server.Discord;
 
 namespace Clocktower.ServerTests.Common.Services;
 
@@ -9,6 +10,7 @@ namespace Clocktower.ServerTests.Common.Services;
 public class DiscordTownManagerTests
 {
     private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
+    private Mock<IDiscordConstantsService> _mockDiscordConstantsService = null!;
     private IDiscordTownManager _sut = null!;
     private const string GuildId = "1";
     private DiscordTown _capturedDiscordTown = null!;
@@ -17,7 +19,9 @@ public class DiscordTownManagerTests
     public void SetUp()
     {
         _mockDiscordTownStore = StrictMockFactory.Create<IDiscordTownStore>();
-        _sut = new DiscordTownManager(_mockDiscordTownStore.Object);
+        _mockDiscordConstantsService = StrictMockFactory.Create<IDiscordConstantsService>();
+        _mockDiscordConstantsService.SetupGet(s => s.NightCategoryName).Returns("Night Category");
+        _sut = new DiscordTownManager(_mockDiscordTownStore.Object, _mockDiscordConstantsService.Object);
     }
 
     private DiscordTown GetDummyDiscordTown()
@@ -538,6 +542,123 @@ public class DiscordTownManagerTests
 
         result.Should().BeNull();
         _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
+    }
+
+    #endregion
+
+    #region RedactTownDto
+
+    [TestMethod]
+    public void RedactTownDto_WhenUserIsInNightChannel_ReturnsOnlyThatNightChannel_AndKeepsOtherCategories()
+    {
+        const string gameId = "test-game-123";
+        const string userId = "u-night";
+
+        var dayCategory = new MiniCategoryDto("day", "Day Category", [
+            new ChannelOccupantsDto(
+                new MiniChannel("day-1", "Day Channel 1"),
+                [new UserDto("u-day", "Day User", "avatar")]
+            )
+        ]);
+
+        var nightCategory = new MiniCategoryDto("night", "Night Category", [
+            new ChannelOccupantsDto(
+                new MiniChannel("night-1", "Night Channel 1"),
+                [new UserDto("someone-else", "Other", "avatar")]
+            ),
+            new ChannelOccupantsDto(
+                new MiniChannel("night-2", "Night Channel 2"),
+                [new UserDto(userId, "Viewer", "avatar")]
+            ),
+            new ChannelOccupantsDto(
+                new MiniChannel("night-3", "Night Channel 3"),
+                []
+            )
+        ]);
+
+        var dto = new DiscordTownDto(gameId, [dayCategory, nightCategory]);
+
+        var result = _sut.RedactTownDto(dto, userId);
+
+        result.GameId.Should().Be(gameId);
+
+        result.ChannelCategories.Should().ContainSingle(c => c.Name == "Day Category");
+        result.ChannelCategories.Should().ContainSingle(c => c.Name == "Night Category");
+
+        var redactedNight = result.ChannelCategories.Single(c => c.Name == "Night Category");
+        redactedNight.Channels.Should().HaveCount(1);
+        redactedNight.Channels.Single().Channel.Id.Should().Be("night-2");
+        redactedNight.Channels.Single().Occupants.Should().Contain(o => o.Id == userId);
+    }
+
+    [TestMethod]
+    public void RedactTownDto_WhenUserNotInAnyNightChannel_RemovesNightCategory()
+    {
+        const string gameId = "test-game-123";
+        const string userId = "u-not-in-night";
+
+        var dayCategory = new MiniCategoryDto("day", "Day Category", [
+            new ChannelOccupantsDto(
+                new MiniChannel("day-1", "Day Channel 1"),
+                [new UserDto("u-day", "Day User", "avatar")]
+            )
+        ]);
+
+        var nightCategory = new MiniCategoryDto("night", "Night Category", [
+            new ChannelOccupantsDto(
+                new MiniChannel("night-1", "Night Channel 1"),
+                [new UserDto("someone-else", "Other", "avatar")]
+            )
+        ]);
+
+        var dto = new DiscordTownDto(gameId, [dayCategory, nightCategory]);
+
+        var result = _sut.RedactTownDto(dto, userId);
+
+        result.ChannelCategories.Should().ContainSingle(c => c.Name == "Day Category");
+        result.ChannelCategories.Should().NotContain(c => c.Name == "Night Category");
+    }
+
+    [TestMethod]
+    public void RedactTownDto_MatchesNightCategoryName_CaseInsensitive()
+    {
+        const string gameId = "test-game-123";
+        const string userId = "u-night";
+
+        _mockDiscordConstantsService
+            .SetupGet(s => s.NightCategoryName)
+            .Returns("nIgHt CaTeGoRy");
+
+        _sut = new DiscordTownManager(_mockDiscordTownStore.Object, _mockDiscordConstantsService.Object);
+
+        var dayCategory = new MiniCategoryDto("day", "Day Category", [
+            new ChannelOccupantsDto(
+                new MiniChannel("day-1", "Day Channel 1"),
+                [new UserDto("u-day", "Day User", "avatar")]
+            )
+        ]);
+
+        var nightCategory = new MiniCategoryDto("night", "NIGHT CATEGORY", [
+            new ChannelOccupantsDto(
+                new MiniChannel("night-2", "Night Channel 2"),
+                [new UserDto(userId, "Viewer", "avatar")]
+            ),
+            new ChannelOccupantsDto(
+                new MiniChannel("night-1", "Night Channel 1"),
+                [new UserDto("someone-else", "Other", "avatar")]
+            )
+        ]);
+
+        var dto = new DiscordTownDto(gameId, [dayCategory, nightCategory]);
+
+        var result = _sut.RedactTownDto(dto, userId);
+
+        result.ChannelCategories.Should().ContainSingle(c => c.Name == "Day Category");
+        result.ChannelCategories.Should().ContainSingle(c => c.Name == "NIGHT CATEGORY");
+
+        var redactedNight = result.ChannelCategories.Single(c => c.Name == "NIGHT CATEGORY");
+        redactedNight.Channels.Should().HaveCount(1);
+        redactedNight.Channels.Single().Channel.Id.Should().Be("night-2");
     }
 
     #endregion

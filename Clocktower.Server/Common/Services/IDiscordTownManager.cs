@@ -11,4 +11,5 @@ public interface IDiscordTownManager
     string? GetVoiceChannelIdByName(string guildId, string voiceChannelName);
     TownUser? GetTownUser(string userId);
     IEnumerable<MiniChannel> GetNightChannels(string guildId, string categoryName);
+    DiscordTownDto RedactTownDto(DiscordTownDto discordTownDto, string userId);
 }
