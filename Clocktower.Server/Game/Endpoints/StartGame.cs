@@ -11,7 +11,7 @@ public class StartGame : IEndpoint
         .WithSummaryAndDescription("Starts new game state for id")
         .WithRequestValidation<Request>();
 
-    internal static async Task<Results<Created<GameState>, BadRequest<string>>> Handle([AsParameters] Request request, [FromServices] IGameStateService gameStateService, [FromServices] IDiscordTownService discordTownService, ILogger<StartGame> logger)
+    internal static async Task<Results<Created<GameState>, BadRequest<string>>> Handle([AsParameters] Request request, [FromServices] IGameStateService gameStateService, [FromServices] IDiscordTownService discordTownService, [FromServices] ILogger<StartGame> logger)
     {
         var gameId = request.GameId.Trim();
         var result = gameStateService.StartNewGame(request.GuildId, gameId, request.UserId);
