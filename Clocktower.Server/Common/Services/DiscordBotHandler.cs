@@ -43,22 +43,17 @@ public class DiscordBotHandler(
         var townService = scope.ServiceProvider.GetRequiredService<IDiscordTownService>();
         var (success, discordTown, _) = await townService.GetDiscordTown(guildId);
         if (!success || discordTown is null) return;
-        var newDiscordTown = discordDiscordTownManager.MoveUser(discordTown, user, after.VoiceChannel);
+        discordDiscordTownManager.MoveUser(discordTown, user, after.VoiceChannel);
 
-        await notificationService.BroadcastDiscordTownUpdate(gameId, newDiscordTown);
+        await notificationService.BroadcastDiscordTownUpdate(gameId);
     }
 
     public virtual async Task UpdateVoiceStatus(IDiscordGuildUser user, IDiscordVoiceState after, string gameId, string guildId)
     {
         bool inVoice = after.VoiceChannel != null;
         var discordVoiceState = new VoiceState(after.IsMuted, after.IsDeafened, after.IsSelfMuted, after.IsSelfDeafened);
+        userService.UpdateDiscordPresence(user.Id, guildId, inVoice, discordVoiceState);
 
-        userService.UpdateDiscordPresence(user.Id.ToString(), guildId, inVoice, discordVoiceState);
-
-        var discordTown = discordDiscordTownManager.GetDiscordTown(guildId);
-        if (discordTown is not null)
-        {
-            await notificationService.BroadcastDiscordTownUpdate(gameId, discordTown);
-        }
+        await notificationService.BroadcastDiscordTownUpdate(gameId);
     }
 }

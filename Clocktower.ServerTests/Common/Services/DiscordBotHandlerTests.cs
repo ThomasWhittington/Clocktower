@@ -256,10 +256,7 @@ public class DiscordBotHandlerTests
 
         await Sut.UpdateDiscordTown(_guildUser.Object, _after.Object, string.Empty, GuildId);
 
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(
-            string.Empty,
-            It.IsAny<DiscordTown>()
-        ), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(string.Empty), Times.Once);
     }
 
     [TestMethod]
@@ -267,12 +264,11 @@ public class DiscordBotHandlerTests
     {
         const string gameId = "game-id";
         var dummyDiscordTown = GetDummyDiscordTown();
-        var dummyDiscordTown2 = new DiscordTown([]);
-        Setup_UpdateDiscordTown(getDiscordTownValue: dummyDiscordTown, moveUserValue: dummyDiscordTown2);
+        Setup_UpdateDiscordTown(getDiscordTownValue: dummyDiscordTown);
 
         await Sut.UpdateDiscordTown(_guildUser.Object, _after.Object, gameId, GuildId);
 
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(gameId, dummyDiscordTown2), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(gameId), Times.Once);
     }
 
     [TestMethod]
@@ -293,7 +289,7 @@ public class DiscordBotHandlerTests
                 voiceState.IsSelfDeafened == isSelfDeafened &&
                 voiceState.IsServerDeafened == isServerDeafened
             )));
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(gameId, discordTown), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(gameId), Times.Once);
     }
 
     private static DiscordTown GetDummyDiscordTown()
