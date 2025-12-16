@@ -9,9 +9,6 @@ import {
 import {
     useServerHub
 } from "@/hooks";
-import {
-    discordService
-} from '@/services';
 import type {
     DiscordTown
 } from '@/types';
@@ -28,7 +25,6 @@ let globalTownState: DiscordTownState = {
     error: ""
 };
 const globalTownListeners = new Set<(state: DiscordTownState) => void>();
-let isInitializing = false;
 
 const notifyTownListeners = () => {
     globalTownListeners.forEach(listener => listener({...globalTownState}));
@@ -37,33 +33,6 @@ const notifyTownListeners = () => {
 const setTownState = (updates: Partial<DiscordTownState>) => {
     globalTownState = {...globalTownState, ...updates};
     notifyTownListeners();
-};
-
-const initializeDiscordTown = async (gameId: string) => {
-    if (isInitializing || globalTownState.gameId === gameId) return;
-
-    isInitializing = true;
-    
-    setTownState({
-        isLoading: true,
-        error: "",
-        gameId: gameId
-    });
-
-    try {
-        const data = await discordService.getDiscordTown(gameId);
-        setTownState({
-            discordTown: data,
-            isLoading: false
-        });
-    } catch (err: any) {
-        setTownState({
-            error: err.message,
-            isLoading: false
-        });
-    } finally {
-        isInitializing = false;
-    }
 };
 
 const resetDiscordTownState = () => {
@@ -80,25 +49,19 @@ export const useDiscordTown = () => {
     const [state, setState] = useState<DiscordTownState>(globalTownState);
     const listenerRef = useRef<(state: DiscordTownState) => void>(null);
 
-    const currentGameId = useAppStore((state) => state.gameId);
+    const {gameId} = useAppStore();
     const {discordTown: realtimeDiscordTown} = useServerHub();
 
     useEffect(() => {
         const listener = (newState: DiscordTownState) => setState(newState);
         listenerRef.current = listener;
         globalTownListeners.add(listener);
-
-        if (currentGameId && currentGameId !== globalTownState.gameId) {
-            initializeDiscordTown(currentGameId).then(_ => {
-            });
-        }
-
         return () => {
             if (listenerRef.current) {
                 globalTownListeners.delete(listenerRef.current);
             }
         };
-    }, [currentGameId]);
+    }, [gameId]);
 
     useEffect(() => {
         if (realtimeDiscordTown) {

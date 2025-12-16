@@ -1,21 +1,30 @@
+using Clocktower.Server.Common.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Socket;
 
-public class NotificationService(IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hub, IGameStateStore gameStateStore, IDiscordTownStore discordTownStore)
+public class NotificationService(IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hub, IGameStateStore gameStateStore, IDiscordTownManager discordTownManager)
     : INotificationService
 {
-    public Task BroadcastDiscordTownUpdate(string gameId)
+    public async Task BroadcastDiscordTownUpdate(string gameId)
     {
         var thisGame = gameStateStore.Get(gameId);
-        if (thisGame is null)
-            return Task.CompletedTask;
-        var discordTown = discordTownStore.Get(thisGame.GuildId);
-        if (discordTown is null)
-            return Task.CompletedTask;
+        if (thisGame is null) return;
+        var discordTown = discordTownManager.GetDiscordTown(thisGame.GuildId);
+        if (discordTown is null) return;
         var users = thisGame.Users;
-        var enhancedTown = discordTown.ToDiscordTownDto(gameId, users);
-        return hub.Clients.Group(GetGameGroupName(gameId)).DiscordTownUpdated(enhancedTown);
+
+        var fullAccessUserIds = users.Where(u => u.UserType is UserType.StoryTeller or UserType.Spectator).GetIds().ToArray();
+        var playerUserIds = users.Where(u => u.UserType is UserType.Player).GetIds().ToArray();
+
+        var fullTown = discordTown.ToDiscordTownDto(gameId, users);
+        await hub.Clients.Users(fullAccessUserIds).DiscordTownUpdated(fullTown);
+        var playerTasks = playerUserIds.Select(playerId =>
+        {
+            var perPlayerTown = discordTownManager.RedactTownDto(fullTown, playerId);
+            return hub.Clients.User(playerId).DiscordTownUpdated(perPlayerTown);
+        });
+        await Task.WhenAll(playerTasks);
     }
 
     public Task BroadcastUserVoiceStateChanged(string gameId, string userId, bool inVoice, VoiceState voiceState) => hub.Clients.Group(GetGameGroupName(gameId)).UserVoiceStateChanged(userId, inVoice, voiceState);

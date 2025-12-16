@@ -1,8 +1,9 @@
 ﻿using Clocktower.Server.Data.Wrappers;
+using Clocktower.Server.Discord;
 
 namespace Clocktower.Server.Common.Services;
 
-public class DiscordTownManager(IDiscordTownStore discordTownStore) : IDiscordTownManager
+public class DiscordTownManager(IDiscordTownStore discordTownStore, IDiscordConstantsService discordConstantsService) : IDiscordTownManager
 {
     public DiscordTown MoveUser(DiscordTown current, IDiscordGuildUser user, IDiscordVoiceChannel? newChannel)
     {
@@ -111,5 +112,27 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore) : IDiscordTo
         if (nightCategory is null) return [];
         var cottages = nightCategory.Channels.Select(channel => channel.Channel).ToList();
         return cottages;
+    }
+
+    public DiscordTownDto RedactTownDto(DiscordTownDto discordTownDto, string userId)
+    {
+        var redactedCategories = discordTownDto.ChannelCategories
+            .Select(category =>
+            {
+                if (!string.Equals(category.Name, discordConstantsService.NightCategoryName, StringComparison.OrdinalIgnoreCase))
+                    return category;
+
+                var visibleNightChannel = category.Channels.FirstOrDefault(ch => ch.Occupants.Any(o => o.Id == userId));
+
+                var redactedNightChannels = visibleNightChannel is null
+                    ? Enumerable.Empty<ChannelOccupantsDto>()
+                    : new[] { visibleNightChannel };
+
+                return category with { Channels = redactedNightChannels };
+            })
+            .Where(category => category.Channels.Any())
+            .ToList();
+
+        return discordTownDto with { ChannelCategories = redactedCategories };
     }
 }
