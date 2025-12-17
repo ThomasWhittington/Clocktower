@@ -17,8 +17,7 @@ import {
     useAppStore
 } from "@/store";
 import {
-    GameList,
-    TimeOfDaySwitch
+    GameList
 } from "@/components/features/gameManager/components";
 import {
     joinGameGroup,
@@ -192,7 +191,6 @@ function GameManager() {
                                 </>
                             }
                                 <br/>
-                                <TimeOfDaySwitch/>
                                 {gameId &&
                                     <>
                                         <button

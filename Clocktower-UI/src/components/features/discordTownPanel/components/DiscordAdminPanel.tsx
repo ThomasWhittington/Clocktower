@@ -2,7 +2,7 @@
     Spinner
 } from "@/components/ui";
 import {
-    useDiscordActions
+    useDiscordActions,
 } from "@/components/features/discordTownPanel/hooks";
 import {
     useTimerActions
@@ -11,6 +11,7 @@ import {
     useMemo,
     useState
 } from "react";
+import {TimeOfDaySwitch} from "@/components/features/discordTownPanel/components/TimeOfDaySwitch.tsx";
 
 function DiscordAdminPanel() {
     const {
@@ -38,8 +39,7 @@ function DiscordAdminPanel() {
     }, [timerActionsCanRun, isTimerLoading, timerSeconds]);
 
     return (
-        <div
-            className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-2">
             {isLoading &&
                 <Spinner/>}
             {result &&
@@ -49,15 +49,11 @@ function DiscordAdminPanel() {
             <div>
                 {discordActionsCanRun &&
                     <>
-                        <button
-                            className="btn-primary"
-                            aria-label="Send to Town Square"
-                            onClick={sendToTownSquare}>⛲
+                        <button className="btn-primary" aria-label="Send to Town Square" onClick={sendToTownSquare}>
+                            ⛲
                         </button>
-                        <button
-                            className="btn-secondary"
-                            aria-label="Send to Cottages"
-                            onClick={sendToCottages}>🛌
+                        <button className="btn-secondary" aria-label="Send to Cottages" onClick={sendToCottages}>
+                            🛌
                         </button>
                     </>
                 }
@@ -70,37 +66,15 @@ function DiscordAdminPanel() {
 
                 {timerActionsCanRun &&
                     <>
-                        <input
-                            type="number"
-                            min={1}
-                            value={timerSeconds}
-                            onChange={(e) => setTimerSeconds(Number(e.target.value))}
-                            placeholder="Seconds"
-                            className="input-primary w-24"
-                        />
-                        <input
-                            type="text"
-                            value={timerLabel}
-                            onChange={(e) => setTimerLabel(e.target.value)}
-                            placeholder="Label (optional)"
-                            className="input-primary w-32"
-                        />
-                        <button
-                            className="btn-primary"
-                            aria-label="Start or edit timer"
-                            disabled={!canSubmitTimer}
-                            onClick={() => startOrEditTimer(timerSeconds, timerLabel.trim() || undefined)}
-                        >
+                        <input type="number" min={1} value={timerSeconds} onChange={(e) => setTimerSeconds(Number(e.target.value))} placeholder="Seconds" className="input-primary w-24"/>
+                        <input type="text" value={timerLabel} onChange={(e) => setTimerLabel(e.target.value)} placeholder="Label (optional)" className="input-primary w-32"/>
+                        <button className="btn-primary" aria-label="Start or edit timer" disabled={!canSubmitTimer} onClick={() => startOrEditTimer(timerSeconds, timerLabel.trim() || undefined)}>
                             ⌛
                         </button>
-                        <button
-                            className="btn-danger"
-                            aria-label="Cancel timer"
-                            disabled={!timerActionsCanRun || isTimerLoading}
-                            onClick={cancelTimer}
-                        >
+                        <button className="btn-danger" aria-label="Cancel timer" disabled={!timerActionsCanRun || isTimerLoading} onClick={cancelTimer}>
                             ❌
                         </button>
+                        <TimeOfDaySwitch/>
                     </>
                 }
             </div>

@@ -1,13 +1,8 @@
-﻿import {
-    useCallback,
-    useState
-} from "react";
-import {
-    useAppStore
-} from "@/store";
-import {
-    discordService
-} from "@/services";
+﻿import {useCallback, useState} from "react";
+import {useAppStore} from "@/store";
+import {discordService} from "@/services";
+import {useTimeOfDay} from "@/components/features/discordTownPanel/hooks/useTimeOfDay.ts";
+import {GameTime} from "@/types";
 
 type DiscordActionsState = {
     isLoading: boolean;
@@ -17,6 +12,7 @@ type DiscordActionsState = {
 
 export const useDiscordActions = () => {
     const {gameId} = useAppStore();
+    const setTime = useTimeOfDay();
 
     const [state, setState] = useState<DiscordActionsState>({
         isLoading: false,
@@ -59,6 +55,7 @@ export const useDiscordActions = () => {
         if (!gameId) return;
 
         await run(async () => {
+            await setTime(GameTime.Night);
             return await discordService.sendToCottages(gameId);
         });
     }, [gameId, run]);
@@ -67,6 +64,7 @@ export const useDiscordActions = () => {
         if (!gameId) return;
 
         await run(async () => {
+            await setTime(GameTime.Day);
             return await discordService.sendToTownSquare(gameId);
         });
     }, [gameId, run]);
