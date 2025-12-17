@@ -21,3 +21,7 @@ export {
     default as ErrorPage
 }
     from './ErrorPage.tsx'
+export {
+    default as Playground
+}
+    from './Playground.tsx'

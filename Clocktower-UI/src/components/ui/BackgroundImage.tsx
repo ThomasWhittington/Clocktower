@@ -1,8 +1,5 @@
-﻿import React
-    from "react";
-import {
-    GameTime
-} from "@/types";
+﻿import React from "react";
+import {GameTime} from "@/types";
 
 export const BackgroundImage = ({ gameTime, children }: { gameTime: GameTime, children?: React.ReactNode }) => {
     const backgrounds = {
@@ -13,7 +10,7 @@ export const BackgroundImage = ({ gameTime, children }: { gameTime: GameTime, ch
     };
     
     return (
-        <div className="relative flex justify-center align-center w-full">
+        <div className="relative flex flex-col w-full h-full min-h-0 overflow-hidden">
             {Object.entries(backgrounds).map(([time, image]) => (
                 <div
                     key={time}
@@ -27,7 +24,6 @@ export const BackgroundImage = ({ gameTime, children }: { gameTime: GameTime, ch
             <div className="absolute inset-0 backdrop-blur-sm" />
 
             <div className="relative z-10">
-                <p>{GameTime[gameTime]}</p>
                 {children}
             </div>
         </div>
