@@ -20,6 +20,15 @@
         <node-interpreter value="project" />
         <envs />
       </option>
+      <option name="NpmBeforeRunTask" enabled="true">
+        <package-json value="$PROJECT_DIR$/Clocktower-UI/package.json" />
+        <command value="run" />
+        <scripts>
+          <script value="type-check" />
+        </scripts>
+        <node-interpreter value="project" />
+        <envs />
+      </option>
     </method>
   </configuration>
 </component>

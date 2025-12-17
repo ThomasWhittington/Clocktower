@@ -32,11 +32,11 @@ function Home() {
 
     const handleGuildClick = (guild: MiniGuild) => {
         setGuildId(guild.id);
-        window.location.href = '/game';
+        globalThis.location.href = '/game';
     };
 
     return (
-        <>
+        <div className="m-8">
             {loggedIn ?
                 (
                     <>
@@ -47,26 +47,19 @@ function Home() {
                             error={error}
                             onGuildClick={handleGuildClick}
                         />
-                        <button
-                            onClick={addBot}
-                            className="btn-outline"
-                        >
+                        <button onClick={addBot} className="btn-outline">
                             Add Bot To Server
                         </button>
 
                         <GameManager/>
                     </>
                 ) : (
-                    <>
-                        <button
-                            onClick={() => authService.initiateDiscordLogin()}
-                        >
-                            Login with Discord
-                        </button>
-                    </>
+                    <button onClick={() => authService.initiateDiscordLogin()}>
+                        Login with Discord
+                    </button>
                 )
             }
-        </>
+        </div>
     );
 }
 

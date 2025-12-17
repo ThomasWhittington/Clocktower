@@ -45,8 +45,8 @@ const Join = () => {
                     } else if (data?.user && data.guildId && data.gameId) {
                         setCurrentUser({
                             id: data.user?.id ?? '',
-                            name: data.user?.name ?? '',
-                            avatarUrl: data.user?.avatarUrl ?? ''
+                            name: '',// name: data.user?.name ?? '',
+                            avatarUrl: ''// avatarUrl: data.user?.avatarUrl ?? ''
                         });
                         setGuildId(data.guildId);
                         setGameId(data.gameId);
