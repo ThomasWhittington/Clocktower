@@ -1,24 +1,9 @@
-﻿import {
-    Panel,
-    PanelGroup,
-    PanelResizeHandle
-} from "react-resizable-panels";
-import {
-    DiscordTownPanel
-} from "../components/features";
-import {
-    useServerHub
-} from "@/hooks";
-import {
-    HubConnectionState
-} from "@microsoft/signalr";
-import {
-    BackgroundImage,
-    Spinner
-} from "@/components/ui";
-import {
-    Timer
-} from "@/components/ui/Timer.tsx";
+﻿import {Panel, PanelGroup, PanelResizeHandle} from "react-resizable-panels";
+import {DiscordTownPanel} from "../components/features";
+import {useServerHub} from "@/hooks";
+import {HubConnectionState} from "@microsoft/signalr";
+import {BackgroundImage, Spinner} from "@/components/ui";
+import {Timer} from "@/components/ui/Timer.tsx";
 import {TownSquare} from "@/components/features";
 
 function Game() {

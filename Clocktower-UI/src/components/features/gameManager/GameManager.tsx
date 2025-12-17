@@ -1,29 +1,11 @@
-﻿import {
-    useState
-} from "react";
-import {
-    BackgroundImage,
-    Spinner
-} from '@/components/ui';
+﻿import {useState} from "react";
+import {BackgroundImage, Spinner} from '@/components/ui';
 
-import {
-    discordService,
-    gamesService
-} from "@/services";
-import type {
-    GameState
-} from "@/types";
-import {
-    useAppStore
-} from "@/store";
-import {
-    GameList
-} from "@/components/features/gameManager/components";
-import {
-    joinGameGroup,
-    leaveGameGroup,
-    useServerHub
-} from "@/hooks";
+import {discordService, gamesService} from "@/services";
+import type {GameState} from "@/types";
+import {useAppStore} from "@/store";
+import {GameList} from "@/components/features/gameManager/components";
+import {joinGameGroup, leaveGameGroup, useServerHub} from "@/hooks";
 
 function GameManager() {
     const [isLoading, setIsLoading] = useState(false);

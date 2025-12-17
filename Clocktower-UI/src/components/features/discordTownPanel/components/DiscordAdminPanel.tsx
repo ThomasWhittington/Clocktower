@@ -1,16 +1,7 @@
-﻿import {
-    Spinner
-} from "@/components/ui";
-import {
-    useDiscordActions,
-} from "@/components/features/discordTownPanel/hooks";
-import {
-    useTimerActions
-} from "@/hooks/useTimerActions.ts";
-import {
-    useMemo,
-    useState
-} from "react";
+﻿import {Spinner} from "@/components/ui";
+import {useDiscordActions,} from "@/components/features/discordTownPanel/hooks";
+import {useTimerActions} from "@/hooks/useTimerActions.ts";
+import {useMemo, useState} from "react";
 import {TimeOfDaySwitch} from "@/components/features/discordTownPanel/components/TimeOfDaySwitch.tsx";
 
 function DiscordAdminPanel() {

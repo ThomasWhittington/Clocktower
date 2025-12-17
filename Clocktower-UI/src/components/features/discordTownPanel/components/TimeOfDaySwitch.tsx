@@ -1,6 +1,4 @@
-﻿import {
-    GameTime
-} from "@/types";
+﻿import {GameTime} from "@/types";
 import {useTimeOfDay} from "@/components/features/discordTownPanel/hooks";
 
 export const TimeOfDaySwitch = () => {
