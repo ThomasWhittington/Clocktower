@@ -1,23 +1,10 @@
-﻿import {
-    useAppStore
-} from "@/store";
-import {
-    authService
-} from "@/services";
+﻿import {useAppStore} from "@/store";
+import {authService} from "@/services";
 
-import {
-    useAddBot,
-    useGuildsWithUser
-} from "@/pages/hooks";
-import type {
-    MiniGuild
-} from "@/types";
-import {
-    GuildsList
-} from "@/components/ui";
-import {
-    GameManager
-} from "@/components/features";
+import {useAddBot, useGuildsWithUser} from "@/pages/hooks";
+import type {MiniGuild} from "@/types";
+import {GuildsList} from "@/components/ui";
+import {GameManager} from "@/components/features";
 
 function Home() {
     const loggedIn = useAppStore((state) => state.loggedIn);
@@ -32,11 +19,11 @@ function Home() {
 
     const handleGuildClick = (guild: MiniGuild) => {
         setGuildId(guild.id);
-        window.location.href = '/game';
+        globalThis.location.href = '/game';
     };
 
     return (
-        <>
+        <div className="m-8">
             {loggedIn ?
                 (
                     <>
@@ -47,26 +34,19 @@ function Home() {
                             error={error}
                             onGuildClick={handleGuildClick}
                         />
-                        <button
-                            onClick={addBot}
-                            className="btn-outline"
-                        >
+                        <button onClick={addBot} className="btn-outline">
                             Add Bot To Server
                         </button>
 
                         <GameManager/>
                     </>
                 ) : (
-                    <>
-                        <button
-                            onClick={() => authService.initiateDiscordLogin()}
-                        >
-                            Login with Discord
-                        </button>
-                    </>
+                    <button onClick={() => authService.initiateDiscordLogin()}>
+                        Login with Discord
+                    </button>
                 )
             }
-        </>
+        </div>
     );
 }
 

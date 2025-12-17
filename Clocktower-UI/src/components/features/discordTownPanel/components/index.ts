@@ -14,3 +14,4 @@ export {
     default as DiscordTownUser
 }
     from './DiscordTownUser.tsx';
+export {TimeOfDaySwitch} from'./TimeOfDaySwitch';
