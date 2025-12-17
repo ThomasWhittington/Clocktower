@@ -37,4 +37,4 @@ jobs:
           channelId: ${{ github.event_name == 'push' && 'live' || '' }}
           projectId: amarantosclocktower
           entryPoint: ./Clocktower-UI
-        if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
+        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository }}
