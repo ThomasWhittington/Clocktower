@@ -8,7 +8,7 @@ import {useServerHeartbeat} from "@/hooks";
 function App() {
     const loggedIn = useAppStore((state) => state.loggedIn);
     const heartbeat = useServerHeartbeat();
-    const playground = false;
+    const playground = import.meta.env.VITE_PLAYGROUND_MODE === 'true';
     return (
         <>
             {playground ?
