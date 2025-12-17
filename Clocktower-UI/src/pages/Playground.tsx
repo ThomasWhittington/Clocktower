@@ -6,7 +6,7 @@ import {GameTime} from "@/types";
 
 export default function Playground() {
     return (
-        <PanelGroup autoSaveId="example" direction="horizontal">
+        <PanelGroup autoSaveId="playground-panel-layout" direction="horizontal">
             <Panel defaultSize={25}>
                 <DiscordTownPanel/>
             </Panel>

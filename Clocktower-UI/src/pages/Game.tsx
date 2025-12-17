@@ -13,7 +13,7 @@ function Game() {
             {
                 connectionState === HubConnectionState.Connected ?
                     (
-                        <PanelGroup autoSaveId="example" direction="horizontal">
+                        <PanelGroup autoSaveId="game-panel-layout" direction="horizontal">
                             <Panel defaultSize={25}>
                                 <DiscordTownPanel/>
                             </Panel>
