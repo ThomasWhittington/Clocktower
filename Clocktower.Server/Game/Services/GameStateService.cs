@@ -1,5 +1,6 @@
 ﻿using System.IO.Abstractions;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Clocktower.Server.Common.Services;
 using Clocktower.Server.Socket;
 
@@ -25,7 +26,12 @@ public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, I
         try
         {
             var json = fileSystem.File.ReadAllText(filePath);
-            var games = JsonSerializer.Deserialize<GameState[]>(json);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
+            var games = JsonSerializer.Deserialize<GameState[]>(json, options);
             if (games == null)
             {
                 return (false, "Failed to deserialize json");
