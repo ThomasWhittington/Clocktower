@@ -1,18 +1,8 @@
-﻿import {
-    useAppStore
-} from "@/store";
-import {
-    useEffect
-} from "react";
-import {
-    discordService
-} from "@/services";
-import {
-    resetAllApplicationState
-} from "@/utils";
-import {
-    Spinner
-} from "@/components/ui";
+﻿import {useAppStore} from "@/store";
+import {useEffect} from "react";
+import {discordService} from "@/services";
+import {resetAllApplicationState} from "@/utils";
+import {Spinner} from "@/components/ui";
 
 const Join = () => {
     const {

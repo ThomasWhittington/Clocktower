@@ -1,23 +1,10 @@
-﻿import {
-    useAppStore
-} from "@/store";
-import {
-    authService
-} from "@/services";
+﻿import {useAppStore} from "@/store";
+import {authService} from "@/services";
 
-import {
-    useAddBot,
-    useGuildsWithUser
-} from "@/pages/hooks";
-import type {
-    MiniGuild
-} from "@/types";
-import {
-    GuildsList
-} from "@/components/ui";
-import {
-    GameManager
-} from "@/components/features";
+import {useAddBot, useGuildsWithUser} from "@/pages/hooks";
+import type {MiniGuild} from "@/types";
+import {GuildsList} from "@/components/ui";
+import {GameManager} from "@/components/features";
 
 function Home() {
     const loggedIn = useAppStore((state) => state.loggedIn);

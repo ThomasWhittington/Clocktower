@@ -1,9 +1,5 @@
-﻿import type {
-    GameState
-} from "@/types";
-import {
-    useAppStore
-} from "@/store";
+﻿import type {GameState} from "@/types";
+import {useAppStore} from "@/store";
 import type {FC} from "react";
 
 

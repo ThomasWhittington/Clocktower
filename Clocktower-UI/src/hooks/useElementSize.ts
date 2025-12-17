@@ -1,4 +1,4 @@
-﻿import { useCallback, useLayoutEffect, useState } from "react";
+﻿import {useCallback, useLayoutEffect, useState} from "react";
 
 type Size = { width: number; height: number };
 
