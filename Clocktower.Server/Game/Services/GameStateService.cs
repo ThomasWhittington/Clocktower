@@ -84,12 +84,8 @@ public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, I
         if (user is null) return (false, null, "Couldn't find user");
         var gameUser = user.AsGameUser();
         gameUser.UserType = UserType.StoryTeller;
-        var newGameState = new GameState
+        var newGameState = new GameState(gameId, guildId, gameUser, DateTime.UtcNow)
         {
-            Id = gameId,
-            GuildId = guildId,
-            CreatedDate = DateTime.UtcNow,
-            CreatedBy = gameUser,
             Users = [gameUser]
         };
 
@@ -115,5 +111,10 @@ public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, I
         {
             return (false, ex.Message);
         }
+    }
+
+    public Task<Result<GameStateDto>> GetPlayerGameState(string gameId, string userId)
+    {
+        throw new NotImplementedException();
     }
 }

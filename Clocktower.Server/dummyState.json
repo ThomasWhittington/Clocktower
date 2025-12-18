@@ -89,14 +89,12 @@
       }
     ],
     "spectators": [],
-    "maxPlayers": 0,
     "createdBy": {
       "id": "285398267854848000",
       "isPlaying": false,
       "userType": "StoryTeller"
     },
     "createdDate": "2025-12-17T17:01:25.3972206Z",
-    "gameTime": "Unknown",
-    "isFull": false
+    "gameTime": "Unknown"
   }
 ]

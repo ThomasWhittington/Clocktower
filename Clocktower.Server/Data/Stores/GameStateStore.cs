@@ -36,7 +36,7 @@ public class GameStateStore : IGameStateStore
     {
         return GetAll().Where(game => game.GuildId == guildId);
     }
-    
+
     public IEnumerable<GameState> GetUserGames(string userId)
     {
         return GetAll().Where(game => game.Users.Select(o => o.Id).Contains(userId));
@@ -46,20 +46,15 @@ public class GameStateStore : IGameStateStore
 
     public void AddUserToGame(string gameId, GameUser gameUser)
     {
-        TryUpdate(gameId, state =>
+        TryUpdate(gameId, state => state with
         {
-            state.Users.Add(gameUser);
-            return state;
+            Users = [.. state.Users, gameUser]
         });
     }
 
     public void SetTime(string gameId, GameTime gameTime)
     {
-        TryUpdate(gameId, state =>
-        {
-            state.GameTime = gameTime;
-            return state;
-        });
+        TryUpdate(gameId, state => state with { GameTime = gameTime });
     }
 
     public bool UpdateUser(string gameId,
@@ -71,20 +66,22 @@ public class GameStateStore : IGameStateStore
 
         GameState UpdateFunction(GameState state)
         {
-            var user = state.Users.GetById(userId);
-            if (user is null) return state;
+            var user = state.Users.FirstOrDefault(u => u.Id == userId);
+            if (user is null ||
+                (userType == null || user.UserType == userType) &&
+                (isPlaying == null || user.IsPlaying == isPlaying)
+               ) return state;
 
-            if (userType.HasValue)
+            var updatedUser = user with
             {
-                user.UserType = userType.Value;
-            }
+                UserType = userType ?? user.UserType,
+                IsPlaying = isPlaying ?? user.IsPlaying
+            };
 
-            if (isPlaying.HasValue)
+            return state with
             {
-                user.IsPlaying = isPlaying.Value;
-            }
-
-            return state;
+                Users = state.Users.Select(u => u.Id == userId ? updatedUser : u).ToList()
+            };
         }
     }
 }

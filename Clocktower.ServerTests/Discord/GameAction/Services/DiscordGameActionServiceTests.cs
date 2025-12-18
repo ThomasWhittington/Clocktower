@@ -31,9 +31,7 @@ public class DiscordGameActionServiceTests
     private void SetUp_GameStateStore(bool hasGame, bool checkMuted = false, string? guildId = GuildId, (string userId, bool isPresent, bool muted, UserType userType)[]? users = null)
     {
         _guild.Setup(o => o.Id).Returns(guildId!);
-        _gameState.Id = GameId;
-        _gameState.GuildId = guildId!;
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(hasGame ? _gameState : null);
+        _gameState = CommonMethods.GetGameState(GameId, guildId);
 
         if (users is not null)
         {
@@ -46,11 +44,13 @@ public class DiscordGameActionServiceTests
                 return thisUser;
             }).ToList();
 
-            _gameState.Users.AddRange(gameUsers);
+            _gameState = _gameState with { Users = [.._gameState.Users, ..gameUsers] };
             _mockUserService.Setup(o => o.GetTownUsersForGameUsers(_gameState.StoryTellers, guildId!, It.IsAny<Func<TownUser, bool>>()))
                 .Callback<IEnumerable<GameUser>, string, Func<TownUser, bool>>((_, _, predicate) => { _capturedPredicate = predicate; })
                 .Returns(townUsers);
         }
+
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(hasGame ? _gameState : null);
     }
 
     [TestInitialize]
@@ -62,7 +62,6 @@ public class DiscordGameActionServiceTests
         _mockDiscordTownManager = StrictMockFactory.Create<IDiscordTownManager>();
         _mockDiscordConstantsService = StrictMockFactory.Create<IDiscordConstantsService>();
 
-        _gameState = new GameState();
         _guild = StrictMockFactory.Create<IDiscordGuild>();
 
         _sut = new DiscordGameActionService(
@@ -294,7 +293,6 @@ public class DiscordGameActionServiceTests
     }
 
     [TestMethod]
-
     public async Task SendToCottagesAsync_ReturnsError_WhenGuildInvalid()
     {
         SetUp_GameStateStore(true, guildId: "invalid");
@@ -344,7 +342,7 @@ public class DiscordGameActionServiceTests
         Setup_SendToCottagesAsync(cottageCount, users:
         [
             new ValueTuple<string, UserType>("1", UserType.StoryTeller),
-            new ValueTuple<string, UserType>("1", UserType.Player)
+            new ValueTuple<string, UserType>("2", UserType.Player)
         ]);
 
         var result = await _sut.SendToCottagesAsync(GameId);

@@ -48,7 +48,7 @@ public class HubStateManagerTests
     {
         const string gameId = "test-game";
         const string userId = "non-existent-user";
-        var gameState = new GameState { Id = gameId };
+        var gameState = CommonMethods.GetGameState(gameId);
 
         _mockGameStateStore.Setup(s => s.Get(gameId)).Returns(gameState);
 
@@ -56,22 +56,17 @@ public class HubStateManagerTests
 
         result.Should().BeNull();
     }
-    
-    
+
+
     [TestMethod]
     public void GetState_ReturnsSessionState_WhenUserFoundInGame_Player()
     {
         const string gameId = "test-game";
         const string guildId = "1";
         const string userId = "user-123";
-        var gameUser = new GameUser(userId){UserType = UserType.Player};
-        var gameState = new GameState
-        {
-            Id = gameId,
-            GameTime = GameTime.Day,
-            Users = [gameUser],
-            GuildId = guildId
-        };
+        var gameUser = new GameUser(userId) { UserType = UserType.Player };
+        var gameState = CommonMethods.GetGameState(gameId, guildId) with { GameTime = GameTime.Day, Users = [gameUser] };
+
         var timer = new TimerState
         {
             GameId = gameId,
@@ -100,7 +95,7 @@ public class HubStateManagerTests
         result.DiscordTown.GameId.Should().Be(gameId);
         result.Timer.Should().Be(timer);
     }
-    
+
 
     [TestMethod]
     public void GetState_ReturnsSessionState_WhenUserFoundInGame_Storyteller()
@@ -108,14 +103,9 @@ public class HubStateManagerTests
         const string gameId = "test-game";
         const string guildId = "1";
         const string userId = "user-123";
-        var gameUser = new GameUser(userId) {UserType = UserType.StoryTeller};
-        var gameState = new GameState
-        {
-            Id = gameId,
-            GameTime = GameTime.Day,
-            Users = [gameUser],
-            GuildId = guildId
-        };
+        var gameUser = new GameUser(userId) { UserType = UserType.StoryTeller };
+        var gameState = CommonMethods.GetGameState(gameId, guildId) with { GameTime = GameTime.Day, Users = [gameUser] };
+
         var timer = new TimerState
         {
             GameId = gameId,

@@ -79,4 +79,9 @@ public static class CommonMethods
         return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day,
             dateTime.Hour, dateTime.Minute, dateTime.Second, DateTimeKind.Utc);
     }
+
+    public static GameState GetGameState(string? gameId = null, string? guildId = null, string? creatorId = null, GameUser? createdBy = null)
+    {
+        return new GameState(gameId ?? GetRandomString(), guildId ?? GetRandomSnowflakeStringId(), createdBy ?? GetRandomGameUser(creatorId), DateTime.UtcNow);
+    }
 }

@@ -186,7 +186,7 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task ToggleStoryTeller_ReturnsFalse_WhenGuildNotFound()
     {
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(CommonMethods.GetGameState(GameId, GuildId));
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns((IDiscordGuild?)null);
 
         var result = await Sut.ToggleStoryTeller(GameId, UserId);
@@ -200,7 +200,7 @@ public class DiscordTownServiceTests
     public async Task ToggleStoryTeller_ReturnsFalse_WhenRoleNotFound()
     {
         var guild = new Mock<IDiscordGuild>();
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(CommonMethods.GetGameState(GameId, GuildId));
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns((IDiscordRole?)null);
@@ -217,7 +217,7 @@ public class DiscordTownServiceTests
     {
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(CommonMethods.GetGameState(GameId, GuildId));
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
@@ -237,7 +237,7 @@ public class DiscordTownServiceTests
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = GuildId });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(CommonMethods.GetGameState(GameId, GuildId));
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
         guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(role.Object);
@@ -257,11 +257,8 @@ public class DiscordTownServiceTests
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
-        var gameState = new GameState
-        {
-            GuildId = GuildId,
-            Users = []
-        };
+        var gameState = CommonMethods.GetGameState(GameId, GuildId) with { Users = [] };
+
         var gameUser = CommonMethods.GetRandomGameUser(UserId);
         _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
@@ -286,14 +283,8 @@ public class DiscordTownServiceTests
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
-        var gameState = new GameState
-        {
-            GuildId = GuildId,
-            Users =
-            [
-                CommonMethods.GetRandomGameUser(UserId)
-            ]
-        };
+        var gameState = CommonMethods.GetGameState(GameId, GuildId) with { Users = [CommonMethods.GetRandomGameUser(UserId)] };
+
         _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
@@ -317,14 +308,7 @@ public class DiscordTownServiceTests
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
-        var gameState = new GameState
-        {
-            GuildId = GuildId,
-            Users =
-            [
-                CommonMethods.GetRandomGameUser(UserId)
-            ]
-        };
+        var gameState = CommonMethods.GetGameState(GameId, GuildId) with { Users = [CommonMethods.GetRandomGameUser(UserId)] };
 
         _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
@@ -353,14 +337,7 @@ public class DiscordTownServiceTests
         var guild = new Mock<IDiscordGuild>();
         var role = new Mock<IDiscordRole>();
         var user = new Mock<IDiscordGuildUser>();
-        var gameState = new GameState
-        {
-            GuildId = GuildId,
-            Users =
-            [
-                CommonMethods.GetRandomGameUser(UserId)
-            ]
-        };
+        var gameState = CommonMethods.GetGameState(GameId, GuildId) with { Users = [CommonMethods.GetRandomGameUser(UserId)] };
 
         _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(gameState);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
@@ -864,7 +841,7 @@ public class DiscordTownServiceTests
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetMiniCategory(DayCategory.Name)).Returns(DayCategory);
         guild.Setup(o => o.GetMiniCategory(NightCategory.Name)).Returns(NightCategory);
-        _mockGameStateStore.Setup(o => o.GetGuildGames(GuildId)).Returns([new GameState { Id = GameId }]);
+        _mockGameStateStore.Setup(o => o.GetGuildGames(GuildId)).Returns([CommonMethods.GetGameState(GameId, GuildId)]);
 
         _ = await Sut.GetDiscordTown(GuildId);
 
@@ -902,7 +879,7 @@ public class DiscordTownServiceTests
             }
             : [];
 
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(hasGameState ? new GameState { Id = gameId, GuildId = guildId, Users = users } : null);
+        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(hasGameState ? CommonMethods.GetGameState(GameId, GuildId) with { Users = users } : null);
         _mockDiscordTownStore.Setup(o => o.Get(guildId)).Returns(discordTown);
         _mockBot.Setup(o => o.GetGuild(guildId)).Returns(hasGuild ? new Mock<IDiscordGuild>().Object : null);
     }
@@ -980,7 +957,7 @@ public class DiscordTownServiceTests
     [DataRow("invalid-guild")]
     public async Task InviteUser_ReturnsError_WhenGuildIdInvalid(string? guildId)
     {
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = guildId! });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(CommonMethods.GetGameState(GameId, GuildId));
 
         var (outcome, message) = await Sut.InviteUser(GameId, UserId);
 
@@ -991,7 +968,7 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_ReturnsError_WhenGuildNotFound()
     {
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(CommonMethods.GetGameState(GameId, GuildId));
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns((IDiscordGuild?)null);
 
         var (outcome, message) = await Sut.InviteUser(GameId, UserId);
@@ -1005,7 +982,7 @@ public class DiscordTownServiceTests
     public async Task InviteUser_ReturnsError_WhenUserNotFound()
     {
         var guild = new Mock<IDiscordGuild>();
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(CommonMethods.GetGameState(GameId, GuildId));
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(UserId)).Returns((IDiscordGuildUser?)null);
 
@@ -1021,7 +998,7 @@ public class DiscordTownServiceTests
     {
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(new GameState { GuildId = "1" });
+        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(CommonMethods.GetGameState(GameId, GuildId));
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(UserId)).Returns(user.Object);
         user.Setup(o => o.Id).Returns(UserId);
@@ -1037,7 +1014,7 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_GetsJwtToken_WhenDataGood()
     {
-        var gameState = new GameState { GuildId = "1" };
+        var gameState = CommonMethods.GetGameState(GameId, GuildId);
         var gameUser = CommonMethods.GetRandomGameUser(UserId);
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
@@ -1058,7 +1035,7 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_GeneratesId_WhenGotJwt()
     {
-        var gameState = new GameState { GuildId = "1" };
+        var gameState = CommonMethods.GetGameState(GameId, GuildId);
         var gameUser = CommonMethods.GetRandomGameUser(UserId);
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
@@ -1082,7 +1059,7 @@ public class DiscordTownServiceTests
     {
         const string feUri = "fe-uri";
         CommonMethods.SetUpMockSecrets(_mockSecrets, feUri: feUri);
-        var gameState = new GameState { GuildId = "1" };
+        var gameState = CommonMethods.GetGameState(GameId, GuildId);
         var gameUser = CommonMethods.GetRandomGameUser(UserId);
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();
@@ -1110,7 +1087,7 @@ public class DiscordTownServiceTests
     {
         const string feUri = "fe-uri";
         CommonMethods.SetUpMockSecrets(_mockSecrets, feUri: feUri);
-        var gameState = new GameState { GuildId = "1" };
+        var gameState = CommonMethods.GetGameState(GameId, GuildId);
         var gameUser = CommonMethods.GetRandomGameUser(UserId);
         var guild = new Mock<IDiscordGuild>();
         var user = new Mock<IDiscordGuildUser>();

@@ -43,15 +43,17 @@ export type ClocktowerServerDataDiscordTownDto = {
 export type ClocktowerServerDataGameState = {
     id?: string | null;
     guildId?: string | null;
+    createdBy?: ClocktowerServerDataGameUser;
+    createdDate?: Date;
     users?: Array<ClocktowerServerDataGameUser> | null;
     readonly players?: Array<ClocktowerServerDataGameUser> | null;
     readonly storyTellers?: Array<ClocktowerServerDataGameUser> | null;
     readonly spectators?: Array<ClocktowerServerDataGameUser> | null;
-    maxPlayers?: number;
-    createdBy?: ClocktowerServerDataGameUser;
-    createdDate?: Date;
     gameTime?: ClocktowerServerDataTypesEnumGameTime;
-    readonly isFull?: boolean;
+};
+
+export type ClocktowerServerDataGameStateDto = {
+    [key: string]: never;
 };
 
 export type ClocktowerServerDataGameUser = {
@@ -185,10 +187,9 @@ export type ClocktowerServerDataDiscordTownDtoWritable = {
 export type ClocktowerServerDataGameStateWritable = {
     id?: string | null;
     guildId?: string | null;
-    users?: Array<ClocktowerServerDataGameUser> | null;
-    maxPlayers?: number;
     createdBy?: ClocktowerServerDataGameUser;
     createdDate?: Date;
+    users?: Array<ClocktowerServerDataGameUser> | null;
     gameTime?: ClocktowerServerDataTypesEnumGameTime;
 };
 
@@ -821,6 +822,38 @@ export type GetPlayerGamesApiResponses = {
 };
 
 export type GetPlayerGamesApiResponse = GetPlayerGamesApiResponses[keyof GetPlayerGamesApiResponses];
+
+export type GetPlayerGameStateApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/players/{userId}/state';
+};
+
+export type GetPlayerGameStateApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type GetPlayerGameStateApiError = GetPlayerGameStateApiErrors[keyof GetPlayerGameStateApiErrors];
+
+export type GetPlayerGameStateApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerDataGameStateDto;
+};
+
+export type GetPlayerGameStateApiResponse = GetPlayerGameStateApiResponses[keyof GetPlayerGameStateApiResponses];
 
 export type LoadDummyGamesApiData = {
     body?: never;

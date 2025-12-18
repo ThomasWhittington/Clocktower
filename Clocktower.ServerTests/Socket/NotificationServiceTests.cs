@@ -49,9 +49,9 @@ public class NotificationServiceTests
         _mockClients.Setup(c => c.User("player")).Returns(_mockClientProxy1.Object);
         _mockClients.Setup(c => c.Users(new[] { "storyteller", "spectator" })).Returns(_mockClientProxy2.Object);
         _mockDiscordTownManager.Setup(o => o.RedactTownDto(It.IsAny<DiscordTownDto>(), "player")).Returns(playerTown);
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState
+        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(CommonMethods.GetGameState(gameId, guildId) with
         {
-            Id = gameId, GuildId = guildId, Users =
+            Users =
             [
                 new GameUser("player") { UserType = UserType.Player },
                 new GameUser("storyteller") { UserType = UserType.StoryTeller },
@@ -88,7 +88,7 @@ public class NotificationServiceTests
         const string gameId = "test-game-123";
         const string guildId = "123";
         _mockClients.Setup(c => c.Group($"game:{gameId}")).Returns(_mockClientProxy1.Object);
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { Id = gameId, GuildId = guildId });
+        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(CommonMethods.GetGameState(gameId, guildId));
         _mockDiscordTownManager.Setup(o => o.GetDiscordTown(guildId)).Returns((DiscordTown?)null);
 
         await _sut.BroadcastDiscordTownUpdate(gameId);

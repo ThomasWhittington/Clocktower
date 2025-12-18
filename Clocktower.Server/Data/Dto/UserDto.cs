@@ -3,7 +3,7 @@
 [UsedImplicitly]
 public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITownUser
 {
-    [UsedImplicitly] public VoiceState VoiceState { get; set; } = new (false, false, false, false);
+    [UsedImplicitly] public VoiceState VoiceState { get; set; } = new(false, false, false, false);
     [UsedImplicitly] public bool IsPresent { get; set; }
     [UsedImplicitly] public bool IsPlaying { get; set; }
     [UsedImplicitly] public UserType UserType { get; set; } = UserType.Unknown;

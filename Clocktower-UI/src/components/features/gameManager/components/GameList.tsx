@@ -18,10 +18,9 @@ export const GameList: FC<GameListProps> = ({games}) => {
                         <div key={game.id} className="bg-gray-800 p-4 rounded-lg w-1/4">
                             <h4 className="text-lg font-medium text-gray-200">{game.id}</h4>
                             <h5 className="sm text-gray-600">{game.guildId}</h5>
-                            <p className="text-gray-400">Players: {game.players.length}{game.maxPlayers > 0 ? `/${game.maxPlayers}` : ''}</p>
+                            <p className="text-gray-400">Players: {game.players.length}</p>
                             <p className="text-gray-400">Spectators: {game.spectators.length}</p>
                             <p className="text-gray-400">StoryTellers: {game.storyTellers.length}</p>
-                            {game.isFull && <p>FULL</p>}
                             {game.createdDate && <h5 className="sm text-gray-600">{new Date(game.createdDate).toDateString()}</h5>}
                             <h5 className="sm text-gray-600">{game.createdBy.id}</h5>
 

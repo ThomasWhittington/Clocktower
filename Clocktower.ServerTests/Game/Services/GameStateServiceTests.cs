@@ -13,7 +13,7 @@ namespace Clocktower.ServerTests.Game.Services;
 [TestClass]
 public class GameStateServiceTests
 {
-    private const string  DummyJsonFile  = "dummyState.json";
+    private const string DummyJsonFile = "dummyState.json";
 
     private Mock<IDiscordBot> _mockBot = null!;
     private Mock<IGameStateStore> _mockGameStateStore = null!;
@@ -38,9 +38,9 @@ public class GameStateServiceTests
     {
         GameState[] allGames =
         [
-            new() { Id = CommonMethods.GetRandomString() },
-            new() { Id = CommonMethods.GetRandomString() },
-            new() { Id = CommonMethods.GetRandomString() }
+            CommonMethods.GetGameState(),
+            CommonMethods.GetGameState(),
+            CommonMethods.GetGameState()
         ];
 
         _mockGameStateStore.Setup(o => o.GetAll()).Returns(allGames);
@@ -61,9 +61,9 @@ public class GameStateServiceTests
         var guildId = CommonMethods.GetRandomString();
         GameState[] allGames =
         [
-            new() { Id = CommonMethods.GetRandomString() },
-            new() { Id = CommonMethods.GetRandomString() },
-            new() { Id = CommonMethods.GetRandomString() }
+            CommonMethods.GetGameState(),
+            CommonMethods.GetGameState(),
+            CommonMethods.GetGameState()
         ];
 
         _mockGameStateStore.Setup(o => o.GetGuildGames(guildId)).Returns(allGames);
@@ -82,12 +82,11 @@ public class GameStateServiceTests
     public void GetPlayerGames_CallsGameStateStore()
     {
         var userId = CommonMethods.GetRandomSnowflakeStringId();
-        var user = CommonMethods.GetRandomGameUser(userId);
         GameState[] allGames =
         [
-            new() { Id = CommonMethods.GetRandomString(), CreatedDate = DateTime.UtcNow, CreatedBy = user },
-            new() { Id = CommonMethods.GetRandomString(), CreatedDate = DateTime.UtcNow, CreatedBy = user },
-            new() { Id = CommonMethods.GetRandomString(), CreatedDate = DateTime.UtcNow, CreatedBy = user }
+            CommonMethods.GetGameState(creatorId: userId),
+            CommonMethods.GetGameState(creatorId: userId),
+            CommonMethods.GetGameState(creatorId: userId)
         ];
         var expected = allGames.Select(o => new MiniGameState(o.Id, o.CreatedBy, o.CreatedDate));
 
@@ -107,7 +106,7 @@ public class GameStateServiceTests
     public void GetGame_ReturnsExpected_WhenStoreReturnsGame()
     {
         var gameId = CommonMethods.GetRandomString();
-        var gameState = new GameState { Id = CommonMethods.GetRandomString() };
+        var gameState = CommonMethods.GetGameState();
 
         _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(gameState);
 
@@ -190,19 +189,11 @@ public class GameStateServiceTests
         var userId = CommonMethods.GetRandomSnowflakeStringId();
         var userName = CommonMethods.GetRandomString();
         var userAvatarUrl = CommonMethods.GetRandomString();
-
-        var expectedGameUser = new GameUser(userId.ToString())
+        var expectedGameUser = new GameUser(userId)
         {
             UserType = UserType.StoryTeller
         };
-        var expectedGameState = new GameState
-        {
-            Id = gameId,
-            GuildId = guildId,
-            CreatedDate = DateTime.UtcNow,
-            CreatedBy = expectedGameUser,
-            Users = [expectedGameUser]
-        };
+        var expectedGameState = CommonMethods.GetGameState(gameId, guildId, createdBy: expectedGameUser) with { Users = [expectedGameUser] };
 
         var mockedUser = MockMaker.CreateMockDiscordUser(userId, userName, userAvatarUrl);
         _mockBot.Setup(o => o.GetUser(userId)).Returns(mockedUser);
@@ -246,8 +237,8 @@ public class GameStateServiceTests
     {
         var validJson = JsonSerializer.Serialize(new[]
         {
-            new GameState { Id = "game1", GuildId = "guild1" },
-            new GameState { Id = "game2", GuildId = "guild2" }
+            CommonMethods.GetGameState("game1", "guild1"),
+            CommonMethods.GetGameState("game2", "guild2")
         });
 
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(validJson);
@@ -291,7 +282,7 @@ public class GameStateServiceTests
     [TestMethod]
     public void LoadDummyData_ClearsStoreBeforeLoading()
     {
-        var validJson = JsonSerializer.Serialize(new[] { new GameState { Id = "game1" } });
+        var validJson = JsonSerializer.Serialize(new[] { CommonMethods.GetGameState() });
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(validJson);
 
         Sut.LoadDummyData();
@@ -346,9 +337,9 @@ public class GameStateServiceTests
     {
         var games = new[]
         {
-            new GameState { Id = "first" },
-            new GameState { Id = "second" },
-            new GameState { Id = "third" }
+            CommonMethods.GetGameState("first"),
+            CommonMethods.GetGameState("second"),
+            CommonMethods.GetGameState("third")
         };
         var validJson = JsonSerializer.Serialize(games);
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(validJson);
@@ -383,7 +374,7 @@ public class GameStateServiceTests
     public async Task SetTime_SetsTime_NotifyClients_WhenDataGood(GameTime gameTime)
     {
         const string gameId = "game-id";
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(new GameState { GuildId = "12345" });
+        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(CommonMethods.GetGameState(gameId));
 
         var result = await Sut.SetTime(gameId, gameTime);
 

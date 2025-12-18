@@ -27,23 +27,21 @@ public class GameAuthorizationServiceTests
     }
 
 
-    private static GameState CreateGameState(string gameId, List<(string userId, UserType userType)> users)
+    private static GameState CreateGameState(string gameId, List<(string userId, UserType userType)>? users = null)
     {
         var gameUsers = new List<GameUser>();
-
-        foreach ((string userId, UserType userType) in users)
+        if (users is not null)
         {
-            gameUsers.Add(new GameUser(userId)
+            foreach ((string userId, UserType userType) in users)
             {
-                UserType = userType
-            });
+                gameUsers.Add(new GameUser(userId)
+                {
+                    UserType = userType
+                });
+            }
         }
 
-        return new GameState
-        {
-            Id = gameId,
-            Users = gameUsers
-        };
+        return CommonMethods.GetGameState(gameId) with { Users = gameUsers };
     }
 
 
@@ -54,7 +52,7 @@ public class GameAuthorizationServiceTests
         string gameId = CommonMethods.GetRandomString();
         var gameState = CreateGameState("dummy", [new ValueTuple<string, UserType>(userId, UserType.StoryTeller)]);
         MockResponse("dummy", gameState);
-        
+
         var result = Sut.IsStoryTellerForGame(userId, gameId);
 
         result.Should().BeFalse();
@@ -65,7 +63,7 @@ public class GameAuthorizationServiceTests
     {
         string userId = CommonMethods.GetRandomString();
         string gameId = CommonMethods.GetRandomString();
-        var gameState = new GameState { Id = gameId };
+        var gameState = CommonMethods.GetGameState(gameId);
         MockResponse(gameId, gameState);
 
         var result = Sut.IsStoryTellerForGame(userId, gameId);
@@ -78,7 +76,7 @@ public class GameAuthorizationServiceTests
     {
         string userId = CommonMethods.GetRandomString();
         string gameId = CommonMethods.GetRandomString();
-        var gameState = new GameState { Id = "dummy" };
+        var gameState = CommonMethods.GetGameState("dummy");
         MockResponse(gameId, gameState);
 
         var result = Sut.IsStoryTellerForGame(userId, gameId);

@@ -113,7 +113,7 @@ public class DiscordBotHandlerTests
             _user.Setup(o => o.GetGuildUser()).Returns(_guildUser.Object);
         }
 
-        var gameStates = gameIds is null ? [] : gameIds.Select(o => new GameState { Id = o });
+        var gameStates = gameIds is null ? [] : gameIds.Select(id => CommonMethods.GetGameState(id));
         _mockGameStateStore.Setup(o => o.GetGuildGames(GuildId)).Returns(gameStates);
 
         _voiceChannel1.Setup(o => o.Id).Returns(ChannelId1);

@@ -55,10 +55,7 @@ public class GetGameTests
     public void Handle_ReturnsOk_WhenServiceGetGameReturnsTrue()
     {
         var gameId = CommonMethods.GetRandomString();
-        var gameState = new GameState
-        {
-            Id = CommonMethods.GetRandomString()
-        };
+        var gameState = CommonMethods.GetGameState();
         MockResponse(true, gameState);
 
         var result = GetGame.Handle(gameId, _mockGameStateService.Object);

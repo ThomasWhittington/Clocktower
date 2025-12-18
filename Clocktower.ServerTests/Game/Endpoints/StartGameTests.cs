@@ -69,16 +69,12 @@ public class StartGameTests
     public async Task Handle_ReturnsCreated_WhenServiceStartNewGameReturnsTrue()
     {
         var request = GetRandomRequest();
-        var gameState = new GameState
-        {
-            Id = CommonMethods.GetRandomString()
-        };
+        var gameState = CommonMethods.GetGameState();
         MockResponse(true, gameState, true);
 
         var result = await StartGame.Handle(request, _mockGameStateService.Object, _mockDiscordTownService.Object, _mockLogger.Object);
 
         _mockGameStateService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), request.UserId), Times.Once);
-
         var response = result.Result.Should().BeOfType<Created<GameState>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.Created);
         response.Location.Should().Be($"/games/{gameState.Id}");
@@ -89,14 +85,10 @@ public class StartGameTests
     public async Task Handle_LogsWarning_WhenTownNotFound()
     {
         var request = GetRandomRequest();
-        var gameState = new GameState
-        {
-            Id = CommonMethods.GetRandomString()
-        };
+        var gameState = CommonMethods.GetGameState();
         MockResponse(true, gameState, false);
 
         var result = await StartGame.Handle(request, _mockGameStateService.Object, _mockDiscordTownService.Object, _mockLogger.Object);
-
         _mockGameStateService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), request.UserId), Times.Once);
 
         _mockLogger.Verify(
