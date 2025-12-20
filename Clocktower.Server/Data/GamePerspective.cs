@@ -1,6 +1,6 @@
 ﻿namespace Clocktower.Server.Data;
 
-public record GameState(string Id, string GuildId, GameUser CreatedBy, DateTime CreatedDate) : IIdentifiable
+public record GamePerspective(string Id, string GuildId, GameUser CreatedBy, DateTime CreatedDate) : IIdentifiable
 {
     public string Id { get; } = Id;
     public string GuildId { get; } = GuildId;

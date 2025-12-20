@@ -5,7 +5,7 @@ using Clocktower.Server.Socket;
 namespace Clocktower.Server.Common.Services;
 
 public class DiscordBotHandler(
-    IGameStateStore gameStateStore,
+    IGamePerspectiveStore gamePerspectiveStore,
     IDiscordTownManager discordDiscordTownManager,
     IUserService userService,
     INotificationService notificationService,
@@ -18,21 +18,21 @@ public class DiscordBotHandler(
         if (guildId is null) return;
         var guildUser = user.GetGuildUser();
         if (guildUser is null) return;
-        var gameStates = gameStateStore.GetGuildGames(guildId);
+        var gamePerspectives = gamePerspectiveStore.GetGuildGames(guildId);
 
         var channelsAreSame = before.VoiceChannel?.Id == after.VoiceChannel?.Id;
         if (channelsAreSame)
         {
-            foreach (var gameState in gameStates)
+            foreach (var gamePerspective in gamePerspectives)
             {
-                await UpdateVoiceStatus(guildUser, after, gameState.Id, guildId);
+                await UpdateVoiceStatus(guildUser, after, gamePerspective.Id, guildId);
             }
         }
         else
         {
-            foreach (var gameState in gameStates)
+            foreach (var gamePerspective in gamePerspectives)
             {
-                await UpdateDiscordTown(guildUser, after, gameState.Id, guildId);
+                await UpdateDiscordTown(guildUser, after, gamePerspective.Id, guildId);
             }
         }
     }

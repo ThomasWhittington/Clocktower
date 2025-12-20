@@ -11,7 +11,7 @@ namespace Clocktower.Server.Discord.Town.Services;
 public class DiscordTownService(
     IDiscordBot bot,
     INotificationService notificationService,
-    IGameStateStore gameStateStore,
+    IGamePerspectiveStore gamePerspectiveStore,
     IDiscordTownStore discordTownStore,
     IJwtWriter jwtWriter,
     IMemoryCache cache,
@@ -123,7 +123,7 @@ public class DiscordTownService(
 
             bool isStoryTellerAlready = user.DoesUserHaveRole(role.Id);
 
-            EnsureUserExistsInGameState(gameId, user);
+            EnsureUserPerspectiveExistsForGame(gameId, user);
 
             if (isStoryTellerAlready)
                 return await RemoveStoryTellerRole(gameId, user, role);
@@ -156,8 +156,8 @@ public class DiscordTownService(
 
             discordTownStore.Set(guildId, discordTown);
 
-            var gameState = gameStateStore.GetGuildGames(guildId).FirstOrDefault();
-            if (gameState is not null) await notificationService.BroadcastDiscordTownUpdate(gameState.Id);
+            var gamePerspective = gamePerspectiveStore.GetGuildGames(guildId).FirstOrDefault();
+            if (gamePerspective is not null) await notificationService.BroadcastDiscordTownUpdate(gamePerspective.Id);
             return (true, discordTown, $"Discord town {discordTown.UserCount}");
         }
         catch (Exception ex)
@@ -168,13 +168,13 @@ public class DiscordTownService(
 
     public async Task<(bool success, DiscordTownDto? discordTown, string message)> GetDiscordTownDto(string gameId)
     {
-        var gameState = gameStateStore.Get(gameId);
-        if (gameState is null) return (false, null, $"Game not found for id: {gameId}");
+        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return (false, null, $"Game not found for id: {gameId}");
 
-        var (success, discordTown, message) = await GetDiscordTown(gameState.GuildId);
+        var (success, discordTown, message) = await GetDiscordTown(gamePerspective.GuildId);
         if (success && discordTown != null)
         {
-            var discordTownDto = discordTown.ToDiscordTownDto(gameId, gameState.Users);
+            var discordTownDto = discordTown.ToDiscordTownDto(gameId, gamePerspective.Users);
             return (true, discordTownDto, message);
         }
 
@@ -185,7 +185,7 @@ public class DiscordTownService(
     {
         if (cache.TryGetValue($"join_data_{key}", out var joinData) && joinData is JoinData response)
         {
-            gameStateStore.UpdateUser(response.GameId, response.User.Id, isPlaying: true);
+            gamePerspectiveStore.UpdateUser(response.GameId, response.User.Id, isPlaying: true);
             cache.Remove($"join_data_{key}");
             return response;
         }
@@ -202,17 +202,17 @@ public class DiscordTownService(
     {
         try
         {
-            var gameState = gameStateStore.Get(gameId);
-            if (gameState is null) return (InviteUserOutcome.GameDoesNotExistError, $"Couldn't find game with id: {gameId}");
-            var guild = bot.GetGuild(gameState.GuildId);
-            if (guild is null) return (InviteUserOutcome.InvalidGuildError, "GameState contained a guildId that could not be found");
+            var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+            if (gamePerspective is null) return (InviteUserOutcome.GameDoesNotExistError, $"Couldn't find game with id: {gameId}");
+            var guild = bot.GetGuild(gamePerspective.GuildId);
+            if (guild is null) return (InviteUserOutcome.InvalidGuildError, "GamePerspective contained a guildId that could not be found");
 
             var user = guild.GetUser(userId);
             if (user is null) return (InviteUserOutcome.UserNotFoundError, $"Couldn't find user: {userId}");
             var dmChannel = await user.CreateDmChannelAsync();
             if (dmChannel is null) return (InviteUserOutcome.DmChannelError, "Couldn't open dm channel with user");
 
-            var thisGameUser = user.AsGameUser(gameState);
+            var thisGameUser = user.AsGameUser(gamePerspective);
             thisGameUser.UserType = UserType.Player;
             var jwt = jwtWriter.GetJwtToken(thisGameUser);
             var response = new JoinData(guild.Id, thisGameUser, gameId, jwt);
@@ -222,7 +222,7 @@ public class DiscordTownService(
 
             await dmChannel.SendMessageAsync($"[Join here]({url})");
 
-            gameStateStore.AddUserToGame(gameId, thisGameUser);
+            gamePerspectiveStore.AddUserToGame(gameId, thisGameUser);
             return (InviteUserOutcome.InviteSent, "Sent message to user");
         }
         catch (Exception)
@@ -233,10 +233,10 @@ public class DiscordTownService(
 
     private ((bool success, string message) status, (IDiscordRole role, IDiscordGuildUser user) data) ValidateToggleStoryTellerRequest(string gameId, string userId)
     {
-        var gameState = gameStateStore.Get(gameId);
-        if (gameState is null) return ((false, $"Couldn't find game with id: {gameId}"), default);
+        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return ((false, $"Couldn't find game with id: {gameId}"), default);
 
-        var guild = bot.GetGuild(gameState.GuildId);
+        var guild = bot.GetGuild(gamePerspective.GuildId);
         if (guild is null) return ((false, GuildNotFoundMessage), default);
 
         var role = guild.GetRole(discordConstants.StoryTellerRoleName);
@@ -249,16 +249,16 @@ public class DiscordTownService(
     }
 
 
-    private void EnsureUserExistsInGameState(string gameId, IDiscordGuildUser user)
+    private void EnsureUserPerspectiveExistsForGame(string gameId, IDiscordGuildUser user)
     {
-        var thisUser = gameStateStore.Get(gameId)?.Users.GetById(user.Id);
-        if (thisUser is null) gameStateStore.AddUserToGame(gameId, user.AsGameUser());
+        var thisUser = gamePerspectiveStore.Get(gameId, user.Id);
+        if (thisUser is null) gamePerspectiveStore.AddUserToGame(gameId, user.AsGameUser());
     }
 
     private async Task<(bool success, string message)> RemoveStoryTellerRole(string gameId, IDiscordGuildUser user, IDiscordRole role)
     {
         await user.RemoveRoleAsync(role);
-        gameStateStore.UpdateUser(gameId, user.Id, UserType.Spectator);
+        gamePerspectiveStore.UpdateUser(gameId, user.Id, UserType.Spectator);
         await notificationService.BroadcastDiscordTownUpdate(gameId);
         return (true, $"User {user.DisplayName} is no longer a {discordConstants.StoryTellerRoleName}");
     }
@@ -266,7 +266,7 @@ public class DiscordTownService(
     private async Task<(bool success, string message)> AddStoryTellerRole(string gameId, IDiscordGuildUser user, IDiscordRole role)
     {
         await user.AddRoleAsync(role);
-        gameStateStore.UpdateUser(gameId, user.Id, UserType.StoryTeller);
+        gamePerspectiveStore.UpdateUser(gameId, user.Id, UserType.StoryTeller);
         await notificationService.BroadcastDiscordTownUpdate(gameId);
         return (true, $"User {user.DisplayName} is now a {discordConstants.StoryTellerRoleName}");
     }

@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Socket;
 
-public class NotificationService(IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hub, IGameStateStore gameStateStore, IDiscordTownManager discordTownManager)
+public class NotificationService(IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hub, IGamePerspectiveStore gamePerspectiveStore, IDiscordTownManager discordTownManager)
     : INotificationService
 {
+    //TODO will need a rework to ensure the correct game perspective is retrieved per player
     public async Task BroadcastDiscordTownUpdate(string gameId)
     {
-        var thisGame = gameStateStore.Get(gameId);
+        var thisGame = gamePerspectiveStore.GetFirstPerspective(gameId);
         if (thisGame is null) return;
         var discordTown = discordTownManager.GetDiscordTown(thisGame.GuildId);
         if (discordTown is null) return;

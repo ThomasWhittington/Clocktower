@@ -8,12 +8,12 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class GetPlayerGameStateTests
 {
-    private Mock<IGameStateService> _mockGameStateService = null!;
+    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _mockGameStateService = StrictMockFactory.Create<IGameStateService>();
+        _mockGamePerspectiveService = StrictMockFactory.Create<IGamePerspectiveService>();
     }
 
     [TestMethod]
@@ -38,12 +38,12 @@ public class GetPlayerGameStateTests
         const string gameId = "game-id";
         const string userId = "12345";
         var request = new GameAndUserRequest(gameId, userId);
-        var error = Result.Fail<GameStateDto>(ErrorKind.Invalid, "error code", "error message");
-        _mockGameStateService.Setup(o => o.GetPlayerGameState(gameId, userId)).ReturnsAsync(error);
+        var error = Result.Fail<GamePerspectiveDto>(ErrorKind.Invalid, "error code", "error message");
+        _mockGamePerspectiveService.Setup(o => o.GetPlayerGameState(gameId, userId)).ReturnsAsync(error);
 
-        var result = await GetPlayerGameState.Handle(request, _mockGameStateService.Object);
+        var result = await GetPlayerGameState.Handle(request, _mockGamePerspectiveService.Object);
 
-        _mockGameStateService.Verify(o => o.GetPlayerGameState(gameId, userId), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetPlayerGameState(gameId, userId), Times.Once);
         var response = result.Result.Should().BeOfType<BadRequest<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
     }
@@ -55,12 +55,12 @@ public class GetPlayerGameStateTests
         const string gameId = "game-id";
         const string userId = "12345";
         var request = new GameAndUserRequest(gameId, userId);
-        var error = Result.Fail<GameStateDto>(ErrorKind.NotFound, "error code", "error message");
-        _mockGameStateService.Setup(o => o.GetPlayerGameState(gameId, userId)).ReturnsAsync(error);
+        var error = Result.Fail<GamePerspectiveDto>(ErrorKind.NotFound, "error code", "error message");
+        _mockGamePerspectiveService.Setup(o => o.GetPlayerGameState(gameId, userId)).ReturnsAsync(error);
 
-        var result = await GetPlayerGameState.Handle(request, _mockGameStateService.Object);
+        var result = await GetPlayerGameState.Handle(request, _mockGamePerspectiveService.Object);
 
-        _mockGameStateService.Verify(o => o.GetPlayerGameState(gameId, userId), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetPlayerGameState(gameId, userId), Times.Once);
         var response = result.Result.Should().BeOfType<NotFound<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
     }
@@ -71,13 +71,13 @@ public class GetPlayerGameStateTests
         const string gameId = "game-id";
         const string userId = "12345";
         var request = new GameAndUserRequest(gameId, userId);
-        var success = Result.Ok(new GameStateDto());
-        _mockGameStateService.Setup(o => o.GetPlayerGameState(gameId, userId)).ReturnsAsync(success);
+        var success = Result.Ok(CommonMethods.GetGamePerspectiveDto());
+        _mockGamePerspectiveService.Setup(o => o.GetPlayerGameState(gameId, userId)).ReturnsAsync(success);
 
-        var result = await GetPlayerGameState.Handle(request, _mockGameStateService.Object);
+        var result = await GetPlayerGameState.Handle(request, _mockGamePerspectiveService.Object);
 
-        _mockGameStateService.Verify(o => o.GetPlayerGameState(gameId, userId), Times.Once);
-        var response = result.Result.Should().BeOfType<Ok<GameStateDto>>().Subject;
+        _mockGamePerspectiveService.Verify(o => o.GetPlayerGameState(gameId, userId), Times.Once);
+        var response = result.Result.Should().BeOfType<Ok<GamePerspectiveDto>>().Subject;
         response.Value.Should().Be(success.Value);
     }
 }

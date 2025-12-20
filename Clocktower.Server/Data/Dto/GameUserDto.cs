@@ -3,4 +3,4 @@
 namespace Clocktower.Server.Data;
 
 [UsedImplicitly, ExcludeFromCodeCoverage(Justification = "DTO")]
-public record GameStateDto();
+public record GameUserDto(string Id) : IIdentifiable;

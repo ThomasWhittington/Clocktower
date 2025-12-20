@@ -63,7 +63,7 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
             builder.Services.AddSingleton<ITimerCoordinator, TimerCoordinator>();
             builder.Services.AddSingleton<IHubStateManager, HubStateManager>();
-            builder.Services.AddSingleton<IGameStateStore, GameStateStore>();
+            builder.Services.AddSingleton<IGamePerspectiveStore, GamePerspectiveStore>();
             builder.Services.AddSingleton<IDiscordTownStore, DiscordTownStore>();
             builder.Services.AddSingleton<IDiscordTownManager, DiscordTownManager>();
             builder.Services.AddSingleton<INotificationService, NotificationService>();
@@ -78,22 +78,19 @@ public static class ConfigureServices
 
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IDiscordAuthService, DiscordAuthService>();
-            builder.Services.AddScoped<IGameStateService, GameStateService>();
+            builder.Services.AddScoped<IGamePerspectiveService, GamePerspectiveService>();
             builder.Services.AddScoped<IDiscordGameActionService, DiscordGameActionService>();
             builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddScoped<IGameAuthorizationService, GameAuthorizationService>();
             builder.Services.AddScoped<IAuthorizationHandler, StoryTellerForGameHandler>();
             builder.Services.AddScoped<ITimerService, TimerService>();
-            
+
             builder.Services.AddHostedService(provider => provider.GetRequiredService<IDiscordBot>());
         }
 
         private void ConfigureJson()
         {
-            builder.Services.ConfigureHttpJsonOptions(options =>
-            {
-                options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
+            builder.Services.ConfigureHttpJsonOptions(options => { options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
             builder.Services.Configure<JsonOptions>(options => { options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
         }
 
@@ -131,7 +128,7 @@ public static class ConfigureServices
                 });
             });
         }
-        
+
         private void AddSerilog()
         {
             builder.Host.UseSerilog((context, configuration) => { configuration.ReadFrom.Configuration(context.Configuration); });

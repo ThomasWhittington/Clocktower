@@ -8,11 +8,11 @@ public class GetGames : IEndpoint
         .SetOpenApiOperationId<GetGames>()
         .WithSummaryAndDescription("Gets all games, optionally filtered by guildId");
 
-    internal static Ok<IEnumerable<GameState>> Handle([FromServices] IGameStateService gameStateService, [FromQuery] string? guildId)
+    internal static Ok<IEnumerable<GamePerspective>> Handle([FromServices] IGamePerspectiveService gamePerspectiveService, [FromQuery] string? guildId)
     {
         var games = string.IsNullOrWhiteSpace(guildId)
-            ? gameStateService.GetGames()
-            : gameStateService.GetGuildGames(guildId);
+            ? gamePerspectiveService.GetGames()
+            : gamePerspectiveService.GetGuildGames(guildId);
 
         return TypedResults.Ok(games);
     }

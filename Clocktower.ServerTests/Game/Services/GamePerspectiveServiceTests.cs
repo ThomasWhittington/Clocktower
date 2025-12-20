@@ -16,7 +16,7 @@ public class GameStateServiceTests
     private const string DummyJsonFile = "dummyState.json";
 
     private Mock<IDiscordBot> _mockBot = null!;
-    private Mock<IGameStateStore> _mockGameStateStore = null!;
+    private Mock<IGamePerspectiveStore> _mockGameStateStore = null!;
     private Mock<IFileSystem> _mockFileSystem = null!;
     private Mock<INotificationService> _mockNotificationService = null!;
 
@@ -24,7 +24,7 @@ public class GameStateServiceTests
     public void Setup()
     {
         _mockBot = new Mock<IDiscordBot>();
-        _mockGameStateStore = new Mock<IGameStateStore>();
+        _mockGameStateStore = new Mock<IGamePerspectiveStore>();
         _mockFileSystem = new Mock<IFileSystem>();
         _mockNotificationService = new Mock<INotificationService>();
     }
@@ -36,7 +36,7 @@ public class GameStateServiceTests
     [TestMethod]
     public void GetGames_CallsGameStateStore()
     {
-        GameState[] allGames =
+        GamePerspective[] allGames =
         [
             CommonMethods.GetGameState(),
             CommonMethods.GetGameState(),
@@ -59,7 +59,7 @@ public class GameStateServiceTests
     public void GetGuildGames_CallsGameStateStore()
     {
         var guildId = CommonMethods.GetRandomString();
-        GameState[] allGames =
+        GamePerspective[] allGames =
         [
             CommonMethods.GetGameState(),
             CommonMethods.GetGameState(),
@@ -82,13 +82,13 @@ public class GameStateServiceTests
     public void GetPlayerGames_CallsGameStateStore()
     {
         var userId = CommonMethods.GetRandomSnowflakeStringId();
-        GameState[] allGames =
+        GamePerspective[] allGames =
         [
             CommonMethods.GetGameState(creatorId: userId),
             CommonMethods.GetGameState(creatorId: userId),
             CommonMethods.GetGameState(creatorId: userId)
         ];
-        var expected = allGames.Select(o => new MiniGameState(o.Id, o.CreatedBy, o.CreatedDate));
+        var expected = allGames.Select(o => new MiniGamePerspective(o.Id, o.CreatedBy, o.CreatedDate));
 
         _mockGameStateStore.Setup(o => o.GetUserGames(userId)).Returns(allGames);
 
@@ -113,7 +113,7 @@ public class GameStateServiceTests
         var result = Sut.GetGame(gameId);
 
         result.success.Should().BeTrue();
-        result.gameState.Should().Be(gameState);
+        result.perspectives.Should().Be(gameState);
         result.message.Should().Be("Game retrieved successfully");
     }
 
@@ -122,12 +122,12 @@ public class GameStateServiceTests
     {
         var gameId = CommonMethods.GetRandomString();
 
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns((GameState)null!);
+        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns((GamePerspective)null!);
 
         var result = Sut.GetGame(gameId);
 
         result.success.Should().BeFalse();
-        result.gameState.Should().BeNull();
+        result.perspectives.Should().BeNull();
         result.message.Should().Be($"Game ID '{gameId}' not found");
     }
 
@@ -140,7 +140,7 @@ public class GameStateServiceTests
     {
         var gameId = CommonMethods.GetRandomString();
 
-        _mockGameStateStore.Setup(o => o.Remove(gameId)).Returns(true);
+        _mockGameStateStore.Setup(o => o.RemoveGame(gameId)).Returns(true);
 
         var result = Sut.DeleteGame(gameId);
 
@@ -153,7 +153,7 @@ public class GameStateServiceTests
     {
         var gameId = CommonMethods.GetRandomString();
 
-        _mockGameStateStore.Setup(o => o.Remove(gameId)).Returns(false);
+        _mockGameStateStore.Setup(o => o.RemoveGame(gameId)).Returns(false);
 
         var result = Sut.DeleteGame(gameId);
 
@@ -197,7 +197,7 @@ public class GameStateServiceTests
 
         var mockedUser = MockMaker.CreateMockDiscordUser(userId, userName, userAvatarUrl);
         _mockBot.Setup(o => o.GetUser(userId)).Returns(mockedUser);
-        _mockGameStateStore.Setup(o => o.Set(It.Is<GameState>(g => g.Id == gameId))).Returns(true);
+        _mockGameStateStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId))).Returns(true);
 
         var result = Sut.StartNewGame(guildId, gameId, userId);
 
@@ -219,7 +219,7 @@ public class GameStateServiceTests
 
         var mockedUser = MockMaker.CreateMockDiscordUser(userId, userName, userAvatarUrl);
         _mockBot.Setup(o => o.GetUser(userId)).Returns(mockedUser);
-        _mockGameStateStore.Setup(o => o.Set(It.Is<GameState>(g => g.Id == gameId))).Returns(false);
+        _mockGameStateStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId))).Returns(false);
 
         var result = Sut.StartNewGame(guildId, gameId, userId);
 
@@ -229,7 +229,7 @@ public class GameStateServiceTests
     }
 
     #endregion
-
+/*
     #region LoadDummyData
 
     [TestMethod]
@@ -353,7 +353,7 @@ public class GameStateServiceTests
     }
 
     #endregion
-
+*/
 
     #region SetTime
 
@@ -361,7 +361,7 @@ public class GameStateServiceTests
     public async Task SetTime_ReturnsFalse_WhenGameNotFound()
     {
         const string gameId = "game-id";
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns((GameState?)null);
+        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns((GamePerspective?)null);
 
         var result = await Sut.SetTime(gameId, GameTime.Evening);
 

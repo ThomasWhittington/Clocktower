@@ -1,29 +1,30 @@
 ﻿using System.IO.Abstractions;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Clocktower.Server.Common.Services;
 using Clocktower.Server.Socket;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, IFileSystem fileSystem, INotificationService notificationService) : IGameStateService
+public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gamePerspectiveStore, IFileSystem fileSystem, INotificationService notificationService) : IGamePerspectiveService
 {
-    public IEnumerable<GameState> GetGames() =>
-        gameStateStore.GetAll();
+    public IEnumerable<GamePerspective> GetGames() =>
+        gamePerspectiveStore.GetAll();
 
-    public IEnumerable<GameState> GetGuildGames(string guildId) =>
-        gameStateStore.GetGuildGames(guildId);
+    public IEnumerable<GamePerspective> GetGuildGames(string guildId) =>
+        gamePerspectiveStore.GetGuildGames(guildId);
 
-    public IEnumerable<MiniGameState> GetPlayerGames(string userId)
+    public IEnumerable<MiniGamePerspective> GetPlayerGames(string userId)
     {
-        var playerGames = gameStateStore.GetUserGames(userId);
-        var miniGameStates = playerGames.Select(o => new MiniGameState(o.Id, o.CreatedBy, o.CreatedDate));
-        return miniGameStates;
+        var playerGames = gamePerspectiveStore.GetUserGames(userId);
+        var miniGamePerspectives = playerGames.Select(o => new MiniGamePerspective(o.Id, o.CreatedBy, o.CreatedDate));
+        return miniGamePerspectives;
     }
 
     public (bool success, string message) LoadDummyData(string filePath = "dummyState.json")
     {
-        try
+        //TODO implement new dummy data once rework of GamePerspective is complete
+        throw new NotImplementedException();
+
+        /*try
         {
             var json = fileSystem.File.ReadAllText(filePath);
             var options = new JsonSerializerOptions
@@ -31,16 +32,16 @@ public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, I
                 PropertyNameCaseInsensitive = true
             };
             options.Converters.Add(new JsonStringEnumConverter());
-            var games = JsonSerializer.Deserialize<GameState[]>(json, options);
+            var games = JsonSerializer.Deserialize<GamePerspective[]>(json, options);
             if (games == null)
             {
                 return (false, "Failed to deserialize json");
             }
 
-            gameStateStore.Clear();
-            foreach (var gameState in games)
+            gamePerspectiveStore.Clear();
+            foreach (var gamePerspective in games)
             {
-                gameStateStore.Set(gameState);
+                gamePerspectiveStore.Set(gamePerspective);
             }
 
             return (true, "Loaded dummy data");
@@ -57,42 +58,43 @@ public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, I
         {
             return (false, $"Error loading dummy data: {ex.Message}");
         }
+        */
     }
 
-    public (bool success, GameState? gameState, string message) GetGame(string gameId)
+    public (bool success, IEnumerable<GamePerspective> perspectives, string message) GetGame(string gameId)
     {
-        var game = gameStateStore.Get(gameId);
+        var game = gamePerspectiveStore.GetAllPerspectivesForGame(gameId);
 
         return game is not null
             ? (true, game, "Game retrieved successfully")
-            : (false, null, $"Game ID '{gameId}' not found");
+            : (false, [], $"Game ID '{gameId}' not found");
     }
 
 
     public (bool success, string message) DeleteGame(string gameId)
     {
-        bool deleteSuccessful = gameStateStore.Remove(gameId);
+        bool deleteSuccessful = gamePerspectiveStore.RemoveGame(gameId);
 
         return deleteSuccessful
             ? (true, "Game deleted successfully")
             : (false, $"Game ID '{gameId}' failed to be deleted");
     }
 
-    public (bool success, GameState? gameState, string message) StartNewGame(string guildId, string gameId, string userId)
+    public (bool success, GamePerspective? gamePerspective, string message) StartNewGame(string guildId, string gameId, string userId)
     {
         var user = bot.GetUser(userId);
         if (user is null) return (false, null, "Couldn't find user");
         var gameUser = user.AsGameUser();
         gameUser.UserType = UserType.StoryTeller;
-        var newGameState = new GameState(gameId, guildId, gameUser, DateTime.UtcNow)
+        var newGamePerspective = new GamePerspective(gameId, guildId, gameUser, DateTime.UtcNow)
         {
             Users = [gameUser]
         };
 
-        bool addSuccessful = gameStateStore.Set(newGameState);
+        bool addSuccessful = gamePerspectiveStore.Set(newGamePerspective, userId);
 
         return addSuccessful
-            ? (true, newGameState, "Game started successfully")
+            ? (true, newGamePerspective, "Game started successfully")
             : (false, null, $"Game Id '{gameId}' already exists");
     }
 
@@ -100,10 +102,10 @@ public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, I
     {
         try
         {
-            var gameState = gameStateStore.Get(gameId);
-            if (gameState is null) return (false, "Game not found");
+            var gamePerspective = gamePerspectiveStore.GameExists(gameId);
+            if (!gamePerspective) return (false, "Game not found");
 
-            gameStateStore.SetTime(gameId, gameTime);
+            gamePerspectiveStore.SetTime(gameId, gameTime);
             await notificationService.BroadcastTownTime(gameId, gameTime);
             return (true, $"Time set to {gameTime}");
         }
@@ -113,8 +115,9 @@ public class GameStateService(IDiscordBot bot, IGameStateStore gameStateStore, I
         }
     }
 
-    public Task<Result<GameStateDto>> GetPlayerGameState(string gameId, string userId)
+    public Task<Result<GamePerspectiveDto>> GetPlayerGamePerspective(string gameId, string userId)
     {
+        //TODO implement GetPlayerGamePerspective
         throw new NotImplementedException();
     }
 }
