@@ -10,6 +10,7 @@ public static class CommonMethods
     public static string GetRandomString() => Guid.NewGuid().ToString();
     public static string GetRandomSnowflakeStringId() => new Random((int)DateTime.Now.Ticks).NextInt64().ToString();
     public static GameUser GetRandomGameUser(string? id = null) => new(id ?? GetRandomSnowflakeStringId());
+    public static GameUserDto GetRandomGameUserDto(string? id = null) => new(id ?? GetRandomSnowflakeStringId());
     public static TownUser GetRandomTownUser(string? id = null, string? name = null) => new(id ?? GetRandomSnowflakeStringId(), name ?? GetRandomString(), GetRandomString());
 
 
@@ -80,8 +81,13 @@ public static class CommonMethods
             dateTime.Hour, dateTime.Minute, dateTime.Second, DateTimeKind.Utc);
     }
 
-    public static GameState GetGameState(string? gameId = null, string? guildId = null, string? creatorId = null, GameUser? createdBy = null)
+    public static GamePerspective GetGamePerspective(string? gameId = null, string? guildId = null, string? creatorId = null, GameUser? createdBy = null)
     {
-        return new GameState(gameId ?? GetRandomString(), guildId ?? GetRandomSnowflakeStringId(), createdBy ?? GetRandomGameUser(creatorId), DateTime.UtcNow);
+        return new GamePerspective(gameId ?? GetRandomString(), guildId ?? GetRandomSnowflakeStringId(), createdBy ?? GetRandomGameUser(creatorId), DateTime.UtcNow);
+    }
+
+    public static GamePerspectiveDto GetGamePerspectiveDto(string? gameId = null, string? guildId = null, string? creatorId = null, GameUserDto? createdBy = null)
+    {
+        return new GamePerspectiveDto(gameId ?? GetRandomString(), guildId ?? GetRandomSnowflakeStringId(), createdBy ?? GetRandomGameUserDto(creatorId), DateTime.UtcNow);
     }
 }

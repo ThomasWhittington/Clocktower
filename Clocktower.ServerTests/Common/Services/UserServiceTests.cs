@@ -9,7 +9,7 @@ namespace Clocktower.ServerTests.Common.Services;
 public class UserServiceTests
 {
     private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
-    private Mock<IGameStateStore> _mockGameStateStore = null!;
+    private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private IUserService _sut = null!;
 
@@ -17,10 +17,10 @@ public class UserServiceTests
     public void SetUp()
     {
         _mockDiscordTownStore = StrictMockFactory.Create<IDiscordTownStore>();
-        _mockGameStateStore = StrictMockFactory.Create<IGameStateStore>();
+        _mockGamePerspectiveStore = StrictMockFactory.Create<IGamePerspectiveStore>();
         _mockDiscordTownManager = StrictMockFactory.Create<IDiscordTownManager>();
 
-        _sut = new UserService(_mockDiscordTownStore.Object, _mockGameStateStore.Object, _mockDiscordTownManager.Object);
+        _sut = new UserService(_mockDiscordTownStore.Object, _mockGamePerspectiveStore.Object, _mockDiscordTownManager.Object);
     }
 
     #region GetUserName
@@ -66,7 +66,7 @@ public class UserServiceTests
 
     private void SetUp_UpdateGameUser(string gameId, string userId, UserType userType, bool? isPlaying, bool updateReturn)
     {
-        _mockGameStateStore.Setup(o => o.UpdateUser(gameId, userId, userType, isPlaying)).Returns(updateReturn);
+        _mockGamePerspectiveStore.Setup(o => o.UpdateUser(gameId, userId, userType, isPlaying)).Returns(updateReturn);
     }
 
     [TestMethod]
@@ -85,7 +85,6 @@ public class UserServiceTests
     }
 
     #endregion
-
 
     #region UpdateDiscordPresence
 

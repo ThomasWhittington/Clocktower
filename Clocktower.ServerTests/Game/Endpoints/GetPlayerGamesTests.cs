@@ -7,17 +7,17 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class GetPlayerGamesTests
 {
-    private Mock<IGameStateService> _mockGameStateService = null!;
+    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
 
-    private void MockResponse(string userId, MiniGameState[] playerGames)
+    private void MockResponse(string userId, MiniGamePerspective[] playerGames)
     {
-        _mockGameStateService.Setup(o => o.GetPlayerGames(userId)).Returns(playerGames);
+        _mockGamePerspectiveService.Setup(o => o.GetPlayerGames(userId)).Returns(playerGames);
     }
 
     [TestInitialize]
     public void Setup()
     {
-        _mockGameStateService = new Mock<IGameStateService>();
+        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
     }
 
     [TestMethod]
@@ -37,18 +37,18 @@ public class GetPlayerGamesTests
     public void Handle_ReturnsOkPlayerGamesGames()
     {
         var userId = CommonMethods.GetRandomString();
-        var playerGames = new MiniGameState[]
+        var playerGames = new MiniGamePerspective[]
         {
             new(CommonMethods.GetRandomString(), CommonMethods.GetRandomGameUser(), DateTime.UtcNow),
         };
 
         MockResponse(userId, playerGames);
 
-        var result = GetPlayerGames.Handle(userId, _mockGameStateService.Object);
+        var result = GetPlayerGames.Handle(userId, _mockGamePerspectiveService.Object);
 
-        _mockGameStateService.Verify(o => o.GetPlayerGames(userId.Trim()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetPlayerGames(userId.Trim()), Times.Once);
 
-        var response = result.Should().BeOfType<Ok<IEnumerable<MiniGameState>>>().Subject;
+        var response = result.Should().BeOfType<Ok<IEnumerable<MiniGamePerspective>>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);
         response.Value.Should().BeEquivalentTo(playerGames);
     }

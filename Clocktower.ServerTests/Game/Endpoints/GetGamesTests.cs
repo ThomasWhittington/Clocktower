@@ -7,18 +7,18 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class GetGamesTests
 {
-    private Mock<IGameStateService> _mockGameStateService = null!;
+    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
 
-    private void MockResponse(GameState[] allGames, GameState[] guildGames)
+    private void MockResponse(GamePerspective[] allGames, GamePerspective[] guildGames)
     {
-        _mockGameStateService.Setup(o => o.GetGames()).Returns(allGames);
-        _mockGameStateService.Setup(o => o.GetGuildGames(It.IsAny<string>())).Returns(guildGames);
+        _mockGamePerspectiveService.Setup(o => o.GetGames()).Returns(allGames);
+        _mockGamePerspectiveService.Setup(o => o.GetGuildGames(It.IsAny<string>())).Returns(guildGames);
     }
 
     [TestInitialize]
     public void Setup()
     {
-        _mockGameStateService = new Mock<IGameStateService>();
+        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
     }
 
     [TestMethod]
@@ -40,23 +40,23 @@ public class GetGamesTests
         const string guildId = null!;
         var allGames = new[]
         {
-            CommonMethods.GetGameState(),
-            CommonMethods.GetGameState()
+            CommonMethods.GetGamePerspective(),
+            CommonMethods.GetGamePerspective()
         };
 
         var guildGames = new[]
         {
-            CommonMethods.GetGameState()
+            CommonMethods.GetGamePerspective()
         };
 
         MockResponse(allGames, guildGames);
 
-        var result = GetGames.Handle(_mockGameStateService.Object, guildId);
+        var result = GetGames.Handle(_mockGamePerspectiveService.Object, guildId);
 
-        _mockGameStateService.Verify(o => o.GetGames(), Times.Once);
-        _mockGameStateService.Verify(o => o.GetGuildGames(It.IsAny<string>()), Times.Never);
+        _mockGamePerspectiveService.Verify(o => o.GetGames(), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetGuildGames(It.IsAny<string>()), Times.Never);
 
-        var response = result.Should().BeOfType<Ok<IEnumerable<GameState>>>().Subject;
+        var response = result.Should().BeOfType<Ok<IEnumerable<GamePerspective>>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);
         response.Value.Should().BeEquivalentTo(allGames);
     }
@@ -67,23 +67,23 @@ public class GetGamesTests
         var guildId = CommonMethods.GetRandomString();
         var allGames = new[]
         {
-            CommonMethods.GetGameState(),
-            CommonMethods.GetGameState()
+            CommonMethods.GetGamePerspective(),
+            CommonMethods.GetGamePerspective()
         };
 
         var guildGames = new[]
         {
-            CommonMethods.GetGameState()
+            CommonMethods.GetGamePerspective()
         };
 
         MockResponse(allGames, guildGames);
 
-        var result = GetGames.Handle(_mockGameStateService.Object, guildId);
+        var result = GetGames.Handle(_mockGamePerspectiveService.Object, guildId);
 
-        _mockGameStateService.Verify(o => o.GetGames(), Times.Never);
-        _mockGameStateService.Verify(o => o.GetGuildGames(It.IsAny<string>()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetGames(), Times.Never);
+        _mockGamePerspectiveService.Verify(o => o.GetGuildGames(It.IsAny<string>()), Times.Once);
 
-        var response = result.Should().BeOfType<Ok<IEnumerable<GameState>>>().Subject;
+        var response = result.Should().BeOfType<Ok<IEnumerable<GamePerspective>>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);
         response.Value.Should().BeEquivalentTo(guildGames);
     }

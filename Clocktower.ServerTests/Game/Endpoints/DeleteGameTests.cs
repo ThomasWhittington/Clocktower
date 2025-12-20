@@ -6,12 +6,12 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class DeleteGameTests
 {
-    private Mock<IGameStateService> _mockGameStateService = null!;
+    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
     private const string ResponseMessage = "Response";
 
     private void MockResponse(bool success)
     {
-        _mockGameStateService.Setup(o =>
+        _mockGamePerspectiveService.Setup(o =>
                 o.DeleteGame(It.IsAny<string>()))
             .Returns((success, ResponseMessage));
     }
@@ -19,7 +19,7 @@ public class DeleteGameTests
     [TestInitialize]
     public void Setup()
     {
-        _mockGameStateService = new Mock<IGameStateService>();
+        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
     }
 
     [TestMethod]
@@ -41,9 +41,9 @@ public class DeleteGameTests
         var gameId = CommonMethods.GetRandomString();
         MockResponse(false);
 
-        var result = DeleteGame.Handle(gameId, _mockGameStateService.Object);
+        var result = DeleteGame.Handle(gameId, _mockGamePerspectiveService.Object);
 
-        _mockGameStateService.Verify(o => o.DeleteGame(gameId.Trim()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.DeleteGame(gameId.Trim()), Times.Once);
 
         var response = result.Result.Should().BeOfType<NotFound<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
@@ -57,9 +57,9 @@ public class DeleteGameTests
         var gameId = CommonMethods.GetRandomString();
         MockResponse(true);
 
-        var result = DeleteGame.Handle(gameId, _mockGameStateService.Object);
+        var result = DeleteGame.Handle(gameId, _mockGamePerspectiveService.Object);
 
-        _mockGameStateService.Verify(o => o.DeleteGame(gameId.Trim()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.DeleteGame(gameId.Trim()), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);
