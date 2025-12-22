@@ -156,8 +156,8 @@ public class DiscordTownService(
 
             discordTownStore.Set(guildId, discordTown);
 
-            var gamePerspective = gamePerspectiveStore.GetGuildGames(guildId).FirstOrDefault();
-            if (gamePerspective is not null) await notificationService.BroadcastDiscordTownUpdate(gamePerspective.Id);
+            var gameId = gamePerspectiveStore.GetGuildGameIds(guildId).FirstOrDefault();
+            if (gameId is not null) await notificationService.BroadcastDiscordTownUpdate(gameId);
             return (true, discordTown, $"Discord town {discordTown.UserCount}");
         }
         catch (Exception ex)

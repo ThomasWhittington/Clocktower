@@ -104,6 +104,7 @@ public class DiscordBotHandlerTests
 
     private void Setup_Mocks(string? beforeGuildId = GuildId, string? afterGuildId = GuildId, bool hasGuildUser = true, string[]? gameIds = null, Mock<IDiscordVoiceChannel>? beforeChannel = null, Mock<IDiscordVoiceChannel>? afterChannel = null)
     {
+        gameIds ??= [];
         _before.Setup(o => o.GuildId).Returns(beforeGuildId);
         _after.Setup(o => o.GuildId).Returns(afterGuildId);
         _user.Setup(o => o.Id).Returns(UserId);
@@ -113,8 +114,7 @@ public class DiscordBotHandlerTests
             _user.Setup(o => o.GetGuildUser()).Returns(_guildUser.Object);
         }
 
-        var gamePerspectives = gameIds is null ? [] : gameIds.Select(id => CommonMethods.GetGamePerspective(id));
-        _mockGamePerspectiveStore.Setup(o => o.GetGuildGames(GuildId)).Returns(gamePerspectives);
+        _mockGamePerspectiveStore.Setup(o => o.GetGuildGameIds(GuildId)).Returns(gameIds!);
 
         _voiceChannel1.Setup(o => o.Id).Returns(ChannelId1);
         _voiceChannel2.Setup(o => o.Id).Returns(ChannelId2);
@@ -139,7 +139,7 @@ public class DiscordBotHandlerTests
 
         await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
 
-        _mockGamePerspectiveStore.Verify(f => f.GetGuildGames(It.IsAny<string>()), Times.Never);
+        _mockGamePerspectiveStore.Verify(f => f.GetGuildGameIds(It.IsAny<string>()), Times.Never);
     }
 
 
@@ -150,7 +150,7 @@ public class DiscordBotHandlerTests
 
         await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
 
-        _mockGamePerspectiveStore.Verify(f => f.GetGuildGames(GuildId), Times.Once);
+        _mockGamePerspectiveStore.Verify(f => f.GetGuildGameIds(GuildId), Times.Once);
     }
 
     [TestMethod]

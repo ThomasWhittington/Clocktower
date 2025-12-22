@@ -18,22 +18,16 @@ public class DiscordBotHandler(
         if (guildId is null) return;
         var guildUser = user.GetGuildUser();
         if (guildUser is null) return;
-        var gamePerspectives = gamePerspectiveStore.GetGuildGames(guildId);
+        var guildGameIds = gamePerspectiveStore.GetGuildGameIds(guildId);
 
         var channelsAreSame = before.VoiceChannel?.Id == after.VoiceChannel?.Id;
-        if (channelsAreSame)
+        Func<string, Task> updateAction = channelsAreSame
+            ? id => UpdateVoiceStatus(guildUser, after, id, guildId)
+            : id => UpdateDiscordTown(guildUser, after, id, guildId);
+
+        foreach (var gameId in guildGameIds)
         {
-            foreach (var gamePerspective in gamePerspectives)
-            {
-                await UpdateVoiceStatus(guildUser, after, gamePerspective.Id, guildId);
-            }
-        }
-        else
-        {
-            foreach (var gamePerspective in gamePerspectives)
-            {
-                await UpdateDiscordTown(guildUser, after, gamePerspective.Id, guildId);
-            }
+            await updateAction(gameId);
         }
     }
 

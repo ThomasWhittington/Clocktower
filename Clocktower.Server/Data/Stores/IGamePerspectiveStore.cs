@@ -8,7 +8,7 @@ public interface IGamePerspectiveStore
     bool Set(GamePerspective perspective, string userId);
     bool RemovePerspective(string gameId, string userId);
     bool RemoveGame(string gameId);
-    IEnumerable<GamePerspective> GetGuildGames(string guildId);
+    IEnumerable<string> GetGuildGameIds(string guildId);
     IEnumerable<GamePerspective> GetAllPerspectivesForGame(string gameId);
     GamePerspective? GetFirstPerspective(string gameId);
     IEnumerable<GamePerspective> GetUserGames(string userId);

@@ -52,29 +52,6 @@ public class GamePerspectiveServiceTests
 
     #endregion
 
-    #region GetGuildGames
-
-    [TestMethod]
-    public void GetGuildGames_CallsGamePerspectiveStore()
-    {
-        var guildId = CommonMethods.GetRandomString();
-        GamePerspective[] allGames =
-        [
-            CommonMethods.GetGamePerspective(),
-            CommonMethods.GetGamePerspective(),
-            CommonMethods.GetGamePerspective()
-        ];
-
-        _mockGamePerspectiveStore.Setup(o => o.GetGuildGames(guildId)).Returns(allGames);
-
-        var result = Sut.GetGuildGames(guildId);
-        result.Should().BeEquivalentTo(allGames);
-
-        _mockGamePerspectiveStore.Verify(o => o.GetGuildGames(guildId), Times.Once);
-    }
-
-    #endregion
-
     #region GetPlayerGames
 
     [TestMethod]
@@ -228,6 +205,7 @@ public class GamePerspectiveServiceTests
     }
 
     #endregion
+
 //!TODO Readdtests once reimplemented
 /*
     #region LoadDummyData

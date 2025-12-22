@@ -695,7 +695,7 @@ public class DiscordTownServiceTests
         _guild.Setup(o => o.GetMiniCategory(DayCategory.Name)).Returns(hasDayCategory ? DayCategory : null);
         _guild.Setup(o => o.GetMiniCategory(NightCategory.Name)).Returns(hasNightCategory ? NightCategory : null);
 
-        _mockGamePerspectiveStore.Setup(o => o.GetGuildGames(GuildId)).Returns(gameFound ? [CommonMethods.GetGamePerspective(GameId, GuildId)] : []);
+        _mockGamePerspectiveStore.Setup(o => o.GetGuildGameIds(GuildId)).Returns(gameFound ? [GameId] : []);
     }
 
     [TestMethod]

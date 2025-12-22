@@ -9,9 +9,6 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
     public IEnumerable<GamePerspective> GetGames() =>
         gamePerspectiveStore.GetAll();
 
-    public IEnumerable<GamePerspective> GetGuildGames(string guildId) =>
-        gamePerspectiveStore.GetGuildGames(guildId);
-
     public IEnumerable<MiniGamePerspective> GetPlayerGames(string userId)
     {
         var playerGames = gamePerspectiveStore.GetUserGames(userId);

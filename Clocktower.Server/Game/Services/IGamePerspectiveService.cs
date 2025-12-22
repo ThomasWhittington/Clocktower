@@ -6,7 +6,6 @@ public interface IGamePerspectiveService
     (bool success, string message) DeleteGame(string gameId);
     (bool success, IEnumerable<GamePerspective> perspectives, string message) GetGame(string gameId);
     IEnumerable<GamePerspective> GetGames();
-    IEnumerable<GamePerspective> GetGuildGames(string guildId);
     IEnumerable<MiniGamePerspective> GetPlayerGames(string userId);
     (bool success, string message) LoadDummyData(string filePath = "dummyState.json");
     Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime);

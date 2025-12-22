@@ -1,24 +1,33 @@
-﻿using Clocktower.Server.Data.Extensions;
+﻿using Clocktower.Server.Data;
 using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
 
 namespace Clocktower.ServerTests.Data.Stores;
 
 [TestClass]
-public class GameStateStoreTests
+public class GamePerspectiveStoreTests
 {
-    private const string GameId1 = "game1";
-    private const string GameId2 = "game2";
-    private const string GameId3 = "game3";
-    private const string UserId = "123";
-    private IGameStateStore _sut = null!;
+    private const string GameId1 = "_game1";
+    private const string GameId2 = "_game2";
+    private const string GameId3 = "_game3";
+    private const string UserId1 = "123";
+    private const string UserId2 = "456";
+    private const string UserId3 = "789";
+    private const string GuildId = "123456789";
+    private IGamePerspectiveStore _sut = null!;
+
+    private GamePerspective _game1 = null!;
+    private GamePerspective _game2 = null!;
+    private GamePerspective _game3 = null!;
 
     [TestInitialize]
     public void SetUp()
     {
-        _sut = new GameStateStore();
+        _game1 = CommonMethods.GetGamePerspective(GameId1, GuildId);
+        _game2 = CommonMethods.GetGamePerspective(GameId2, GuildId);
+        _game3 = CommonMethods.GetGamePerspective(GameId3, GuildId);
+        _sut = new GamePerspectiveStore();
     }
-
 
     [TestMethod]
     public void GameExists_ReturnsFalse_WhenGameNotFound()
@@ -31,129 +40,123 @@ public class GameStateStoreTests
     [TestMethod]
     public void GameExists_ReturnsTrue_WhenGameFound()
     {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        _sut.Set(game1);
+        _sut.Set(_game1, UserId1);
 
         var result = _sut.GameExists(GameId1);
 
         result.Should().BeTrue();
     }
 
-
     [TestMethod]
     public void Set_WhenGameDoesNotExist_ReturnsTrue()
     {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        var result = _sut.Set(game1);
+        var result = _sut.Set(_game1, UserId1);
 
         result.Should().BeTrue();
-        _sut.Get(GameId1).Should().BeEquivalentTo(game1);
+        _sut.Get(GameId1, UserId1).Should().BeEquivalentTo(_game1);
     }
 
-    [TestMethod]
-    public void Set_WhenGameAlreadyExists_ReturnsFalse()
-    {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        _sut.Set(game1);
 
-        var result = _sut.Set(CommonMethods.GetGameState(GameId1));
+    [TestMethod]
+    public void Set_WhenPerspectiveAlreadyExists_ReturnsFalse()
+    {
+        _sut.Set(_game1, UserId1);
+
+        var result = _sut.Set(CommonMethods.GetGamePerspective(GameId1), UserId1);
 
         result.Should().BeFalse();
-        _sut.Get(GameId1).Should().BeEquivalentTo(game1);
+        _sut.Get(GameId1, UserId1).Should().BeEquivalentTo(_game1);
     }
 
     [TestMethod]
     public void Get_WhenGameDoesNotExist_ReturnsNull()
     {
-        var result = _sut.Get("nonexistent");
+        var result = _sut.Get("nonexistent", UserId1);
 
         result.Should().BeNull();
     }
 
+
     [TestMethod]
     public void Clear_RemovesAllEntries()
     {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        var game2 = CommonMethods.GetGameState(GameId2);
-        _sut.Set(game1);
-        _sut.Set(game2);
+        _sut.Set(_game1, UserId1);
+        _sut.Set(_game2, UserId1);
 
         _sut.Clear();
 
-        _sut.Get(GameId1).Should().BeNull();
-        _sut.Get(GameId2).Should().BeNull();
+        _sut.Get(GameId1, UserId1).Should().BeNull();
+        _sut.Get(GameId2, UserId1).Should().BeNull();
     }
 
     [TestMethod]
-    public void Remove_WhenGameExists_RemovesAndReturnsTrue()
+    public void RemovePerspective_RemovesOnlySelectedPerspective()
     {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        _sut.Set(game1);
+        _sut.Set(_game1, UserId1);
+        _sut.Set(_game1, UserId2);
+
+        _sut.RemovePerspective(GameId1, UserId1);
+
+        _sut.Get(GameId1, UserId1).Should().BeNull();
+        _sut.Get(GameId1, UserId2).Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public void RemoveGame_RemovesAllPerspectivesFromGame()
+    {
+        _sut.Set(_game1, UserId1);
+        _sut.Set(_game1, UserId2);
+        _sut.Set(_game2, UserId1);
+        _sut.Set(_game2, UserId2);
 
         var result = _sut.RemoveGame(GameId1);
 
         result.Should().BeTrue();
-        _sut.Get(GameId1).Should().BeNull();
-    }
-/*
-    [TestMethod]
-    public void TryUpdate_WhenGameExists_UpdatesAndReturnsTrue()
-    {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        var game2 = CommonMethods.GetGameState(GameId2);
-        _sut.Set(game1);
-
-        var result = _sut.TryUpdate(GameId1, _ => game2);
-
-        result.Should().BeTrue();
-        _sut.Get(GameId1).Should().BeEquivalentTo(game2);
+        _sut.Get(GameId1, UserId1).Should().BeNull();
+        _sut.Get(GameId1, UserId2).Should().BeNull();
+        _sut.Get(GameId2, UserId1).Should().NotBeNull();
+        _sut.Get(GameId2, UserId2).Should().NotBeNull();
     }
 
-    [TestMethod]
-    public void TryUpdate_WhenGameDoesNotExist_ReturnsFalse()
-    {
-        var result = _sut.TryUpdate("nonexistent", null!);
-
-        result.Should().BeFalse();
-    }
-*/
     [TestMethod]
     [DynamicData(nameof(GetGameTimeValues))]
-    public void SetTime_UpdatesGameTime(GameTime gameTime)
+    public void SetTime_UpdatesGameTimeForAllPerspectivesInGame(GameTime gameTime)
     {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        _sut.Set(game1);
+        _sut.Set(_game1, UserId1);
+        _sut.Set(_game1, UserId2);
+        _sut.Set(_game2, UserId1);
+
+        var game2GameTime = _sut.Get(GameId2, UserId1)!.GameTime;
 
         _sut.SetTime(GameId1, gameTime);
 
-        var output = _sut.Get(GameId1);
-        output.Should().NotBeNull();
-        output.GameTime.Should().Be(gameTime);
+        _sut.Get(GameId1, UserId1)!.GameTime.Should().Be(gameTime);
+        _sut.Get(GameId1, UserId2)!.GameTime.Should().Be(gameTime);
+        _sut.Get(GameId2, UserId1)!.GameTime.Should().Be(game2GameTime);
     }
 
     [TestMethod]
-    public void AddUserToGame_AddsUser()
+    public void AddUserToGame_AddsUserForAllPerspectivesInGame()
     {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        _sut.Set(game1);
-        var user = CommonMethods.GetRandomGameUser(UserId);
+        _sut.Set(_game1, UserId1);
+        _sut.Set(_game1, UserId2);
+        _sut.Set(_game2, UserId1);
+
+        var user = CommonMethods.GetRandomGameUser(UserId3);
 
         _sut.AddUserToGame(GameId1, user);
 
-        var output = _sut.Get(GameId1);
-        output.Should().NotBeNull();
-        output.Users.Should().Contain(o => o.Id == UserId);
+        _sut.Get(GameId1, UserId1)!.Users.Should().Contain(o => o.Id == UserId3);
+        _sut.Get(GameId1, UserId2)!.Users.Should().Contain(o => o.Id == UserId3);
+        _sut.Get(GameId2, UserId1)!.Users.Should().NotContain(o => o.Id == UserId3);
     }
 
     [TestMethod]
     public void GetAll_ReturnsAll()
     {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        var game2 = CommonMethods.GetGameState(GameId2);
-        var game3 = CommonMethods.GetGameState(GameId3);
-        _sut.Set(game1);
-        _sut.Set(game2);
-        _sut.Set(game3);
+        _sut.Set(_game1, UserId1);
+        _sut.Set(_game2, UserId1);
+        _sut.Set(_game3, UserId3);
 
         var result = _sut.GetAll().ToList();
 
@@ -163,36 +166,62 @@ public class GameStateStoreTests
     }
 
     [TestMethod]
+    public void GetFirstPerspective_ReturnsFirst()
+    {
+        var game1 = _game1;
+        var game1Day = _game1 with { GameTime = GameTime.Day };
+        var game1Night = _game1 with { GameTime = GameTime.Night };
+        _sut.Set(game1, UserId1);
+        _sut.Set(game1Day, UserId2);
+        _sut.Set(game1Night, UserId3);
+
+        var result = _sut.GetFirstPerspective(GameId1);
+
+        result.Should().BeOneOf(_game1, game1Day, game1Night);
+    }
+
+    [TestMethod]
+    public void GetAllPerspectivesForGame_GetsAllPerspectivesForGame()
+    {
+        var game1 = _game1;
+        var game1Day = _game1 with { GameTime = GameTime.Day };
+        var game1Night = _game1 with { GameTime = GameTime.Night };
+        _sut.Set(game1, UserId1);
+        _sut.Set(game1Day, UserId2);
+        _sut.Set(game1Night, UserId3);
+        _sut.Set(_game2, UserId3);
+
+        var result = _sut.GetAllPerspectivesForGame(GameId1).ToArray();
+        result.Should().HaveCount(3);
+        result.Should().BeEquivalentTo([game1, game1Day, game1Night]);
+        result.Should().NotContain(_game2);
+    }
+
+    [TestMethod]
     public void GetGuildGames_ReturnsGuildGames()
     {
-        const string guildId = "123456789";
-        var game1 = CommonMethods.GetGameState(GameId1);
-        var game2 = CommonMethods.GetGameState(GameId2, guildId);
-        var game3 = CommonMethods.GetGameState(GameId3, guildId);
+        _sut.Set(_game1, UserId1);
+        _sut.Set(_game2, UserId1);
+        _sut.Set(_game3, UserId1);
+        _sut.Set(CommonMethods.GetGamePerspective("game4", "987"), UserId1);
 
-        _sut.Set(game1);
-        _sut.Set(game2);
-        _sut.Set(game3);
+        var result = _sut.GetGuildGameIds(GuildId).ToList();
 
-        var result = _sut.GetGuildGames(guildId).ToList();
-
-        result.Should().HaveCount(2);
-        result.Should().Contain(o => o.Id == GameId2);
-        result.Should().Contain(o => o.Id == GameId3);
+        result.Should().HaveCount(3);
+        result.Should().Contain(GameId1);
+        result.Should().Contain(GameId2);
+        result.Should().Contain(GameId3);
+        result.Should().NotContain("game4");
     }
 
     [TestMethod]
     public void GetUserGames_ReturnsUserGames()
     {
-        var game1 = CommonMethods.GetGameState(GameId1) with { Users = [CommonMethods.GetRandomGameUser()] };
-        var game2 = CommonMethods.GetGameState(GameId2) with { Users = [CommonMethods.GetRandomGameUser(UserId), CommonMethods.GetRandomGameUser()] };
-        var game3 = CommonMethods.GetGameState(GameId3) with { Users = [CommonMethods.GetRandomGameUser(UserId)] };
+        _sut.Set(_game1, UserId2);
+        _sut.Set(_game2, UserId1);
+        _sut.Set(_game3, UserId1);
 
-        _sut.Set(game1);
-        _sut.Set(game2);
-        _sut.Set(game3);
-
-        var result = _sut.GetUserGames(UserId).ToList();
+        var result = _sut.GetUserGames(UserId1).ToList();
 
         result.Should().HaveCount(2);
         result.Should().Contain(o => o.Id == GameId2);
@@ -204,49 +233,47 @@ public class GameStateStoreTests
     [TestMethod]
     public void UpdateUser_DoesNotChange_WhenNoUserFound()
     {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        _sut.Set(game1);
+        _sut.Set(_game1, UserId1);
+        _sut.Set(_game1, UserId2);
+        var user = CommonMethods.GetRandomGameUser(UserId3);
+        _sut.AddUserToGame(GameId1, user);
 
-        var result = _sut.UpdateUser(GameId1, UserId);
-        var val = _sut.Get(GameId1);
+        var result = _sut.UpdateUser(GameId1, UserId1);
 
         result.Should().BeTrue();
-        val.Should().BeEquivalentTo(game1);
+        _sut.Get(GameId1, UserId1)!.Users.Should().Contain(user);
+        _sut.Get(GameId1, UserId2)!.Users.Should().Contain(user);
     }
 
     [TestMethod]
     public void UpdateUser_ReturnsOriginal_NoChangesRequested()
     {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        _sut.Set(game1);
-        var user = CommonMethods.GetRandomGameUser(UserId);
+        _sut.Set(_game1, UserId1);
+        _sut.Set(_game1, UserId2);
+        var user = CommonMethods.GetRandomGameUser(UserId3);
         _sut.AddUserToGame(GameId1, user);
-        var stateWithUser = _sut.Get(GameId1);
 
-        var result = _sut.UpdateUser(GameId1, UserId);
-        var val = _sut.Get(GameId1);
+        var result = _sut.UpdateUser(GameId1, UserId3, userType: user.UserType, isPlaying: user.IsPlaying);
+
         result.Should().BeTrue();
-        val.Should().NotBeNull();
-        val.Should().Be(stateWithUser);
+        _sut.Get(GameId1, UserId1)!.Users.Should().Contain(user);
+        _sut.Get(GameId1, UserId2)!.Users.Should().Contain(user);
     }
 
     [TestMethod]
     [DynamicData(nameof(GetUserTypeValues))]
     public void UpdateUser_Updates_UserType(UserType userType)
     {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        _sut.Set(game1);
-        var user = CommonMethods.GetRandomGameUser(UserId);
+        _sut.Set(_game1, UserId1);
+        _sut.Set(_game1, UserId2);
+        var user = CommonMethods.GetRandomGameUser(UserId3);
         _sut.AddUserToGame(GameId1, user);
 
-        var result = _sut.UpdateUser(GameId1, UserId, userType: userType);
+        var result = _sut.UpdateUser(GameId1, UserId3, userType: userType);
 
-        var val = _sut.Get(GameId1);
         result.Should().BeTrue();
-        val.Should().NotBeNull();
-        var thisUser = val.GetUser(UserId);
-        thisUser.Should().NotBeNull();
-        thisUser.UserType.Should().Be(userType);
+        _sut.Get(GameId1, UserId1)!.Users[0].UserType.Should().Be(userType);
+        _sut.Get(GameId1, UserId2)!.Users[0].UserType.Should().Be(userType);
     }
 
     [TestMethod]
@@ -254,19 +281,16 @@ public class GameStateStoreTests
     [DataRow(false)]
     public void UpdateUser_Updates_IsPlaying(bool isPlaying)
     {
-        var game1 = CommonMethods.GetGameState(GameId1);
-        _sut.Set(game1);
-        var user = CommonMethods.GetRandomGameUser(UserId);
+        _sut.Set(_game1, UserId1);
+        _sut.Set(_game1, UserId2);
+        var user = CommonMethods.GetRandomGameUser(UserId3);
         _sut.AddUserToGame(GameId1, user);
 
-        var result = _sut.UpdateUser(GameId1, UserId, isPlaying: isPlaying);
+        var result = _sut.UpdateUser(GameId1, UserId3, isPlaying: isPlaying);
 
-        var val = _sut.Get(GameId1);
         result.Should().BeTrue();
-        val.Should().NotBeNull();
-        var thisUser = val.GetUser(UserId);
-        thisUser.Should().NotBeNull();
-        thisUser.IsPlaying.Should().Be(isPlaying);
+        _sut.Get(GameId1, UserId1)!.Users[0].IsPlaying.Should().Be(isPlaying);
+        _sut.Get(GameId1, UserId2)!.Users[0].IsPlaying.Should().Be(isPlaying);
     }
 
     #endregion

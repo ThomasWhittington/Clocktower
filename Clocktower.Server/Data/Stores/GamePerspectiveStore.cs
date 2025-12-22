@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Clocktower.Server.Data.Stores;
 
@@ -28,15 +29,11 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         return keysToRemove.Count > 0;
     }
 
-    private void TryUpdate(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction)
+    public IEnumerable<string> GetGuildGameIds(string guildId)
     {
-        if (!_store.TryGetValue((gameId, userId), out var existing)) return;
-        _store[(gameId, userId)] = updateFunction(existing);
-    }
-
-    public IEnumerable<GamePerspective> GetGuildGames(string guildId)
-    {
-        return _store.Values.Where(g => g.GuildId == guildId).DistinctBy(g => g.Id);
+        return _store.Where(g => g.Value.GuildId == guildId)
+            .DistinctBy(g => g.Key.Item1)
+            .Select(g => g.Key.Item1);
     }
 
     public IEnumerable<GamePerspective> GetAllPerspectivesForGame(string gameId)
@@ -106,5 +103,12 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         {
             TryUpdate(gameId, userId, updateFunction);
         }
+    }
+
+    [ExcludeFromCodeCoverage(Justification = "This just runs a delegate, the the value not found issue is covered in the calling functions")]
+    private void TryUpdate(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction)
+    {
+        if (!_store.TryGetValue((gameId, userId), out var existing)) return;
+        _store[(gameId, userId)] = updateFunction(existing);
     }
 }
