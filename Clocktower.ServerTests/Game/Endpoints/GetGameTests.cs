@@ -7,20 +7,20 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class GetGameTests
 {
-    private Mock<IGameStateService> _mockGameStateService = null!;
+    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
     private const string ResponseMessage = "Response";
 
-    private void MockResponse(bool success, GameState? gameState)
+    private void MockResponse(bool success, GamePerspective? gamePerspective)
     {
-        _mockGameStateService.Setup(o =>
+        _mockGamePerspectiveService.Setup(o =>
                 o.GetGame(It.IsAny<string>()))
-            .Returns((success, gameState, ResponseMessage));
+            .Returns((success, gamePerspective is null ? [] : [gamePerspective], ResponseMessage));
     }
 
     [TestInitialize]
     public void Setup()
     {
-        _mockGameStateService = new Mock<IGameStateService>();
+        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
     }
 
     [TestMethod]
@@ -33,7 +33,7 @@ public class GetGameTests
         builder.GetEndpoint("/{gameId}")
             .ShouldHaveMethod(HttpMethod.Get)
             .ShouldHaveOperationId("getGameApi")
-            .ShouldHaveSummaryAndDescription("Get the game state by id");
+            .ShouldHaveSummaryAndDescription("Get the game perspective by id");
     }
 
     [TestMethod]
@@ -42,9 +42,9 @@ public class GetGameTests
         var gameId = CommonMethods.GetRandomString();
         MockResponse(false, null);
 
-        var result = GetGame.Handle(gameId, _mockGameStateService.Object);
+        var result = GetGame.Handle(gameId, _mockGamePerspectiveService.Object);
 
-        _mockGameStateService.Verify(o => o.GetGame(gameId.Trim()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetGame(gameId.Trim()), Times.Once);
 
         var response = result.Result.Should().BeOfType<NotFound<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
@@ -55,15 +55,15 @@ public class GetGameTests
     public void Handle_ReturnsOk_WhenServiceGetGameReturnsTrue()
     {
         var gameId = CommonMethods.GetRandomString();
-        var gameState = CommonMethods.GetGameState();
-        MockResponse(true, gameState);
+        var gamePerspective = CommonMethods.GetGamePerspective();
+        MockResponse(true, gamePerspective);
 
-        var result = GetGame.Handle(gameId, _mockGameStateService.Object);
+        var result = GetGame.Handle(gameId, _mockGamePerspectiveService.Object);
 
-        _mockGameStateService.Verify(o => o.GetGame(gameId.Trim()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetGame(gameId.Trim()), Times.Once);
 
-        var response = result.Result.Should().BeOfType<Ok<GameState>>().Subject;
+        var response = result.Result.Should().BeOfType<Ok<IEnumerable<GamePerspective>>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);
-        response.Value.Should().Be(gameState);
+        response.Value.Should().BeEquivalentTo([gamePerspective]);
     }
 }
