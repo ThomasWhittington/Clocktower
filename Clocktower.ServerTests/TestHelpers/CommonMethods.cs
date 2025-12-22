@@ -81,9 +81,9 @@ public static class CommonMethods
             dateTime.Hour, dateTime.Minute, dateTime.Second, DateTimeKind.Utc);
     }
 
-    public static GamePerspective GetGamePerspective(string? gameId = null, string? guildId = null, string? creatorId = null, GameUser? createdBy = null)
+    public static GamePerspective GetGamePerspective(string? gameId = null, string? userId = null, string? guildId = null, string? creatorId = null, GameUser? createdBy = null)
     {
-        return new GamePerspective(gameId ?? GetRandomString(), guildId ?? GetRandomSnowflakeStringId(), createdBy ?? GetRandomGameUser(creatorId), DateTime.UtcNow);
+        return new GamePerspective(gameId ?? GetRandomString(), userId ?? GetRandomSnowflakeStringId(), guildId ?? GetRandomSnowflakeStringId(), createdBy ?? GetRandomGameUser(creatorId), DateTime.UtcNow);
     }
 
     public static GamePerspectiveDto GetGamePerspectiveDto(string? gameId = null, string? guildId = null, string? creatorId = null, GameUserDto? createdBy = null)

@@ -23,9 +23,9 @@ public class GamePerspectiveStoreTests
     [TestInitialize]
     public void SetUp()
     {
-        _game1 = CommonMethods.GetGamePerspective(GameId1, GuildId);
-        _game2 = CommonMethods.GetGamePerspective(GameId2, GuildId);
-        _game3 = CommonMethods.GetGamePerspective(GameId3, GuildId);
+        _game1 = CommonMethods.GetGamePerspective(GameId1, guildId: GuildId);
+        _game2 = CommonMethods.GetGamePerspective(GameId2, guildId: GuildId);
+        _game3 = CommonMethods.GetGamePerspective(GameId3, guildId: GuildId);
         _sut = new GamePerspectiveStore();
     }
 
@@ -40,7 +40,7 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void GameExists_ReturnsTrue_WhenGameFound()
     {
-        _sut.Set(_game1, UserId1);
+        _sut.Set(_game1 with { UserId = UserId1 });
 
         var result = _sut.GameExists(GameId1);
 
@@ -50,22 +50,24 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void Set_WhenGameDoesNotExist_ReturnsTrue()
     {
-        var result = _sut.Set(_game1, UserId1);
+        var game = _game1 with { UserId = UserId1 };
+        var result = _sut.Set(game);
 
         result.Should().BeTrue();
-        _sut.Get(GameId1, UserId1).Should().BeEquivalentTo(_game1);
+        _sut.Get(GameId1, UserId1).Should().BeEquivalentTo(game);
     }
 
 
     [TestMethod]
     public void Set_WhenPerspectiveAlreadyExists_ReturnsFalse()
     {
-        _sut.Set(_game1, UserId1);
+        var game = _game1 with { UserId = UserId1 };
+        _sut.Set(game);
 
-        var result = _sut.Set(CommonMethods.GetGamePerspective(GameId1), UserId1);
+        var result = _sut.Set(CommonMethods.GetGamePerspective(GameId1) with { UserId = UserId1 });
 
         result.Should().BeFalse();
-        _sut.Get(GameId1, UserId1).Should().BeEquivalentTo(_game1);
+        _sut.Get(GameId1, UserId1).Should().BeEquivalentTo(game);
     }
 
     [TestMethod]
@@ -80,8 +82,8 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void Clear_RemovesAllEntries()
     {
-        _sut.Set(_game1, UserId1);
-        _sut.Set(_game2, UserId1);
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game1 with { UserId = UserId2 });
 
         _sut.Clear();
 
@@ -92,8 +94,8 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void RemovePerspective_RemovesOnlySelectedPerspective()
     {
-        _sut.Set(_game1, UserId1);
-        _sut.Set(_game1, UserId2);
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game1 with { UserId = UserId2 });
 
         _sut.RemovePerspective(GameId1, UserId1);
 
@@ -104,10 +106,10 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void RemoveGame_RemovesAllPerspectivesFromGame()
     {
-        _sut.Set(_game1, UserId1);
-        _sut.Set(_game1, UserId2);
-        _sut.Set(_game2, UserId1);
-        _sut.Set(_game2, UserId2);
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game1 with { UserId = UserId2 });
+        _sut.Set(_game2 with { UserId = UserId1 });
+        _sut.Set(_game2 with { UserId = UserId2 });
 
         var result = _sut.RemoveGame(GameId1);
 
@@ -122,9 +124,9 @@ public class GamePerspectiveStoreTests
     [DynamicData(nameof(GetGameTimeValues))]
     public void SetTime_UpdatesGameTimeForAllPerspectivesInGame(GameTime gameTime)
     {
-        _sut.Set(_game1, UserId1);
-        _sut.Set(_game1, UserId2);
-        _sut.Set(_game2, UserId1);
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game1 with { UserId = UserId2 });
+        _sut.Set(_game2 with { UserId = UserId1 });
 
         var game2GameTime = _sut.Get(GameId2, UserId1)!.GameTime;
 
@@ -138,9 +140,9 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void AddUserToGame_AddsUserForAllPerspectivesInGame()
     {
-        _sut.Set(_game1, UserId1);
-        _sut.Set(_game1, UserId2);
-        _sut.Set(_game2, UserId1);
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game1 with { UserId = UserId2 });
+        _sut.Set(_game2 with { UserId = UserId1 });
 
         var user = CommonMethods.GetRandomGameUser(UserId3);
 
@@ -154,9 +156,9 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void GetAll_ReturnsAll()
     {
-        _sut.Set(_game1, UserId1);
-        _sut.Set(_game2, UserId1);
-        _sut.Set(_game3, UserId3);
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game2 with { UserId = UserId1 });
+        _sut.Set(_game3 with { UserId = UserId3 });
 
         var result = _sut.GetAll().ToList();
 
@@ -168,12 +170,12 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void GetFirstPerspective_ReturnsFirst()
     {
-        var game1 = _game1;
-        var game1Day = _game1 with { GameTime = GameTime.Day };
-        var game1Night = _game1 with { GameTime = GameTime.Night };
-        _sut.Set(game1, UserId1);
-        _sut.Set(game1Day, UserId2);
-        _sut.Set(game1Night, UserId3);
+        var game1 = _game1 with { UserId = UserId1 };
+        var game1Day = _game1 with { UserId = UserId2, GameTime = GameTime.Day };
+        var game1Night = _game1 with { UserId = UserId3, GameTime = GameTime.Night };
+        _sut.Set(game1);
+        _sut.Set(game1Day);
+        _sut.Set(game1Night);
 
         var result = _sut.GetFirstPerspective(GameId1);
 
@@ -183,13 +185,14 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void GetAllPerspectivesForGame_GetsAllPerspectivesForGame()
     {
-        var game1 = _game1;
-        var game1Day = _game1 with { GameTime = GameTime.Day };
-        var game1Night = _game1 with { GameTime = GameTime.Night };
-        _sut.Set(game1, UserId1);
-        _sut.Set(game1Day, UserId2);
-        _sut.Set(game1Night, UserId3);
-        _sut.Set(_game2, UserId3);
+        var game1 = _game1 with { UserId = UserId1 };
+        var game1Day = _game1 with { UserId = UserId2, GameTime = GameTime.Day };
+        var game1Night = _game1 with { UserId = UserId3, GameTime = GameTime.Night };
+        _sut.Set(game1);
+        _sut.Set(game1Day);
+        _sut.Set(game1Night);
+        _sut.Set(_game2 with { UserId = UserId3 });
+
 
         var result = _sut.GetAllPerspectivesForGame(GameId1).ToArray();
         result.Should().HaveCount(3);
@@ -200,10 +203,10 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void GetGuildGames_ReturnsGuildGames()
     {
-        _sut.Set(_game1, UserId1);
-        _sut.Set(_game2, UserId1);
-        _sut.Set(_game3, UserId1);
-        _sut.Set(CommonMethods.GetGamePerspective("game4", "987"), UserId1);
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game2 with { UserId = UserId1 });
+        _sut.Set(_game3 with { UserId = UserId1 });
+        _sut.Set(CommonMethods.GetGamePerspective("game4", UserId3, guildId: "987"));
 
         var result = _sut.GetGuildGameIds(GuildId).ToList();
 
@@ -217,9 +220,9 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void GetUserGames_ReturnsUserGames()
     {
-        _sut.Set(_game1, UserId2);
-        _sut.Set(_game2, UserId1);
-        _sut.Set(_game3, UserId1);
+        _sut.Set(_game1 with { UserId = UserId2 });
+        _sut.Set(_game2 with { UserId = UserId1 });
+        _sut.Set(_game3 with { UserId = UserId1 });
 
         var result = _sut.GetUserGames(UserId1).ToList();
 
@@ -233,8 +236,8 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void UpdateUser_DoesNotChange_WhenNoUserFound()
     {
-        _sut.Set(_game1, UserId1);
-        _sut.Set(_game1, UserId2);
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game1 with { UserId = UserId2 });
         var user = CommonMethods.GetRandomGameUser(UserId3);
         _sut.AddUserToGame(GameId1, user);
 
@@ -248,8 +251,8 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void UpdateUser_ReturnsOriginal_NoChangesRequested()
     {
-        _sut.Set(_game1, UserId1);
-        _sut.Set(_game1, UserId2);
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game1 with { UserId = UserId2 });
         var user = CommonMethods.GetRandomGameUser(UserId3);
         _sut.AddUserToGame(GameId1, user);
 
@@ -264,8 +267,8 @@ public class GamePerspectiveStoreTests
     [DynamicData(nameof(GetUserTypeValues))]
     public void UpdateUser_Updates_UserType(UserType userType)
     {
-        _sut.Set(_game1, UserId1);
-        _sut.Set(_game1, UserId2);
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game1 with { UserId = UserId2 });
         var user = CommonMethods.GetRandomGameUser(UserId3);
         _sut.AddUserToGame(GameId1, user);
 
@@ -281,8 +284,8 @@ public class GamePerspectiveStoreTests
     [DataRow(false)]
     public void UpdateUser_Updates_IsPlaying(bool isPlaying)
     {
-        _sut.Set(_game1, UserId1);
-        _sut.Set(_game1, UserId2);
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game1 with { UserId = UserId2 });
         var user = CommonMethods.GetRandomGameUser(UserId3);
         _sut.AddUserToGame(GameId1, user);
 

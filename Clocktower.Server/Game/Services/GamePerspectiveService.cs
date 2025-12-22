@@ -1,4 +1,6 @@
 ﻿using System.IO.Abstractions;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Clocktower.Server.Common.Services;
 using Clocktower.Server.Socket;
 
@@ -6,8 +8,7 @@ namespace Clocktower.Server.Game.Services;
 
 public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gamePerspectiveStore, IFileSystem fileSystem, INotificationService notificationService) : IGamePerspectiveService
 {
-    public IEnumerable<GamePerspective> GetGames() =>
-        gamePerspectiveStore.GetAll();
+    public IEnumerable<GamePerspective> GetGames() => gamePerspectiveStore.GetAll();
 
     public IEnumerable<MiniGamePerspective> GetPlayerGames(string userId)
     {
@@ -18,10 +19,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
 
     public (bool success, string message) LoadDummyData(string filePath = "dummyState.json")
     {
-        //TODO implement new dummy data once rework of GamePerspective is complete
-        throw new NotImplementedException();
-
-        /*try
+        try
         {
             var json = fileSystem.File.ReadAllText(filePath);
             var options = new JsonSerializerOptions
@@ -55,7 +53,6 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         {
             return (false, $"Error loading dummy data: {ex.Message}");
         }
-        */
     }
 
     public (bool success, IEnumerable<GamePerspective> perspectives, string message) GetGame(string gameId)
@@ -83,16 +80,16 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         if (user is null) return (false, null, "Couldn't find user");
         var gameUser = user.AsGameUser();
         gameUser.UserType = UserType.StoryTeller;
-        var newGamePerspective = new GamePerspective(gameId, guildId, gameUser, DateTime.UtcNow)
+        var newGamePerspective = new GamePerspective(gameId, userId, guildId, gameUser, DateTime.UtcNow)
         {
             Users = [gameUser]
         };
 
-        bool addSuccessful = gamePerspectiveStore.Set(newGamePerspective, userId);
+        bool addSuccessful = gamePerspectiveStore.Set(newGamePerspective);
 
         return addSuccessful
             ? (true, newGamePerspective, "Game started successfully")
-            : (false, null, $"Game Id '{gameId}' already exists");
+            : (false, null, $"Perspective for user '{userId}' for game '{gameId}' already exists");
     }
 
     public async Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime)

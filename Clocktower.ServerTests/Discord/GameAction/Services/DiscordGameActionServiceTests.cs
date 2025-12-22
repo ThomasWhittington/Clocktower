@@ -31,7 +31,7 @@ public class DiscordGameActionServiceTests
     private void SetUp_GamePerspectiveStore(bool hasGame, bool checkMuted = false, string? guildId = GuildId, (string userId, bool isPresent, bool muted, UserType userType)[]? users = null)
     {
         _guild.Setup(o => o.Id).Returns(guildId!);
-        _gamePerspective = CommonMethods.GetGamePerspective(GameId, guildId);
+        _gamePerspective = CommonMethods.GetGamePerspective(GameId, guildId: guildId);
 
         if (users is not null)
         {

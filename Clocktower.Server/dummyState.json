@@ -1,100 +1,108 @@
 [
   {
-    "id": "test-game-1",
-    "guildId": "1318686543363178666",
-    "users": [
-      {
-        "id": "285398267854848000",
-        "isPlaying": false,
-        "userType": "StoryTeller"
-      },
-      {
-        "id": "723487320157716520",
-        "isPlaying": false,
-        "userType": "Player"
-      },
-      {
-        "id": "723487320157716521",
-        "isPlaying": false,
-        "userType": "Player"
-      },
-      {
-        "id": "723487320157716522",
-        "isPlaying": false,
-        "userType": "Player"
-      },
-      {
-        "id": "723487320157716523",
-        "isPlaying": false,
-        "userType": "Player"
-      },
-      {
-        "id": "723487320157716524",
-        "isPlaying": false,
-        "userType": "Player"
-      },
-      {
-        "id": "723487320157716525",
-        "isPlaying": false,
-        "userType": "Player"
-      },
-      {
-        "id": "723487320157716527",
-        "isPlaying": false,
-        "userType": "Player"
-      }
-    ],
-    "players": [
-      {
-        "id": "723487320157716520",
-        "isPlaying": false,
-        "userType": "Player"
-      },
-      {
-        "id": "723487320157716521",
-        "isPlaying": false,
-        "userType": "Player"
-      },
-      {
-        "id": "723487320157716522",
-        "isPlaying": false,
-        "userType": "Player"
-      },
-      {
-        "id": "723487320157716523",
-        "isPlaying": false,
-        "userType": "Player"
-      },
-      {
-        "id": "723487320157716524",
-        "isPlaying": false,
-        "userType": "Player"
-      },
-      {
-        "id": "723487320157716525",
-        "isPlaying": false,
-        "userType": "Player"
-      },
-      {
-        "id": "723487320157716527",
-        "isPlaying": false,
-        "userType": "Player"
-      }
-    ],
-    "storyTellers": [
-      {
-        "id": "285398267854848000",
-        "isPlaying": false,
-        "userType": "StoryTeller"
-      }
-    ],
-    "spectators": [],
-    "createdBy": {
-      "id": "285398267854848000",
-      "isPlaying": false,
-      "userType": "StoryTeller"
+    "Id": "test_game_2",
+    "UserId": "285398267854848000",
+    "GuildId": "1318686543363178666",
+    "CreatedBy": {
+      "Id": "285398267854848000",
+      "IsPlaying": false,
+      "UserType": 2
     },
-    "createdDate": "2025-12-17T17:01:25.3972206Z",
-    "gameTime": "Unknown"
+    "CreatedDate": "2025-12-22T12:38:27.8914317Z",
+    "Users": [
+      {
+        "Id": "285398267854848000",
+        "IsPlaying": false,
+        "UserType": 2
+      }
+    ],
+    "Players": [],
+    "StoryTellers": [
+      {
+        "Id": "285398267854848000",
+        "IsPlaying": false,
+        "UserType": 2
+      }
+    ],
+    "Spectators": [],
+    "GameTime": 2
+  },
+  {
+    "Id": "test_game_1",
+    "UserId": "285398267854848001",
+    "GuildId": "1318686543363178666",
+    "CreatedBy": {
+      "Id": "285398267854848000",
+      "IsPlaying": false,
+      "UserType": 2
+    },
+    "CreatedDate": "2025-12-22T12:38:20.7032605Z",
+    "Users": [
+      {
+        "Id": "285398267854848000",
+        "IsPlaying": false,
+        "UserType": 2
+      },
+      {
+        "Id": "723487320157716522",
+        "IsPlaying": false,
+        "UserType": 1
+      }
+    ],
+    "Players": [
+      {
+        "Id": "723487320157716522",
+        "IsPlaying": false,
+        "UserType": 1
+      }
+    ],
+    "StoryTellers": [
+      {
+        "Id": "285398267854848000",
+        "IsPlaying": false,
+        "UserType": 2
+      }
+    ],
+    "Spectators": [],
+    "GameTime": 0
+  },
+  {
+    "Id": "test_game_3",
+    "UserId": "723487320157716522",
+    "GuildId": "1318686543363178666",
+    "CreatedBy": {
+      "Id": "285398267854848000",
+      "IsPlaying": false,
+      "UserType": 2
+    },
+    "CreatedDate": "2025-12-22T12:38:29.7962375Z",
+    "Users": [
+      {
+        "Id": "285398267854848000",
+        "IsPlaying": false,
+        "UserType": 2
+      },
+      {
+        "Id": "723487320157716522",
+        "IsPlaying": false,
+        "UserType": 1
+      }
+    ],
+    "Players": [
+      {
+        "Id": "723487320157716522",
+        "IsPlaying": false,
+        "UserType": 1
+      }
+    ],
+    "StoryTellers": [
+      {
+        "Id": "285398267854848000",
+        "IsPlaying": false,
+        "UserType": 2
+      }
+    ],
+    "Spectators": [],
+    "GameTime": 3
   }
 ]

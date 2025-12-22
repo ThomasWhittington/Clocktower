@@ -14,7 +14,7 @@ public class GamePerspectiveStore : IGamePerspectiveStore
     public GamePerspective? Get(string gameId, string userId) =>
         _store.TryGetValue((gameId, userId), out var state) ? state : null;
 
-    public bool Set(GamePerspective perspective, string userId) => _store.TryAdd((perspective.Id, userId), perspective);
+    public bool Set(GamePerspective perspective) => _store.TryAdd((perspective.Id, perspective.UserId), perspective);
 
     public bool RemovePerspective(string gameId, string userId) => _store.TryRemove((gameId, userId), out _);
 

@@ -65,7 +65,7 @@ public class HubStateManagerTests
         const string guildId = "1";
         const string userId = "user-123";
         var gameUser = new GameUser(userId) { UserType = UserType.Player };
-        var gamePerspective = CommonMethods.GetGamePerspective(gameId, guildId) with { GameTime = GameTime.Day, Users = [gameUser] };
+        var gamePerspective = CommonMethods.GetGamePerspective(gameId, guildId: guildId) with { GameTime = GameTime.Day, Users = [gameUser] };
 
         var timer = new TimerState
         {
@@ -104,7 +104,7 @@ public class HubStateManagerTests
         const string guildId = "1";
         const string userId = "user-123";
         var gameUser = new GameUser(userId) { UserType = UserType.StoryTeller };
-        var gamePerspective = CommonMethods.GetGamePerspective(gameId, guildId) with { GameTime = GameTime.Day, Users = [gameUser] };
+        var gamePerspective = CommonMethods.GetGamePerspective(gameId, guildId: guildId) with { GameTime = GameTime.Day, Users = [gameUser] };
 
         var timer = new TimerState
         {

@@ -1,4 +1,5 @@
 ﻿using System.IO.Abstractions;
+using System.Text.Json;
 using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data;
 using Clocktower.Server.Data.Stores;
@@ -169,11 +170,11 @@ public class GamePerspectiveServiceTests
         {
             UserType = UserType.StoryTeller
         };
-        var expectedGamePerspective = CommonMethods.GetGamePerspective(gameId, guildId, createdBy: expectedGameUser) with { Users = [expectedGameUser] };
+        var expectedGamePerspective = CommonMethods.GetGamePerspective(gameId, userId: userId, guildId, createdBy: expectedGameUser) with { Users = [expectedGameUser] };
 
         var mockedUser = MockMaker.CreateMockDiscordUser(userId, userName, userAvatarUrl);
         _mockBot.Setup(o => o.GetUser(userId)).Returns(mockedUser);
-        _mockGamePerspectiveStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId), userId)).Returns(true);
+        _mockGamePerspectiveStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId && g.UserId == userId))).Returns(true);
 
         var result = Sut.StartNewGame(guildId, gameId, userId);
 
@@ -195,19 +196,17 @@ public class GamePerspectiveServiceTests
 
         var mockedUser = MockMaker.CreateMockDiscordUser(userId, userName, userAvatarUrl);
         _mockBot.Setup(o => o.GetUser(userId)).Returns(mockedUser);
-        _mockGamePerspectiveStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId), userId)).Returns(false);
+        _mockGamePerspectiveStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId))).Returns(false);
 
         var result = Sut.StartNewGame(guildId, gameId, userId);
 
         result.success.Should().BeFalse();
         result.gamePerspective.Should().BeNull();
-        result.message.Should().Be($"Game Id '{gameId}' already exists");
+        result.message.Should().Be($"Perspective for user '{userId}' for game '{gameId}' already exists");
     }
 
     #endregion
 
-//!TODO Readdtests once reimplemented
-/*
     #region LoadDummyData
 
     [TestMethod]
@@ -331,7 +330,6 @@ public class GamePerspectiveServiceTests
     }
 
     #endregion
-*/
 
     #region SetTime
 

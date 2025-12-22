@@ -5,7 +5,7 @@ public interface IGamePerspectiveStore
     bool GameExists(string gameId);
     void Clear();
     GamePerspective? Get(string gameId, string userId);
-    bool Set(GamePerspective perspective, string userId);
+    bool Set(GamePerspective perspective);
     bool RemovePerspective(string gameId, string userId);
     bool RemoveGame(string gameId);
     IEnumerable<string> GetGuildGameIds(string guildId);

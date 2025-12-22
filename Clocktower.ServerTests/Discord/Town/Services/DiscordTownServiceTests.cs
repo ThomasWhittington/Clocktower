@@ -218,7 +218,7 @@ public class DiscordTownServiceTests
 
 
         var gameUsers = hasPerspectiveUser ? [CommonMethods.GetRandomGameUser(UserId)] : Array.Empty<GameUser>();
-        GamePerspective gamePerspective = CommonMethods.GetGamePerspective(GameId, GuildId) with { Users = gameUsers };
+        GamePerspective gamePerspective = CommonMethods.GetGamePerspective(GameId, guildId: GuildId) with { Users = gameUsers };
 
         _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId))
             .Returns(hasGamePerspective ? gamePerspective : null);
@@ -786,7 +786,7 @@ public class DiscordTownServiceTests
             }
             : [];
 
-        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(gameId)).Returns(hasGamePerspective ? CommonMethods.GetGamePerspective(GameId, GuildId) with { Users = users } : null);
+        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(gameId)).Returns(hasGamePerspective ? CommonMethods.GetGamePerspective(GameId, guildId: guildId) with { Users = users } : null);
         _mockDiscordTownStore.Setup(o => o.Get(guildId)).Returns(hasTown ? _discordTown : null);
         _mockBot.Setup(o => o.GetGuild(guildId)).Returns(hasGuild ? new Mock<IDiscordGuild>().Object : null);
     }
@@ -839,7 +839,7 @@ public class DiscordTownServiceTests
     private void Setup_InviteUser(bool hasPerspective = false, string? guildId = GuildId, bool hasGuild = false, bool hasUser = false, bool hasDmChannel = false)
     {
         _gameUser = CommonMethods.GetRandomGameUser(UserId);
-        var gamePerspective = CommonMethods.GetGamePerspective(GameId, guildId);
+        var gamePerspective = CommonMethods.GetGamePerspective(GameId, guildId: guildId);
 
         _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasPerspective ? gamePerspective : null);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? _guild.Object : null);
