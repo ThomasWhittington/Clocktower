@@ -16,7 +16,7 @@ public class GetPlayerGamePerspective : IEndpoint
 
     internal static async Task<Results<Ok<GamePerspectiveDto>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle([AsParameters] GameAndUserRequest request, [FromServices] IGamePerspectiveService gamePerspectiveService)
     {
-        var result = await gamePerspectiveService.GetPlayerGamePerspective(request.GameId, request.UserId);
+        var result = await gamePerspectiveService.GetPlayerGamePerspectiveDto(request.GameId, request.UserId);
         return result.ToHttpResult();
     }
 }

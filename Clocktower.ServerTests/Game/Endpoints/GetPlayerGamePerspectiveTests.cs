@@ -39,11 +39,11 @@ public class GetPlayerGamePerspectiveTests
         const string userId = "12345";
         var request = new GameAndUserRequest(gameId, userId);
         var error = Result.Fail<GamePerspectiveDto>(ErrorKind.Invalid, "error code", "error message");
-        _mockGamePerspectiveService.Setup(o => o.GetPlayerGamePerspective(gameId, userId)).ReturnsAsync(error);
+        _mockGamePerspectiveService.Setup(o => o.GetPlayerGamePerspectiveDto(gameId, userId)).ReturnsAsync(error);
 
         var result = await GetPlayerGamePerspective.Handle(request, _mockGamePerspectiveService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.GetPlayerGamePerspective(gameId, userId), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetPlayerGamePerspectiveDto(gameId, userId), Times.Once);
         var response = result.Result.Should().BeOfType<BadRequest<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
     }
@@ -56,11 +56,11 @@ public class GetPlayerGamePerspectiveTests
         const string userId = "12345";
         var request = new GameAndUserRequest(gameId, userId);
         var error = Result.Fail<GamePerspectiveDto>(ErrorKind.NotFound, "error code", "error message");
-        _mockGamePerspectiveService.Setup(o => o.GetPlayerGamePerspective(gameId, userId)).ReturnsAsync(error);
+        _mockGamePerspectiveService.Setup(o => o.GetPlayerGamePerspectiveDto(gameId, userId)).ReturnsAsync(error);
 
         var result = await GetPlayerGamePerspective.Handle(request, _mockGamePerspectiveService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.GetPlayerGamePerspective(gameId, userId), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetPlayerGamePerspectiveDto(gameId, userId), Times.Once);
         var response = result.Result.Should().BeOfType<NotFound<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
     }
@@ -72,11 +72,11 @@ public class GetPlayerGamePerspectiveTests
         const string userId = "12345";
         var request = new GameAndUserRequest(gameId, userId);
         var success = Result.Ok(CommonMethods.GetGamePerspectiveDto());
-        _mockGamePerspectiveService.Setup(o => o.GetPlayerGamePerspective(gameId, userId)).ReturnsAsync(success);
+        _mockGamePerspectiveService.Setup(o => o.GetPlayerGamePerspectiveDto(gameId, userId)).ReturnsAsync(success);
 
         var result = await GetPlayerGamePerspective.Handle(request, _mockGamePerspectiveService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.GetPlayerGamePerspective(gameId, userId), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetPlayerGamePerspectiveDto(gameId, userId), Times.Once);
         var response = result.Result.Should().BeOfType<Ok<GamePerspectiveDto>>().Subject;
         response.Value.Should().Be(success.Value);
     }

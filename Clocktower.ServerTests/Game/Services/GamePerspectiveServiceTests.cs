@@ -1,5 +1,4 @@
 ﻿using System.IO.Abstractions;
-using System.Text.Json;
 using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data;
 using Clocktower.Server.Data.Stores;
@@ -11,12 +10,12 @@ using Clocktower.Server.Socket;
 namespace Clocktower.ServerTests.Game.Services;
 
 [TestClass]
-public class GameStateServiceTests
+public class GamePerspectiveServiceTests
 {
     private const string DummyJsonFile = "dummyState.json";
 
     private Mock<IDiscordBot> _mockBot = null!;
-    private Mock<IGamePerspectiveStore> _mockGameStateStore = null!;
+    private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
     private Mock<IFileSystem> _mockFileSystem = null!;
     private Mock<INotificationService> _mockNotificationService = null!;
 
@@ -24,31 +23,31 @@ public class GameStateServiceTests
     public void Setup()
     {
         _mockBot = new Mock<IDiscordBot>();
-        _mockGameStateStore = new Mock<IGamePerspectiveStore>();
+        _mockGamePerspectiveStore = new Mock<IGamePerspectiveStore>();
         _mockFileSystem = new Mock<IFileSystem>();
         _mockNotificationService = new Mock<INotificationService>();
     }
 
-    private IGameStateService Sut => new GameStateService(_mockBot.Object, _mockGameStateStore.Object, _mockFileSystem.Object, _mockNotificationService.Object);
+    private IGamePerspectiveService Sut => new GamePerspectiveService(_mockBot.Object, _mockGamePerspectiveStore.Object, _mockFileSystem.Object, _mockNotificationService.Object);
 
     #region GetGames
 
     [TestMethod]
-    public void GetGames_CallsGameStateStore()
+    public void GetGames_CallsGamePerspectiveStore()
     {
         GamePerspective[] allGames =
         [
-            CommonMethods.GetGameState(),
-            CommonMethods.GetGameState(),
-            CommonMethods.GetGameState()
+            CommonMethods.GetGamePerspective(),
+            CommonMethods.GetGamePerspective(),
+            CommonMethods.GetGamePerspective()
         ];
 
-        _mockGameStateStore.Setup(o => o.GetAll()).Returns(allGames);
+        _mockGamePerspectiveStore.Setup(o => o.GetAll()).Returns(allGames);
 
         var result = Sut.GetGames();
         result.Should().BeEquivalentTo(allGames);
 
-        _mockGameStateStore.Verify(o => o.GetAll(), Times.Once);
+        _mockGamePerspectiveStore.Verify(o => o.GetAll(), Times.Once);
     }
 
     #endregion
@@ -56,22 +55,22 @@ public class GameStateServiceTests
     #region GetGuildGames
 
     [TestMethod]
-    public void GetGuildGames_CallsGameStateStore()
+    public void GetGuildGames_CallsGamePerspectiveStore()
     {
         var guildId = CommonMethods.GetRandomString();
         GamePerspective[] allGames =
         [
-            CommonMethods.GetGameState(),
-            CommonMethods.GetGameState(),
-            CommonMethods.GetGameState()
+            CommonMethods.GetGamePerspective(),
+            CommonMethods.GetGamePerspective(),
+            CommonMethods.GetGamePerspective()
         ];
 
-        _mockGameStateStore.Setup(o => o.GetGuildGames(guildId)).Returns(allGames);
+        _mockGamePerspectiveStore.Setup(o => o.GetGuildGames(guildId)).Returns(allGames);
 
         var result = Sut.GetGuildGames(guildId);
         result.Should().BeEquivalentTo(allGames);
 
-        _mockGameStateStore.Verify(o => o.GetGuildGames(guildId), Times.Once);
+        _mockGamePerspectiveStore.Verify(o => o.GetGuildGames(guildId), Times.Once);
     }
 
     #endregion
@@ -79,23 +78,23 @@ public class GameStateServiceTests
     #region GetPlayerGames
 
     [TestMethod]
-    public void GetPlayerGames_CallsGameStateStore()
+    public void GetPlayerGames_CallsGamePerspectiveStore()
     {
         var userId = CommonMethods.GetRandomSnowflakeStringId();
         GamePerspective[] allGames =
         [
-            CommonMethods.GetGameState(creatorId: userId),
-            CommonMethods.GetGameState(creatorId: userId),
-            CommonMethods.GetGameState(creatorId: userId)
+            CommonMethods.GetGamePerspective(creatorId: userId),
+            CommonMethods.GetGamePerspective(creatorId: userId),
+            CommonMethods.GetGamePerspective(creatorId: userId)
         ];
         var expected = allGames.Select(o => new MiniGamePerspective(o.Id, o.CreatedBy, o.CreatedDate));
 
-        _mockGameStateStore.Setup(o => o.GetUserGames(userId)).Returns(allGames);
+        _mockGamePerspectiveStore.Setup(o => o.GetUserGames(userId)).Returns(allGames);
 
         var result = Sut.GetPlayerGames(userId);
         result.Should().BeEquivalentTo(expected);
 
-        _mockGameStateStore.Verify(o => o.GetUserGames(userId), Times.Once);
+        _mockGamePerspectiveStore.Verify(o => o.GetUserGames(userId), Times.Once);
     }
 
     #endregion
@@ -106,14 +105,14 @@ public class GameStateServiceTests
     public void GetGame_ReturnsExpected_WhenStoreReturnsGame()
     {
         var gameId = CommonMethods.GetRandomString();
-        var gameState = CommonMethods.GetGameState();
+        var gamePerspective = CommonMethods.GetGamePerspective();
 
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(gameState);
+        _mockGamePerspectiveStore.Setup(o => o.GetAllPerspectivesForGame(gameId)).Returns([gamePerspective]);
 
         var result = Sut.GetGame(gameId);
 
         result.success.Should().BeTrue();
-        result.perspectives.Should().Be(gameState);
+        result.perspectives.Should().BeEquivalentTo([gamePerspective]);
         result.message.Should().Be("Game retrieved successfully");
     }
 
@@ -122,12 +121,12 @@ public class GameStateServiceTests
     {
         var gameId = CommonMethods.GetRandomString();
 
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns((GamePerspective)null!);
+        _mockGamePerspectiveStore.Setup(o => o.GetAllPerspectivesForGame(gameId)).Returns([]);
 
         var result = Sut.GetGame(gameId);
 
         result.success.Should().BeFalse();
-        result.perspectives.Should().BeNull();
+        result.perspectives.Should().BeEmpty();
         result.message.Should().Be($"Game ID '{gameId}' not found");
     }
 
@@ -140,7 +139,7 @@ public class GameStateServiceTests
     {
         var gameId = CommonMethods.GetRandomString();
 
-        _mockGameStateStore.Setup(o => o.RemoveGame(gameId)).Returns(true);
+        _mockGamePerspectiveStore.Setup(o => o.RemoveGame(gameId)).Returns(true);
 
         var result = Sut.DeleteGame(gameId);
 
@@ -153,7 +152,7 @@ public class GameStateServiceTests
     {
         var gameId = CommonMethods.GetRandomString();
 
-        _mockGameStateStore.Setup(o => o.RemoveGame(gameId)).Returns(false);
+        _mockGamePerspectiveStore.Setup(o => o.RemoveGame(gameId)).Returns(false);
 
         var result = Sut.DeleteGame(gameId);
 
@@ -177,12 +176,12 @@ public class GameStateServiceTests
         var result = Sut.StartNewGame(guildId, gameId, userId);
 
         result.success.Should().BeFalse();
-        result.gameState.Should().BeNull();
+        result.gamePerspective.Should().BeNull();
         result.message.Should().Be("Couldn't find user");
     }
 
     [TestMethod]
-    public void StartNewGame_ReturnsExpected_WhenGameStateStoreSetReturnsTrue()
+    public void StartNewGame_ReturnsExpected_WhenGamePerspectiveStoreSetReturnsTrue()
     {
         var guildId = CommonMethods.GetRandomSnowflakeStringId();
         var gameId = CommonMethods.GetRandomString();
@@ -193,23 +192,23 @@ public class GameStateServiceTests
         {
             UserType = UserType.StoryTeller
         };
-        var expectedGameState = CommonMethods.GetGameState(gameId, guildId, createdBy: expectedGameUser) with { Users = [expectedGameUser] };
+        var expectedGamePerspective = CommonMethods.GetGamePerspective(gameId, guildId, createdBy: expectedGameUser) with { Users = [expectedGameUser] };
 
         var mockedUser = MockMaker.CreateMockDiscordUser(userId, userName, userAvatarUrl);
         _mockBot.Setup(o => o.GetUser(userId)).Returns(mockedUser);
-        _mockGameStateStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId))).Returns(true);
+        _mockGamePerspectiveStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId), userId)).Returns(true);
 
         var result = Sut.StartNewGame(guildId, gameId, userId);
 
         result.success.Should().BeTrue();
-        result.gameState.Should().BeEquivalentTo(expectedGameState, options => options
+        result.gamePerspective.Should().BeEquivalentTo(expectedGamePerspective, options => options
             .Excluding(x => x.CreatedDate));
-        result.gameState.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        result.gamePerspective.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
         result.message.Should().Be("Game started successfully");
     }
 
     [TestMethod]
-    public void StartNewGame_ReturnsExpected_WhenGameStateStoreSetReturnsFalse()
+    public void StartNewGame_ReturnsExpected_WhenGamePerspectiveStoreSetReturnsFalse()
     {
         var guildId = CommonMethods.GetRandomSnowflakeStringId();
         var gameId = CommonMethods.GetRandomString();
@@ -219,16 +218,17 @@ public class GameStateServiceTests
 
         var mockedUser = MockMaker.CreateMockDiscordUser(userId, userName, userAvatarUrl);
         _mockBot.Setup(o => o.GetUser(userId)).Returns(mockedUser);
-        _mockGameStateStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId))).Returns(false);
+        _mockGamePerspectiveStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId), userId)).Returns(false);
 
         var result = Sut.StartNewGame(guildId, gameId, userId);
 
         result.success.Should().BeFalse();
-        result.gameState.Should().BeNull();
+        result.gamePerspective.Should().BeNull();
         result.message.Should().Be($"Game Id '{gameId}' already exists");
     }
 
     #endregion
+//!TODO Readdtests once reimplemented
 /*
     #region LoadDummyData
 
@@ -237,8 +237,8 @@ public class GameStateServiceTests
     {
         var validJson = JsonSerializer.Serialize(new[]
         {
-            CommonMethods.GetGameState("game1", "guild1"),
-            CommonMethods.GetGameState("game2", "guild2")
+            CommonMethods.GetGamePerspective("game1", "guild1"),
+            CommonMethods.GetGamePerspective("game2", "guild2")
         });
 
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(validJson);
@@ -247,9 +247,9 @@ public class GameStateServiceTests
 
         result.success.Should().BeTrue();
         result.message.Should().Be("Loaded dummy data");
-        _mockGameStateStore.Verify(s => s.Clear(), Times.Once);
-        _mockGameStateStore.Verify(s => s.Set(It.Is<GameState>(o => o.Id == "game1")), Times.Once);
-        _mockGameStateStore.Verify(s => s.Set(It.Is<GameState>(o => o.Id == "game2")), Times.Once);
+        _mockGamePerspectiveStore.Verify(s => s.Clear(), Times.Once);
+        _mockGamePerspectiveStore.Verify(s => s.Set(It.Is<GamePerspective>(o => o.Id == "game1")), Times.Once);
+        _mockGamePerspectiveStore.Verify(s => s.Set(It.Is<GamePerspective>(o => o.Id == "game2")), Times.Once);
     }
 
     [TestMethod]
@@ -262,8 +262,8 @@ public class GameStateServiceTests
 
         result.success.Should().BeFalse();
         result.message.Should().Be("Failed to deserialize json");
-        _mockGameStateStore.Verify(s => s.Clear(), Times.Never);
-        _mockGameStateStore.Verify(s => s.Set(It.IsAny<GameState>()), Times.Never);
+        _mockGamePerspectiveStore.Verify(s => s.Clear(), Times.Never);
+        _mockGamePerspectiveStore.Verify(s => s.Set(It.IsAny<GamePerspective>()), Times.Never);
     }
 
     [TestMethod]
@@ -276,18 +276,18 @@ public class GameStateServiceTests
 
         result.success.Should().BeFalse();
         result.message.Should().Be("Failed to deserialize json");
-        _mockGameStateStore.Verify(s => s.Clear(), Times.Never);
+        _mockGamePerspectiveStore.Verify(s => s.Clear(), Times.Never);
     }
 
     [TestMethod]
     public void LoadDummyData_ClearsStoreBeforeLoading()
     {
-        var validJson = JsonSerializer.Serialize(new[] { CommonMethods.GetGameState() });
+        var validJson = JsonSerializer.Serialize(new[] { CommonMethods.GetGamePerspective() });
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(validJson);
 
         Sut.LoadDummyData();
 
-        var invocations = _mockGameStateStore.Invocations.ToList();
+        var invocations = _mockGamePerspectiveStore.Invocations.ToList();
         invocations.Should().HaveCountGreaterThan(0);
         invocations[0].Method.Name.Should().Be("Clear");
     }
@@ -302,8 +302,8 @@ public class GameStateServiceTests
 
         result.success.Should().BeTrue();
         result.message.Should().Be("Loaded dummy data");
-        _mockGameStateStore.Verify(s => s.Clear(), Times.Once);
-        _mockGameStateStore.Verify(s => s.Set(It.IsAny<GameState>()), Times.Never);
+        _mockGamePerspectiveStore.Verify(s => s.Clear(), Times.Once);
+        _mockGamePerspectiveStore.Verify(s => s.Set(It.IsAny<GamePerspective>()), Times.Never);
     }
 
     [TestMethod]
@@ -316,7 +316,7 @@ public class GameStateServiceTests
 
         result.success.Should().BeFalse();
         result.message.Should().Be("File not found");
-        _mockGameStateStore.Verify(s => s.Clear(), Times.Never);
+        _mockGamePerspectiveStore.Verify(s => s.Clear(), Times.Never);
     }
 
     [TestMethod]
@@ -329,7 +329,7 @@ public class GameStateServiceTests
 
         result.success.Should().BeFalse();
         result.message.Should().Be($"Error loading dummy data: Custom error message");
-        _mockGameStateStore.Verify(s => s.Clear(), Times.Never);
+        _mockGamePerspectiveStore.Verify(s => s.Clear(), Times.Never);
     }
 
     [TestMethod]
@@ -337,9 +337,9 @@ public class GameStateServiceTests
     {
         var games = new[]
         {
-            CommonMethods.GetGameState("first"),
-            CommonMethods.GetGameState("second"),
-            CommonMethods.GetGameState("third")
+            CommonMethods.GetGamePerspective("first"),
+            CommonMethods.GetGamePerspective("second"),
+            CommonMethods.GetGamePerspective("third")
         };
         var validJson = JsonSerializer.Serialize(games);
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(validJson);
@@ -347,9 +347,9 @@ public class GameStateServiceTests
         var result = Sut.LoadDummyData();
 
         result.success.Should().BeTrue();
-        _mockGameStateStore.Verify(s => s.Set(It.Is<GameState>(g => g.Id == "first")), Times.Once);
-        _mockGameStateStore.Verify(s => s.Set(It.Is<GameState>(g => g.Id == "second")), Times.Once);
-        _mockGameStateStore.Verify(s => s.Set(It.Is<GameState>(g => g.Id == "third")), Times.Once);
+        _mockGamePerspectiveStore.Verify(s => s.Set(It.Is<GamePerspective>(g => g.Id == "first")), Times.Once);
+        _mockGamePerspectiveStore.Verify(s => s.Set(It.Is<GamePerspective>(g => g.Id == "second")), Times.Once);
+        _mockGamePerspectiveStore.Verify(s => s.Set(It.Is<GamePerspective>(g => g.Id == "third")), Times.Once);
     }
 
     #endregion
@@ -361,7 +361,7 @@ public class GameStateServiceTests
     public async Task SetTime_ReturnsFalse_WhenGameNotFound()
     {
         const string gameId = "game-id";
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns((GamePerspective?)null);
+        _mockGamePerspectiveStore.Setup(o => o.GameExists(gameId)).Returns(false);
 
         var result = await Sut.SetTime(gameId, GameTime.Evening);
 
@@ -374,11 +374,11 @@ public class GameStateServiceTests
     public async Task SetTime_SetsTime_NotifyClients_WhenDataGood(GameTime gameTime)
     {
         const string gameId = "game-id";
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Returns(CommonMethods.GetGameState(gameId));
+        _mockGamePerspectiveStore.Setup(o => o.GameExists(gameId)).Returns(true);
 
         var result = await Sut.SetTime(gameId, gameTime);
 
-        _mockGameStateStore.Verify(o => o.SetTime(gameId, gameTime), Times.Once);
+        _mockGamePerspectiveStore.Verify(o => o.SetTime(gameId, gameTime), Times.Once);
         _mockNotificationService.Verify(o => o.BroadcastTownTime(gameId, gameTime), Times.Once);
         result.success.Should().BeTrue();
         result.message.Should().Be($"Time set to {gameTime}");
@@ -389,7 +389,7 @@ public class GameStateServiceTests
     {
         const string gameId = "game-id";
         const string message = "message";
-        _mockGameStateStore.Setup(o => o.Get(gameId)).Throws(new Exception(message));
+        _mockGamePerspectiveStore.Setup(o => o.GameExists(gameId)).Throws(new Exception(message));
 
         var result = await Sut.SetTime(gameId, GameTime.Evening);
 

@@ -10,5 +10,5 @@ public interface IGamePerspectiveService
     IEnumerable<MiniGamePerspective> GetPlayerGames(string userId);
     (bool success, string message) LoadDummyData(string filePath = "dummyState.json");
     Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime);
-    Task<Result<GamePerspectiveDto>> GetPlayerGamePerspective(string gameId, string userId);
+    Task<Result<GamePerspectiveDto>> GetPlayerGamePerspectiveDto(string gameId, string userId);
 }
