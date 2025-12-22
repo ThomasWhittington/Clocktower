@@ -179,7 +179,7 @@ public class GamePerspectiveStoreTests
 
         var result = _sut.GetFirstPerspective(GameId1);
 
-        result.Should().BeOneOf(_game1, game1Day, game1Night);
+        result.Should().BeOneOf(game1, game1Day, game1Night);
     }
 
     [TestMethod]

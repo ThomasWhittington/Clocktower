@@ -1,4 +1,4 @@
-﻿export * from './gameState.ts'
+﻿export * from './gamePerspective.ts'
 export * from './channelOccupants.ts'
 export * from './miniCategory.ts'
 export * from './miniChannel.ts'

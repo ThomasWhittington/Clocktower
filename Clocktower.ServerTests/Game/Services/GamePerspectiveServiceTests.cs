@@ -77,17 +77,17 @@ public class GamePerspectiveServiceTests
 
     #endregion
 
-    #region GetGame
+    #region GetGamePerspectives
 
     [TestMethod]
-    public void GetGame_ReturnsExpected_WhenStoreReturnsGame()
+    public void GetGamePerspectives_ReturnsExpected_WhenStoreReturnsGame()
     {
         var gameId = CommonMethods.GetRandomString();
         var gamePerspective = CommonMethods.GetGamePerspective();
 
         _mockGamePerspectiveStore.Setup(o => o.GetAllPerspectivesForGame(gameId)).Returns([gamePerspective]);
 
-        var result = Sut.GetGame(gameId);
+        var result = Sut.GetGamePerspectives(gameId);
 
         result.success.Should().BeTrue();
         result.perspectives.Should().BeEquivalentTo([gamePerspective]);
@@ -95,13 +95,13 @@ public class GamePerspectiveServiceTests
     }
 
     [TestMethod]
-    public void GetGame_ReturnsExpected_WhenStoreReturnsNull()
+    public void GetGamePerspectives_ReturnsExpected_WhenStoreReturnsNull()
     {
         var gameId = CommonMethods.GetRandomString();
 
         _mockGamePerspectiveStore.Setup(o => o.GetAllPerspectivesForGame(gameId)).Returns([]);
 
-        var result = Sut.GetGame(gameId);
+        var result = Sut.GetGamePerspectives(gameId);
 
         result.success.Should().BeFalse();
         result.perspectives.Should().BeEmpty();

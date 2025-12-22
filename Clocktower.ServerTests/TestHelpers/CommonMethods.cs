@@ -85,9 +85,4 @@ public static class CommonMethods
     {
         return new GamePerspective(gameId ?? GetRandomString(), userId ?? GetRandomSnowflakeStringId(), guildId ?? GetRandomSnowflakeStringId(), createdBy ?? GetRandomGameUser(creatorId), DateTime.UtcNow);
     }
-
-    public static GamePerspectiveDto GetGamePerspectiveDto(string? gameId = null, string? guildId = null, string? creatorId = null, GameUserDto? createdBy = null)
-    {
-        return new GamePerspectiveDto(gameId ?? GetRandomString(), guildId ?? GetRandomSnowflakeStringId(), createdBy ?? GetRandomGameUserDto(creatorId), DateTime.UtcNow);
-    }
 }

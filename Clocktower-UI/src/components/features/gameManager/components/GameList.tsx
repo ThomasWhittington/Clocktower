@@ -1,10 +1,10 @@
-﻿import type {GameState} from "@/types";
+﻿import type {GamePerspective} from "@/types";
 import {useAppStore} from "@/store";
 import type {FC} from "react";
 
 
 interface GameListProps {
-    games: GameState[];
+    games: GamePerspective[];
 }
 
 export const GameList: FC<GameListProps> = ({games}) => {
@@ -14,7 +14,7 @@ export const GameList: FC<GameListProps> = ({games}) => {
             <h3 className="text-xl font-semibold text-gray-200 mb-4">Games List</h3>
             <div className="space-y-4">
                 {games.length === 0 ? (<p className="text-gray-400">No games available</p>) : (
-                    games.map((game: GameState) => (
+                    games.map((game: GamePerspective) => (
                         <div key={game.id} className="bg-gray-800 p-4 rounded-lg w-1/4">
                             <h4 className="text-lg font-medium text-gray-200">{game.id}</h4>
                             <h5 className="sm text-gray-600">{game.guildId}</h5>

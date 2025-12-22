@@ -32,9 +32,9 @@ import type {
     GetDiscordTownApiData,
     GetDiscordTownApiErrors,
     GetDiscordTownApiResponses,
-    GetGameApiData,
-    GetGameApiErrors,
-    GetGameApiResponses,
+    GetGamePerspectivesApiData,
+    GetGamePerspectivesApiErrors,
+    GetGamePerspectivesApiResponses,
     GetGamesApiData,
     GetGamesApiResponses,
     GetGuildsWithUserApiData,
@@ -45,9 +45,6 @@ import type {
     GetJoinDataApiResponses,
     GetPlayerGamesApiData,
     GetPlayerGamesApiResponses,
-    GetPlayerGameStateApiData,
-    GetPlayerGameStateApiErrors,
-    GetPlayerGameStateApiResponses,
     GetRolesApiData,
     GetRolesApiResponses,
     GetTimerApiData,
@@ -534,12 +531,12 @@ export const deleteGameApi = <ThrowOnError extends boolean = false>(options: Opt
 };
 
 /**
- * Get the game state by id
+ * Get the game perspective by id
  *
- * Get the game state by id
+ * Get the game perspective by id
  */
-export const getGameApi = <ThrowOnError extends boolean = false>(options: Options<GetGameApiData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetGameApiResponses, GetGameApiErrors, ThrowOnError>({
+export const getGamePerspectivesApi = <ThrowOnError extends boolean = false>(options: Options<GetGamePerspectivesApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetGamePerspectivesApiResponses, GetGamePerspectivesApiErrors, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
@@ -552,9 +549,9 @@ export const getGameApi = <ThrowOnError extends boolean = false>(options: Option
 };
 
 /**
- * Gets all games, optionally filtered by guildId
+ * Gets all games perspectives
  *
- * Gets all games, optionally filtered by guildId
+ * Gets all games perspectives
  */
 export const getGamesApi = <ThrowOnError extends boolean = false>(options?: Options<GetGamesApiData, ThrowOnError>) => {
     return (options?.client ?? client).get<GetGamesApiResponses, unknown, ThrowOnError>({
@@ -588,24 +585,6 @@ export const getPlayerGamesApi = <ThrowOnError extends boolean = false>(options:
 };
 
 /**
- * Get the player game state
- *
- * Gets the game state that the provided user is allowed to see
- */
-export const getPlayerGameStateApi = <ThrowOnError extends boolean = false>(options: Options<GetPlayerGameStateApiData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetPlayerGameStateApiResponses, GetPlayerGameStateApiErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/games/{gameId}/players/{userId}/state',
-        ...options
-    });
-};
-
-/**
  * Loads dummy data from saved json file
  *
  * Loads dummy data from saved json file
@@ -626,7 +605,7 @@ export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?
 /**
  * Sets the time of the town
  *
- * Sets the game state of the town based on the day time
+ * Sets the game perspective of the town based on the day time
  */
 export const setTimeApi = <ThrowOnError extends boolean = false>(options: Options<SetTimeApiData, ThrowOnError>) => {
     return (options.client ?? client).post<SetTimeApiResponses, SetTimeApiErrors, ThrowOnError>({
@@ -642,9 +621,9 @@ export const setTimeApi = <ThrowOnError extends boolean = false>(options: Option
 };
 
 /**
- * Starts new game state for id
+ * Starts new game perspective for id
  *
- * Starts new game state for id
+ * Starts new game perspective for id
  */
 export const startGameApi = <ThrowOnError extends boolean = false>(options: Options<StartGameApiData, ThrowOnError>) => {
     return (options.client ?? client).post<StartGameApiResponses, StartGameApiErrors, ThrowOnError>({

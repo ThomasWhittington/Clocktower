@@ -5,7 +5,7 @@ using Clocktower.Server.Game.Services;
 namespace Clocktower.ServerTests.Game.Endpoints;
 
 [TestClass]
-public class GetGameTests
+public class GetGamePerspectivesTests
 {
     private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
     private const string ResponseMessage = "Response";
@@ -13,7 +13,7 @@ public class GetGameTests
     private void MockResponse(bool success, GamePerspective? gamePerspective)
     {
         _mockGamePerspectiveService.Setup(o =>
-                o.GetGame(It.IsAny<string>()))
+                o.GetGamePerspectives(It.IsAny<string>()))
             .Returns((success, gamePerspective is null ? [] : [gamePerspective], ResponseMessage));
     }
 
@@ -28,11 +28,11 @@ public class GetGameTests
     {
         var builder = EndpointFactory.CreateBuilder();
 
-        GetGame.Map(builder);
+        GetGamePerspectives.Map(builder);
 
         builder.GetEndpoint("/{gameId}")
             .ShouldHaveMethod(HttpMethod.Get)
-            .ShouldHaveOperationId("getGameApi")
+            .ShouldHaveOperationId("getGamePerspectivesApi")
             .ShouldHaveSummaryAndDescription("Get the game perspective by id");
     }
 
@@ -42,9 +42,9 @@ public class GetGameTests
         var gameId = CommonMethods.GetRandomString();
         MockResponse(false, null);
 
-        var result = GetGame.Handle(gameId, _mockGamePerspectiveService.Object);
+        var result = GetGamePerspectives.Handle(gameId, _mockGamePerspectiveService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.GetGame(gameId.Trim()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetGamePerspectives(gameId.Trim()), Times.Once);
 
         var response = result.Result.Should().BeOfType<NotFound<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
@@ -58,9 +58,9 @@ public class GetGameTests
         var gamePerspective = CommonMethods.GetGamePerspective();
         MockResponse(true, gamePerspective);
 
-        var result = GetGame.Handle(gameId, _mockGamePerspectiveService.Object);
+        var result = GetGamePerspectives.Handle(gameId, _mockGamePerspectiveService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.GetGame(gameId.Trim()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetGamePerspectives(gameId.Trim()), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<IEnumerable<GamePerspective>>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);

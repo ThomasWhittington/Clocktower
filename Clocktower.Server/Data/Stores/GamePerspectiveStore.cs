@@ -52,9 +52,24 @@ public class GamePerspectiveStore : IGamePerspectiveStore
 
     public void AddUserToGame(string gameId, GameUser gameUser)
     {
-        UpdateAllPerspectives(gameId, state => state with
+        var existingPerspective = GetFirstPerspective(gameId);
+        if (existingPerspective is null) return;
+
+        var newUserPerspective = existingPerspective with
         {
-            Users = [.. state.Users, gameUser]
+            UserId = gameUser.Id,
+            Users = existingPerspective.Users.Select(ToPublicUser).Append(gameUser).ToList()
+        };
+        _store.TryAdd((gameId, gameUser.Id), newUserPerspective);
+
+        var publicNewUser = ToPublicUser(gameUser);
+        UpdateAllPerspectives(gameId, state =>
+        {
+            if (state.UserId == gameUser.Id) return state;
+            return state with
+            {
+                Users = [.. state.Users, publicNewUser]
+            };
         });
     }
 
@@ -111,4 +126,11 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         if (!_store.TryGetValue((gameId, userId), out var existing)) return;
         _store[(gameId, userId)] = updateFunction(existing);
     }
+
+    private GameUser ToPublicUser(GameUser user) =>
+        new(user.Id)
+        {
+            UserType = user.UserType,
+            IsPlaying = user.IsPlaying
+        };
 }

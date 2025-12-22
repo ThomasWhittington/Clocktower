@@ -55,7 +55,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         }
     }
 
-    public (bool success, IEnumerable<GamePerspective> perspectives, string message) GetGame(string gameId)
+    public (bool success, IEnumerable<GamePerspective> perspectives, string message) GetGamePerspectives(string gameId)
     {
         var game = gamePerspectiveStore.GetAllPerspectivesForGame(gameId).ToArray();
 
@@ -107,11 +107,5 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         {
             return (false, ex.Message);
         }
-    }
-
-    public Task<Result<GamePerspectiveDto>> GetPlayerGamePerspectiveDto(string gameId, string userId)
-    {
-        //TODO implement GetPlayerGamePerspectiveDto
-        throw new NotImplementedException();
     }
 }
