@@ -6,26 +6,29 @@ namespace Clocktower.Server.Socket;
 public class NotificationService(IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hub, IGamePerspectiveStore gamePerspectiveStore, IDiscordTownManager discordTownManager)
     : INotificationService
 {
-    //TODO will need a rework to ensure the correct game perspective is retrieved per player
     public async Task BroadcastDiscordTownUpdate(string gameId)
     {
-        var thisGame = gamePerspectiveStore.GetFirstPerspective(gameId);
-        if (thisGame is null) return;
-        var discordTown = discordTownManager.GetDiscordTown(thisGame.GuildId);
+        var perspectives = gamePerspectiveStore.GetAllPerspectivesForGame(gameId).ToList();
+        if (!perspectives.Any()) return;
+        var guildId = perspectives[0].GuildId;
+        var discordTown = discordTownManager.GetDiscordTown(guildId);
         if (discordTown is null) return;
-        var users = thisGame.Users;
 
-        var fullAccessUserIds = users.Where(u => u.UserType is UserType.StoryTeller or UserType.Spectator).GetIds().ToArray();
-        var playerUserIds = users.Where(u => u.UserType is UserType.Player).GetIds().ToArray();
+        var tasks = new List<Task>();
 
-        var fullTown = discordTown.ToDiscordTownDto(gameId, users);
-        await hub.Clients.Users(fullAccessUserIds).DiscordTownUpdated(fullTown);
-        var playerTasks = playerUserIds.Select(playerId =>
+        foreach (var perspective in perspectives)
         {
-            var perPlayerTown = discordTownManager.RedactTownDto(fullTown, playerId);
-            return hub.Clients.User(playerId).DiscordTownUpdated(perPlayerTown);
-        });
-        await Task.WhenAll(playerTasks);
+            var currentUser = perspective.Users.FirstOrDefault(u => u.Id == perspective.UserId);
+            bool needsRedaction = currentUser?.UserType is UserType.Player;
+
+            var thisTown = discordTown.ToDiscordTownDto(gameId, perspective.Users);
+            if (needsRedaction) thisTown = discordTownManager.RedactTownDto(thisTown, perspective.UserId);
+
+            var task = hub.Clients.User(perspective.UserId).DiscordTownUpdated(thisTown);
+            tasks.Add(task);
+        }
+
+        await Task.WhenAll(tasks);
     }
 
     public Task BroadcastUserVoiceStateChanged(string gameId, string userId, bool inVoice, VoiceState voiceState) => hub.Clients.Group(GetGameGroupName(gameId)).UserVoiceStateChanged(userId, inVoice, voiceState);
