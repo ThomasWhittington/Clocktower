@@ -561,7 +561,7 @@ export const getGamesApi = <ThrowOnError extends boolean = false>(options?: Opti
                 type: 'http'
             }
         ],
-        url: '/api/games',
+        url: '/api/games/all',
         ...options
     });
 };

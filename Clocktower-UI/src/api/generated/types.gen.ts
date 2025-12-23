@@ -36,8 +36,8 @@ export type ClocktowerServerDataChannelOccupantsDto = {
 export type ClocktowerServerDataDiscordTownDto = {
     gameId?: string | null;
     channelCategories?: Array<ClocktowerServerDataMiniCategoryDto> | null;
-    readonly userCount?: number;
     readonly townUsers?: Array<ClocktowerServerDataUserDto> | null;
+    gameUsers?: Array<ClocktowerServerDataUserDto> | null;
 };
 
 export type ClocktowerServerDataGamePerspective = {
@@ -179,6 +179,7 @@ export type MicrosoftAspNetCoreHttpHttpValidationProblemDetails = {
 export type ClocktowerServerDataDiscordTownDtoWritable = {
     gameId?: string | null;
     channelCategories?: Array<ClocktowerServerDataMiniCategoryDto> | null;
+    gameUsers?: Array<ClocktowerServerDataUserDto> | null;
 };
 
 export type ClocktowerServerDataGamePerspectiveWritable = {
@@ -789,7 +790,7 @@ export type GetGamesApiData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/games';
+    url: '/api/games/all';
 };
 
 export type GetGamesApiResponses = {

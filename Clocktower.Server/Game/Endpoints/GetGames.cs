@@ -4,7 +4,7 @@
 public class GetGames : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapGet("/", Handle)
+        .MapGet("/all", Handle)
         .SetOpenApiOperationId<GetGames>()
         .WithSummaryAndDescription("Gets all games perspectives");
 

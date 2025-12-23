@@ -4,8 +4,12 @@ public static class DiscordTownExtensions
 {
     public static DiscordTownDto ToDiscordTownDto(this DiscordTown discordTown, string gameId, IEnumerable<GameUser>? gameUsers = null)
     {
-        var gameUserLookup = gameUsers?.ToDictionary(u => u.Id) ?? new Dictionary<string, GameUser>();
-
+        gameUsers ??= [];
+        var gameUserList = gameUsers.ToList();
+        var gameUserLookup = gameUserList.ToDictionary(u => u.Id);
+        var townUserLookup = discordTown.TownUsers.ToDictionary(u => u.Id);
+        var gUsers = gameUserList.Select(o => UserDto.FromGameUser(o, townUserLookup.GetValueOrDefault(o.Id)));
+        //TODO use TownDto. Probably need to move this out of an extension into a new service for dto mapping
         var categoriesDto = discordTown.ChannelCategories.Select(category =>
             new MiniCategoryDto(
                 category.Id,
@@ -21,6 +25,11 @@ public static class DiscordTownExtensions
             )
         ).ToList();
 
-        return new DiscordTownDto(gameId, categoriesDto);
+        var town = new DiscordTownDto(gameId, categoriesDto)
+        {
+            GameUsers = gUsers
+        };
+
+        return town;
     }
 }

@@ -1,22 +1,8 @@
-﻿import {
-    useEffect,
-    useRef,
-    useState
-} from 'react';
-import * as signalR
-    from '@microsoft/signalr';
-import {
-    HubConnectionState
-} from '@microsoft/signalr';
-import {
-    type DiscordTown,
-    GameTime,
-    TimerStatus,
-    type VoiceState
-} from '@/types';
-import {
-    useAppStore
-} from "@/store";
+﻿import {useEffect, useRef, useState} from 'react';
+import * as signalR from '@microsoft/signalr';
+import {HubConnectionState} from '@microsoft/signalr';
+import {DiscordTown, GameTime, TimerStatus, type VoiceState} from '@/types';
+import {useAppStore} from "@/store";
 
 type UserPresenceStates = Record<string, boolean>;
 type UserVoiceStates = Record<string, VoiceState>;
@@ -95,7 +81,7 @@ const createConnection = async () => {
 
     globalConnection.on('DiscordTownUpdated', (discordTown: DiscordTown) => {
         console.log(`🏪 Received DiscordTownUpdated for game ${joinedGameId}:`, discordTown);
-        setState({discordTown: discordTown});
+        setState({discordTown: new DiscordTown(discordTown)});
     });
 
     globalConnection.on('TownTimeChanged', (gameTime: number) => {
@@ -262,7 +248,7 @@ export const joinGameGroup = async (gameId: string): Promise<void> => {
             if (snapshot) {
                 setState({
                     gameTime: snapshot.gameTime,
-                    discordTown: snapshot.discordTown,
+                    discordTown: snapshot.discordTown ? new DiscordTown(snapshot.discordTown) : undefined,
                     timer: snapshot.timer
                 });
 

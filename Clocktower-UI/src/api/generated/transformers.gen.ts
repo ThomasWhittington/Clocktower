@@ -63,6 +63,11 @@ const clocktowerServerDataDiscordTownDtoSchemaResponseTransformer = (data: any) 
             return clocktowerServerDataUserDtoSchemaResponseTransformer(item);
         });
     }
+    if (data.gameUsers) {
+        data.gameUsers = data.gameUsers.map((item: any) => {
+            return clocktowerServerDataUserDtoSchemaResponseTransformer(item);
+        });
+    }
     return data;
 };
 

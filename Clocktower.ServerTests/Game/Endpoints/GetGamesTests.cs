@@ -27,7 +27,7 @@ public class GetGamesTests
 
         GetGames.Map(builder);
 
-        builder.GetEndpoint("/")
+        builder.GetEndpoint("/all")
             .ShouldHaveMethod(HttpMethod.Get)
             .ShouldHaveOperationId("getGamesApi")
             .ShouldHaveSummaryAndDescription("Gets all games perspectives");
