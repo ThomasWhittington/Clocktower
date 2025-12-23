@@ -42,7 +42,7 @@ public class DiscordTownServiceTests
     private Mock<IDiscordBot> _mockBot = null!;
     private Mock<INotificationService> _mockNotificationService = null!;
     private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
-    private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
+    private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private Mock<IJwtWriter> _mockJwtWriter = null!;
     private Mock<IMemoryCache> _mockCache = null!;
     private Mock<IOptions<Secrets>> _mockSecrets = null!;
@@ -84,7 +84,7 @@ public class DiscordTownServiceTests
         _mockBot = new Mock<IDiscordBot>();
         _mockNotificationService = new Mock<INotificationService>();
         _mockGamePerspectiveStore = new Mock<IGamePerspectiveStore>();
-        _mockDiscordTownStore = new Mock<IDiscordTownStore>();
+        _mockDiscordTownManager = new Mock<IDiscordTownManager>();
         _mockJwtWriter = new Mock<IJwtWriter>();
         _mockCache = new Mock<IMemoryCache>();
         _mockSecrets = new Mock<IOptions<Secrets>>();
@@ -97,7 +97,7 @@ public class DiscordTownServiceTests
             _mockBot.Object,
             _mockNotificationService.Object,
             _mockGamePerspectiveStore.Object,
-            _mockDiscordTownStore.Object,
+            _mockDiscordTownManager.Object,
             _mockJwtWriter.Object,
             _mockCache.Object,
             _mockSecrets.Object,
@@ -688,7 +688,7 @@ public class DiscordTownServiceTests
 
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? _guild.Object : null);
 
-        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Returns(hasCachedTown ? _discordTown : null);
+        _mockDiscordTownManager.Setup(o => o.GetDiscordTown(GuildId)).Returns(hasCachedTown ? _discordTown : null);
         _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategory.Name);
         _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategory.Name);
 
@@ -702,7 +702,7 @@ public class DiscordTownServiceTests
     public async Task GetDiscordTown_ReturnsFalse_WhenExceptionThrown()
     {
         const string exMessage = "message";
-        _mockDiscordTownStore.Setup(o => o.Get(GuildId)).Throws(new Exception(exMessage));
+        _mockDiscordTownManager.Setup(o => o.GetDiscordTown(GuildId)).Throws(new Exception(exMessage));
 
         var (success, discordTown, message) = await _sut.GetDiscordTown(GuildId);
 
@@ -787,7 +787,7 @@ public class DiscordTownServiceTests
             : [];
 
         _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(gameId)).Returns(hasGamePerspective ? CommonMethods.GetGamePerspective(GameId, guildId: guildId) with { Users = users } : null);
-        _mockDiscordTownStore.Setup(o => o.Get(guildId)).Returns(hasTown ? _discordTown : null);
+        _mockDiscordTownManager.Setup(o => o.GetDiscordTown(guildId)).Returns(hasTown ? _discordTown : null);
         _mockBot.Setup(o => o.GetGuild(guildId)).Returns(hasGuild ? new Mock<IDiscordGuild>().Object : null);
     }
 
@@ -813,7 +813,7 @@ public class DiscordTownServiceTests
         result.success.Should().BeFalse();
         result.discordTown.Should().BeNull();
         result.message.Should().Be(GuildNotFoundMessage);
-        _mockDiscordTownStore.Verify(o => o.Get(GuildId), Times.Once);
+        _mockDiscordTownManager.Verify(o => o.GetDiscordTown(GuildId), Times.Once);
         _mockBot.Verify(o => o.GetGuild(GuildId), Times.Once);
     }
 
@@ -867,7 +867,7 @@ public class DiscordTownServiceTests
     {
         _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Throws<Exception>();
 
-        var (outcome, message) = await _sut.InviteUser(GameId, UserId);
+        var (outcome, message) = await _sut.InviteUser(GameId, UserId, true);
 
         outcome.Should().Be(InviteUserOutcome.UnknownError);
         message.Should().Be("Failed to send message to user");
@@ -878,7 +878,7 @@ public class DiscordTownServiceTests
     {
         Setup_InviteUser(hasPerspective: false);
 
-        var (outcome, message) = await _sut.InviteUser(GameId, UserId);
+        var (outcome, message) = await _sut.InviteUser(GameId, UserId, true);
 
         outcome.Should().Be(InviteUserOutcome.GameDoesNotExistError);
         message.Should().Be($"Couldn't find game with id: {GameId}");
@@ -891,7 +891,7 @@ public class DiscordTownServiceTests
     {
         Setup_InviteUser(hasPerspective: true, guildId: guildId);
 
-        var (outcome, message) = await _sut.InviteUser(GameId, UserId);
+        var (outcome, message) = await _sut.InviteUser(GameId, UserId, true);
 
         outcome.Should().Be(InviteUserOutcome.InvalidGuildError);
         message.Should().Be("GamePerspective contained a guildId that could not be found");
@@ -902,7 +902,7 @@ public class DiscordTownServiceTests
     {
         Setup_InviteUser(hasPerspective: true, hasGuild: false);
 
-        var (outcome, message) = await _sut.InviteUser(GameId, UserId);
+        var (outcome, message) = await _sut.InviteUser(GameId, UserId, true);
 
         _mockBot.Verify(o => o.GetGuild(GuildId), Times.Once);
         outcome.Should().Be(InviteUserOutcome.InvalidGuildError);
@@ -914,7 +914,7 @@ public class DiscordTownServiceTests
     {
         Setup_InviteUser(hasPerspective: true, hasGuild: true, hasUser: false);
 
-        var (outcome, message) = await _sut.InviteUser(GameId, UserId);
+        var (outcome, message) = await _sut.InviteUser(GameId, UserId, true);
 
         _guild.Verify(o => o.GetUser(UserId), Times.Once);
         outcome.Should().Be(InviteUserOutcome.UserNotFoundError);
@@ -926,7 +926,7 @@ public class DiscordTownServiceTests
     {
         Setup_InviteUser(hasPerspective: true, hasGuild: true, hasUser: true, hasDmChannel: false);
 
-        var (outcome, message) = await _sut.InviteUser(GameId, UserId);
+        var (outcome, message) = await _sut.InviteUser(GameId, UserId, true);
 
         _user.Verify(o => o.CreateDmChannelAsync(), Times.Once);
         outcome.Should().Be(InviteUserOutcome.DmChannelError);
@@ -938,7 +938,7 @@ public class DiscordTownServiceTests
     {
         Setup_InviteUser(hasPerspective: true, hasGuild: true, hasUser: true, hasDmChannel: true);
 
-        _ = await _sut.InviteUser(GameId, UserId);
+        _ = await _sut.InviteUser(GameId, UserId, true);
 
         _mockJwtWriter.Verify(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId && g.UserType == UserType.Player)), Times.Once);
     }
@@ -948,7 +948,7 @@ public class DiscordTownServiceTests
     {
         Setup_InviteUser(hasPerspective: true, hasGuild: true, hasUser: true, hasDmChannel: true);
 
-        _ = await _sut.InviteUser(GameId, UserId);
+        _ = await _sut.InviteUser(GameId, UserId, true);
 
         _mockIdGenerator.Verify(o => o.GenerateId(), Times.Once);
     }
@@ -958,7 +958,7 @@ public class DiscordTownServiceTests
     {
         Setup_InviteUser(hasPerspective: true, hasGuild: true, hasUser: true, hasDmChannel: true);
 
-        _ = await _sut.InviteUser(GameId, UserId);
+        _ = await _sut.InviteUser(GameId, UserId, true);
 
         _mockCache.Verify(o => o.CreateEntry(It.Is<object>(e => (string)e == $"join_data_{Key}")), Times.Once);
         _cacheEntry.VerifySet(entry => entry.Value = It.Is<JoinData>(u => u.Jwt == Jwt && u.User.Id == UserId), Times.Once);
@@ -970,7 +970,7 @@ public class DiscordTownServiceTests
     {
         Setup_InviteUser(hasPerspective: true, hasGuild: true, hasUser: true, hasDmChannel: true);
 
-        var (outcome, message) = await _sut.InviteUser(GameId, UserId);
+        var (outcome, message) = await _sut.InviteUser(GameId, UserId, true);
 
         _dmChannel.Verify(o => o.SendMessageAsync($"[Join here]({FeUrl + $"/join?key={Key}"})"), Times.Once);
         _mockGamePerspectiveStore.Verify(o => o.AddUserToGame(GameId, It.Is<GameUser>(g => g.Id == UserId && g.UserType == UserType.Player)), Times.Once);
@@ -983,7 +983,7 @@ public class DiscordTownServiceTests
     {
         Setup_InviteUser(hasPerspective: true, hasGuild: true, hasUser: true, hasDmChannel: true);
 
-        _ = await _sut.InviteUser(GameId, UserId);
+        _ = await _sut.InviteUser(GameId, UserId, true);
 
         _mockGamePerspectiveStore.Verify(o => o.AddUserToGame(GameId, _gameUser), Times.Once);
     }

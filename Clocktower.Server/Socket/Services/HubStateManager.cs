@@ -9,11 +9,10 @@ public class HubStateManager(IGamePerspectiveStore gamePerspectiveStore, IDiscor
         var currentPerspective = gamePerspectiveStore.Get(gameId, userId);
         var gameUser = currentPerspective?.GetUser(userId);
         if (currentPerspective is null || gameUser is null) return null;
-        var discordTown = discordTownManager.GetDiscordTown(currentPerspective.GuildId);
-        var enhancedTown = discordTown?.ToDiscordTownDto(currentPerspective.Id, currentPerspective.Users);
+        var discordTown = discordTownManager.GetDiscordTownDto(currentPerspective.GuildId, currentPerspective.Id, currentPerspective.Users);
 
-        if (enhancedTown != null && gameUser.UserType == UserType.Player)
-            enhancedTown = discordTownManager.RedactTownDto(enhancedTown, userId);
+        if (discordTown != null && gameUser.UserType == UserType.Player)
+            discordTown = discordTownManager.RedactTownDto(discordTown, userId);
 
         var timer = timerCoordinator.Get(gameId);
 
@@ -21,7 +20,7 @@ public class HubStateManager(IGamePerspectiveStore gamePerspectiveStore, IDiscor
         {
             GameTime = currentPerspective.GameTime,
             Jwt = jwtWriter.GetJwtToken(gameUser),
-            DiscordTown = enhancedTown,
+            DiscordTown = discordTown,
             Timer = timer
         };
         return currentState;

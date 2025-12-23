@@ -10,6 +10,7 @@ namespace Clocktower.ServerTests.Common.Services;
 public class DiscordTownManagerTests
 {
     private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
+    private Mock<IUserIdentityStore> _mockUserIdentityStore = null!;
     private Mock<IDiscordConstantsService> _mockDiscordConstantsService = null!;
     private IDiscordTownManager _sut = null!;
     private const string GuildId = "1";
@@ -19,9 +20,10 @@ public class DiscordTownManagerTests
     public void SetUp()
     {
         _mockDiscordTownStore = StrictMockFactory.Create<IDiscordTownStore>();
+        _mockUserIdentityStore = StrictMockFactory.Create<IUserIdentityStore>();
         _mockDiscordConstantsService = StrictMockFactory.Create<IDiscordConstantsService>();
         _mockDiscordConstantsService.SetupGet(s => s.NightCategoryName).Returns("Night Category");
-        _sut = new DiscordTownManager(_mockDiscordTownStore.Object, _mockDiscordConstantsService.Object);
+        _sut = new DiscordTownManager(_mockDiscordTownStore.Object, _mockUserIdentityStore.Object, _mockDiscordConstantsService.Object);
     }
 
     private DiscordTown GetDummyDiscordTown()
@@ -629,7 +631,7 @@ public class DiscordTownManagerTests
             .SetupGet(s => s.NightCategoryName)
             .Returns("nIgHt CaTeGoRy");
 
-        _sut = new DiscordTownManager(_mockDiscordTownStore.Object, _mockDiscordConstantsService.Object);
+        _sut = new DiscordTownManager(_mockDiscordTownStore.Object, _mockUserIdentityStore.Object, _mockDiscordConstantsService.Object);
 
         var dayCategory = new MiniCategoryDto("day", "Day Category", [
             new ChannelOccupantsDto(

@@ -12,7 +12,7 @@ public class DiscordTownService(
     IDiscordBot bot,
     INotificationService notificationService,
     IGamePerspectiveStore gamePerspectiveStore,
-    IDiscordTownStore discordTownStore,
+    IDiscordTownManager discordTownManager,
     IJwtWriter jwtWriter,
     IMemoryCache cache,
     IOptions<Secrets> secretsOptions,
@@ -140,7 +140,7 @@ public class DiscordTownService(
     {
         try
         {
-            var thisDiscordTown = discordTownStore.Get(guildId);
+            var thisDiscordTown = discordTownManager.GetDiscordTown(guildId);
             if (thisDiscordTown != null) return (true, thisDiscordTown, "Got from store");
 
             var guild = bot.GetGuild(guildId);
@@ -154,7 +154,7 @@ public class DiscordTownService(
 
             var discordTown = new DiscordTown(channelCategories);
 
-            discordTownStore.Set(guildId, discordTown);
+            discordTownManager.SetDiscordTown(guildId, discordTown);
 
             var gameId = gamePerspectiveStore.GetGuildGameIds(guildId).FirstOrDefault();
             if (gameId is not null) await notificationService.BroadcastDiscordTownUpdate(gameId);
@@ -174,19 +174,20 @@ public class DiscordTownService(
         var (success, discordTown, message) = await GetDiscordTown(gamePerspective.GuildId);
         if (success && discordTown != null)
         {
-            var discordTownDto = discordTown.ToDiscordTownDto(gameId, gamePerspective.Users);
+            var discordTownDto = discordTownManager.GetDiscordTownDto(discordTown, gameId, gamePerspective.Users);
             return (true, discordTownDto, message);
         }
 
         return (success, null, message);
     }
 
-    public JoinData? GetJoinData(string key)
+    public async Task<JoinData?> GetJoinData(string key)
     {
         if (cache.TryGetValue($"join_data_{key}", out var joinData) && joinData is JoinData response)
         {
             gamePerspectiveStore.UpdateUser(response.GameId, response.User.Id, isPlaying: true);
             cache.Remove($"join_data_{key}");
+            await notificationService.BroadcastDiscordTownUpdate(response.GameId);
             return response;
         }
 
@@ -198,7 +199,7 @@ public class DiscordTownService(
         await notificationService.PingUser(userId, "Ping!");
     }
 
-    public async Task<(InviteUserOutcome outcome, string message)> InviteUser(string gameId, string userId)
+    public async Task<(InviteUserOutcome outcome, string message)> InviteUser(string gameId, string userId, bool sendInvite)
     {
         try
         {
@@ -212,6 +213,9 @@ public class DiscordTownService(
             var dmChannel = await user.CreateDmChannelAsync();
             if (dmChannel is null) return (InviteUserOutcome.DmChannelError, "Couldn't open dm channel with user");
 
+            var townUser = user.AsTownUser();
+            discordTownManager.UpdateUserIdentity(townUser);
+
             var thisGameUser = user.AsGameUser(gamePerspective);
             thisGameUser.UserType = UserType.Player;
             var jwt = jwtWriter.GetJwtToken(thisGameUser);
@@ -220,9 +224,10 @@ public class DiscordTownService(
             cache.Set($"join_data_{tempKey}", response, TimeSpan.FromMinutes(5));
             var url = _secrets.FeUri + $"/join?key={tempKey}";
 
-            await dmChannel.SendMessageAsync($"[Join here]({url})");
+            if (sendInvite) await dmChannel.SendMessageAsync($"[Join here]({url})");
 
             gamePerspectiveStore.AddUserToGame(gameId, thisGameUser);
+            await notificationService.BroadcastDiscordTownUpdate(gameId);
             return (InviteUserOutcome.InviteSent, "Sent message to user");
         }
         catch (Exception)

@@ -55,22 +55,29 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         var existingPerspective = GetFirstPerspective(gameId);
         if (existingPerspective is null) return;
 
-        var newUserPerspective = existingPerspective with
+        if (!_store.ContainsKey((gameId, gameUser.Id)))
         {
-            UserId = gameUser.Id,
-            Users = existingPerspective.Users.Select(ToPublicUser).Append(gameUser).ToList()
-        };
-        _store.TryAdd((gameId, gameUser.Id), newUserPerspective);
-
-        var publicNewUser = ToPublicUser(gameUser);
-        UpdateAllPerspectives(gameId, state =>
-        {
-            if (state.UserId == gameUser.Id) return state;
-            return state with
+            var newUserPerspective = existingPerspective with
             {
-                Users = [.. state.Users, publicNewUser]
+                UserId = gameUser.Id,
+                Users = existingPerspective.Users.Select(ToPublicUser).Append(gameUser).ToList()
             };
-        });
+
+            _store.TryAdd((gameId, gameUser.Id), newUserPerspective);
+        }
+
+        if (existingPerspective.Users.All(o => o.Id != gameUser.Id))
+        {
+            var publicNewUser = ToPublicUser(gameUser);
+            UpdateAllPerspectives(gameId, state =>
+            {
+                if (state.UserId == gameUser.Id) return state;
+                return state with
+                {
+                    Users = [.. state.Users, publicNewUser]
+                };
+            });
+        }
     }
 
     public void SetTime(string gameId, GameTime gameTime)

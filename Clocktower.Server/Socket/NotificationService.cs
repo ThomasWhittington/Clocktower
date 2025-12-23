@@ -11,8 +11,6 @@ public class NotificationService(IHubContext<DiscordNotificationHub, IDiscordNot
         var perspectives = gamePerspectiveStore.GetAllPerspectivesForGame(gameId).ToList();
         if (!perspectives.Any()) return;
         var guildId = perspectives[0].GuildId;
-        var discordTown = discordTownManager.GetDiscordTown(guildId);
-        if (discordTown is null) return;
 
         var tasks = new List<Task>();
 
@@ -21,7 +19,8 @@ public class NotificationService(IHubContext<DiscordNotificationHub, IDiscordNot
             var currentUser = perspective.Users.FirstOrDefault(u => u.Id == perspective.UserId);
             bool needsRedaction = currentUser?.UserType is UserType.Player;
 
-            var thisTown = discordTown.ToDiscordTownDto(gameId, perspective.Users);
+            var thisTown = discordTownManager.GetDiscordTownDto(guildId, gameId, perspective.Users);
+            if (thisTown is null) continue;
             if (needsRedaction) thisTown = discordTownManager.RedactTownDto(thisTown, perspective.UserId);
 
             var task = hub.Clients.User(perspective.UserId).DiscordTownUpdated(thisTown);
