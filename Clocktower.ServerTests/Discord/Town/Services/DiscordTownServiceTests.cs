@@ -64,6 +64,7 @@ public class DiscordTownServiceTests
     private Mock<ICacheEntry> _cacheEntry = null!;
 
     private GameUser _gameUser = null!;
+    private TownUser _townUser = null!;
     private DiscordTown _discordTown = null!;
 
     [TestInitialize]
@@ -356,12 +357,12 @@ public class DiscordTownServiceTests
     #region GetJoinData
 
     [TestMethod]
-    public void GetJoinData_ReturnsNull_WhenKeyNotFound()
+    public async Task GetJoinData_ReturnsNull_WhenKeyNotFound()
     {
         object invalidValue = null!;
         _mockCache.Setup(o => o.TryGetValue($"join_data_{Key}", out invalidValue!)).Returns(false);
 
-        var result = _sut.GetJoinData(Key);
+        var result = await _sut.GetJoinData(Key);
 
         _mockCache.Verify(o => o.TryGetValue($"join_data_{Key}", out It.Ref<object?>.IsAny), Times.Once);
         result.Should().BeNull();
@@ -369,24 +370,24 @@ public class DiscordTownServiceTests
 
 
     [TestMethod]
-    public void GetJoinData_ReturnsNull_WhenCacheValueInvalid()
+    public async Task GetJoinData_ReturnsNull_WhenCacheValueInvalid()
     {
         object invalidValue = "not-a-_user-join-data-object";
         _mockCache.Setup(o => o.TryGetValue($"join_data_{Key}", out invalidValue!)).Returns(true);
 
-        var result = _sut.GetJoinData(Key);
+        var result = await _sut.GetJoinData(Key);
 
         result.Should().BeNull();
     }
 
     [TestMethod]
-    public void GetJoinData_CallsCacheRemove_UpdatesGame_ReturnsData_WhenCacheValueFound()
+    public async Task GetJoinData_CallsCacheRemove_UpdatesGame_ReturnsData_WhenCacheValueFound()
     {
         var joinData = new JoinData(CommonMethods.GetRandomString(), CommonMethods.GetRandomGameUser(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString());
         object joinDataObj = joinData;
         _mockCache.Setup(o => o.TryGetValue($"join_data_{Key}", out joinDataObj!)).Returns(true);
 
-        var result = _sut.GetJoinData(Key);
+        var result = await _sut.GetJoinData(Key);
 
         _mockGamePerspectiveStore.Verify(o => o.UpdateUser(joinData.GameId, joinData.User.Id, null, true), Times.Once());
         _mockCache.Verify(o => o.Remove($"join_data_{Key}"), Times.Once);
@@ -788,6 +789,11 @@ public class DiscordTownServiceTests
 
         _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(gameId)).Returns(hasGamePerspective ? CommonMethods.GetGamePerspective(GameId, guildId: guildId) with { Users = users } : null);
         _mockDiscordTownManager.Setup(o => o.GetDiscordTown(guildId)).Returns(hasTown ? _discordTown : null);
+        if (hasTown)
+        {
+            _mockDiscordTownManager.Setup(o => o.GetDiscordTownDto(_discordTown, gameId, users)).Returns(new DiscordTownDto(gameId, []));
+        }
+
         _mockBot.Setup(o => o.GetGuild(guildId)).Returns(hasGuild ? new Mock<IDiscordGuild>().Object : null);
     }
 
@@ -830,6 +836,7 @@ public class DiscordTownServiceTests
         result.discordTown.Should().NotBeNull();
         result.discordTown.GameId.Should().Be(GameId);
         result.message.Should().Be("Got from store");
+        _mockDiscordTownManager.Verify(o => o.GetDiscordTownDto(_discordTown, GameId, It.IsAny<IEnumerable<GameUser>>()), Times.Once);
     }
 
     #endregion
@@ -839,6 +846,7 @@ public class DiscordTownServiceTests
     private void Setup_InviteUser(bool hasPerspective = false, string? guildId = GuildId, bool hasGuild = false, bool hasUser = false, bool hasDmChannel = false)
     {
         _gameUser = CommonMethods.GetRandomGameUser(UserId);
+        _townUser = CommonMethods.GetRandomTownUser(UserId);
         var gamePerspective = CommonMethods.GetGamePerspective(GameId, guildId: guildId);
 
         _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasPerspective ? gamePerspective : null);
@@ -850,6 +858,9 @@ public class DiscordTownServiceTests
         _user.Setup(o => o.Id).Returns(UserId);
         _user.Setup(o => o.CreateDmChannelAsync()).ReturnsAsync(hasDmChannel ? _dmChannel.Object : null);
         _user.Setup(o => o.AsGameUser(gamePerspective)).Returns(_gameUser);
+        _user.Setup(o => o.AsTownUser()).Returns(_townUser);
+
+        _mockDiscordTownManager.Setup(o => o.UpdateUserIdentity(_townUser));
 
         _mockJwtWriter.Setup(o => o.GetJwtToken(_gameUser)).Returns(Jwt);
 
@@ -941,6 +952,16 @@ public class DiscordTownServiceTests
         _ = await _sut.InviteUser(GameId, UserId, true);
 
         _mockJwtWriter.Verify(o => o.GetJwtToken(It.Is<GameUser>(g => g.Id == UserId && g.UserType == UserType.Player)), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task InviteUser_UpdatesUserIdentity()
+    {
+        Setup_InviteUser(hasPerspective: true, hasGuild: true, hasUser: true, hasDmChannel: true);
+
+        _ = await _sut.InviteUser(GameId, UserId, true);
+
+        _mockDiscordTownManager.Verify(o => o.UpdateUserIdentity(_townUser), Times.Once);
     }
 
     [TestMethod]

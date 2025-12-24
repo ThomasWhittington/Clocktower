@@ -59,12 +59,12 @@ public class NotificationServiceTests
         const string guildId = "123";
         _mockClients.Setup(c => c.Group($"game:{gameId}")).Returns(_mockClientProxy1.Object);
         _mockGamePerspectiveStore.Setup(o => o.GetAllPerspectivesForGame(gameId)).Returns([CommonMethods.GetGamePerspective(gameId, guildId: guildId)]);
-        _mockDiscordTownManager.Setup(o => o.GetDiscordTown(guildId)).Returns((DiscordTown?)null);
+        _mockDiscordTownManager.Setup(o => o.GetDiscordTownDto(guildId, gameId, new List<GameUser>())).Returns((DiscordTownDto?)null);
 
         await _sut.BroadcastDiscordTownUpdate(gameId);
 
         _mockGamePerspectiveStore.Verify(o => o.GetAllPerspectivesForGame(gameId), Times.Once);
-        _mockDiscordTownManager.Verify(c => c.GetDiscordTown(guildId), Times.Once);
+        _mockDiscordTownManager.Verify(c => c.GetDiscordTownDto(guildId, gameId, new List<GameUser>()), Times.Once);
         _mockClients.Verify(c => c.Group($"game:{gameId}"), Times.Never);
     }
 
@@ -73,9 +73,9 @@ public class NotificationServiceTests
     {
         const string gameId = "test-game-123";
         const string guildId = "123";
-        var discordTown = new DiscordTown([
-            new MiniCategory(CommonMethods.GetRandomString(), CommonMethods.GetRandomString(), []),
-            new MiniCategory(CommonMethods.GetRandomString(), CommonMethods.GetRandomString(), [])
+        var discordTownDto = new DiscordTownDto(gameId, [
+            new MiniCategoryDto(CommonMethods.GetRandomString(), CommonMethods.GetRandomString(), []),
+            new MiniCategoryDto(CommonMethods.GetRandomString(), CommonMethods.GetRandomString(), []),
         ]);
 
         var users = new GameUser[]
@@ -96,7 +96,7 @@ public class NotificationServiceTests
             CommonMethods.GetGamePerspective(gameId, "storyteller", guildId) with { Users = users },
             CommonMethods.GetGamePerspective(gameId, "spectator", guildId) with { Users = users }
         ]);
-        _mockDiscordTownManager.Setup(o => o.GetDiscordTown(guildId)).Returns(discordTown);
+        _mockDiscordTownManager.Setup(o => o.GetDiscordTownDto(guildId, gameId, users)).Returns(discordTownDto);
 
         await _sut.BroadcastDiscordTownUpdate(gameId);
 

@@ -30,7 +30,7 @@ public class GetJoinDataTests
     }
 
     [TestMethod]
-    public void Handle_ReturnsOk_WhenJoinDataIsFound()
+    public async Task Handle_ReturnsOk_WhenJoinDataIsFound()
     {
         var key = CommonMethods.GetRandomString();
         var user = CommonMethods.GetRandomGameUser();
@@ -38,7 +38,7 @@ public class GetJoinDataTests
 
         _mockDiscordTownService.Setup(o => o.GetJoinData(key)).ReturnsAsync(joinData);
 
-        var result = GetJoinData.Handle(key, _mockDiscordTownService.Object);
+        var result = await GetJoinData.Handle(key, _mockDiscordTownService.Object);
 
         _mockDiscordTownService.Verify(o => o.GetJoinData(key), Times.Once);
         var response = result.Result.Should().BeOfType<Ok<JoinData>>().Subject;
@@ -47,13 +47,13 @@ public class GetJoinDataTests
     }
 
     [TestMethod]
-    public void Handle_ReturnsBadRequest_WhenJoinDataIsNotFound()
+    public async Task Handle_ReturnsBadRequest_WhenJoinDataIsNotFound()
     {
         var key = CommonMethods.GetRandomString();
 
         _mockDiscordTownService.Setup(o => o.GetJoinData(key)).ReturnsAsync((JoinData)null!);
 
-        var result = GetJoinData.Handle(key, _mockDiscordTownService.Object);
+        var result = await GetJoinData.Handle(key, _mockDiscordTownService.Object);
 
         _mockDiscordTownService.Verify(o => o.GetJoinData(key), Times.Once);
         var response = result.Result.Should().BeOfType<NotFound>().Subject;

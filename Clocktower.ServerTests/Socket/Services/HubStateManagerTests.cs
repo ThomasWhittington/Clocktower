@@ -74,10 +74,10 @@ public class HubStateManagerTests
             ServerNowUtc = DateTime.UtcNow,
             EndUtc = DateTime.UtcNow.AddSeconds(30)
         };
-        var discordTown = new DiscordTown([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
+        var discordTownDto = new DiscordTownDto(gameId, [new MiniCategoryDto(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
         const string expectedJwt = "jwt-token-123";
         _mockGamePerspectiveStore.Setup(s => s.Get(gameId, userId)).Returns(gamePerspective);
-        _mockDiscordTownManager.Setup(s => s.GetDiscordTown(guildId)).Returns(discordTown);
+        _mockDiscordTownManager.Setup(s => s.GetDiscordTownDto(guildId, gameId, new List<GameUser> { gameUser })).Returns(discordTownDto);
         _mockDiscordTownManager.Setup(o => o.RedactTownDto(It.IsAny<DiscordTownDto>(), userId)).Returns(new DiscordTownDto(gameId, []));
         _mockJwtWriter.Setup(j => j.GetJwtToken(gameUser)).Returns(expectedJwt);
         _mockTimerCoordinator.Setup(t => t.Get(gameId)).Returns(timer);
@@ -85,7 +85,7 @@ public class HubStateManagerTests
         var result = _sut.GetState(gameId, userId);
 
         _mockGamePerspectiveStore.Verify(o => o.Get(gameId, userId), Times.Once);
-        _mockDiscordTownManager.Verify(o => o.GetDiscordTown(guildId), Times.Once);
+        _mockDiscordTownManager.Verify(o => o.GetDiscordTownDto(guildId, gameId, new List<GameUser> { gameUser }), Times.Once);
         _mockDiscordTownManager.Verify(o => o.RedactTownDto(It.IsAny<DiscordTownDto>(), userId), Times.Once);
         _mockJwtWriter.Verify(o => o.GetJwtToken(gameUser), Times.Once);
         result.Should().NotBeNull();
@@ -113,17 +113,17 @@ public class HubStateManagerTests
             ServerNowUtc = DateTime.UtcNow,
             EndUtc = DateTime.UtcNow.AddSeconds(30)
         };
-        var discordTown = new DiscordTown([new MiniCategory(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
+        var discordTownDto = new DiscordTownDto(gameId, [new MiniCategoryDto(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
         const string expectedJwt = "jwt-token-123";
         _mockGamePerspectiveStore.Setup(s => s.Get(gameId, userId)).Returns(gamePerspective);
-        _mockDiscordTownManager.Setup(s => s.GetDiscordTown(guildId)).Returns(discordTown);
+        _mockDiscordTownManager.Setup(s => s.GetDiscordTownDto(guildId, gameId, new List<GameUser> { gameUser })).Returns(discordTownDto);
         _mockJwtWriter.Setup(j => j.GetJwtToken(gameUser)).Returns(expectedJwt);
         _mockTimerCoordinator.Setup(t => t.Get(gameId)).Returns(timer);
 
         var result = _sut.GetState(gameId, userId);
 
         _mockGamePerspectiveStore.Verify(o => o.Get(gameId, userId), Times.Once);
-        _mockDiscordTownManager.Verify(o => o.GetDiscordTown(guildId), Times.Once);
+        _mockDiscordTownManager.Verify(o => o.GetDiscordTownDto(guildId, gameId, new List<GameUser> { gameUser }), Times.Once);
         _mockJwtWriter.Verify(o => o.GetJwtToken(gameUser), Times.Once);
         result.Should().NotBeNull();
         result!.GameTime.Should().Be(GameTime.Day);

@@ -6,8 +6,13 @@ namespace Clocktower.Server.Socket;
 public sealed class DiscordNotificationHub(IHubStateManager hubStateManager) : Hub<IDiscordNotificationClient>
 {
     [UsedImplicitly]
-    public async Task<SessionSyncState?> JoinGameGroup(string gameId, string userId)
+    public async Task<SessionSyncState?> JoinGameGroup(string gameId, string userId, string? oldGameId = null)
     {
+        if (!string.IsNullOrEmpty(oldGameId) && oldGameId != gameId)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetGameGroupName(oldGameId));
+        }
+
         await Groups.AddToGroupAsync(Context.ConnectionId, GetGameGroupName(gameId));
 
         var currentState = hubStateManager.GetState(gameId, userId);
