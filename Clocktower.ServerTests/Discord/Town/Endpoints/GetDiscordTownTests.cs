@@ -1,4 +1,4 @@
-﻿using Clocktower.Server.Data;
+﻿using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Discord.Town.Endpoints;
 using Clocktower.Server.Discord.Town.Endpoints.Validation;
 using Clocktower.Server.Discord.Town.Services;

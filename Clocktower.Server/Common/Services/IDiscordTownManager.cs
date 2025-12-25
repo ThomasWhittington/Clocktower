@@ -1,4 +1,5 @@
-﻿using Clocktower.Server.Data.Wrappers;
+﻿using Clocktower.Server.Data.Dto;
+using Clocktower.Server.Data.Wrappers;
 
 namespace Clocktower.Server.Common.Services;
 

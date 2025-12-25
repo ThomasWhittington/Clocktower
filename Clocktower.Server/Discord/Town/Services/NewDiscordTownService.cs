@@ -1,4 +1,5 @@
 using Clocktower.Server.Common.Services;
+using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Socket;
 using Discord;

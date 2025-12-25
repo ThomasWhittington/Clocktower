@@ -1,6 +1,7 @@
 ﻿global using Clocktower.Server.Common.Types;
 using Clocktower.Server.Common;
 using Clocktower.Server.Data;
+using Clocktower.Server.Data.Dto;
 using Microsoft.Extensions.Options;
 
 namespace Clocktower.ServerTests.TestHelpers;

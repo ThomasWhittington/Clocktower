@@ -1,4 +1,4 @@
-﻿namespace Clocktower.Server.Data;
+﻿namespace Clocktower.Server.Data.Dto;
 
 [UsedImplicitly]
 public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITownUser

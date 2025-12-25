@@ -1,4 +1,6 @@
-﻿namespace Clocktower.Server.Discord.Town.Services;
+﻿using Clocktower.Server.Data.Dto;
+
+namespace Clocktower.Server.Discord.Town.Services;
 
 public interface IDiscordTownService
 {

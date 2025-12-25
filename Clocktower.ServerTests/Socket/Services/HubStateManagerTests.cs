@@ -1,5 +1,6 @@
 ﻿using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data;
+using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Socket.Services;

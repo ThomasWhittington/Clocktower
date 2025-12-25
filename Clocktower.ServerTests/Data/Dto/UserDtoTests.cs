@@ -1,4 +1,5 @@
 ﻿using Clocktower.Server.Data;
+using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Data.Types.Enum;
 
 namespace Clocktower.ServerTests.Data.Dto;

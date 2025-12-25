@@ -1,4 +1,6 @@
-﻿namespace Clocktower.Server.Socket;
+﻿using Clocktower.Server.Data.Dto;
+
+namespace Clocktower.Server.Socket;
 
 public interface IDiscordNotificationClient
 {
