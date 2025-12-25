@@ -52,47 +52,47 @@ export const getAuthDataApiResponseTransformer = async (data: any): Promise<GetA
     return data;
 };
 
-const clocktowerServerDataDiscordTownDtoSchemaResponseTransformer = (data: any) => {
+const clocktowerServerDataDtoDiscordTownDtoSchemaResponseTransformer = (data: any) => {
     if (data.channelCategories) {
         data.channelCategories = data.channelCategories.map((item: any) => {
-            return clocktowerServerDataMiniCategoryDtoSchemaResponseTransformer(item);
+            return clocktowerServerDataDtoMiniCategoryDtoSchemaResponseTransformer(item);
         });
     }
     if (data.townUsers) {
         data.townUsers = data.townUsers.map((item: any) => {
-            return clocktowerServerDataUserDtoSchemaResponseTransformer(item);
+            return clocktowerServerDataDtoUserDtoSchemaResponseTransformer(item);
         });
     }
     if (data.gameUsers) {
         data.gameUsers = data.gameUsers.map((item: any) => {
-            return clocktowerServerDataUserDtoSchemaResponseTransformer(item);
+            return clocktowerServerDataDtoUserDtoSchemaResponseTransformer(item);
         });
     }
     return data;
 };
 
-const clocktowerServerDataMiniCategoryDtoSchemaResponseTransformer = (data: any) => {
+const clocktowerServerDataDtoMiniCategoryDtoSchemaResponseTransformer = (data: any) => {
     if (data.channels) {
         data.channels = data.channels.map((item: any) => {
-            return clocktowerServerDataChannelOccupantsDtoSchemaResponseTransformer(item);
+            return clocktowerServerDataDtoChannelOccupantsDtoSchemaResponseTransformer(item);
         });
     }
     return data;
 };
 
-const clocktowerServerDataChannelOccupantsDtoSchemaResponseTransformer = (data: any) => {
+const clocktowerServerDataDtoChannelOccupantsDtoSchemaResponseTransformer = (data: any) => {
     if (data.channel) {
         data.channel = clocktowerServerDataMiniChannelSchemaResponseTransformer(data.channel);
     }
     if (data.occupants) {
         data.occupants = data.occupants.map((item: any) => {
-            return clocktowerServerDataUserDtoSchemaResponseTransformer(item);
+            return clocktowerServerDataDtoUserDtoSchemaResponseTransformer(item);
         });
     }
     return data;
 };
 
-const clocktowerServerDataUserDtoSchemaResponseTransformer = (data: any) => {
+const clocktowerServerDataDtoUserDtoSchemaResponseTransformer = (data: any) => {
     if (data.voiceState) {
         data.voiceState = clocktowerServerDataVoiceStateSchemaResponseTransformer(data.voiceState);
     }
@@ -103,7 +103,7 @@ const clocktowerServerDataUserDtoSchemaResponseTransformer = (data: any) => {
 };
 
 export const getDiscordTownApiResponseTransformer = async (data: any): Promise<GetDiscordTownApiResponse> => {
-    data = clocktowerServerDataDiscordTownDtoSchemaResponseTransformer(data);
+    data = clocktowerServerDataDtoDiscordTownDtoSchemaResponseTransformer(data);
     return data;
 };
 
