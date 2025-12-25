@@ -1,4 +1,4 @@
-﻿import type {ClocktowerServerDataUserDto} from "@/api";
+﻿import type {ClocktowerServerDataDtoUserDto} from "@/api";
 import {mapToVoiceState, type VoiceState} from "@/types/voiceState.ts";
 import {UserType} from "@/types/userType.ts";
 
@@ -12,7 +12,7 @@ export type User = {
     userType: UserType
 };
 
-export function mapToUser(userDto: ClocktowerServerDataUserDto): User {
+export function mapToUser(userDto: ClocktowerServerDataDtoUserDto): User {
     return {
         id: userDto.id!,
         name: userDto.name!,
