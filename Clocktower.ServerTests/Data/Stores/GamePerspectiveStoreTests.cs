@@ -138,6 +138,22 @@ public class GamePerspectiveStoreTests
     }
 
     [TestMethod]
+    public void AddUserToGame_ChangesNothing_WhenGameNotFound()
+    {
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game1 with { UserId = UserId2 });
+        _sut.Set(_game2 with { UserId = UserId1 });
+
+        var user = CommonMethods.GetRandomGameUser(UserId3);
+
+        _sut.AddUserToGame(GameId3, user);
+
+        _sut.Get(GameId1, UserId1)!.Users.Should().NotContain(o => o.Id == UserId3);
+        _sut.Get(GameId1, UserId2)!.Users.Should().NotContain(o => o.Id == UserId3);
+        _sut.Get(GameId2, UserId1)!.Users.Should().NotContain(o => o.Id == UserId3);
+    }
+
+    [TestMethod]
     public void AddUserToGame_AddsUserForAllPerspectivesInGame()
     {
         _sut.Set(_game1 with { UserId = UserId1 });
@@ -151,6 +167,22 @@ public class GamePerspectiveStoreTests
         _sut.Get(GameId1, UserId1)!.Users.Should().Contain(o => o.Id == UserId3);
         _sut.Get(GameId1, UserId2)!.Users.Should().Contain(o => o.Id == UserId3);
         _sut.Get(GameId2, UserId1)!.Users.Should().NotContain(o => o.Id == UserId3);
+    }
+
+
+    [TestMethod]
+    public void AddUserToGame_ChangesNothing_WhenUserAlreadyInGame()
+    {
+        var user = CommonMethods.GetRandomGameUser(UserId1);
+        _sut.Set(_game1 with { UserId = UserId1, Users = [user] });
+        _sut.Set(_game1 with { UserId = UserId2, Users = [user] });
+
+        _sut.AddUserToGame(GameId1, user);
+
+        _sut.Get(GameId1, UserId1)!.Users.Should().Contain(o => o.Id == UserId1);
+        _sut.Get(GameId1, UserId1)!.Users.Should().HaveCount(1);
+        _sut.Get(GameId1, UserId2)!.Users.Should().Contain(o => o.Id == UserId1);
+        _sut.Get(GameId1, UserId2)!.Users.Should().HaveCount(1);
     }
 
     [TestMethod]

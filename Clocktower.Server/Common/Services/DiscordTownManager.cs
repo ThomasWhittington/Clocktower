@@ -160,7 +160,7 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore, IUserIdentit
         {
             var townUser = userIdentityStore.GetIdentity(o.Id);
             return UserDto.FromGameUser(o, townUser);
-        });
+        }).ToList();
 
         var categoriesDto = discordTown.ChannelCategories.Select(category =>
             new MiniCategoryDto(

@@ -50,20 +50,43 @@ public class DiscordNotificationHubTests
     }
 
     [TestMethod]
-    public async Task JoinGameGroup_ReturnsSessionState_WhenUserFoundInGame()
+    public async Task JoinGameGroup_ReturnsSessionState_WhenUserFoundInGameWithoutLeaveGame()
     {
         const string gameId = "test-game";
+        const string oldGameId = "";
         const string userId = "user-123";
         const string jwt = "jwt-token-123";
+        const string connection = "connection-456";
         var sessionSyncState = GetSessionSyncState(jwt);
-        _mockContext.Setup(c => c.ConnectionId).Returns("connection-456");
+        _mockContext.Setup(c => c.ConnectionId).Returns(connection);
         _mockHubStateManager.Setup(o => o.GetState(gameId, userId)).Returns(sessionSyncState);
 
-        var result = await _sut.JoinGameGroup(gameId, userId);
+        var result = await _sut.JoinGameGroup(gameId, userId, oldGameId);
 
         result.Should().Be(sessionSyncState);
         _mockHubStateManager.Verify(o => o.GetState(gameId, userId), Times.Once);
-        _mockGroups.Verify(g => g.AddToGroupAsync("connection-456", "game:test-game"), Times.Once);
+        _mockGroups.Verify(g => g.AddToGroupAsync(connection, $"game:{gameId}"), Times.Once);
+        _mockGroups.Verify(g => g.RemoveFromGroupAsync(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task JoinGameGroup_ReturnsSessionState_WhenUserFoundInGame()
+    {
+        const string gameId = "test-game";
+        const string oldGameId = "old-game-id";
+        const string userId = "user-123";
+        const string jwt = "jwt-token-123";
+        const string connection = "connection-456";
+        var sessionSyncState = GetSessionSyncState(jwt);
+        _mockContext.Setup(c => c.ConnectionId).Returns(connection);
+        _mockHubStateManager.Setup(o => o.GetState(gameId, userId)).Returns(sessionSyncState);
+
+        var result = await _sut.JoinGameGroup(gameId, userId, oldGameId);
+
+        result.Should().Be(sessionSyncState);
+        _mockHubStateManager.Verify(o => o.GetState(gameId, userId), Times.Once);
+        _mockGroups.Verify(g => g.AddToGroupAsync(connection, $"game:{gameId}"), Times.Once);
+        _mockGroups.Verify(g => g.RemoveFromGroupAsync(connection, $"game:{oldGameId}"), Times.Once);
     }
 
     [TestMethod]
