@@ -1,4 +1,6 @@
-﻿namespace Clocktower.Server.Data;
+﻿using Clocktower.Server.Data.Dto;
+
+namespace Clocktower.Server.Data;
 
 public class SessionSyncState
 {

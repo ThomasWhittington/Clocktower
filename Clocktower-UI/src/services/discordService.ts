@@ -1,53 +1,6 @@
-﻿import {
-    type ClocktowerServerDataTypesEnumGameTime,
-    getAuthDataApi,
-    getDiscordTownApi,
-    getGuildsWithUserApi,
-    getJoinDataApi,
-    inviteUserApi,
-    moveUserToChannelApi,
-    pingUserApi,
-    sendToCottagesApi,
-    sendToTownSquareApi,
-    setTimeApi
-} from '@/api';
-import {
-    type DiscordTown,
-    GameTime,
-    mapToDiscordTown,
-    mapToMiniGuild,
-    type MiniGuild
-} from "@/types";
-import {
-    apiClient
-} from "@/api/api-client.ts";
-
-async function getDiscordTown(gameId: string): Promise<DiscordTown> {
-    const {
-        data,
-        error
-    } = await getDiscordTownApi({
-        client: apiClient,
-        path: {
-            gameId: gameId
-        }
-    });
-
-    if (error) {
-        console.error('Failed to get Discord Town', error);
-        throw new Error(error.toString());
-    }
-
-
-    if (data) {
-        return mapToDiscordTown(data);
-    }
-    return {
-        gameId: '',
-        userCount: 0,
-        channelCategories: []
-    };
-}
+﻿import {type ClocktowerServerDataTypesEnumGameTime, getAuthDataApi, getGuildsWithUserApi, getJoinDataApi, inviteUserApi, moveUserToChannelApi, pingUserApi, sendToCottagesApi, sendToTownSquareApi, setTimeApi} from '@/api';
+import {GameTime, mapToMiniGuild, type MiniGuild} from "@/types";
+import {apiClient} from "@/api/api-client.ts";
 
 async function moveUserToChannel(guildId: string, userId: string, channelId: string): Promise<string> {
     const {
@@ -224,7 +177,6 @@ const getMessage = (err: unknown): string =>
 
 export const discordService = {
     getGuildsWithUser,
-    getDiscordTown,
     moveUserToChannel,
     getAuthData,
     inviteUser,

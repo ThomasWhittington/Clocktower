@@ -1,9 +1,10 @@
-﻿using Clocktower.Server.Data.Wrappers;
+﻿using Clocktower.Server.Data.Dto;
+using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Discord;
 
 namespace Clocktower.Server.Common.Services;
 
-public class DiscordTownManager(IDiscordTownStore discordTownStore, IDiscordConstantsService discordConstantsService) : IDiscordTownManager
+public class DiscordTownManager(IDiscordTownStore discordTownStore, IUserIdentityStore userIdentityStore, IDiscordConstantsService discordConstantsService) : IDiscordTownManager
 {
     public DiscordTown MoveUser(DiscordTown current, IDiscordGuildUser user, IDiscordVoiceChannel? newChannel)
     {
@@ -114,6 +115,7 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore, IDiscordCons
         return cottages;
     }
 
+
     public DiscordTownDto RedactTownDto(DiscordTownDto discordTownDto, string userId)
     {
         var redactedCategories = discordTownDto.ChannelCategories
@@ -134,5 +136,53 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore, IDiscordCons
             .ToList();
 
         return discordTownDto with { ChannelCategories = redactedCategories };
+    }
+
+    public bool SetDiscordTown(string guildId, DiscordTown discordTown) => discordTownStore.Set(guildId, discordTown);
+    public void UpdateUserIdentity(TownUser townUser) => userIdentityStore.UpdateIdentity(townUser);
+
+    public DiscordTownDto? GetDiscordTownDto(string guildId, string gameId, IEnumerable<GameUser>? gameUsers = null)
+    {
+        var discordTown = GetDiscordTown(guildId);
+        if (discordTown is null) return null;
+        return GetDiscordTownDto(discordTown, gameId, gameUsers);
+    }
+
+    public DiscordTownDto? GetDiscordTownDto(DiscordTown? discordTown, string gameId, IEnumerable<GameUser>? gameUsers = null)
+    {
+        if (discordTown is null) return null;
+
+        foreach (var user in discordTown.TownUsers) userIdentityStore.UpdateIdentity(user);
+
+        gameUsers ??= [];
+        var gameUserList = gameUsers.ToList();
+        var gameUserLookup = gameUserList.ToDictionary(u => u.Id);
+        var gUsers = gameUserList.Select(o =>
+        {
+            var townUser = userIdentityStore.GetIdentity(o.Id);
+            return UserDto.FromGameUser(o, townUser);
+        }).ToList();
+
+        var categoriesDto = discordTown.ChannelCategories.Select(category =>
+            new MiniCategoryDto(
+                category.Id,
+                category.Name,
+                category.Channels.Select(channel =>
+                    new ChannelOccupantsDto(
+                        channel.Channel,
+                        channel.Occupants.Select(townUser =>
+                            UserDto.FromTownUser(townUser, gameUserLookup.GetValueOrDefault(townUser.Id))
+                        ).ToList()
+                    )
+                ).ToList()
+            )
+        ).ToList();
+
+        var town = new DiscordTownDto(gameId, categoriesDto)
+        {
+            GameUsers = gUsers
+        };
+
+        return town;
     }
 }

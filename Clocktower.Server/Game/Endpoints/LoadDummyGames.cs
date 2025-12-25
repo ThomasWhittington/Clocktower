@@ -8,9 +8,9 @@ public class LoadDummyGames : IEndpoint
         .SetOpenApiOperationId<LoadDummyGames>()
         .WithSummaryAndDescription("Loads dummy data from saved json file");
 
-    internal static Results<Ok<string>, BadRequest<string>> Handle([FromServices] IGameStateService gameStateService)
+    internal static Results<Ok<string>, BadRequest<string>> Handle([FromServices] IGamePerspectiveService gamePerspectiveService)
     {
-        var result = gameStateService.LoadDummyData();
+        var result = gamePerspectiveService.LoadDummyData();
 
         return result.success
             ? TypedResults.Ok(result.message)

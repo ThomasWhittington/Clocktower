@@ -1,5 +1,6 @@
 ﻿using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data;
+using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Discord;
@@ -10,6 +11,7 @@ namespace Clocktower.ServerTests.Common.Services;
 public class DiscordTownManagerTests
 {
     private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
+    private Mock<IUserIdentityStore> _mockUserIdentityStore = null!;
     private Mock<IDiscordConstantsService> _mockDiscordConstantsService = null!;
     private IDiscordTownManager _sut = null!;
     private const string GuildId = "1";
@@ -19,9 +21,10 @@ public class DiscordTownManagerTests
     public void SetUp()
     {
         _mockDiscordTownStore = StrictMockFactory.Create<IDiscordTownStore>();
+        _mockUserIdentityStore = StrictMockFactory.Create<IUserIdentityStore>();
         _mockDiscordConstantsService = StrictMockFactory.Create<IDiscordConstantsService>();
         _mockDiscordConstantsService.SetupGet(s => s.NightCategoryName).Returns("Night Category");
-        _sut = new DiscordTownManager(_mockDiscordTownStore.Object, _mockDiscordConstantsService.Object);
+        _sut = new DiscordTownManager(_mockDiscordTownStore.Object, _mockUserIdentityStore.Object, _mockDiscordConstantsService.Object);
     }
 
     private DiscordTown GetDummyDiscordTown()
@@ -629,7 +632,7 @@ public class DiscordTownManagerTests
             .SetupGet(s => s.NightCategoryName)
             .Returns("nIgHt CaTeGoRy");
 
-        _sut = new DiscordTownManager(_mockDiscordTownStore.Object, _mockDiscordConstantsService.Object);
+        _sut = new DiscordTownManager(_mockDiscordTownStore.Object, _mockUserIdentityStore.Object, _mockDiscordConstantsService.Object);
 
         var dayCategory = new MiniCategoryDto("day", "Day Category", [
             new ChannelOccupantsDto(
@@ -662,6 +665,90 @@ public class DiscordTownManagerTests
     }
 
     #endregion
+
+    #region SetDiscordTown
+
+    [TestMethod]
+    public void SetDiscordTown_SetsTownCorrectly()
+    {
+        const string gameId = "test-game-123";
+        var discordTown = GetDummyDiscordTown();
+        _mockDiscordTownStore.Setup(o => o.Set(gameId, discordTown)).Returns(true);
+
+        var result = _sut.SetDiscordTown(gameId, discordTown);
+
+        result.Should().BeTrue();
+        _mockDiscordTownStore.Verify(o => o.Set(gameId, discordTown), Times.Once);
+    }
+
+    #endregion
+
+    #region UpdateUserIdentity
+
+    [TestMethod]
+    public void UpdateUserIdentity_UpdatesIdentity()
+    {
+        var townUser = CommonMethods.GetRandomTownUser();
+        _mockUserIdentityStore.Setup(o => o.UpdateIdentity(townUser));
+
+        _sut.UpdateUserIdentity(townUser);
+
+        _mockUserIdentityStore.Verify(o => o.UpdateIdentity(townUser), Times.Once);
+    }
+
+    #endregion
+
+    #region GetDiscordTownDto
+
+    [TestMethod]
+    public void GetDiscordTownDto_Id_ReturnsNull_WhenNoTownFound()
+    {
+        const string guildId = "123";
+        const string gameId = "456";
+        _mockDiscordTownStore.Setup(o => o.Get(guildId)).Returns((DiscordTown?)null);
+
+        var result = _sut.GetDiscordTownDto(guildId, gameId);
+
+        result.Should().BeNull();
+        _mockDiscordTownStore.Verify(o => o.Get(guildId), Times.Once);
+    }
+
+    [TestMethod]
+    public void GetDiscordTownDto_ReturnsNull_WhenNoTownFound()
+    {
+        const string gameId = "456";
+
+        var result = _sut.GetDiscordTownDto((DiscordTown?)null, gameId);
+
+        result.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void GetDiscordTownDto_Id_UpdatesUsers()
+    {
+        const string guildId = "123";
+        const string gameId = "456";
+        var discordTown = GetDummyDiscordTown();
+        var gameUsers = new List<GameUser>
+        {
+            CommonMethods.GetRandomGameUser("3001"),
+            CommonMethods.GetRandomGameUser("3002"),
+            CommonMethods.GetRandomGameUser("3003"),
+            CommonMethods.GetRandomGameUser("3004")
+        };
+        foreach (var user in gameUsers) _mockUserIdentityStore.Setup(o => o.GetIdentity(user.Id)).Returns(CommonMethods.GetRandomTownUser(user.Id));
+        foreach (var user in discordTown.TownUsers) _mockUserIdentityStore.Setup(o => o.UpdateIdentity(user));
+        _mockDiscordTownStore.Setup(o => o.Get(guildId)).Returns(discordTown);
+
+        var result = _sut.GetDiscordTownDto(guildId, gameId, gameUsers);
+
+        result.Should().NotBeNull();
+        foreach (var user in discordTown.TownUsers) _mockUserIdentityStore.Verify(o => o.UpdateIdentity(user), Times.Once);
+        foreach (var user in gameUsers) _mockUserIdentityStore.Verify(o => o.GetIdentity(user.Id), Times.Once);
+    }
+
+    #endregion
+
 
     private static IDiscordGuildUser CreateMockDiscordUser(string id)
     {

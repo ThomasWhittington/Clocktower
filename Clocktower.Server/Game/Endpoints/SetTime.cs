@@ -7,14 +7,14 @@ public class SetTime : IEndpoint
         .MapPost("/{gameId}/time", Handle)
         .SetOpenApiOperationId<SetTime>()
         .WithSummary("Sets the time of the town")
-        .WithDescription("Sets the game state of the town based on the day time");
+        .WithDescription("Sets the game perspective of the town based on the day time");
 
 
-    internal static async Task<Results<Ok<string>, BadRequest<string>>> Handle([AsParameters] Request request, [FromServices] IGameStateService gameStateService)
+    internal static async Task<Results<Ok<string>, BadRequest<string>>> Handle([AsParameters] Request request, [FromServices] IGamePerspectiveService gamePerspectiveService)
     {
         var gameId = request.GameId.Trim();
 
-        var (success, message) = await gameStateService.SetTime(gameId, request.GameTime);
+        var (success, message) = await gamePerspectiveService.SetTime(gameId, request.GameTime);
         return success ? TypedResults.Ok(message) : TypedResults.BadRequest(message);
     }
 

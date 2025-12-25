@@ -1,13 +1,6 @@
-﻿import {
-    type ClientOptions,
-} from "@/api";
-import {
-    createClient,
-    createConfig
-} from "@/api/generated/client";
-import {
-    useAppStore
-} from "@/store";
+﻿import {type ClientOptions,} from "@/api";
+import {createClient, createConfig} from "@/api/generated/client";
+import {useAppStore} from "@/store";
 
 export const apiClient =
     createClient(createConfig<ClientOptions>({

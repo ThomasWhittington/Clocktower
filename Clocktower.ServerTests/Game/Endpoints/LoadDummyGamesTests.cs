@@ -6,12 +6,12 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class LoadDummyGamesTests
 {
-    private Mock<IGameStateService> _mockGameStateService = null!;
+    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
     private const string ResponseMessage = "Response";
 
     private void MockResponse(bool success)
     {
-        _mockGameStateService.Setup(o =>
+        _mockGamePerspectiveService.Setup(o =>
                 o.LoadDummyData())
             .Returns((success, ResponseMessage));
     }
@@ -19,7 +19,7 @@ public class LoadDummyGamesTests
     [TestInitialize]
     public void Setup()
     {
-        _mockGameStateService = new Mock<IGameStateService>();
+        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
     }
 
     [TestMethod]
@@ -40,9 +40,9 @@ public class LoadDummyGamesTests
     {
         MockResponse(false);
 
-        var result = LoadDummyGames.Handle(_mockGameStateService.Object);
+        var result = LoadDummyGames.Handle(_mockGamePerspectiveService.Object);
 
-        _mockGameStateService.Verify(o => o.LoadDummyData(), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.LoadDummyData(), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
@@ -54,9 +54,9 @@ public class LoadDummyGamesTests
     {
         MockResponse(true);
 
-        var result = LoadDummyGames.Handle(_mockGameStateService.Object);
+        var result = LoadDummyGames.Handle(_mockGamePerspectiveService.Object);
 
-        _mockGameStateService.Verify(o => o.LoadDummyData(), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.LoadDummyData(), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);

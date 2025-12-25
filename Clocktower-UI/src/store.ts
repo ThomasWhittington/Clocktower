@@ -1,18 +1,16 @@
-﻿import {
-    create
-} from 'zustand';
-import type {
-    User
-} from "./types/auth.ts";
+﻿import {create} from 'zustand';
+import type {User} from "./types/auth.ts";
 
 interface AppState {
     loggedIn: boolean,
     guildId: string,
     gameId: string | null,
+    joinedGameId: string | null,
     currentUser?: User,
     jwt: string | null;
     setGuildId: (value: string) => void;
     setGameId: (value: string | null) => void;
+    setJoinedGameId: (value: string | null) => void;
     setCurrentUser: (value: User) => void;
     setJwt: (value: string | undefined) => void;
     clearSession: () => void;
@@ -44,6 +42,10 @@ const getStoredGameId = (): string => {
     return localStorage.getItem('gameId') || '';
 };
 
+const getStoredJoinedGameId = (): string => {
+    return localStorage.getItem('joinedGameId') || '';
+};
+
 const setStoredGuildId = (id: string) => {
     localStorage.setItem('guildId', id);
 };
@@ -55,6 +57,15 @@ const setStoredGameId = (id: string | null) => {
         localStorage.removeItem('gameId');
     }
 };
+
+const setStoredJoinedGameId = (id: string | null) => {
+    if (id) {
+        localStorage.setItem('joinedGameId', id);
+    } else {
+        localStorage.removeItem('joinedGameId');
+    }
+};
+
 
 const getStoredUser = (): User | undefined => {
     const stored = localStorage.getItem('currentUser');
@@ -80,6 +91,7 @@ export const useAppStore = create<AppState>(
     (set) => ({
         guildId: getStoredGuildId(),
         gameId: getStoredGameId(),
+        joinedGameId: getStoredJoinedGameId(),
         jwt: getStoredJwt(),
         currentUser: getStoredUser(),
         loggedIn: getLoggedIn(),
@@ -90,6 +102,10 @@ export const useAppStore = create<AppState>(
         setGameId: (id) => {
             setStoredGameId(id);
             set(() => ({gameId: id}));
+        },
+        setJoinedGameId: (id) => {
+            setStoredJoinedGameId(id);
+            set(() => ({joinedGameId: id}));
         },
         setCurrentUser: (user) => {
             setStoredUser(user);

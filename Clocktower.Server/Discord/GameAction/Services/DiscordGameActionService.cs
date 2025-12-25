@@ -5,7 +5,7 @@ namespace Clocktower.Server.Discord.GameAction.Services;
 
 public class DiscordGameActionService(
     IDiscordBot bot,
-    IGameStateStore gameStateStore,
+    IGamePerspectiveStore gamePerspectiveStore,
     IDiscordTownManager discordTownManager,
     IDiscordConstantsService discordConstantsService,
     IUserService userService
@@ -13,11 +13,11 @@ public class DiscordGameActionService(
 {
     public async Task<Result<string>> SetMuteAllPlayersAsync(string gameId, bool muted)
     {
-        var (status, (guild, gameState)) = ValidateFromGameId(gameId);
+        var (status, (guild, gamePerspective)) = ValidateFromGameId(gameId);
         if (!status.IsSuccess) return status;
 
         var toBeMuted = userService.GetTownUsersForGameUsers(
-            gameState.StoryTellers,
+            gamePerspective.StoryTellers,
             guild.Id,
             user =>
                 user.IsPresent &&
@@ -40,11 +40,11 @@ public class DiscordGameActionService(
 
     public async Task<Result<string>> SendToCottagesAsync(string gameId)
     {
-        var (status, (guild, gameState)) = ValidateFromGameId(gameId);
+        var (status, (guild, gamePerspective)) = ValidateFromGameId(gameId);
         if (!status.IsSuccess) return status;
 
-        var players = guild.GetInVoiceGuildUsers(gameState.Players.GetIds()).ToArray();
-        var storyTellers = guild.GetInVoiceGuildUsers(gameState.StoryTellers.GetIds()).ToArray();
+        var players = guild.GetInVoiceGuildUsers(gamePerspective.Players.GetIds()).ToArray();
+        var storyTellers = guild.GetInVoiceGuildUsers(gamePerspective.StoryTellers.GetIds()).ToArray();
 
         var nightChannels = discordTownManager.GetNightChannels(guild.Id, discordConstantsService.NightCategoryName);
         var cottages = nightChannels.Select(channel => guild.GetVoiceChannel(channel.Id)).Where(o => o != null).Cast<IDiscordVoiceChannel>().ToArray();
@@ -82,12 +82,12 @@ public class DiscordGameActionService(
         return Result.Ok($"Moved all users to {channel.Name}");
     }
 
-    private (Result<string> status, (IDiscordGuild discordGuild, GameState gameState) data) ValidateFromGameId(string gameId)
+    private (Result<string> status, (IDiscordGuild discordGuild, GamePerspective gamePerspective) data) ValidateFromGameId(string gameId)
     {
-        var gameState = gameStateStore.Get(gameId);
-        if (gameState is null) return (Result.Fail<string>(Errors.GameNotFound(gameId)), default);
-        var guild = bot.GetGuild(gameState.GuildId);
+        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return (Result.Fail<string>(Errors.GameNotFound(gameId)), default);
+        var guild = bot.GetGuild(gamePerspective.GuildId);
         if (guild is null) return (Result.Fail<string>(Errors.InvalidGuildId()), default);
-        return (Result.Ok(string.Empty), (guild, gameState));
+        return (Result.Ok(string.Empty), (guild, gamePerspective));
     }
 }

@@ -1,12 +1,10 @@
-﻿using Clocktower.Server.Data.Extensions;
+﻿namespace Clocktower.Server.Common.Api.Auth;
 
-namespace Clocktower.Server.Common.Api.Auth;
-
-public class GameAuthorizationService(IGameStateStore gameStateStore) : IGameAuthorizationService
+public class GameAuthorizationService(IGamePerspectiveStore gamePerspectiveStore) : IGameAuthorizationService
 {
     public bool IsStoryTellerForGame(string userId, string gameId)
     {
-        var gameState = gameStateStore.Get(gameId);
-        return gameState is not null && gameState.IsUserOfType(userId, UserType.StoryTeller);
+        var gamePerspective = gamePerspectiveStore.Get(gameId, userId);
+        return gamePerspective is not null && gamePerspective.IsUserOfType(userId, UserType.StoryTeller);
     }
 }

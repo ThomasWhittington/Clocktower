@@ -1,4 +1,5 @@
-﻿using Clocktower.Server.Discord.Town.Services;
+﻿using Clocktower.Server.Data.Dto;
+using Clocktower.Server.Discord.Town.Services;
 
 namespace Clocktower.Server.Discord.Town.Endpoints;
 

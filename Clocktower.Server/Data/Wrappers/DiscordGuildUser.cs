@@ -60,12 +60,12 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
         await user.ModifyAsync(o => o.Mute = isMuted);
     }
 
-    public GameUser AsGameUser(GameState? gameState = null)
+    public GameUser AsGameUser(GamePerspective? gamePerspective = null)
     {
         var result = new GameUser(user.Id.ToString());
-        if (gameState is not null)
+        if (gamePerspective is not null)
         {
-            result.UserType = gameState.GetUserType(user.Id.ToString());
+            result.UserType = gamePerspective.GetUserType(user.Id.ToString());
         }
 
         return result;
