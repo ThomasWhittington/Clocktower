@@ -77,11 +77,11 @@ const createConnection = async () => {
         setState({discordTown: new DiscordTown(discordTown)});
     });
 
-    globalConnection.on('TownTimeChanged', (gameTime: number) => {
-        //TODO filter response by gameId
+    globalConnection.on('TownTimeChanged', (gameId: string, gameTime: number) => {
+        console.log(`BEFORE⏰ Received TownTimeChanged for game ${gameId}: ${gameTime}`);
         const {joinedGameId} = useAppStore.getState();
-        //if (gameId !== joinedGameId) return;
-        console.log(`⏰ Received TownTimeChanged for game ${joinedGameId}: ${gameTime}`);
+        if (gameId !== joinedGameId) return;
+        console.log(`AFTER⏰ Received TownTimeChanged for game ${joinedGameId}: ${gameTime}`);
         setState({gameTime: gameTime as GameTime});
     });
 

@@ -169,6 +169,6 @@ public class NotificationServiceTests
         await _sut.BroadcastTownTime(gameId, gameTime);
 
         _mockClients.Verify(c => c.Group("game:test-game-789"), Times.Once);
-        _mockClientProxy1.Verify(cp => cp.TownTimeChanged((int)gameTime), Times.Once);
+        _mockClientProxy1.Verify(cp => cp.TownTimeChanged(gameId, (int)gameTime), Times.Once);
     }
 }
