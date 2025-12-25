@@ -1,18 +1,12 @@
 ﻿import {useEffect, useRef, useState} from 'react';
 import * as signalR from '@microsoft/signalr';
 import {HubConnectionState} from '@microsoft/signalr';
-import {DiscordTown, GameTime, type TimerState, type VoiceState} from '@/types';
+import {DiscordTown, GameTime, type SessionSyncState, type TimerState, type VoiceState} from '@/types';
 import {useAppStore} from "@/store";
 
 type UserPresenceStates = Record<string, boolean>;
 type UserVoiceStates = Record<string, VoiceState>;
 
-export type SessionSyncState = {
-    gameTime: GameTime,
-    jwt: string,
-    discordTown?: DiscordTown;
-    timer?: TimerState;
-};
 type HubState = {
     discordTown?: DiscordTown;
     userPresenceStates: UserPresenceStates;
