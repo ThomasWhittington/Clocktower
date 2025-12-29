@@ -116,7 +116,7 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         }
     }
 
-    [ExcludeFromCodeCoverage(Justification = "This just runs a delegate, the the value not found issue is covered in the calling functions")]
+    [ExcludeFromCodeCoverage(Justification = "This just runs a delegate, the value not found issue is covered in the calling functions")]
     private void TryUpdate(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction)
     {
         _store.AddOrUpdate((gameId, userId),
