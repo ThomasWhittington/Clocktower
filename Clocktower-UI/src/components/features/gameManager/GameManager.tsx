@@ -2,13 +2,13 @@
 import {Spinner} from '@/components/ui';
 
 import {discordService, gamesService} from "@/services";
-import type {GameState} from "@/types";
+import type {GamePerspective} from "@/types";
 import {useAppStore} from "@/store";
 import {GameList} from "@/components/features/gameManager/components";
 
 function GameManager() {
     const [isLoading, setIsLoading] = useState(false);
-    const [games, setGames] = useState<GameState[]>([]);
+    const [games, setGames] = useState<GamePerspective[]>([]);
     const [text, setText] = useState('');
     const [hasError, setHasError] = useState(false);
     const [error, setError] = useState('');

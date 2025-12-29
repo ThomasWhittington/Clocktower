@@ -19,7 +19,7 @@ public class DiscordBotHandlerTests
     private const string UserId = "4";
 
     private Mock<DiscordBotHandler> _mockHandler = null!;
-    private Mock<IGameStateStore> _mockGameStateStore = null!;
+    private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private Mock<IUserService> _mockUserService = null!;
     private Mock<INotificationService> _mockNotificationService = null!;
@@ -38,7 +38,7 @@ public class DiscordBotHandlerTests
     [TestInitialize]
     public void SetUp()
     {
-        _mockGameStateStore = new Mock<IGameStateStore>();
+        _mockGamePerspectiveStore = new Mock<IGamePerspectiveStore>();
         _mockDiscordTownManager = new Mock<IDiscordTownManager>();
         _mockUserService = new Mock<IUserService>();
         _mockNotificationService = new Mock<INotificationService>();
@@ -63,7 +63,7 @@ public class DiscordBotHandlerTests
 
         _mockHandler = new Mock<DiscordBotHandler>
         (
-            _mockGameStateStore.Object,
+            _mockGamePerspectiveStore.Object,
             _mockDiscordTownManager.Object,
             _mockUserService.Object,
             _mockNotificationService.Object,
@@ -104,6 +104,7 @@ public class DiscordBotHandlerTests
 
     private void Setup_Mocks(string? beforeGuildId = GuildId, string? afterGuildId = GuildId, bool hasGuildUser = true, string[]? gameIds = null, Mock<IDiscordVoiceChannel>? beforeChannel = null, Mock<IDiscordVoiceChannel>? afterChannel = null)
     {
+        gameIds ??= [];
         _before.Setup(o => o.GuildId).Returns(beforeGuildId);
         _after.Setup(o => o.GuildId).Returns(afterGuildId);
         _user.Setup(o => o.Id).Returns(UserId);
@@ -113,8 +114,7 @@ public class DiscordBotHandlerTests
             _user.Setup(o => o.GetGuildUser()).Returns(_guildUser.Object);
         }
 
-        var gameStates = gameIds is null ? [] : gameIds.Select(o => new GameState { Id = o });
-        _mockGameStateStore.Setup(o => o.GetGuildGames(GuildId)).Returns(gameStates);
+        _mockGamePerspectiveStore.Setup(o => o.GetGuildGameIds(GuildId)).Returns(gameIds!);
 
         _voiceChannel1.Setup(o => o.Id).Returns(ChannelId1);
         _voiceChannel2.Setup(o => o.Id).Returns(ChannelId2);
@@ -139,7 +139,7 @@ public class DiscordBotHandlerTests
 
         await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
 
-        _mockGameStateStore.Verify(f => f.GetGuildGames(It.IsAny<string>()), Times.Never);
+        _mockGamePerspectiveStore.Verify(f => f.GetGuildGameIds(It.IsAny<string>()), Times.Never);
     }
 
 
@@ -150,7 +150,7 @@ public class DiscordBotHandlerTests
 
         await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
 
-        _mockGameStateStore.Verify(f => f.GetGuildGames(GuildId), Times.Once);
+        _mockGamePerspectiveStore.Verify(f => f.GetGuildGameIds(GuildId), Times.Once);
     }
 
     [TestMethod]
@@ -170,7 +170,7 @@ public class DiscordBotHandlerTests
     }
 
     [TestMethod]
-    public async Task HandleUserVoiceStateUpdate_CallsUpdateDiscordTown_WhenChannelsMatch_WithGameState()
+    public async Task HandleUserVoiceStateUpdate_CallsUpdateDiscordTown_WhenChannelsMatch_WithGamePerspective()
     {
         const string gameId1 = "game-id1";
         const string gameId2 = "game-id2";
@@ -186,7 +186,7 @@ public class DiscordBotHandlerTests
     }
 
     [TestMethod]
-    public async Task HandleUserVoiceStateUpdate_CallsUpdateDiscordTown_WhenChannelsMatch_WithNoGameState()
+    public async Task HandleUserVoiceStateUpdate_CallsUpdateDiscordTown_WhenChannelsMatch_WithNoGamePerspective()
     {
         Setup_Mocks(gameIds: [], beforeChannel: _voiceChannel1, afterChannel: _voiceChannel1);
 

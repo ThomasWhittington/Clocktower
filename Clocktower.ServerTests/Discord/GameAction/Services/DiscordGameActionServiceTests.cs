@@ -15,12 +15,12 @@ public class DiscordGameActionServiceTests
     private const string GuildId = "123";
     private IDiscordGameActionService _sut = null!;
     private Mock<IDiscordBot> _mockBot = null!;
-    private Mock<IGameStateStore> _mockGameStateStore = null!;
+    private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private Mock<IDiscordConstantsService> _mockDiscordConstantsService = null!;
     private Mock<IUserService> _mockUserService = null!;
     private Mock<IDiscordGuild> _guild = null!;
-    private GameState _gameState = null!;
+    private GamePerspective _gamePerspective = null!;
     private Func<TownUser, bool> _capturedPredicate = null!;
 
     private void SetUp_Bot(bool hasGuild)
@@ -28,12 +28,10 @@ public class DiscordGameActionServiceTests
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? _guild.Object : null);
     }
 
-    private void SetUp_GameStateStore(bool hasGame, bool checkMuted = false, string? guildId = GuildId, (string userId, bool isPresent, bool muted, UserType userType)[]? users = null)
+    private void SetUp_GamePerspectiveStore(bool hasGame, bool checkMuted = false, string? guildId = GuildId, (string userId, bool isPresent, bool muted, UserType userType)[]? users = null)
     {
         _guild.Setup(o => o.Id).Returns(guildId!);
-        _gameState.Id = GameId;
-        _gameState.GuildId = guildId!;
-        _mockGameStateStore.Setup(o => o.Get(GameId)).Returns(hasGame ? _gameState : null);
+        _gamePerspective = CommonMethods.GetGamePerspective(GameId, guildId: guildId);
 
         if (users is not null)
         {
@@ -46,28 +44,29 @@ public class DiscordGameActionServiceTests
                 return thisUser;
             }).ToList();
 
-            _gameState.Users.AddRange(gameUsers);
-            _mockUserService.Setup(o => o.GetTownUsersForGameUsers(_gameState.StoryTellers, guildId!, It.IsAny<Func<TownUser, bool>>()))
+            _gamePerspective = _gamePerspective with { Users = [.._gamePerspective.Users, ..gameUsers] };
+            _mockUserService.Setup(o => o.GetTownUsersForGameUsers(_gamePerspective.StoryTellers, guildId!, It.IsAny<Func<TownUser, bool>>()))
                 .Callback<IEnumerable<GameUser>, string, Func<TownUser, bool>>((_, _, predicate) => { _capturedPredicate = predicate; })
                 .Returns(townUsers);
         }
+
+        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? _gamePerspective : null);
     }
 
     [TestInitialize]
     public void SetUp()
     {
         _mockBot = new Mock<IDiscordBot>();
-        _mockGameStateStore = new Mock<IGameStateStore>();
+        _mockGamePerspectiveStore = new Mock<IGamePerspectiveStore>();
         _mockUserService = new Mock<IUserService>();
         _mockDiscordTownManager = StrictMockFactory.Create<IDiscordTownManager>();
         _mockDiscordConstantsService = StrictMockFactory.Create<IDiscordConstantsService>();
 
-        _gameState = new GameState();
         _guild = StrictMockFactory.Create<IDiscordGuild>();
 
         _sut = new DiscordGameActionService(
             _mockBot.Object,
-            _mockGameStateStore.Object,
+            _mockGamePerspectiveStore.Object,
             _mockDiscordTownManager.Object,
             _mockDiscordConstantsService.Object,
             _mockUserService.Object
@@ -80,7 +79,7 @@ public class DiscordGameActionServiceTests
     public async Task SetMuteAllPlayersAsync_ReturnsError_WhenNoGameFound()
     {
         const bool muted = false;
-        SetUp_GameStateStore(false);
+        SetUp_GamePerspectiveStore(false);
 
         var result = await _sut.SetMuteAllPlayersAsync(GameId, muted);
 
@@ -96,7 +95,7 @@ public class DiscordGameActionServiceTests
     public async Task SetMuteAllPlayersAsync_ReturnsError_WhenGuildInvalid()
     {
         const bool muted = false;
-        SetUp_GameStateStore(true, guildId: "invalid");
+        SetUp_GamePerspectiveStore(true, guildId: "invalid");
 
         var result = await _sut.SetMuteAllPlayersAsync(GameId, muted);
 
@@ -107,7 +106,7 @@ public class DiscordGameActionServiceTests
     public async Task SetMuteAllPlayersAsync_ReturnsError_WhenGuildNotFound()
     {
         const bool muted = false;
-        SetUp_GameStateStore(true);
+        SetUp_GamePerspectiveStore(true);
         SetUp_Bot(false);
 
         var result = await _sut.SetMuteAllPlayersAsync(GameId, muted);
@@ -120,7 +119,7 @@ public class DiscordGameActionServiceTests
     {
         string[] userIds = ["user1", "user2", "user3"];
         const bool muted = false;
-        SetUp_GameStateStore(true, users:
+        SetUp_GamePerspectiveStore(true, users:
         [
             new ValueTuple<string, bool, bool, UserType>(userIds[0], true, !muted, UserType.StoryTeller),
             new ValueTuple<string, bool, bool, UserType>(userIds[1], true, !muted, UserType.Player),
@@ -139,7 +138,7 @@ public class DiscordGameActionServiceTests
     {
         string[] userIds = ["user1", "user2"];
         const bool muted = false;
-        SetUp_GameStateStore(true, users:
+        SetUp_GamePerspectiveStore(true, users:
         [
             new ValueTuple<string, bool, bool, UserType>(userIds[0], false, !muted, UserType.StoryTeller),
             new ValueTuple<string, bool, bool, UserType>(userIds[1], true, !muted, UserType.StoryTeller)
@@ -157,7 +156,7 @@ public class DiscordGameActionServiceTests
     {
         string[] userIds = ["user1", "user2"];
         const bool muted = false;
-        SetUp_GameStateStore(true, users:
+        SetUp_GamePerspectiveStore(true, users:
         [
             new ValueTuple<string, bool, bool, UserType>(userIds[0], true, !muted, UserType.StoryTeller),
             new ValueTuple<string, bool, bool, UserType>(userIds[1], true, muted, UserType.StoryTeller)
@@ -176,7 +175,7 @@ public class DiscordGameActionServiceTests
     public async Task SetMuteAllPlayersAsync_CallsMutesEachUser(bool muted)
     {
         string[] userIds = ["user1", "user2", "user3"];
-        SetUp_GameStateStore(true, muted, users:
+        SetUp_GamePerspectiveStore(true, muted, users:
         [
             new ValueTuple<string, bool, bool, UserType>(userIds[0], true, !muted, UserType.StoryTeller),
             new ValueTuple<string, bool, bool, UserType>(userIds[1], true, !muted, UserType.StoryTeller),
@@ -232,14 +231,14 @@ public class DiscordGameActionServiceTests
         _players = [];
         _storyTellers = [];
         _cottages = [];
-        (string userId, bool isPresent, bool muted, UserType userType)[]? gameStateUsers = null;
+        (string userId, bool isPresent, bool muted, UserType userType)[]? gamePerspectiveUsers = null;
         if (users is not null)
         {
-            gameStateUsers = [];
-            gameStateUsers = users.Aggregate(gameStateUsers, (current, user) => current.Append((user.userId, true, false, user.userType)).ToArray());
+            gamePerspectiveUsers = [];
+            gamePerspectiveUsers = users.Aggregate(gamePerspectiveUsers, (current, user) => current.Append((user.userId, true, false, user.userType)).ToArray());
         }
 
-        SetUp_GameStateStore(true, users: gameStateUsers);
+        SetUp_GamePerspectiveStore(true, users: gamePerspectiveUsers);
         SetUp_Bot(true);
         _guild.Setup(o => o.GetInVoiceGuildUsers(Array.Empty<string>())).Returns([]);
 
@@ -282,7 +281,7 @@ public class DiscordGameActionServiceTests
     [TestMethod]
     public async Task SendToCottagesAsync_ReturnsError_WhenNoGameFound()
     {
-        SetUp_GameStateStore(false);
+        SetUp_GamePerspectiveStore(false);
 
         var result = await _sut.SendToCottagesAsync(GameId);
 
@@ -294,10 +293,9 @@ public class DiscordGameActionServiceTests
     }
 
     [TestMethod]
-
     public async Task SendToCottagesAsync_ReturnsError_WhenGuildInvalid()
     {
-        SetUp_GameStateStore(true, guildId: "invalid");
+        SetUp_GamePerspectiveStore(true, guildId: "invalid");
 
         var result = await _sut.SendToCottagesAsync(GameId);
 
@@ -307,7 +305,7 @@ public class DiscordGameActionServiceTests
     [TestMethod]
     public async Task SendToCottagesAsync_ReturnsError_WhenGuildNotFound()
     {
-        SetUp_GameStateStore(true);
+        SetUp_GamePerspectiveStore(true);
         SetUp_Bot(false);
 
         var result = await _sut.SendToCottagesAsync(GameId);
@@ -344,7 +342,7 @@ public class DiscordGameActionServiceTests
         Setup_SendToCottagesAsync(cottageCount, users:
         [
             new ValueTuple<string, UserType>("1", UserType.StoryTeller),
-            new ValueTuple<string, UserType>("1", UserType.Player)
+            new ValueTuple<string, UserType>("2", UserType.Player)
         ]);
 
         var result = await _sut.SendToCottagesAsync(GameId);
@@ -393,7 +391,7 @@ public class DiscordGameActionServiceTests
 
     private void Setup_SendToTownSquareAsync(string? townSquareChannelId, bool channelFound, string[]? userIds = null)
     {
-        SetUp_GameStateStore(true);
+        SetUp_GamePerspectiveStore(true);
         SetUp_Bot(true);
 
         _mockDiscordTownManager.Setup(o => o.GetVoiceChannelIdByName(GuildId, TownSquareName)).Returns(townSquareChannelId);
@@ -426,7 +424,7 @@ public class DiscordGameActionServiceTests
     [TestMethod]
     public async Task SendToTownSquareAsync_ReturnsError_WhenNoGameFound()
     {
-        SetUp_GameStateStore(false);
+        SetUp_GamePerspectiveStore(false);
 
         var result = await _sut.SendToTownSquareAsync(GameId);
 
@@ -442,7 +440,7 @@ public class DiscordGameActionServiceTests
     [DataRow("invalid")]
     public async Task SendToTownSquareAsync_ReturnsError_WhenGuildInvalid(string? guildId)
     {
-        SetUp_GameStateStore(true, guildId: guildId);
+        SetUp_GamePerspectiveStore(true, guildId: guildId);
 
         var result = await _sut.SendToTownSquareAsync(GameId);
 
@@ -452,7 +450,7 @@ public class DiscordGameActionServiceTests
     [TestMethod]
     public async Task SendToTownSquareAsync_ReturnsError_WhenGuildNotFound()
     {
-        SetUp_GameStateStore(true);
+        SetUp_GamePerspectiveStore(true);
         SetUp_Bot(false);
 
         var result = await _sut.SendToTownSquareAsync(GameId);

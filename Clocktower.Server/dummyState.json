@@ -1,68 +1,108 @@
 [
   {
-    "Id": "test1",
-    "GuildId": "123456",
-    "MaxPlayers": 0,
-    "Players": [
+    "Id": "test_game_2",
+    "UserId": "",
+    "GuildId": "",
+    "CreatedBy": {
+      "Id": "",
+      "IsPlaying": false,
+      "UserType": 2
+    },
+    "CreatedDate": "2025-12-22T12:38:27.8914317Z",
+    "Users": [
       {
-        "Id": 0,
-        "Name": "Tamzin"
-      },
-      {
-        "Id": 1,
-        "Name": "Joe"
-      },
-      {
-        "Id": 2,
-        "Name": "Mark"
-      },
-      {
-        "Id": 3,
-        "Name": "Jas"
-      },
-      {
-        "Id": 4,
-        "Name": "Krystal"
+        "Id": "",
+        "IsPlaying": false,
+        "UserType": 2
       }
-    ]
+    ],
+    "Players": [],
+    "StoryTellers": [
+      {
+        "Id": "",
+        "IsPlaying": false,
+        "UserType": 2
+      }
+    ],
+    "Spectators": [],
+    "GameTime": 2
   },
   {
-    "Id": "test2",
-    "GuildId": "654321",
-    "MaxPlayers": 8,
+    "Id": "test_game_1",
+    "UserId": "",
+    "GuildId": "",
+    "CreatedBy": {
+      "Id": "",
+      "IsPlaying": false,
+      "UserType": 2
+    },
+    "CreatedDate": "2025-12-22T12:38:20.7032605Z",
+    "Users": [
+      {
+        "Id": "",
+        "IsPlaying": false,
+        "UserType": 2
+      },
+      {
+        "Id": "",
+        "IsPlaying": false,
+        "UserType": 1
+      }
+    ],
     "Players": [
       {
-        "Id": 0,
-        "Name": "Bob"
-      },
-      {
-        "Id": 1,
-        "Name": "Steve"
-      },
-      {
-        "Id": 2,
-        "Name": "Ben"
-      },
-      {
-        "Id": 3,
-        "Name": "Claire"
-      },
-      {
-        "Id": 4,
-        "Name": "Jane"
-      },
-      {
-        "Id": 5,
-        "Name": "Jenny"
-      },
-      {
-        "Id": 6,
-        "Name": "Keith"
-      },
-      {
-        "Id": 7,
-        "Name": "Richard"
+        "Id": "",
+        "IsPlaying": false,
+        "UserType": 1
       }
-    ]
+    ],
+    "StoryTellers": [
+      {
+        "Id": "",
+        "IsPlaying": false,
+        "UserType": 2
+      }
+    ],
+    "Spectators": [],
+    "GameTime": 0
+  },
+  {
+    "Id": "test_game_3",
+    "UserId": "",
+    "GuildId": "",
+    "CreatedBy": {
+      "Id": "",
+      "IsPlaying": false,
+      "UserType": 2
+    },
+    "CreatedDate": "2025-12-22T12:38:29.7962375Z",
+    "Users": [
+      {
+        "Id": "",
+        "IsPlaying": false,
+        "UserType": 2
+      },
+      {
+        "Id": "",
+        "IsPlaying": false,
+        "UserType": 1
+      }
+    ],
+    "Players": [
+      {
+        "Id": "",
+        "IsPlaying": false,
+        "UserType": 1
+      }
+    ],
+    "StoryTellers": [
+      {
+        "Id": "",
+        "IsPlaying": false,
+        "UserType": 2
+      }
+    ],
+    "Spectators": [],
+    "GameTime": 3
   }
 ]

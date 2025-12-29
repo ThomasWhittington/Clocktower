@@ -1,4 +1,5 @@
-﻿using Clocktower.Server.Data.Wrappers;
+﻿using Clocktower.Server.Data.Dto;
+using Clocktower.Server.Data.Wrappers;
 
 namespace Clocktower.Server.Common.Services;
 
@@ -11,5 +12,9 @@ public interface IDiscordTownManager
     string? GetVoiceChannelIdByName(string guildId, string voiceChannelName);
     TownUser? GetTownUser(string userId);
     IEnumerable<MiniChannel> GetNightChannels(string guildId, string categoryName);
+    DiscordTownDto? GetDiscordTownDto(string guildId, string gameId, IEnumerable<GameUser>? gameUsers = null);
+    DiscordTownDto? GetDiscordTownDto(DiscordTown? discordTown, string gameId, IEnumerable<GameUser>? gameUsers = null);
     DiscordTownDto RedactTownDto(DiscordTownDto discordTownDto, string userId);
+    bool SetDiscordTown(string guildId, DiscordTown discordTown);
+    void UpdateUserIdentity(TownUser townUser);
 }

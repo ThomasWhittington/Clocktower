@@ -4,16 +4,13 @@
 public class GetGames : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapGet("/", Handle)
+        .MapGet("/all", Handle)
         .SetOpenApiOperationId<GetGames>()
-        .WithSummaryAndDescription("Gets all games, optionally filtered by guildId");
+        .WithSummaryAndDescription("Gets all games perspectives");
 
-    internal static Ok<IEnumerable<GameState>> Handle([FromServices] IGameStateService gameStateService, [FromQuery] string? guildId)
+    internal static Ok<IEnumerable<GamePerspective>> Handle([FromServices] IGamePerspectiveService gamePerspectiveService)
     {
-        var games = string.IsNullOrWhiteSpace(guildId)
-            ? gameStateService.GetGames()
-            : gameStateService.GetGuildGames(guildId);
-
+        var games = gamePerspectiveService.GetGames();
         return TypedResults.Ok(games);
     }
 }

@@ -1,40 +1,12 @@
-﻿import {
-    useEffect,
-    useRef,
-    useState
-} from 'react';
-import * as signalR
-    from '@microsoft/signalr';
-import {
-    HubConnectionState
-} from '@microsoft/signalr';
-import {
-    type DiscordTown,
-    GameTime,
-    TimerStatus,
-    type VoiceState
-} from '@/types';
-import {
-    useAppStore
-} from "@/store";
+﻿import {useEffect, useRef, useState} from 'react';
+import * as signalR from '@microsoft/signalr';
+import {HubConnectionState} from '@microsoft/signalr';
+import {DiscordTown, GameTime, type SessionSyncState, type TimerState, type VoiceState} from '@/types';
+import {useAppStore} from "@/store";
 
 type UserPresenceStates = Record<string, boolean>;
 type UserVoiceStates = Record<string, VoiceState>;
 
-export type TimerState = {
-    gameId: string;
-    status: TimerStatus;
-    serverNowUtc: string;
-    endUtc?: string | null;
-    label?: string | null;
-};
-
-export type SessionSyncState = {
-    gameTime: GameTime,
-    jwt: string,
-    discordTown?: DiscordTown;
-    timer?: TimerState;
-};
 type HubState = {
     discordTown?: DiscordTown;
     userPresenceStates: UserPresenceStates;
@@ -44,7 +16,6 @@ type HubState = {
     timer?: TimerState;
 };
 
-let joinedGameId: string | null = null;
 let globalConnection: signalR.HubConnection | null = null;
 let globalState: HubState = {
     userPresenceStates: {},
@@ -75,6 +46,30 @@ export const resetHubState = () => {
     };
     notifyListeners();
 };
+
+let currentJwtContent: string | null = null;
+const handleJoinSnapshot = async (snapshot: SessionSyncState, isReconnecting: boolean) => {
+    const {setJwt} = useAppStore.getState();
+    setState({
+        gameTime: snapshot.gameTime,
+        discordTown: snapshot.discordTown ? new DiscordTown(snapshot.discordTown) : undefined,
+        timer: snapshot.timer
+    });
+
+    const currentJwt = useAppStore.getState().jwt;
+    if (snapshot.jwt !== currentJwt) {
+        const jwtChanged = hasJwtMeaningfullyChanged(currentJwtContent, snapshot.jwt);
+        setJwt(snapshot.jwt);
+        currentJwtContent = snapshot.jwt;
+
+        if (jwtChanged && !isReconnecting) {
+            console.log('JWT content changed, reconnecting...');
+            joinPromise = null;
+            await handleJwtUpdate();
+            return;
+        }
+    }
+}
 const isConnected = (connection: signalR.HubConnection | null): connection is signalR.HubConnection => {
     return connection !== null && connection.state === HubConnectionState.Connected;
 };
@@ -94,22 +89,29 @@ const createConnection = async () => {
         .build();
 
     globalConnection.on('DiscordTownUpdated', (discordTown: DiscordTown) => {
-        console.log(`🏪 Received DiscordTownUpdated for game ${joinedGameId}:`, discordTown);
-        setState({discordTown: discordTown});
+        const {joinedGameId} = useAppStore.getState();
+        if (discordTown.gameId !== joinedGameId) return;
+        console.log(`🏪 Received DiscordTownUpdated for game ${discordTown.gameId}:`, discordTown);
+        setState({discordTown: new DiscordTown(discordTown)});
     });
 
-    globalConnection.on('TownTimeChanged', (gameTime: number) => {
-        console.log(`⏰ Received TownTimeChanged for game ${joinedGameId}: ${gameTime}`);
+    globalConnection.on('TownTimeChanged', (gameId: string, gameTime: number) => {
+        const {joinedGameId} = useAppStore.getState();
+        if (gameId !== joinedGameId) return;
+        console.log(`⏰ Received TownTimeChanged for game ${gameId}: ${gameTime}`);
         setState({gameTime: gameTime as GameTime});
     });
 
     globalConnection.on('TimerUpdated', (timer: TimerState) => {
-        console.log(`⏱️ Received TimerUpdated for game ${joinedGameId}:`, timer);
+        const {joinedGameId} = useAppStore.getState();
+        if (timer.gameId !== joinedGameId) return;
+        console.log(`⏱️ Received TimerUpdated for game ${timer.gameId}:`, timer);
         setState({timer});
     });
 
     globalConnection.on('PingUser', (message: string) => {
-        console.log(`🏓 Received ping for game ${joinedGameId}: ${message}`);
+        const {joinedGameId} = useAppStore.getState();
+        console.log(`🏓 Received ping for game ${joinedGameId ?? 'UNKNOWN'}: ${message}`);
     });
 
     globalConnection.onclose(() => setState({connectionState: signalR.HubConnectionState.Disconnected}));
@@ -127,19 +129,19 @@ const createConnection = async () => {
 
 export const handleJwtUpdate = async () => {
     if (isConnected(globalConnection)) {
+        const {gameId, joinedGameId} = useAppStore.getState();
+        const targetGameId = gameId || joinedGameId;
+
         await globalConnection.stop();
         globalConnection = null;
-        joinedGameId = null;
 
         await createConnection();
 
-        const {gameId} = useAppStore.getState();
-        if (gameId && isConnected(globalConnection)) {
-            await joinGameGroup(gameId);
+        if (targetGameId && isConnected(globalConnection)) {
+            await joinGameGroup(targetGameId, true);
         }
     }
 };
-
 const hasJwtMeaningfullyChanged = (oldJwt: string | null, newJwt: string): boolean => {
     if (!oldJwt) return true;
 
@@ -161,8 +163,6 @@ const hasJwtMeaningfullyChanged = (oldJwt: string | null, newJwt: string): boole
         return true;
     }
 };
-let currentJwtContent: string | null = null;
-
 export const useServerHub = () => {
     const [state, setState] = useState<HubState>(globalState);
     const listenerRef = useRef<(state: HubState) => void>(null);
@@ -183,7 +183,7 @@ export const useServerHub = () => {
                 await createConnection();
 
                 if (gameId && isConnected(globalConnection)) {
-                    await joinGameGroup(gameId);
+                    await joinGameGroup(gameId, false, true);
                 } else if (!gameId) {
                     console.warn('Failed to join game signals: no gameId');
                 }
@@ -193,18 +193,6 @@ export const useServerHub = () => {
         return () => {
             if (listenerRef.current) {
                 globalListeners.delete(listenerRef.current);
-            }
-
-            if (globalListeners.size === 0) {
-                setTimeout(() => {
-                    if (globalListeners.size === 0 && globalConnection) {
-                        globalConnection.stop();
-                        globalConnection = null;
-                        joinedGameId = null;
-                        initializedRef.current = false;
-                        joinPromise = null;
-                    }
-                }, 100);
             }
         };
     }, []);
@@ -224,68 +212,62 @@ export const useServerHub = () => {
 
 let joinPromise: Promise<void> | null = null;
 
-export const joinGameGroup = async (gameId: string): Promise<void> => {
+export const joinGameGroup = async (gameId: string, isReconnecting: boolean = false, isInitialMount: boolean = false): Promise<void> => {
+    const {setJoinedGameId, currentUser} = useAppStore.getState();
 
     if (joinPromise) {
         await joinPromise;
-        if (joinedGameId === gameId) {
-            return;
-        }
     }
+    if (!currentUser) {
+        console.error('Cannot join game: user not authenticated');
+        return;
+    }
+    const currentJoinedId = useAppStore.getState().joinedGameId;
 
-    const {
-        setJwt,
-        currentUser
-    } = useAppStore.getState();
+    if (currentJoinedId === gameId && isConnected(globalConnection) && !isReconnecting && !isInitialMount) {
+        console.log(`Already in game ${gameId}, skipping join.`);
+        return;
+    }
 
     if (!isConnected(globalConnection)) {
         return;
     }
-
     joinPromise = (async () => {
+        const previousState = {
+            discordTown: globalState.discordTown,
+            timer: globalState.timer,
+            userPresenceStates: globalState.userPresenceStates,
+            userVoiceStates: globalState.userVoiceStates
+        };
         try {
-            if (joinedGameId && joinedGameId !== gameId) {
-                console.log(`Leaving game : ${joinedGameId}`);
-                try {
-                    await globalConnection.invoke('LeaveGameGroup', joinedGameId);
-                    console.log(`Successfully left game : ${joinedGameId}`);
-                } catch (error) {
-                    console.error(`Failed to leave game ${joinedGameId}:`, error);
-                }
-            }
+            const {joinedGameId: latestId} = useAppStore.getState();
 
-            console.log(`Calling join game : ${gameId}`);
-            const snapshot = await globalConnection.invoke<SessionSyncState | null>('JoinGameGroup', gameId, currentUser?.id);
-            joinedGameId = gameId;
+
+            setState({
+                discordTown: undefined,
+                timer: undefined,
+                userPresenceStates: {},
+                userVoiceStates: {}
+            });
+            console.log(`Calling join game : ${gameId} (leaving ${latestId})`);
+            const snapshot = await globalConnection.invoke<SessionSyncState | null>(
+                'JoinGameGroup',
+                gameId,
+                currentUser.id,
+                latestId
+            );
+
+            setJoinedGameId(gameId);
+
             console.log(`Successfully joined game : ${gameId}`);
 
             if (snapshot) {
-                setState({
-                    gameTime: snapshot.gameTime,
-                    discordTown: snapshot.discordTown,
-                    timer: snapshot.timer
-                });
-
-                const currentJwt = useAppStore.getState().jwt;
-                if (snapshot.jwt !== currentJwt) {
-                    const jwtChanged = hasJwtMeaningfullyChanged(currentJwtContent, snapshot.jwt);
-                    setJwt(snapshot.jwt);
-
-                    if (jwtChanged) {
-                        console.log('JWT content changed, reconnecting...');
-                        currentJwtContent = snapshot.jwt;
-                        joinPromise = null;
-                        await handleJwtUpdate();
-                        return;
-                    } else {
-                        console.log('JWT expiration updated, no reconnection needed');
-                        currentJwtContent = snapshot.jwt;
-                    }
-                }
+                await handleJoinSnapshot(snapshot, isReconnecting);
             }
         } catch (error) {
             console.error(`Failed to join game ${gameId}:`, error);
-            joinedGameId = null;
+            setJoinedGameId(null);
+            setState(previousState);
             throw error;
         }
     })();
@@ -295,12 +277,4 @@ export const joinGameGroup = async (gameId: string): Promise<void> => {
     } finally {
         joinPromise = null;
     }
-};
-
-export const leaveGameGroup = async (gameId: string) => {
-    if (!globalConnection || globalConnection.state !== HubConnectionState.Connected) {
-        return;
-    }
-    await globalConnection.invoke('LeaveGameGroup', gameId);
-    joinedGameId = null;
 };

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Clocktower.Server.Data;
+namespace Clocktower.Server.Data.Dto;
 
 [UsedImplicitly, ExcludeFromCodeCoverage(Justification = "DTO")]
 public record ChannelOccupantsDto(MiniChannel Channel, IEnumerable<UserDto> Occupants);

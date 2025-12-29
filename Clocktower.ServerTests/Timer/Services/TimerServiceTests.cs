@@ -8,7 +8,7 @@ namespace Clocktower.ServerTests.Timer.Services;
 public class TimerServiceTests
 {
     private Mock<ITimerCoordinator> _mockTimerCoordinator = null!;
-    private Mock<IGameStateStore> _mockGameStateStore = null!;
+    private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
     private ITimerService _sut = null!;
     private CancellationToken _ct;
     private const string GameId = "game-id";
@@ -18,13 +18,13 @@ public class TimerServiceTests
     {
         _ct = CancellationToken.None;
         _mockTimerCoordinator = StrictMockFactory.Create<ITimerCoordinator>();
-        _mockGameStateStore = StrictMockFactory.Create<IGameStateStore>();
-        _sut = new TimerService(_mockTimerCoordinator.Object, _mockGameStateStore.Object);
+        _mockGamePerspectiveStore = StrictMockFactory.Create<IGamePerspectiveStore>();
+        _sut = new TimerService(_mockTimerCoordinator.Object, _mockGamePerspectiveStore.Object);
     }
 
     private void Setup_GameStore(bool gameExists)
     {
-        _mockGameStateStore.Setup(o => o.GameExists(GameId)).Returns(gameExists);
+        _mockGamePerspectiveStore.Setup(o => o.GameExists(GameId)).Returns(gameExists);
     }
 
     #region GetTimer

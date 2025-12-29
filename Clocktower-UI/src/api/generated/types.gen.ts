@@ -28,30 +28,45 @@ export type ClocktowerServerCommonTypesTimerState = {
 
 export type ClocktowerServerCommonTypesTimerStatus = 'None' | 'Running' | 'Cancelled' | 'Finished';
 
-export type ClocktowerServerDataChannelOccupantsDto = {
+export type ClocktowerServerDataDtoChannelOccupantsDto = {
     channel?: ClocktowerServerDataMiniChannel;
-    occupants?: Array<ClocktowerServerDataUserDto> | null;
+    occupants?: Array<ClocktowerServerDataDtoUserDto> | null;
 };
 
-export type ClocktowerServerDataDiscordTownDto = {
+export type ClocktowerServerDataDtoDiscordTownDto = {
     gameId?: string | null;
-    channelCategories?: Array<ClocktowerServerDataMiniCategoryDto> | null;
-    readonly userCount?: number;
-    readonly townUsers?: Array<ClocktowerServerDataUserDto> | null;
+    channelCategories?: Array<ClocktowerServerDataDtoMiniCategoryDto> | null;
+    readonly townUsers?: Array<ClocktowerServerDataDtoUserDto> | null;
+    gameUsers?: Array<ClocktowerServerDataDtoUserDto> | null;
 };
 
-export type ClocktowerServerDataGameState = {
+export type ClocktowerServerDataDtoMiniCategoryDto = {
     id?: string | null;
+    name?: string | null;
+    channels?: Array<ClocktowerServerDataDtoChannelOccupantsDto> | null;
+};
+
+export type ClocktowerServerDataDtoUserDto = {
+    id?: string | null;
+    name?: string | null;
+    avatarUrl?: string | null;
+    voiceState?: ClocktowerServerDataVoiceState;
+    isPresent?: boolean;
+    isPlaying?: boolean;
+    userType?: ClocktowerServerDataTypesEnumUserType;
+};
+
+export type ClocktowerServerDataGamePerspective = {
+    id?: string | null;
+    userId?: string | null;
     guildId?: string | null;
+    createdBy?: ClocktowerServerDataGameUser;
+    createdDate?: Date;
     users?: Array<ClocktowerServerDataGameUser> | null;
     readonly players?: Array<ClocktowerServerDataGameUser> | null;
     readonly storyTellers?: Array<ClocktowerServerDataGameUser> | null;
     readonly spectators?: Array<ClocktowerServerDataGameUser> | null;
-    maxPlayers?: number;
-    createdBy?: ClocktowerServerDataGameUser;
-    createdDate?: Date;
     gameTime?: ClocktowerServerDataTypesEnumGameTime;
-    readonly isFull?: boolean;
 };
 
 export type ClocktowerServerDataGameUser = {
@@ -60,18 +75,12 @@ export type ClocktowerServerDataGameUser = {
     userType?: ClocktowerServerDataTypesEnumUserType;
 };
 
-export type ClocktowerServerDataMiniCategoryDto = {
-    id?: string | null;
-    name?: string | null;
-    channels?: Array<ClocktowerServerDataChannelOccupantsDto> | null;
-};
-
 export type ClocktowerServerDataMiniChannel = {
     id?: string | null;
     name?: string | null;
 };
 
-export type ClocktowerServerDataMiniGameState = {
+export type ClocktowerServerDataMiniGamePerspective = {
     gameId?: string | null;
     createdBy?: ClocktowerServerDataGameUser;
     createdDate?: Date;
@@ -115,16 +124,6 @@ export type ClocktowerServerDataTypesRoleRole = {
 export type ClocktowerServerDataUserAuthData = {
     townUser?: ClocktowerServerDataTownUser;
     jwt?: string | null;
-};
-
-export type ClocktowerServerDataUserDto = {
-    id?: string | null;
-    name?: string | null;
-    avatarUrl?: string | null;
-    voiceState?: ClocktowerServerDataVoiceState;
-    isPresent?: boolean;
-    isPlaying?: boolean;
-    userType?: ClocktowerServerDataTypesEnumUserType;
 };
 
 export type ClocktowerServerDataVoiceState = {
@@ -177,18 +176,19 @@ export type MicrosoftAspNetCoreHttpHttpValidationProblemDetails = {
     } | null | undefined;
 };
 
-export type ClocktowerServerDataDiscordTownDtoWritable = {
+export type ClocktowerServerDataDtoDiscordTownDtoWritable = {
     gameId?: string | null;
-    channelCategories?: Array<ClocktowerServerDataMiniCategoryDto> | null;
+    channelCategories?: Array<ClocktowerServerDataDtoMiniCategoryDto> | null;
+    gameUsers?: Array<ClocktowerServerDataDtoUserDto> | null;
 };
 
-export type ClocktowerServerDataGameStateWritable = {
+export type ClocktowerServerDataGamePerspectiveWritable = {
     id?: string | null;
+    userId?: string | null;
     guildId?: string | null;
-    users?: Array<ClocktowerServerDataGameUser> | null;
-    maxPlayers?: number;
     createdBy?: ClocktowerServerDataGameUser;
     createdDate?: Date;
+    users?: Array<ClocktowerServerDataGameUser> | null;
     gameTime?: ClocktowerServerDataTypesEnumGameTime;
 };
 
@@ -563,7 +563,7 @@ export type GetDiscordTownApiResponses = {
     /**
      * OK
      */
-    200: ClocktowerServerDataDiscordTownDto;
+    200: ClocktowerServerDataDtoDiscordTownDto;
 };
 
 export type GetDiscordTownApiResponse = GetDiscordTownApiResponses[keyof GetDiscordTownApiResponses];
@@ -759,7 +759,7 @@ export type DeleteGameApiResponses = {
     200: unknown;
 };
 
-export type GetGameApiData = {
+export type GetGamePerspectivesApiData = {
     body?: never;
     path: {
         gameId: string;
@@ -768,38 +768,36 @@ export type GetGameApiData = {
     url: '/api/games/{gameId}';
 };
 
-export type GetGameApiErrors = {
+export type GetGamePerspectivesApiErrors = {
     /**
      * Not Found
      */
     404: string;
 };
 
-export type GetGameApiError = GetGameApiErrors[keyof GetGameApiErrors];
+export type GetGamePerspectivesApiError = GetGamePerspectivesApiErrors[keyof GetGamePerspectivesApiErrors];
 
-export type GetGameApiResponses = {
+export type GetGamePerspectivesApiResponses = {
     /**
      * OK
      */
-    200: ClocktowerServerDataGameState;
+    200: Array<ClocktowerServerDataGamePerspective>;
 };
 
-export type GetGameApiResponse = GetGameApiResponses[keyof GetGameApiResponses];
+export type GetGamePerspectivesApiResponse = GetGamePerspectivesApiResponses[keyof GetGamePerspectivesApiResponses];
 
 export type GetGamesApiData = {
     body?: never;
     path?: never;
-    query?: {
-        guildId?: string;
-    };
-    url: '/api/games';
+    query?: never;
+    url: '/api/games/all';
 };
 
 export type GetGamesApiResponses = {
     /**
      * OK
      */
-    200: Array<ClocktowerServerDataGameState>;
+    200: Array<ClocktowerServerDataGamePerspective>;
 };
 
 export type GetGamesApiResponse = GetGamesApiResponses[keyof GetGamesApiResponses];
@@ -817,7 +815,7 @@ export type GetPlayerGamesApiResponses = {
     /**
      * OK
      */
-    200: Array<ClocktowerServerDataMiniGameState>;
+    200: Array<ClocktowerServerDataMiniGamePerspective>;
 };
 
 export type GetPlayerGamesApiResponse = GetPlayerGamesApiResponses[keyof GetPlayerGamesApiResponses];
@@ -900,7 +898,7 @@ export type StartGameApiResponses = {
     /**
      * Created
      */
-    201: ClocktowerServerDataGameState;
+    201: ClocktowerServerDataGamePerspective;
 };
 
 export type StartGameApiResponse = StartGameApiResponses[keyof StartGameApiResponses];

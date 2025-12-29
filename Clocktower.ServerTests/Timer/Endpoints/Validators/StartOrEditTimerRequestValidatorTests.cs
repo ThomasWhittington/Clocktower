@@ -1,8 +1,7 @@
-﻿using Clocktower.Server.Game.Endpoints;
-using Clocktower.Server.Timer.Endpoints;
+﻿using Clocktower.Server.Timer.Endpoints;
 using FluentValidation.TestHelper;
 
-namespace Clocktower.ServerTests.Game.Endpoints.Validators;
+namespace Clocktower.ServerTests.Timer.Endpoints.Validators;
 
 [TestClass]
 public class StartOrEditTimerRequestValidatorTests
@@ -24,14 +23,14 @@ public class StartOrEditTimerRequestValidatorTests
 
         result.ShouldNotHaveAnyValidationErrors();
     }
-    
+
     [TestMethod]
     public void Validate_ShouldHaveErrors_WhenDurationIs0()
     {
         var request = new StartOrEditTimer.Request(0, null);
-        
+
         var result = _validator.TestValidate(request);
-        
+
         result.ShouldHaveValidationErrorFor(x => x.DurationSeconds)
             .WithErrorMessage("'Duration Seconds' must be greater than '0'.");
     }

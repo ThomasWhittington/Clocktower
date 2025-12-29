@@ -7,12 +7,12 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class SetTimeTests
 {
-    private Mock<IGameStateService> _mockGameStateService = null!;
+    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
 
     [TestInitialize]
     public void SetUp()
     {
-        _mockGameStateService = new Mock<IGameStateService>();
+        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
     }
 
     [TestMethod]
@@ -26,7 +26,7 @@ public class SetTimeTests
             .ShouldHaveMethod(HttpMethod.Post)
             .ShouldHaveOperationId("setTimeApi")
             .ShouldHaveSummary("Sets the time of the town")
-            .ShouldHaveDescription("Sets the game state of the town based on the day time");
+            .ShouldHaveDescription("Sets the game perspective of the town based on the day time");
     }
 
     [TestMethod]
@@ -35,11 +35,11 @@ public class SetTimeTests
         const string responseMessage = "response message";
         var request = new SetTime.Request(CommonMethods.GetRandomString(), GameTime.Day);
 
-        _mockGameStateService.Setup(o => o.SetTime(request.GameId.Trim(), request.GameTime)).ReturnsAsync((false, responseMessage));
+        _mockGamePerspectiveService.Setup(o => o.SetTime(request.GameId.Trim(), request.GameTime)).ReturnsAsync((false, responseMessage));
 
-        var result = await SetTime.Handle(request, _mockGameStateService.Object);
+        var result = await SetTime.Handle(request, _mockGamePerspectiveService.Object);
 
-        _mockGameStateService.Verify(o => o.SetTime(request.GameId.Trim(), request.GameTime), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.SetTime(request.GameId.Trim(), request.GameTime), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
@@ -52,11 +52,11 @@ public class SetTimeTests
         const string responseMessage = "response message";
         var request = new SetTime.Request(CommonMethods.GetRandomString(), GameTime.Day);
 
-        _mockGameStateService.Setup(o => o.SetTime(request.GameId.Trim(), request.GameTime)).ReturnsAsync((true, responseMessage));
+        _mockGamePerspectiveService.Setup(o => o.SetTime(request.GameId.Trim(), request.GameTime)).ReturnsAsync((true, responseMessage));
 
-        var result = await SetTime.Handle(request, _mockGameStateService.Object);
+        var result = await SetTime.Handle(request, _mockGamePerspectiveService.Object);
 
-        _mockGameStateService.Verify(o => o.SetTime(request.GameId.Trim(), request.GameTime), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.SetTime(request.GameId.Trim(), request.GameTime), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);

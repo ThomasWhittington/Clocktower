@@ -1,34 +1,34 @@
-﻿import type {
-    ClocktowerServerDataDiscordTownDto
-} from "@/api";
+﻿import {type MiniCategory} from "./miniCategory.ts";
+import {type User, UserType} from "@/types";
 
-import {
-    mapToMiniCategory,
-    type MiniCategory
-} from "./miniCategory.ts";
-import type {
-    User
-} from "@/types";
-
-export type DiscordTown = {
+export class DiscordTown {
     readonly gameId: string;
-    readonly userCount: number;
+    readonly townUsers: User[];
+    readonly gameUsers: User[];
     channelCategories: MiniCategory[];
-}
 
-export function mapToDiscordTown(apiDiscordTown: ClocktowerServerDataDiscordTownDto): DiscordTown {
-    const channelCategories = (apiDiscordTown.channelCategories ?? [])
-        .map(channelCategory => mapToMiniCategory(channelCategory));
+    constructor(data: Partial<DiscordTown>) {
+        this.gameId = data.gameId ?? '';
+        this.townUsers = data.townUsers ?? [];
+        this.gameUsers = data.gameUsers ?? [];
+        this.channelCategories = data.channelCategories ?? [];
+    }
 
-    return {
-        gameId: apiDiscordTown.gameId ?? '',
-        userCount: apiDiscordTown.userCount ?? 0,
-        channelCategories: channelCategories
-    };
+    get players(): User[] {
+        return this.gameUsers.filter(u => u.userType === UserType.Player) ?? [];
+    }
+
+    get storyTellers(): User[] {
+        return this.gameUsers.filter(u => u.userType === UserType.StoryTeller) ?? [];
+    }
+
+    get spectators(): User[] {
+        return this.gameUsers.filter(u => u.userType === UserType.Spectator) ?? [];
+    }
 }
 
 export function findGameUserById(discordTown?: DiscordTown, userId?: string): User | undefined {
-    if(!discordTown || !userId) return undefined;
+    if (!discordTown || !userId) return undefined;
     for (const category of discordTown.channelCategories) {
         for (const channelOccupant of category.channels) {
             const user = channelOccupant.occupants.find(occupant => occupant.id === userId);

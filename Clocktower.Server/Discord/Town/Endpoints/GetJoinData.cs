@@ -13,11 +13,11 @@ public class GetJoinData : IEndpoint
             .WithDescription("Retrieves temporary join data by key");
     }
 
-    internal static Results<Ok<JoinData>, NotFound> Handle(
+    internal static async Task<Results<Ok<JoinData>, NotFound>> Handle(
         string key,
         [FromServices] IDiscordTownService discordTownService)
     {
-        var joinData = discordTownService.GetJoinData(key);
+        var joinData = await discordTownService.GetJoinData(key);
         return joinData != null ? TypedResults.Ok(joinData) : TypedResults.NotFound();
     }
 }

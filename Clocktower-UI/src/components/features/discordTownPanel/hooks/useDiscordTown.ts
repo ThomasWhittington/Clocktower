@@ -1,17 +1,7 @@
-﻿import {
-    useEffect,
-    useRef,
-    useState
-} from 'react';
-import {
-    useAppStore
-} from '@/store';
-import {
-    useServerHub
-} from "@/hooks";
-import type {
-    DiscordTown
-} from '@/types';
+﻿import {useEffect, useRef, useState} from 'react';
+import {useAppStore} from '@/store';
+import {useServerHub} from "@/hooks";
+import {DiscordTown} from '@/types';
 
 type DiscordTownState = {
     discordTown?: DiscordTown;
@@ -65,7 +55,7 @@ export const useDiscordTown = () => {
 
     useEffect(() => {
         if (realtimeDiscordTown) {
-            setTownState({discordTown: realtimeDiscordTown});
+            setTownState({discordTown: new DiscordTown(realtimeDiscordTown)});
         }
     }, [realtimeDiscordTown]);
 

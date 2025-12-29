@@ -39,11 +39,11 @@ public class InviteUserTests
     {
         const string responseMessage = "response message";
         var request = new GameAndUserRequest(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId());
-        _mockDiscordTownService.Setup(o => o.InviteUser(request.GameId.Trim(), request.UserId)).ReturnsAsync((inviteUserOutcome, responseMessage));
+        _mockDiscordTownService.Setup(o => o.InviteUser(request.GameId.Trim(), request.UserId, true)).ReturnsAsync((inviteUserOutcome, responseMessage));
 
         var result = await InviteUser.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.InviteUser(request.GameId.Trim(), request.UserId), Times.Once);
+        _mockDiscordTownService.Verify(o => o.InviteUser(request.GameId.Trim(), request.UserId, true), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
@@ -57,11 +57,11 @@ public class InviteUserTests
     {
         const string responseMessage = "response message";
         var request = new GameAndUserRequest(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId());
-        _mockDiscordTownService.Setup(o => o.InviteUser(request.GameId.Trim(), request.UserId)).ReturnsAsync((inviteUserOutcome, responseMessage));
+        _mockDiscordTownService.Setup(o => o.InviteUser(request.GameId.Trim(), request.UserId, true)).ReturnsAsync((inviteUserOutcome, responseMessage));
 
         var result = await InviteUser.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.InviteUser(request.GameId.Trim(), request.UserId), Times.Once);
+        _mockDiscordTownService.Verify(o => o.InviteUser(request.GameId.Trim(), request.UserId, true), Times.Once);
 
         var response = result.Result.Should().BeOfType<NotFound<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
@@ -72,12 +72,12 @@ public class InviteUserTests
     public async Task Handle_ReturnsOk_WhenServiceSendsInvite()
     {
         const string responseMessage = "response message";
-        var request = new GameAndUserRequest(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId());
-        _mockDiscordTownService.Setup(o => o.InviteUser(request.GameId.Trim(), request.UserId)).ReturnsAsync((InviteUserOutcome.InviteSent, responseMessage));
+        var request = new GameAndUserRequest("test1", CommonMethods.GetRandomSnowflakeStringId());
+        _mockDiscordTownService.Setup(o => o.InviteUser(request.GameId.Trim(), request.UserId, false)).ReturnsAsync((InviteUserOutcome.InviteSent, responseMessage));
 
         var result = await InviteUser.Handle(request, _mockDiscordTownService.Object);
 
-        _mockDiscordTownService.Verify(o => o.InviteUser(request.GameId.Trim(), request.UserId), Times.Once);
+        _mockDiscordTownService.Verify(o => o.InviteUser(request.GameId.Trim(), request.UserId, false), Times.Once);
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);
         response.Value.Should().Be(responseMessage);

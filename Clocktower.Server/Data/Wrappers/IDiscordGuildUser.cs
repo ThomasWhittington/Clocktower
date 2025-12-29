@@ -20,6 +20,6 @@ public interface IDiscordGuildUser
     Task AddRoleAsync(IDiscordRole role);
     bool DoesUserHaveRole(string roleId);
     Task SetIsServerMuted(bool isMuted);
-    GameUser AsGameUser(GameState? gameState = null);
+    GameUser AsGameUser(GamePerspective? gamePerspective = null);
     TownUser AsTownUser();
 }

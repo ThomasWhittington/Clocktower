@@ -2,26 +2,25 @@
 
 namespace Clocktower.Server.Socket.Services;
 
-public class HubStateManager(IGameStateStore gameStateStore, IDiscordTownManager discordTownManager, IJwtWriter jwtWriter, ITimerCoordinator timerCoordinator) : IHubStateManager
+public class HubStateManager(IGamePerspectiveStore gamePerspectiveStore, IDiscordTownManager discordTownManager, IJwtWriter jwtWriter, ITimerCoordinator timerCoordinator) : IHubStateManager
 {
     public SessionSyncState? GetState(string gameId, string userId)
     {
-        var currentGameState = gameStateStore.Get(gameId);
-        var gameUser = currentGameState?.GetUser(userId);
-        if (currentGameState is null || gameUser is null) return null;
-        var discordTown = discordTownManager.GetDiscordTown(currentGameState.GuildId);
-        var enhancedTown = discordTown?.ToDiscordTownDto(currentGameState.Id, currentGameState.Users);
+        var currentPerspective = gamePerspectiveStore.Get(gameId, userId);
+        var gameUser = currentPerspective?.GetUser(userId);
+        if (currentPerspective is null || gameUser is null) return null;
+        var discordTown = discordTownManager.GetDiscordTownDto(currentPerspective.GuildId, currentPerspective.Id, currentPerspective.Users);
 
-        if (enhancedTown != null && gameUser.UserType == UserType.Player)
-            enhancedTown = discordTownManager.RedactTownDto(enhancedTown, userId);
+        if (discordTown != null && gameUser.UserType == UserType.Player)
+            discordTown = discordTownManager.RedactTownDto(discordTown, userId);
 
         var timer = timerCoordinator.Get(gameId);
 
         var currentState = new SessionSyncState
         {
-            GameTime = currentGameState.GameTime,
+            GameTime = currentPerspective.GameTime,
             Jwt = jwtWriter.GetJwtToken(gameUser),
-            DiscordTown = enhancedTown,
+            DiscordTown = discordTown,
             Timer = timer
         };
         return currentState;

@@ -15,10 +15,11 @@ public class InviteUser : IEndpoint
 
     internal static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle(
         [AsParameters] GameAndUserRequest request,
-       [FromServices] IDiscordTownService discordTownService)
+        [FromServices] IDiscordTownService discordTownService)
     {
         var gameId = request.GameId.Trim();
-        var (outcome, message) = await discordTownService.InviteUser(gameId, request.UserId);
+        bool sendInvite = !gameId.StartsWith("test");
+        var (outcome, message) = await discordTownService.InviteUser(gameId, request.UserId, sendInvite);
 
         switch (outcome)
         {
