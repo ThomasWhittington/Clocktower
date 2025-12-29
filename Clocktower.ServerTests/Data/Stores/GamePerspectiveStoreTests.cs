@@ -279,7 +279,7 @@ public class GamePerspectiveStoreTests
 
         var result = _sut.UpdateUser(GameId1, UserId1);
 
-        result.Should().BeTrue();
+        result.Should().BeFalse();
         _sut.Get(GameId1, UserId1)!.Users.Should().Contain(user);
         _sut.Get(GameId1, UserId2)!.Users.Should().Contain(user);
     }
@@ -294,7 +294,7 @@ public class GamePerspectiveStoreTests
 
         var result = _sut.UpdateUser(GameId1, UserId3, userType: user.UserType, isPlaying: user.IsPlaying);
 
-        result.Should().BeTrue();
+        result.Should().BeFalse();
         _sut.Get(GameId1, UserId1)!.Users.Should().Contain(user);
         _sut.Get(GameId1, UserId2)!.Users.Should().Contain(user);
     }
@@ -306,6 +306,7 @@ public class GamePerspectiveStoreTests
         _sut.Set(_game1 with { UserId = UserId1 });
         _sut.Set(_game1 with { UserId = UserId2 });
         var user = CommonMethods.GetRandomGameUser(UserId3);
+        if (userType == UserType.Unknown) user = user with { UserType = UserType.Player };
         _sut.AddUserToGame(GameId1, user);
 
         var result = _sut.UpdateUser(GameId1, UserId3, userType: userType);
@@ -322,7 +323,7 @@ public class GamePerspectiveStoreTests
     {
         _sut.Set(_game1 with { UserId = UserId1 });
         _sut.Set(_game1 with { UserId = UserId2 });
-        var user = CommonMethods.GetRandomGameUser(UserId3);
+        var user = CommonMethods.GetRandomGameUser(UserId3) with { IsPlaying = !isPlaying };
         _sut.AddUserToGame(GameId1, user);
 
         var result = _sut.UpdateUser(GameId1, UserId3, isPlaying: isPlaying);

@@ -55,16 +55,12 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         var existingPerspective = GetFirstPerspective(gameId);
         if (existingPerspective is null) return;
 
-        if (!_store.ContainsKey((gameId, gameUser.Id)))
+        var newUserPerspective = existingPerspective with
         {
-            var newUserPerspective = existingPerspective with
-            {
-                UserId = gameUser.Id,
-                Users = existingPerspective.Users.Select(ToPublicUser).Append(gameUser).ToList()
-            };
-
-            _store.TryAdd((gameId, gameUser.Id), newUserPerspective);
-        }
+            UserId = gameUser.Id,
+            Users = existingPerspective.Users.Select(ToPublicUser).Append(gameUser).ToList()
+        };
+        _store.TryAdd((gameId, gameUser.Id), newUserPerspective);
 
         if (existingPerspective.Users.All(o => o.Id != gameUser.Id))
         {
@@ -90,29 +86,22 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         UserType? userType = null,
         bool? isPlaying = null)
     {
-        UpdateAllPerspectives(gameId, state =>
+        bool updated = false;
+
+        GamePerspective UpdateFunction(GamePerspective state)
         {
             var user = state.Users.FirstOrDefault(u => u.Id == affectedUserId);
-            if (user is null ||
-                (userType == null || user.UserType == userType) &&
-                (isPlaying == null || user.IsPlaying == isPlaying)
-               ) return state;
+            if (user is null || (userType == null || user.UserType == userType) && (isPlaying == null || user.IsPlaying == isPlaying)) return state;
+            updated = true;
 
-            var updatedUser = user with
-            {
-                UserType = userType ?? user.UserType,
-                IsPlaying = isPlaying ?? user.IsPlaying
-            };
+            var updatedUser = user with { UserType = userType ?? user.UserType, IsPlaying = isPlaying ?? user.IsPlaying };
 
-            return state with
-            {
-                Users = state.Users.Select(u =>
-                    u.Id == affectedUserId ? updatedUser : u
-                ).ToList()
-            };
-        });
+            return state with { Users = state.Users.Select(u => u.Id == affectedUserId ? updatedUser : u).ToList() };
+        }
 
-        return true;
+        UpdateAllPerspectives(gameId, UpdateFunction);
+
+        return updated;
     }
 
 
@@ -130,8 +119,10 @@ public class GamePerspectiveStore : IGamePerspectiveStore
     [ExcludeFromCodeCoverage(Justification = "This just runs a delegate, the the value not found issue is covered in the calling functions")]
     private void TryUpdate(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction)
     {
-        if (!_store.TryGetValue((gameId, userId), out var existing)) return;
-        _store[(gameId, userId)] = updateFunction(existing);
+        _store.AddOrUpdate((gameId, userId),
+            addValueFactory: _ => throw new InvalidOperationException("Key should exist"),
+            updateValueFactory: (_, existing) => updateFunction(existing)
+        );
     }
 
     private GameUser ToPublicUser(GameUser user) =>

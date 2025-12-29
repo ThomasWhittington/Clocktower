@@ -47,6 +47,7 @@ export const resetHubState = () => {
     notifyListeners();
 };
 
+let currentJwtContent: string | null = null;
 const handleJoinSnapshot = async (snapshot: SessionSyncState, isReconnecting: boolean) => {
     const {setJwt} = useAppStore.getState();
     setState({
@@ -162,8 +163,6 @@ const hasJwtMeaningfullyChanged = (oldJwt: string | null, newJwt: string): boole
         return true;
     }
 };
-let currentJwtContent: string | null = null;
-
 export const useServerHub = () => {
     const [state, setState] = useState<HubState>(globalState);
     const listenerRef = useRef<(state: HubState) => void>(null);
@@ -219,6 +218,10 @@ export const joinGameGroup = async (gameId: string, isReconnecting: boolean = fa
     if (joinPromise) {
         await joinPromise;
     }
+    if (!currentUser) {
+        console.error('Cannot join game: user not authenticated');
+        return;
+    }
     const currentJoinedId = useAppStore.getState().joinedGameId;
 
     if (currentJoinedId === gameId && isConnected(globalConnection) && !isReconnecting && !isInitialMount) {
@@ -229,7 +232,6 @@ export const joinGameGroup = async (gameId: string, isReconnecting: boolean = fa
     if (!isConnected(globalConnection)) {
         return;
     }
-
     joinPromise = (async () => {
         const previousState = {
             discordTown: globalState.discordTown,
@@ -251,7 +253,7 @@ export const joinGameGroup = async (gameId: string, isReconnecting: boolean = fa
             const snapshot = await globalConnection.invoke<SessionSyncState | null>(
                 'JoinGameGroup',
                 gameId,
-                currentUser!.id,
+                currentUser.id,
                 latestId
             );
 
