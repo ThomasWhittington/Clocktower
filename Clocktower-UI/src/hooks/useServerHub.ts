@@ -72,10 +72,9 @@ const createConnection = async () => {
     });
 
     globalConnection.on('TownTimeChanged', (gameId: string, gameTime: number) => {
-        console.log(`BEFORE⏰ Received TownTimeChanged for game ${gameId}: ${gameTime}`);
         const {joinedGameId} = useAppStore.getState();
         if (gameId !== joinedGameId) return;
-        console.log(`AFTER⏰ Received TownTimeChanged for game ${joinedGameId}: ${gameTime}`);
+        console.log(`⏰ Received TownTimeChanged for game ${gameId}: ${gameTime}`);
         setState({gameTime: gameTime as GameTime});
     });
 
