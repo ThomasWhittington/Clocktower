@@ -1,20 +1,8 @@
-﻿import {
-    DiscordAdminPanel,
-    DiscordTownCategory
-} from "./components";
-import {
-    Spinner
-} from "@/components/ui";
-import {
-    useDiscordTown,
-    useUser
-} from "./hooks";
-import {
-    useAppStore
-} from "@/store";
-import {
-    UserType
-} from "@/types";
+﻿import {DiscordAdminPanel, DiscordTownCategory} from "./components";
+import {Spinner} from "@/components/ui";
+import {useDiscordTown, useUser} from "./hooks";
+import {useAppStore} from "@/store";
+import {UserType} from "@/types";
 
 function DiscordTownPanel() {
     const {
@@ -22,7 +10,7 @@ function DiscordTownPanel() {
         isLoading,
         error
     } = useDiscordTown();
-    const {gameId, currentUser} = useAppStore();
+    const {currentUser} = useAppStore();
     const {thisUser} = useUser(currentUser?.id);
 
     return (
@@ -50,8 +38,6 @@ function DiscordTownPanel() {
                     }
                 </div>
             }
-            {gameId &&
-                <h2>Current Game: {gameId}</h2>}
         </div>
     );
 }
