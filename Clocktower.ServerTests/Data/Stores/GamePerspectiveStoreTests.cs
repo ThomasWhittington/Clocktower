@@ -84,11 +84,15 @@ public class GamePerspectiveStoreTests
     {
         _sut.Set(_game1 with { UserId = UserId1 });
         _sut.Set(_game1 with { UserId = UserId2 });
+        _sut.Set(_game2 with { UserId = UserId1 });
+        _sut.Set(_game2 with { UserId = UserId2 });
 
         _sut.Clear();
 
         _sut.Get(GameId1, UserId1).Should().BeNull();
+        _sut.Get(GameId1, UserId2).Should().BeNull();
         _sut.Get(GameId2, UserId1).Should().BeNull();
+        _sut.Get(GameId2, UserId2).Should().BeNull();
     }
 
     [TestMethod]
