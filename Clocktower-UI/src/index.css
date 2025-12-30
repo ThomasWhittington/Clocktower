@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import '@/components/features/discordTownPanel/discordtownpanel.css';
-
+@import '@/components/features/gameWindow/gamewindow.css';
+@import '@/components/ui/ui.css';
 :root {
     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;

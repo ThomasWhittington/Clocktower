@@ -1,0 +1,13 @@
+﻿@layer components {
+    .btn-close {
+        @apply text-gray-400 hover:text-white text-2xl;
+    }
+
+    .btn-icon {
+        @apply flex transition-colors;
+    }
+
+    .input-field {
+        @apply p-3 bg-gray-900 border border-gray-600 rounded-lg text-white text-lg focus:border-blue-500 outline-none transition-colors;
+    }
+}
