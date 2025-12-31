@@ -2,7 +2,7 @@
 import {Spinner} from "@/components/ui";
 import {useDiscordTown, useUser} from "./hooks";
 import {useAppStore} from "@/store";
-import {UserType} from "@/types";
+import {UserUtils} from "@/utils";
 
 function DiscordTownPanel() {
     const {
@@ -18,8 +18,9 @@ function DiscordTownPanel() {
             id="discord-town-panel"
             className="bg-discord h-full flex flex-col justify-between pr-4">
 
-            {thisUser?.userType == UserType.StoryTeller &&
-                <DiscordAdminPanel/>}
+            {UserUtils.isStoryTeller(thisUser) &&
+                <DiscordAdminPanel/>
+            }
 
             {isLoading &&
                 <Spinner/>}

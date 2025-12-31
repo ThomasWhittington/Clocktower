@@ -1,0 +1,25 @@
+﻿@layer components {
+    .icon-button {
+        @apply w-6 h-6 text-white;
+    }
+
+    .controls-storyteller {
+        @apply absolute left-0 top-0 h-screen w-20 backdrop-blur-sm z-50;
+    }
+
+    .controls-center {
+        @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10;
+    }
+
+    .controls-top {
+        @apply absolute top-8 left-1/2 -translate-x-1/2 pointer-events-none;
+    }
+
+    .controls-bottom {
+        @apply absolute bottom-8 right-0 -translate-x-1/2 pointer-events-none;
+    }
+
+    .game-id-label {
+        @apply bg-black/50 backdrop-blur-sm p-3 rounded-lg pointer-events-auto text-white;
+    }
+} 
