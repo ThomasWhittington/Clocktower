@@ -4,7 +4,11 @@
     }
 
     .btn-icon {
-        @apply flex transition-colors;
+        @apply flex transition-colors flex-row items-center justify-center gap-1;
+    }
+
+    .icon {
+        @apply w-6 h-6 flex items-center justify-center;
     }
 
     .input-field {
@@ -23,7 +27,19 @@
         @apply flex justify-between items-center mb-6;
     }
 
+    .panel-body {
+        @apply flex-1 flex min-h-0 w-full;
+    }
+
     .panel-title {
         @apply text-3xl font-bold text-white;
+    }
+
+    .user-avatar {
+        @apply shrink-0 rounded-full overflow-hidden;
+    }
+
+    .user-avatar > img {
+        @apply object-cover w-full h-full;
     }
 }

@@ -1,5 +1,5 @@
 ﻿import {IconButton} from "@/components/ui";
-import AddUserIcon from "@/../public/icons/addUser.svg?react";
+import {AddUserIcon} from "@/components/ui/icons";
 
 interface StoryTellerHudProps {
     inviteIsOpen: boolean;

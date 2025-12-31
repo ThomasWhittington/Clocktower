@@ -18,7 +18,7 @@ export const BasePanel = ({isOpen, onClose, title, children}: BasePanelProps) =>
                     <h2 className="panel-title">{title}</h2>
                     <CloseButton onClick={onClose}/>
                 </div>
-                <div className="flex-1">
+                <div className="panel-body">
                     {children}
                 </div>
             </div>

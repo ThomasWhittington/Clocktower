@@ -4,7 +4,7 @@
     }
 
     .controls-storyteller {
-        @apply absolute left-0 top-0 h-screen w-20 backdrop-blur-sm z-50;
+        @apply absolute left-0 top-0 h-screen w-20 z-50;
     }
 
     .controls-center {
@@ -16,7 +16,7 @@
     }
 
     .controls-bottom {
-        @apply absolute bottom-8 right-0 -translate-x-1/2 pointer-events-none;
+        @apply absolute bottom-8 right-0 -translate-x-1/2 pointer-events-none z-50;
     }
 
     .game-id-label {

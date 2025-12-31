@@ -1,0 +1,38 @@
+﻿@layer components {
+    .user-manager {
+        @apply flex-1 flex gap-4;
+
+        & .column {
+            @apply rounded-lg p-4 border transition-colors;
+        }
+
+        & .user-list {
+            @apply flex-2 bg-blue-500/20 border-blue-500/30;
+        }
+
+        & .add-users-view {
+            @apply flex-1 bg-gray-500/20 border-gray-500/30;
+        }
+
+        & .title {
+            @apply text-white font-bold mb-2;
+        }
+
+        & .user-group-players,
+        & .user-group-spectators {
+            @apply mt-8;
+        }
+    }
+
+    .user-row {
+        @apply flex items-center justify-between gap-2;
+    }
+
+    .user-row-section {
+        @apply flex items-center gap-2;
+    }
+
+    .user-type-change {
+        @apply flex items-center;
+    }
+}

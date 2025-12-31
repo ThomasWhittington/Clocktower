@@ -1,28 +1,35 @@
-﻿import type {ButtonHTMLAttributes, ReactNode} from "react";
+﻿import {type ButtonHTMLAttributes, Children, isValidElement, type ReactNode} from "react";
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    icon: ReactNode;
+    icon: ReactNode | ReactNode[];
+    text?: string;
     variant?: "primary" | "secondary" | "outline";
     isActive?: boolean;
+    isEnabled?: boolean;
 }
 
 export const IconButton = ({
                                icon,
+                               text,
                                variant = 'secondary',
                                isActive,
+                               isEnabled = true,
                                className = "",
                                ...props
                            }: IconButtonProps) => {
-    const baseClass = isActive ? "btn-outline" : `btn-${variant}`;
-
+    let baseClass = isActive ? "btn-outline" : `btn-${variant}`;
     return (
         <button
+            disabled={!isEnabled}
             className={`${baseClass} btn-icon ${className}`}
             {...props}
         >
-            <span className="w-6 h-6">
-                {icon}
+            {Children.toArray(icon).map((item) => (
+                <span key={isValidElement(item) ? item.key : undefined} className="icon">
+                {item}
             </span>
+            ))}
+            {text && <span className="text">{text}</span>}
         </button>
     );
 };

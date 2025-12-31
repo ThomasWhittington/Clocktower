@@ -1,1 +1,1 @@
-﻿export * from './InviteUserPanel'
+﻿export * from './userManager'

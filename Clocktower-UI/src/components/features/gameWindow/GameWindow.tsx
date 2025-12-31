@@ -1,20 +1,20 @@
 ﻿import {TownSquare} from "@/components/features";
 import {useAppStore} from "@/store";
 import {useState} from "react";
-import {BottomHud, CenterHud, InviteUserPanel, StoryTellerHud, TopHud} from "@/components/features/gameWindow/components";
+import {BottomHud, CenterHud, StoryTellerHud, TopHud, UserManagerPanel} from "@/components/features/gameWindow/components";
 import {UserUtils} from "@/utils";
 import {useUser} from "@/components/features/discordTownPanel/hooks";
 
 export default function GameWindow() {
     const {gameId, currentUser} = useAppStore();
-    const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+    const [isInviteModalOpen, setIsInviteModalOpen] = useState(true);
     const {thisUser} = useUser(currentUser?.id);
 
     return (
         <div className="game-window-controls">
             <TownSquare/>
 
-            <InviteUserPanel
+            <UserManagerPanel
                 isOpen={isInviteModalOpen}
                 onClose={() => setIsInviteModalOpen(false)}
             />
