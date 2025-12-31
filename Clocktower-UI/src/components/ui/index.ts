@@ -10,3 +10,4 @@ export {IconButton} from './IconButton';
 export {CloseButton} from './CloseButton';
 export {InputField} from './InputField';
 export {BasePanel} from './BasePanel';
+export {UserAvatar} from './UserAvatar';

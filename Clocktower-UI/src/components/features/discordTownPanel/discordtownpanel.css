@@ -39,11 +39,7 @@
     }
 
     .town-user-status {
-        @apply flex flex-row w-1/2;
-    }
-
-    .town-user-status > img {
-        @apply size-7 rounded-full mr-2;
+        @apply flex flex-row w-1/2 gap-2;
     }
 
     .town-user-status > p {

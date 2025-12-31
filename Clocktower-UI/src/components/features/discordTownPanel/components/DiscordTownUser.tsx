@@ -1,22 +1,15 @@
-﻿import {
-    type User,
-    UserType
-} from "@/types";
-import {
-    DiscordUserVoiceStatus
-} from "@/components/ui";
+﻿import {type User, UserType} from "@/types";
+import {DiscordUserVoiceStatus, UserAvatar} from "@/components/ui";
 
 function DiscordTownUser({user}: Readonly<{
     user: User
 }>) {
-    const userType = user.userType? UserType[user.userType]: UserType.Unknown;
+    const userType = user.userType ? UserType[user.userType] : UserType.Unknown;
     return (
         <div
             className="town-user-status">
             {user.avatarUrl &&
-                <img
-                    src={user.avatarUrl}
-                    alt={user.name}/>
+                <UserAvatar user={user} size={32} className="discord-user-avatar"/>
             }
             <p>({userType}) {user.name}</p>
             {
