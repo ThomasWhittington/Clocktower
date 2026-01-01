@@ -137,6 +137,40 @@ public class DiscordTownService(
         }
     }
 
+    public async Task<Result<string>> InviteAll(string gameId, bool sendInvite)
+    {
+        var perspectives = gamePerspectiveStore.GetAllPerspectivesForGame(gameId).ToArray();
+
+        var failures = new List<string>();
+        var successCount = 0;
+
+        foreach (var userId in perspectives.Select(o => o.UserId))
+        {
+            var (outcome, message) = await InviteUser(gameId, userId, sendInvite);
+            if (outcome == InviteUserOutcome.InviteSent)
+            {
+                successCount++;
+            }
+            else
+            {
+                failures.Add($"User {userId}: {message}");
+            }
+        }
+
+        if (failures.Any())
+        {
+            if (successCount == 0)
+            {
+                return Result.Fail<string>(ErrorKind.Invalid, "invite.all_failed", $"All invitations failed: {string.Join("; ", failures)}");
+            }
+
+            return Result.Ok($"Sent {successCount} invites. Failures: {string.Join("; ", failures)}");
+        }
+
+
+        return Result.Ok($"Invites sent to all {successCount} users");
+    }
+
     public async Task<(bool success, DiscordTown? discordTown, string message)> GetDiscordTown(string guildId)
     {
         try

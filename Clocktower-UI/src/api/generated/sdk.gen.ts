@@ -54,6 +54,9 @@ import type {
     GetTownStatusApiResponses,
     HealthApiData,
     HealthApiResponses,
+    InviteAllApiData,
+    InviteAllApiErrors,
+    InviteAllApiResponses,
     InviteUserApiData,
     InviteUserApiErrors,
     InviteUserApiResponses,
@@ -436,6 +439,24 @@ export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: 
             }
         ],
         url: '/api/discord/town/{guildId}/status',
+        ...options
+    });
+};
+
+/**
+ * Invites all users to the specified game
+ *
+ * Invites all users to the specified game
+ */
+export const inviteAllApi = <ThrowOnError extends boolean = false>(options: Options<InviteAllApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<InviteAllApiResponses, InviteAllApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/discord/town/{gameId}/invite-all',
         ...options
     });
 };

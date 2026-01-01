@@ -2,6 +2,7 @@
 
 namespace Clocktower.Server.Discord.Town.Endpoints;
 
+//TODO change toggleStoryTeller to be SetUserType
 [UsedImplicitly]
 public class ToggleStoryTeller : IEndpoint
 {

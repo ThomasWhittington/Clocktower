@@ -620,6 +620,37 @@ export type GetTownStatusApiResponses = {
 
 export type GetTownStatusApiResponse = GetTownStatusApiResponses[keyof GetTownStatusApiResponses];
 
+export type InviteAllApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/discord/town/{gameId}/invite-all';
+};
+
+export type InviteAllApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type InviteAllApiError = InviteAllApiErrors[keyof InviteAllApiErrors];
+
+export type InviteAllApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type InviteAllApiResponse = InviteAllApiResponses[keyof InviteAllApiResponses];
+
 export type InviteUserApiData = {
     body?: never;
     path: {

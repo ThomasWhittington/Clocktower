@@ -1,4 +1,4 @@
-﻿import {type ClocktowerServerDataTypesEnumGameTime, getAuthDataApi, getGuildsWithUserApi, getJoinDataApi, inviteUserApi, moveUserToChannelApi, pingUserApi, sendToCottagesApi, sendToTownSquareApi, setTimeApi} from '@/api';
+﻿import {type ClocktowerServerDataTypesEnumGameTime, getAuthDataApi, getGuildsWithUserApi, getJoinDataApi, inviteAllApi, inviteUserApi, moveUserToChannelApi, pingUserApi, sendToCottagesApi, sendToTownSquareApi, setTimeApi} from '@/api';
 import {GameTime, mapToMiniGuild, type MiniGuild} from "@/types";
 import {apiClient} from "@/api/api-client.ts";
 
@@ -67,6 +67,24 @@ async function inviteUser(gameId: string, userId: string): Promise<boolean> {
 
     if (error) {
         console.error('Failed to invite user:', error);
+        throw new Error(error.toString());
+    }
+
+    return true;
+}
+
+async function inviteAll(gameId: string): Promise<boolean> {
+    const {
+        error
+    } = await inviteAllApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+        }
+    });
+
+    if (error) {
+        console.error('Failed to invite all:', error);
         throw new Error(error.toString());
     }
 
@@ -180,6 +198,7 @@ export const discordService = {
     moveUserToChannel,
     getAuthData,
     inviteUser,
+    inviteAll,
     getJoinData,
     setTime,
     pingUser,
