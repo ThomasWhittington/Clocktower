@@ -790,6 +790,37 @@ export type DeleteGameApiResponses = {
     200: unknown;
 };
 
+export type GetAvailableGameUsersApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/available-users';
+};
+
+export type GetAvailableGameUsersApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type GetAvailableGameUsersApiError = GetAvailableGameUsersApiErrors[keyof GetAvailableGameUsersApiErrors];
+
+export type GetAvailableGameUsersApiResponses = {
+    /**
+     * OK
+     */
+    200: Array<ClocktowerServerDataDtoUserDto>;
+};
+
+export type GetAvailableGameUsersApiResponse = GetAvailableGameUsersApiResponses[keyof GetAvailableGameUsersApiResponses];
+
 export type GetGamePerspectivesApiData = {
     body?: never;
     path: {

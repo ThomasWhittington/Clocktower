@@ -29,6 +29,9 @@ import type {
     GetAuthDataApiResponses,
     GetAuthTokenApiData,
     GetAuthTokenApiErrors,
+    GetAvailableGameUsersApiData,
+    GetAvailableGameUsersApiErrors,
+    GetAvailableGameUsersApiResponses,
     GetDiscordTownApiData,
     GetDiscordTownApiErrors,
     GetDiscordTownApiResponses,
@@ -547,6 +550,24 @@ export const deleteGameApi = <ThrowOnError extends boolean = false>(options: Opt
             }
         ],
         url: '/api/games/{gameId}/delete',
+        ...options
+    });
+};
+
+/**
+ * Get available guild users for a game
+ *
+ * Gets all users that are in the games guild but are not yet added to the game
+ */
+export const getAvailableGameUsersApi = <ThrowOnError extends boolean = false>(options: Options<GetAvailableGameUsersApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetAvailableGameUsersApiResponses, GetAvailableGameUsersApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/available-users',
         ...options
     });
 };

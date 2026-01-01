@@ -1,4 +1,6 @@
-﻿namespace Clocktower.Server.Game.Services;
+﻿using Clocktower.Server.Data.Dto;
+
+namespace Clocktower.Server.Game.Services;
 
 public interface IGamePerspectiveService
 {
@@ -9,4 +11,5 @@ public interface IGamePerspectiveService
     IEnumerable<MiniGamePerspective> GetPlayerGames(string userId);
     (bool success, string message) LoadDummyData(string filePath = "dummyState.json");
     Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime);
+    Result<IEnumerable<UserDto>> GetAvailableGameUsers(string gameId);
 }

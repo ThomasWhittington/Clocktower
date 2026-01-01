@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Clocktower.Server.Common.Services;
+using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Socket;
 
 namespace Clocktower.Server.Game.Services;
@@ -107,5 +108,23 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         {
             return (false, ex.Message);
         }
+    }
+
+    public Result<IEnumerable<UserDto>> GetAvailableGameUsers(string gameId)
+    {
+        var game = gamePerspectiveStore.GetFirstPerspective(gameId);
+        if (game is null) return Result.Fail<IEnumerable<UserDto>>(Errors.GameNotFound(gameId));
+        var guildId = game.GuildId;
+
+        var guild = bot.GetGuild(guildId);
+        if (guild is null) return Result.Fail<IEnumerable<UserDto>>(Errors.InvalidGuildId());
+
+        var gameUsersIds = game.Users.Select(o => o.Id).ToHashSet();
+
+        var users = guild.Users
+            .Where(u => !u.IsBot && !gameUsersIds.Contains(u.Id))
+            .Select(u => UserDto.FromTownUser(u.AsTownUser()));
+
+        return Result.Ok(users);
     }
 }

@@ -6,6 +6,7 @@ public interface IDiscordGuildUser
     string GuildId { get; }
     string DisplayName { get; }
     string DisplayAvatarUrl { get; }
+    public bool IsBot { get; }
     public bool IsServerMuted { get; }
     public bool IsServerDeafened { get; }
     public bool IsSelfMuted { get; }

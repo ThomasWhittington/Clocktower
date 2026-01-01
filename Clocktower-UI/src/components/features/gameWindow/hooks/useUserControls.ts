@@ -2,25 +2,30 @@
 import {useCallback} from "react";
 import {create} from "zustand";
 import {type User, UserType} from "@/types";
-import {discordService} from "@/services";
+import {discordService, gamesService} from "@/services";
 
 interface UserControlsStore {
     isLoading: boolean;
     error: string | null;
     result: string | null;
-    runAction: (fn: () => Promise<string | undefined>) => Promise<void>;
+    availableUsers: User[];
+    setAvailableUsers: (users: User[]) => void;
+    runAction: <T>(fn: () => Promise<T>) => Promise<T | undefined>;
 }
 
-//TODO implement hooks
 const useUserControlsStore = create<UserControlsStore>((set) => ({
     isLoading: false,
     error: null,
     result: null,
+    availableUsers: [],
+    setAvailableUsers: (availableUsers) => set({availableUsers}),
     runAction: async (fn) => {
         set({isLoading: true, error: null, result: null});
         try {
             const res = await fn();
-            set({result: res ?? null, isLoading: false});
+            const statusMessage = typeof res === "string" ? res : null;
+            set({result: statusMessage ?? null, isLoading: false});
+            return res;
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : "User control action failed";
             set({error: message, isLoading: false});
@@ -31,7 +36,7 @@ const useUserControlsStore = create<UserControlsStore>((set) => ({
 
 export const useUserControls = () => {
     const {gameId} = useAppStore();
-    const {isLoading, error, result, runAction} = useUserControlsStore();
+    const {isLoading, error, result, availableUsers, setAvailableUsers, runAction} = useUserControlsStore();
 
     const inviteAll = useCallback(async () => {
         if (!gameId) return;
@@ -45,10 +50,16 @@ export const useUserControls = () => {
         if (!gameId) return;
         await runAction(async () => {
             await discordService.inviteUser(gameId, user.id);
-            return `Invite ${user.name} clicked`;
+            return `Invite ${user.name}`;
         });
     }, [gameId, runAction]);
-
+    const addUserToGame = useCallback(async (user: User) => {
+        if (!gameId) return;
+        await runAction(async () => {
+            await gamesService.addUserToGame(gameId, user.id);
+            return `Added ${user.name}`;
+        });
+    }, [gameId, runAction]);
     const changeUserType = useCallback(async (user: User, userType: UserType) => {
         if (!gameId) return;
         await runAction(async () => {
@@ -56,10 +67,23 @@ export const useUserControls = () => {
         });
     }, [gameId, runAction]);
 
+    const getAvailableGameUsers = useCallback(async () => {
+        if (!gameId) return;
+        const users = await runAction(async () => {
+            return await gamesService.getAvailableGameUsers(gameId);
+        });
+        if (Array.isArray(users)) {
+            setAvailableUsers(users);
+        }
+    }, [gameId, runAction, setAvailableUsers]);
+
     return {
         inviteAll,
         inviteUser,
         changeUserType,
+        getAvailableGameUsers,
+        addUserToGame,
+        availableUsers,
         isLoading,
         error,
         result,
