@@ -21,7 +21,6 @@ public class DiscordTownServiceTests
     private const string GuildId = "1";
     private const string UserId = "2";
     private const string ChannelId = "3";
-    private const string RoleId = "4";
     private const string DayCategoryId = "5";
     private const string NightCategoryId = "6";
     private const string GameId = "this-game";
@@ -35,6 +34,8 @@ public class DiscordTownServiceTests
     private const string ExceptionMessage = "message";
     private const string GuildNotFoundMessage = "Guild not found";
     private const string StoryTellerRoleName = "StoryTellerRoleName";
+    private const string PlayerRoleName = "PlayerRoleName";
+    private const string SpectatorRoleName = "SpectatorRoleName";
     private static readonly string[] DayChannelNames = ["day-1", "day-2", "day-3"];
     private static readonly string[] NightChannelNames = ["night-1", "night-2", "night-3"];
 
@@ -53,7 +54,9 @@ public class DiscordTownServiceTests
 
 
     private Mock<IDiscordGuild> _guild = null!;
-    private Mock<IDiscordRole> _role = null!;
+    private Mock<IDiscordRole> _storyTellerRole = null!;
+    private Mock<IDiscordRole> _playerRole = null!;
+    private Mock<IDiscordRole> _spectatorRole = null!;
     private Mock<IDiscordGuildUser> _user = null!;
     private Mock<IDiscordCategoryChannel> _dayCategory = null!;
     private Mock<IDiscordCategoryChannel> _nightCategory = null!;
@@ -72,7 +75,9 @@ public class DiscordTownServiceTests
     public void Setup()
     {
         _guild = StrictMockFactory.Create<IDiscordGuild>();
-        _role = StrictMockFactory.Create<IDiscordRole>();
+        _storyTellerRole = StrictMockFactory.Create<IDiscordRole>();
+        _playerRole = StrictMockFactory.Create<IDiscordRole>();
+        _spectatorRole = StrictMockFactory.Create<IDiscordRole>();
         _user = StrictMockFactory.Create<IDiscordGuildUser>();
         _dayCategory = StrictMockFactory.Create<IDiscordCategoryChannel>();
         _nightCategory = StrictMockFactory.Create<IDiscordCategoryChannel>();
@@ -200,161 +205,6 @@ public class DiscordTownServiceTests
 
     #endregion
 
-    #region ToggleStoryTeller
-
-    private void Setup_ToggleStoryTeller(bool hasGamePerspective, bool hasGuild = false, bool hasRole = false, bool hasUser = false, bool hasPerspectiveUser = false, bool userHasRole = false)
-    {
-        _gameUser = CommonMethods.GetRandomGameUser(UserId);
-
-        _role.Setup(o => o.Id).Returns(RoleId);
-        _user.Setup(o => o.Id).Returns(UserId);
-        _user.Setup(o => o.Roles).Returns([]);
-        _user.Setup(o => o.AsGameUser()).Returns(_gameUser);
-        _user.Setup(o => o.DisplayName).Returns(DisplayName);
-        _user.Setup(o => o.DoesUserHaveRole(RoleId)).Returns(userHasRole);
-
-        _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
-        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? _guild.Object : null);
-        _guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(hasRole ? _role.Object : null);
-        _guild.Setup(o => o.GetUser(UserId)).Returns(hasUser ? _user.Object : null);
-
-
-        var gameUsers = hasPerspectiveUser ? [CommonMethods.GetRandomGameUser(UserId)] : Array.Empty<GameUser>();
-        GamePerspective gamePerspective = CommonMethods.GetGamePerspective(GameId, guildId: GuildId) with { Users = gameUsers };
-
-        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId))
-            .Returns(hasGamePerspective ? gamePerspective : null);
-        _mockGamePerspectiveStore.Setup(o => o.Get(GameId, UserId))
-            .Returns(hasPerspectiveUser ? gamePerspective : null);
-
-        _user.Setup(o => o.AddRoleAsync(_role.Object)).Returns(Task.CompletedTask);
-        _user.Setup(o => o.RemoveRoleAsync(_role.Object)).Returns(Task.CompletedTask);
-    }
-
-    [TestMethod]
-    public async Task ToggleStoryTeller_ReturnsFalse_WhenNoGameFound()
-    {
-        Setup_ToggleStoryTeller(false);
-
-        var result = await _sut.ToggleStoryTeller(GameId, UserId);
-
-        _mockGamePerspectiveStore.Verify(o => o.GetFirstPerspective(GameId), Times.Once);
-        result.success.Should().BeFalse();
-        result.message.Should().Be($"Couldn't find game with id: {GameId}");
-    }
-
-    [TestMethod]
-    public async Task ToggleStoryTeller_ReturnsFalse_WhenGuildNotFound()
-    {
-        Setup_ToggleStoryTeller(true, hasGuild: false);
-        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns((IDiscordGuild?)null);
-
-        var result = await _sut.ToggleStoryTeller(GameId, UserId);
-
-        _mockBot.Verify(o => o.GetGuild(GuildId), Times.Once);
-        result.success.Should().BeFalse();
-        result.message.Should().Be(GuildNotFoundMessage);
-    }
-
-    [TestMethod]
-    public async Task ToggleStoryTeller_ReturnsFalse_WhenRoleNotFound()
-    {
-        Setup_ToggleStoryTeller(true, hasGuild: true, hasRole: false);
-
-        var result = await _sut.ToggleStoryTeller(GameId, UserId);
-
-        _guild.Verify(o => o.GetRole(StoryTellerRoleName), Times.Once);
-        result.success.Should().BeFalse();
-        result.message.Should().Be($"{StoryTellerRoleName} role does not exist");
-    }
-
-    [TestMethod]
-    public async Task ToggleStoryTeller_ReturnsFalse_WhenUserNotFound()
-    {
-        Setup_ToggleStoryTeller(true, hasGuild: true, hasRole: true, hasUser: false);
-
-        var result = await _sut.ToggleStoryTeller(GameId, UserId);
-
-        _guild.Verify(o => o.GetUser(UserId), Times.Once);
-        result.success.Should().BeFalse();
-        result.message.Should().Be("User not found");
-    }
-
-    [TestMethod]
-    public async Task ToggleStoryTeller_CallsDoesUserHaveRole_WhenDataGood()
-    {
-        Setup_ToggleStoryTeller(true, hasGuild: true, hasRole: true, hasUser: true);
-
-        _ = await _sut.ToggleStoryTeller(GameId, UserId);
-
-        _user.Verify(o => o.DoesUserHaveRole(RoleId), Times.Once);
-    }
-
-    [TestMethod]
-    public async Task ToggleStoryTeller_AddsUserToGame_WhenUserNotInGamePerspective()
-    {
-        Setup_ToggleStoryTeller(true, hasGuild: true, hasRole: true, hasUser: true, hasPerspectiveUser: false);
-
-        _ = await _sut.ToggleStoryTeller(GameId, UserId);
-
-        _mockGamePerspectiveStore.Verify(o => o.GetFirstPerspective(GameId), Times.Once);
-        _mockGamePerspectiveStore.Verify(o => o.Get(GameId, UserId), Times.Once);
-        _mockGamePerspectiveStore.Verify(o => o.AddUserToGame(GameId, _gameUser), Times.Once);
-    }
-
-    [TestMethod]
-    public async Task ToggleStoryTeller_DoesNotUserToGame_WhenUserIsInGamePerspective()
-    {
-        Setup_ToggleStoryTeller(true, hasGuild: true, hasRole: true, hasUser: true, hasPerspectiveUser: true);
-
-        _ = await _sut.ToggleStoryTeller(GameId, UserId);
-
-        _mockGamePerspectiveStore.Verify(o => o.GetFirstPerspective(GameId), Times.Once);
-        _mockGamePerspectiveStore.Verify(o => o.Get(GameId, UserId), Times.Once);
-        _mockGamePerspectiveStore.Verify(o => o.AddUserToGame(It.IsAny<string>(), It.IsAny<GameUser>()), Times.Never);
-    }
-
-    [TestMethod]
-    public async Task ToggleStoryTeller_AddsStoryTellerRole_WhenUserIsNotStoryTeller()
-    {
-        Setup_ToggleStoryTeller(true, hasGuild: true, hasRole: true, hasUser: true, hasPerspectiveUser: true, userHasRole: false);
-
-        var result = await _sut.ToggleStoryTeller(GameId, UserId);
-
-        _user.Verify(o => o.AddRoleAsync(_role.Object), Times.Once);
-        _mockGamePerspectiveStore.Verify(o => o.UpdateUser(GameId, UserId, UserType.StoryTeller), Times.Once);
-        result.success.Should().BeTrue();
-        result.message.Should().Be($"User {DisplayName} is now a {StoryTellerRoleName}");
-    }
-
-    [TestMethod]
-    public async Task ToggleStoryTeller_RemovesStoryTellerRole_WhenUserIsStoryTeller()
-    {
-        Setup_ToggleStoryTeller(true, hasGuild: true, hasRole: true, hasUser: true, hasPerspectiveUser: true, userHasRole: true);
-
-        var result = await _sut.ToggleStoryTeller(GameId, UserId);
-
-        _user.Verify(o => o.RemoveRoleAsync(_role.Object), Times.Once);
-        _mockGamePerspectiveStore.Verify(o => o.UpdateUser(GameId, UserId, UserType.Spectator), Times.Once);
-        result.success.Should().BeTrue();
-        result.message.Should().Be($"User {DisplayName} is no longer a {StoryTellerRoleName}");
-    }
-
-    [TestMethod]
-    public async Task ToggleStoryTeller_ReturnsFalse_WhenExceptionThrown()
-    {
-        const string exceptionMessage = "exceptionMessage";
-        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Throws(new Exception(exceptionMessage));
-
-        var result = await _sut.ToggleStoryTeller(GameId, UserId);
-
-        result.success.Should().BeFalse();
-        result.message.Should().Be(exceptionMessage);
-    }
-
-    #endregion
-
-
     #region GetJoinData
 
     [TestMethod]
@@ -417,12 +267,16 @@ public class DiscordTownServiceTests
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? _guild.Object : null);
 
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
+        _mockDiscordConstants.Setup(o => o.PlayerRoleName).Returns(PlayerRoleName);
+        _mockDiscordConstants.Setup(o => o.SpectatorRoleName).Returns(SpectatorRoleName);
         _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategoryName);
         _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategoryName);
         _guild.Setup(o => o.GetCategoryChannelByName(DayCategoryName)).Returns(_dayCategory.Object);
         _guild.Setup(o => o.GetCategoryChannelByName(NightCategoryName)).Returns(_nightCategory.Object);
 
         _guild.Setup(o => o.DeleteRoleAsync(StoryTellerRoleName)).Returns(Task.CompletedTask);
+        _guild.Setup(o => o.DeleteRoleAsync(PlayerRoleName)).Returns(Task.CompletedTask);
+        _guild.Setup(o => o.DeleteRoleAsync(SpectatorRoleName)).Returns(Task.CompletedTask);
         _dayCategory.Setup(o => o.DeleteAsync()).Returns(Task.CompletedTask);
         _nightCategory.Setup(o => o.DeleteAsync()).Returns(Task.CompletedTask);
     }
@@ -450,6 +304,8 @@ public class DiscordTownServiceTests
         _guild.Verify(o => o.GetCategoryChannelByName(NightCategoryName), Times.Once);
         _nightCategory.Verify(o => o.DeleteAsync(), Times.Once);
         _guild.Verify(o => o.DeleteRoleAsync(StoryTellerRoleName), Times.Once);
+        _guild.Verify(o => o.DeleteRoleAsync(PlayerRoleName), Times.Once);
+        _guild.Verify(o => o.DeleteRoleAsync(SpectatorRoleName), Times.Once);
         result.success.Should().BeTrue();
         result.message.Should().Be("Town deleted");
     }
@@ -469,11 +325,20 @@ public class DiscordTownServiceTests
 
     #region CreateTown
 
-    private void Setup_CreateTown(bool hasGuild = false, bool roleCreated = false, bool dayChannelsCreated = false, bool nightChannelsCreated = false)
+    private void Setup_CreateTown(bool hasGuild = false, bool allRolesCreated = false, bool storyTellerRoleCreated = false, bool playerRoleCreated = false, bool spectatorRoleCreated = false, bool dayChannelsCreated = false, bool nightChannelsCreated = false)
     {
+        if (allRolesCreated)
+        {
+            storyTellerRoleCreated = true;
+            playerRoleCreated = true;
+            spectatorRoleCreated = true;
+        }
+
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? _guild.Object : null);
 
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
+        _mockDiscordConstants.Setup(o => o.PlayerRoleName).Returns(PlayerRoleName);
+        _mockDiscordConstants.Setup(o => o.SpectatorRoleName).Returns(SpectatorRoleName);
         _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategoryName);
         _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(DayChannelNames);
         _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategoryName);
@@ -482,9 +347,11 @@ public class DiscordTownServiceTests
         _dayRestCategory.Setup(o => o.Id).Returns(DayCategoryId);
         _nightRestCategory.Setup(o => o.Id).Returns(NightCategoryId);
 
-        _guild.Setup(o => o.CreateRoleAsync(StoryTellerRoleName, It.IsAny<Color>())).ReturnsAsync(roleCreated ? _role.Object : null!);
+        _guild.Setup(o => o.CreateRoleAsync(StoryTellerRoleName, It.IsAny<Color>())).ReturnsAsync(storyTellerRoleCreated ? _storyTellerRole.Object : null!);
+        _guild.Setup(o => o.CreateRoleAsync(PlayerRoleName, It.IsAny<Color>())).ReturnsAsync(playerRoleCreated ? _spectatorRole.Object : null!);
+        _guild.Setup(o => o.CreateRoleAsync(SpectatorRoleName, It.IsAny<Color>())).ReturnsAsync(spectatorRoleCreated ? _spectatorRole.Object : null!);
         _guild.Setup(o => o.CreateCategoryAsync(DayCategoryName, everyoneCanSee: true)).ReturnsAsync(_dayRestCategory.Object);
-        _guild.Setup(o => o.CreateCategoryAsync(NightCategoryName, everyoneCanSee: false, _role.Object)).ReturnsAsync(_nightRestCategory.Object);
+        _guild.Setup(o => o.CreateCategoryAsync(NightCategoryName, everyoneCanSee: false, _storyTellerRole.Object)).ReturnsAsync(_nightRestCategory.Object);
         _guild.Setup(o => o.CreateVoiceChannelsForCategoryAsync(DayChannelNames, DayCategoryId)).ReturnsAsync(dayChannelsCreated);
         _guild.Setup(o => o.CreateVoiceChannelsForCategoryAsync(NightChannelNames, NightCategoryId)).ReturnsAsync(nightChannelsCreated);
     }
@@ -512,21 +379,45 @@ public class DiscordTownServiceTests
     }
 
     [TestMethod]
-    public async Task CreateTown_ReturnsFalse_WhenRoleNotCreated()
+    public async Task CreateTown_ReturnsFalse_WhenStoryTellerRoleNotCreated()
     {
-        Setup_CreateTown(hasGuild: true, roleCreated: false);
+        Setup_CreateTown(hasGuild: true, storyTellerRoleCreated: false);
 
         var result = await _sut.CreateTown(GuildId);
 
         _guild.Verify(o => o.CreateRoleAsync(StoryTellerRoleName, It.IsAny<Color>()), Times.Once);
         result.success.Should().BeFalse();
-        result.message.Should().Be("Failed to create role");
+        result.message.Should().Be($"Failed to create {StoryTellerRoleName} role");
+    }
+
+    [TestMethod]
+    public async Task CreateTown_ReturnsFalse_WhenPlayerRoleNotCreated()
+    {
+        Setup_CreateTown(hasGuild: true, storyTellerRoleCreated: true, playerRoleCreated: false);
+
+        var result = await _sut.CreateTown(GuildId);
+
+        _guild.Verify(o => o.CreateRoleAsync(StoryTellerRoleName, It.IsAny<Color>()), Times.Once);
+        result.success.Should().BeFalse();
+        result.message.Should().Be($"Failed to create {PlayerRoleName} role");
+    }
+
+    [TestMethod]
+    public async Task CreateTown_ReturnsFalse_WhenSpectatorRoleNotCreated()
+    {
+        Setup_CreateTown(hasGuild: true, storyTellerRoleCreated: true, playerRoleCreated: true, spectatorRoleCreated: false);
+
+        var result = await _sut.CreateTown(GuildId);
+
+        _guild.Verify(o => o.CreateRoleAsync(StoryTellerRoleName, It.IsAny<Color>()), Times.Once);
+        result.success.Should().BeFalse();
+        result.message.Should().Be($"Failed to create {SpectatorRoleName} role");
     }
 
     [TestMethod]
     public async Task CreateTown_ReturnsFalse_WhenDayChannelsNotCreated()
     {
-        Setup_CreateTown(hasGuild: true, roleCreated: true, dayChannelsCreated: false);
+        Setup_CreateTown(hasGuild: true, allRolesCreated: true, dayChannelsCreated: false);
 
         var result = await _sut.CreateTown(GuildId);
 
@@ -539,11 +430,11 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task CreateTown_ReturnsFalse_WhenNightChannelsNotCreated()
     {
-        Setup_CreateTown(hasGuild: true, roleCreated: true, dayChannelsCreated: true, nightChannelsCreated: false);
+        Setup_CreateTown(hasGuild: true, allRolesCreated: true, dayChannelsCreated: true, nightChannelsCreated: false);
 
         var result = await _sut.CreateTown(GuildId);
 
-        _guild.Verify(o => o.CreateCategoryAsync(NightCategoryName, everyoneCanSee: false, _role.Object), Times.Once);
+        _guild.Verify(o => o.CreateCategoryAsync(NightCategoryName, everyoneCanSee: false, _storyTellerRole.Object), Times.Once);
         _guild.Verify(o => o.CreateVoiceChannelsForCategoryAsync(NightChannelNames, NightCategoryId), Times.Once);
         result.success.Should().BeFalse();
         result.message.Should().Be("Failed to generate night channels");
@@ -552,7 +443,7 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task CreateTown_ReturnsTrue_WhenChannelsCreated()
     {
-        Setup_CreateTown(hasGuild: true, roleCreated: true, dayChannelsCreated: true, nightChannelsCreated: true);
+        Setup_CreateTown(hasGuild: true, allRolesCreated: true, dayChannelsCreated: true, nightChannelsCreated: true);
 
         var result = await _sut.CreateTown(GuildId);
 
@@ -564,15 +455,26 @@ public class DiscordTownServiceTests
 
     #region GetTownStatus
 
-    private void Setup_GetTownStatus(bool hasGuild = false, bool roleFound = false, bool hasDayCategory = false, bool hasDayChannels = false, bool hasNightCategory = false, bool hasNightChannels = false)
+    private void Setup_GetTownStatus(bool hasGuild = false, bool allRolesFound = false, bool storyTellerRoleFound = false, bool playerRoleFound = false, bool spectatorRoleFound = false, bool hasDayCategory = false, bool hasDayChannels = false, bool hasNightCategory = false, bool hasNightChannels = false)
     {
+        if (allRolesFound)
+        {
+            storyTellerRoleFound = true;
+            playerRoleFound = true;
+            spectatorRoleFound = true;
+        }
+
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? _guild.Object : null);
 
-        _guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(roleFound ? _role.Object : null);
+        _guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(storyTellerRoleFound ? _storyTellerRole.Object : null);
+        _guild.Setup(o => o.GetRole(PlayerRoleName)).Returns(playerRoleFound ? _playerRole.Object : null);
+        _guild.Setup(o => o.GetRole(SpectatorRoleName)).Returns(spectatorRoleFound ? _spectatorRole.Object : null);
         _guild.Setup(o => o.GetCategoryChannelByName(DayCategoryName)).Returns(hasDayCategory ? _dayCategory.Object : null);
         _guild.Setup(o => o.GetCategoryChannelByName(NightCategoryName)).Returns(hasNightCategory ? _nightCategory.Object : null);
 
         _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
+        _mockDiscordConstants.Setup(o => o.PlayerRoleName).Returns(PlayerRoleName);
+        _mockDiscordConstants.Setup(o => o.SpectatorRoleName).Returns(SpectatorRoleName);
         _mockDiscordConstants.Setup(o => o.DayCategoryName).Returns(DayCategoryName);
         _mockDiscordConstants.Setup(o => o.NightCategoryName).Returns(NightCategoryName);
         _mockDiscordConstants.Setup(o => o.DayRoomNames).Returns(DayChannelNames);
@@ -610,7 +512,7 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetTownStatus_ReturnsFalse_WhenStoryTellerRoleNotFound()
     {
-        Setup_GetTownStatus(hasGuild: true, roleFound: false);
+        Setup_GetTownStatus(hasGuild: true, storyTellerRoleFound: false);
 
         var (success, exists, message) = _sut.GetTownStatus(GuildId);
 
@@ -620,9 +522,33 @@ public class DiscordTownServiceTests
     }
 
     [TestMethod]
+    public void GetTownStatus_ReturnsFalse_WhenPlayerRoleNotFound()
+    {
+        Setup_GetTownStatus(hasGuild: true, storyTellerRoleFound: true, playerRoleFound: false);
+
+        var (success, exists, message) = _sut.GetTownStatus(GuildId);
+
+        success.Should().BeTrue();
+        exists.Should().BeFalse();
+        message.Should().Be($"{PlayerRoleName} role does not exist");
+    }
+
+    [TestMethod]
+    public void GetTownStatus_ReturnsFalse_WhenSpectatorRoleNotFound()
+    {
+        Setup_GetTownStatus(hasGuild: true, storyTellerRoleFound: true, playerRoleFound: true, spectatorRoleFound: false);
+
+        var (success, exists, message) = _sut.GetTownStatus(GuildId);
+
+        success.Should().BeTrue();
+        exists.Should().BeFalse();
+        message.Should().Be($"{SpectatorRoleName} role does not exist");
+    }
+
+    [TestMethod]
     public void GetTownStatus_ReturnsFalse_WhenDayCategoryMissing()
     {
-        Setup_GetTownStatus(hasGuild: true, roleFound: true, hasDayCategory: false);
+        Setup_GetTownStatus(hasGuild: true, allRolesFound: true, hasDayCategory: false);
 
         var (success, exists, message) = _sut.GetTownStatus(GuildId);
 
@@ -634,7 +560,7 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetTownStatus_ReturnsFalse_WhenDayChannelsNotMatch()
     {
-        Setup_GetTownStatus(hasGuild: true, roleFound: true, hasDayCategory: true, hasDayChannels: false);
+        Setup_GetTownStatus(hasGuild: true, allRolesFound: true, hasDayCategory: true, hasDayChannels: false);
 
         var (success, exists, message) = _sut.GetTownStatus(GuildId);
 
@@ -646,7 +572,7 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetTownStatus_ReturnsFalse_WhenNightCategoryMissing()
     {
-        Setup_GetTownStatus(hasGuild: true, roleFound: true, hasDayCategory: true, hasDayChannels: true, hasNightCategory: false);
+        Setup_GetTownStatus(hasGuild: true, allRolesFound: true, hasDayCategory: true, hasDayChannels: true, hasNightCategory: false);
 
         var (success, exists, message) = _sut.GetTownStatus(GuildId);
 
@@ -658,7 +584,7 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetTownStatus_ReturnsFalse_WhenNightChannelsNotMatch()
     {
-        Setup_GetTownStatus(hasGuild: true, roleFound: true, hasDayCategory: true, hasDayChannels: true, hasNightCategory: true, hasNightChannels: false);
+        Setup_GetTownStatus(hasGuild: true, allRolesFound: true, hasDayCategory: true, hasDayChannels: true, hasNightCategory: true, hasNightChannels: false);
 
         var (success, exists, message) = _sut.GetTownStatus(GuildId);
 
@@ -670,7 +596,7 @@ public class DiscordTownServiceTests
     [TestMethod]
     public void GetTownStatus_ReturnsTrue_WhenTownStructureCorrect()
     {
-        Setup_GetTownStatus(hasGuild: true, roleFound: true, hasDayCategory: true, hasDayChannels: true, hasNightCategory: true, hasNightChannels: true);
+        Setup_GetTownStatus(hasGuild: true, allRolesFound: true, hasDayCategory: true, hasDayChannels: true, hasNightCategory: true, hasNightChannels: true);
 
         var (success, exists, message) = _sut.GetTownStatus(GuildId);
 
@@ -1096,6 +1022,151 @@ public class DiscordTownServiceTests
     }
 
     #endregion
+
+    #region SetUserType
+
+    public void Setup_SetUserType(bool hasGame = true, bool hasGuild = true, bool hasUser = true, bool storyTellerRoleExists = true, bool playerRoleExists = true, bool spectatorRoleExists = true)
+    {
+        _storyTellerRole.Setup(o => o.Id).Returns("StoryTellerRoleId");
+        _storyTellerRole.Setup(o => o.Id).Returns("PlayerRoleId");
+        _storyTellerRole.Setup(o => o.Id).Returns("SpectatorRoleId");
+
+        _user.Setup(o => o.Id).Returns(UserId);
+        _user.Setup(o => o.DisplayName).Returns(DisplayName);
+
+        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? CommonMethods.GetGamePerspective(GameId, guildId: GuildId) : null);
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? _guild.Object : null);
+        _guild.Setup(o => o.GetUser(UserId)).Returns(hasUser ? _user.Object : null);
+
+        _mockDiscordConstants.Setup(o => o.StoryTellerRoleName).Returns(StoryTellerRoleName);
+        _mockDiscordConstants.Setup(o => o.PlayerRoleName).Returns(PlayerRoleName);
+        _mockDiscordConstants.Setup(o => o.SpectatorRoleName).Returns(SpectatorRoleName);
+
+        _guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(storyTellerRoleExists ? _storyTellerRole.Object : null);
+        _guild.Setup(o => o.GetRole(PlayerRoleName)).Returns(playerRoleExists ? _playerRole.Object : null);
+        _guild.Setup(o => o.GetRole(SpectatorRoleName)).Returns(spectatorRoleExists ? _spectatorRole.Object : null);
+
+        _user.Setup(o => o.AddRoleAsync(_storyTellerRole.Object)).Returns(Task.CompletedTask);
+        _user.Setup(o => o.AddRoleAsync(_playerRole.Object)).Returns(Task.CompletedTask);
+        _user.Setup(o => o.AddRoleAsync(_spectatorRole.Object)).Returns(Task.CompletedTask);
+        _user.Setup(o => o.RemoveRoleAsync(_storyTellerRole.Object)).Returns(Task.CompletedTask);
+        _user.Setup(o => o.RemoveRoleAsync(_playerRole.Object)).Returns(Task.CompletedTask);
+        _user.Setup(o => o.RemoveRoleAsync(_spectatorRole.Object)).Returns(Task.CompletedTask);
+
+        _mockGamePerspectiveStore.Setup(o => o.UpdateUser(GameId, UserId, It.IsAny<UserType>())).Returns(true);
+        _mockNotificationService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+    }
+
+    [TestMethod]
+    public async Task SetUserType_ReturnsError_WhenExceptionThrown()
+    {
+        const string responseMessage = "Response message";
+        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Throws(new Exception(responseMessage));
+
+        var result = await _sut.SetUserType(GameId, UserId, UserType.Player);
+
+        result.ShouldFailWith(ErrorKind.Unexpected, "set-user-type.unexpected", $"Failed to set userType for user '{UserId}' in game '{GameId}' to '{UserType.Player}'. {responseMessage}");
+    }
+
+    [TestMethod]
+    public async Task SetUserType_ReturnsError_WhenGameNotFound()
+    {
+        Setup_SetUserType(hasGame: false);
+
+        var result = await _sut.SetUserType(GameId, UserId, UserType.Player);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetUserType_ReturnsError_WhenGuildNotFound()
+    {
+        Setup_SetUserType(hasGuild: false);
+
+        var result = await _sut.SetUserType(GameId, UserId, UserType.Player);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
+    }
+
+    [TestMethod]
+    public async Task SetUserType_ReturnsError_WhenUserNotFound()
+    {
+        Setup_SetUserType(hasUser: false);
+
+        var result = await _sut.SetUserType(GameId, UserId, UserType.Player);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetUserType_ReturnsError_WhenStoryTellerRoleNotFound()
+    {
+        Setup_SetUserType(storyTellerRoleExists: false);
+
+        var result = await _sut.SetUserType(GameId, UserId, UserType.Player);
+
+        result.ShouldFailWith(ErrorKind.Unexpected, "set-user-type.unexpected", $"Failed to set userType for user '{UserId}' in game '{GameId}' to '{UserType.Player}'. {StoryTellerRoleName} role does not exist");
+    }
+
+    [TestMethod]
+    public async Task SetUserType_ReturnsError_WhenPlayerRoleNotFound()
+    {
+        Setup_SetUserType(playerRoleExists: false);
+
+        var result = await _sut.SetUserType(GameId, UserId, UserType.Player);
+
+        result.ShouldFailWith(ErrorKind.Unexpected, "set-user-type.unexpected", $"Failed to set userType for user '{UserId}' in game '{GameId}' to '{UserType.Player}'. {PlayerRoleName} role does not exist");
+    }
+
+    [TestMethod]
+    public async Task SetUserType_ReturnsError_WhenSpectatorRoleNotFound()
+    {
+        Setup_SetUserType(spectatorRoleExists: false);
+
+        var result = await _sut.SetUserType(GameId, UserId, UserType.Player);
+
+        result.ShouldFailWith(ErrorKind.Unexpected, "set-user-type.unexpected", $"Failed to set userType for user '{UserId}' in game '{GameId}' to '{UserType.Player}'. {SpectatorRoleName} role does not exist");
+    }
+
+    [TestMethod]
+    public async Task SetUserType_ReturnsError_WhenUserTypeIsUnknown()
+    {
+        Setup_SetUserType();
+
+        var result = await _sut.SetUserType(GameId, UserId, UserType.Unknown);
+
+        result.ShouldFailWith(ErrorKind.Unexpected, "set-user-type.unexpected", $"Failed to set userType for user '{UserId}' in game '{GameId}' to '{UserType.Unknown}'. Unsupported user type: {UserType.Unknown}");
+    }
+
+    [TestMethod]
+    [DataRow(UserType.StoryTeller)]
+    [DataRow(UserType.Player)]
+    [DataRow(UserType.Spectator)]
+    public async Task SetUserType_ReturnsOk_UpdatesUser(UserType userType)
+    {
+        Setup_SetUserType();
+
+        var result = await _sut.SetUserType(GameId, UserId, userType);
+
+        _user.Verify(o => o.RemoveRoleAsync(It.IsAny<IDiscordRole>()), Times.Exactly(3));
+        _user.Verify(o => o.AddRoleAsync(GetRoleForUserType(userType).Object), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        result.ShouldSucceedWith<string>($"({GameId}) {DisplayName} set to {userType}");
+    }
+
+    #endregion
+
+    private Mock<IDiscordRole> GetRoleForUserType(UserType userType)
+    {
+        return userType switch
+        {
+            UserType.Player => _playerRole,
+            UserType.StoryTeller => _storyTellerRole,
+            UserType.Spectator => _spectatorRole,
+            UserType.Unknown => throw new ArgumentOutOfRangeException(nameof(userType), userType, null),
+            _ => throw new ArgumentOutOfRangeException(nameof(userType), userType, null)
+        };
+    }
 
     private static DiscordTown GetDummyDiscordTown(bool hasDayCategory = false, bool hasNightCategory = false)
     {

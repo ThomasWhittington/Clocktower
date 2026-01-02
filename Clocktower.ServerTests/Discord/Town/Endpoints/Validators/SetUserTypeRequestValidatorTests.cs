@@ -1,24 +1,25 @@
-﻿using Clocktower.Server.Discord.Town.Endpoints.Validation;
+﻿using Clocktower.Server.Data.Types.Enum;
+using Clocktower.Server.Discord.Town.Endpoints;
 using FluentValidation.TestHelper;
 
 namespace Clocktower.ServerTests.Discord.Town.Endpoints.Validators;
 
 [TestClass]
-public class GameAndUserRequestValidatorTests
+public class SetUserTypeRequestValidatorTests
 {
-    private GameAndUserRequestValidator _validator = null!;
+    private SetUserType.RequestValidator _validator = null!;
     private const string ValidSnowflake = "123456789012345678";
 
     [TestInitialize]
     public void Setup()
     {
-        _validator = new GameAndUserRequestValidator();
+        _validator = new SetUserType.RequestValidator();
     }
 
     [TestMethod]
-    public void Validate_ShouldNotHaveError_WhenGameIdInvalid()
+    public void Validate_ShouldNotHaveError_WhenRequestOk()
     {
-        var request = new GameAndUserRequest("valid-game", ValidSnowflake);
+        var request = new SetUserType.Request("valid-game", ValidSnowflake, UserType.Player);
 
         var result = _validator.TestValidate(request);
 
@@ -32,7 +33,7 @@ public class GameAndUserRequestValidatorTests
     [DataRow("")]
     public void Validate_ShouldHaveError_WhenGameIdIsTooShort(string invalidGameId)
     {
-        var request = new GameAndUserRequest(invalidGameId, ValidSnowflake);
+        var request = new SetUserType.Request(invalidGameId, ValidSnowflake, UserType.Player);
 
         var result = _validator.TestValidate(request);
 
@@ -44,7 +45,7 @@ public class GameAndUserRequestValidatorTests
     public void Validate_ShouldHaveError_WhenGameIdIsTooLong()
     {
         var longGameId = new string('a', 33);
-        var request = new GameAndUserRequest(longGameId, ValidSnowflake);
+        var request = new SetUserType.Request(longGameId, ValidSnowflake, UserType.Player);
 
         var result = _validator.TestValidate(request);
 
@@ -55,7 +56,7 @@ public class GameAndUserRequestValidatorTests
     [TestMethod]
     public void Validate_ShouldPass_WhenGameIdHasWhitespaceButTrimsToValidLength()
     {
-        var request = new GameAndUserRequest("  abc  ", ValidSnowflake);
+        var request = new SetUserType.Request("  abc  ", ValidSnowflake, UserType.Player);
 
         var result = _validator.TestValidate(request);
 
@@ -69,7 +70,7 @@ public class GameAndUserRequestValidatorTests
     [TestMethod]
     public void Validate_ShouldHaveError_WhenUserIdIsEmpty()
     {
-        var request = new GameAndUserRequest("valid-game", "");
+        var request = new SetUserType.Request("valid-game", "", UserType.Player);
 
         var result = _validator.TestValidate(request);
 
@@ -80,12 +81,27 @@ public class GameAndUserRequestValidatorTests
     [TestMethod]
     public void Validate_ShouldHaveError_WhenUserIdIsNotSnowflake()
     {
-        var request = new GameAndUserRequest("valid-game", "invalid-user");
+        var request = new SetUserType.Request("valid-game", "invalid-user", UserType.Player);
 
         var result = _validator.TestValidate(request);
 
         result.ShouldHaveValidationErrorFor(x => x.UserId)
             .WithErrorMessage("UserId must be a valid Discord snowflake");
+    }
+
+    #endregion
+
+    #region UserType Tests
+
+    [TestMethod]
+    public void Validate_ShouldHaveError_WhenUserTypeIsUnknown()
+    {
+        var request = new SetUserType.Request("valid-game", ValidSnowflake, UserType.Unknown);
+
+        var result = _validator.TestValidate(request);
+
+        result.ShouldHaveValidationErrorFor(x => x.UserType)
+            .WithErrorMessage("'User Type' must not be equal to 'Unknown'.");
     }
 
     #endregion

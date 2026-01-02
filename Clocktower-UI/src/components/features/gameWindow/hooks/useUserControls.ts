@@ -67,8 +67,7 @@ export const useUserControls = () => {
     const changeUserType = useCallback(async (user: User, userType: UserType) => {
         if (!gameId) return;
         await runAction(async () => {
-            console.log(`Changing ${user.name} to ${UserType[userType]}`);
-            return `Change ${user.name} to ${UserType[userType]}`;
+            return await discordService.setUserType(gameId, user.id, userType);
         });
     }, [gameId, runAction]);
 

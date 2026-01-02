@@ -32,7 +32,7 @@ public class GetAvailableGameUsersTests
     }
 
     [TestMethod]
-    public void Handle_ReturnsBadRequest_WhenServiceToggleStoryTellerReturnsFalse()
+    public void Handle_ReturnsBadRequest_WhenServiceReturnsFalse()
     {
         var request = new GameIdRequest(CommonMethods.GetRandomString());
 
@@ -48,7 +48,7 @@ public class GetAvailableGameUsersTests
     }
 
     [TestMethod]
-    public void Handle_ReturnsOk_WhenServiceToggleStoryTellerReturnsTrue()
+    public void Handle_ReturnsOk_WhenServiceReturnsTrue()
     {
         var request = new GameIdRequest(CommonMethods.GetRandomString());
         var expected = new List<UserDto>

@@ -737,33 +737,38 @@ export type PingUserApiResponses = {
     200: unknown;
 };
 
-export type ToggleStoryTellerApiData = {
+export type SetUserTypeApiData = {
     body?: never;
     path: {
         gameId: string;
         userId: string;
+        userType: ClocktowerServerDataTypesEnumUserType;
     };
     query?: never;
-    url: '/api/discord/town/{gameId}/{userId}';
+    url: '/api/discord/town/{gameId}/{userId}/set-type/{userType}';
 };
 
-export type ToggleStoryTellerApiErrors = {
+export type SetUserTypeApiErrors = {
     /**
      * Bad Request
      */
     400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
 };
 
-export type ToggleStoryTellerApiError = ToggleStoryTellerApiErrors[keyof ToggleStoryTellerApiErrors];
+export type SetUserTypeApiError = SetUserTypeApiErrors[keyof SetUserTypeApiErrors];
 
-export type ToggleStoryTellerApiResponses = {
+export type SetUserTypeApiResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type ToggleStoryTellerApiResponse = ToggleStoryTellerApiResponses[keyof ToggleStoryTellerApiResponses];
+export type SetUserTypeApiResponse = SetUserTypeApiResponses[keyof SetUserTypeApiResponses];
 
 export type AddUserToGameApiData = {
     body?: never;

@@ -30,7 +30,7 @@ public class RemoveUserFromGameTests
     }
 
     [TestMethod]
-    public async Task Handle_ReturnsBadRequest_WhenServiceToggleStoryTellerReturnsFalse()
+    public async Task Handle_ReturnsBadRequest_WhenServiceReturnsFalse()
     {
         var request = new GameAndUserRequest(CommonMethods.GetRandomString(), CommonMethods.GetRandomString());
 
@@ -46,7 +46,7 @@ public class RemoveUserFromGameTests
     }
 
     [TestMethod]
-    public async Task Handle_ReturnsOk_WhenServiceToggleStoryTellerReturnsTrue()
+    public async Task Handle_ReturnsOk_WhenServiceReturnsTrue()
     {
         var request = new GameAndUserRequest(CommonMethods.GetRandomString(), CommonMethods.GetRandomString());
 

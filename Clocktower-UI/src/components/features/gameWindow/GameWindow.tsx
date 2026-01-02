@@ -7,7 +7,7 @@ import {useUser} from "@/components/features/discordTownPanel/hooks";
 
 export default function GameWindow() {
     const {gameId, currentUser} = useAppStore();
-    const [isInviteModalOpen, setIsInviteModalOpen] = useState(true);
+    const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const {thisUser} = useUser(currentUser?.id);
 
     return (

@@ -95,15 +95,15 @@ import type {
     SetTimeApiData,
     SetTimeApiErrors,
     SetTimeApiResponses,
+    SetUserTypeApiData,
+    SetUserTypeApiErrors,
+    SetUserTypeApiResponses,
     StartGameApiData,
     StartGameApiErrors,
     StartGameApiResponses,
     StartOrEditTimerApiData,
     StartOrEditTimerApiErrors,
-    StartOrEditTimerApiResponses,
-    ToggleStoryTellerApiData,
-    ToggleStoryTellerApiErrors,
-    ToggleStoryTellerApiResponses
+    StartOrEditTimerApiResponses
 } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
@@ -525,19 +525,19 @@ export const pingUserApi = <ThrowOnError extends boolean = false>(options: Optio
 };
 
 /**
- * Toggles the storyteller role for a user
+ * Sets the userType for a user
  *
- * Adds or removes the storyteller role for the specified user
+ * Sets the userType for a user
  */
-export const toggleStoryTellerApi = <ThrowOnError extends boolean = false>(options: Options<ToggleStoryTellerApiData, ThrowOnError>) => {
-    return (options.client ?? client).post<ToggleStoryTellerApiResponses, ToggleStoryTellerApiErrors, ThrowOnError>({
+export const setUserTypeApi = <ThrowOnError extends boolean = false>(options: Options<SetUserTypeApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetUserTypeApiResponses, SetUserTypeApiErrors, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
                 type: 'http'
             }
         ],
-        url: '/api/discord/town/{gameId}/{userId}',
+        url: '/api/discord/town/{gameId}/{userId}/set-type/{userType}',
         ...options
     });
 };

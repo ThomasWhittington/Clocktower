@@ -46,8 +46,14 @@ public class DiscordTownService(
             var guild = bot.GetGuild(guildId);
             if (guild is null) return (false, false, GuildNotFoundMessage);
 
-            var role = guild.GetRole(discordConstants.StoryTellerRoleName);
-            if (role == null) return (true, false, $"{discordConstants.StoryTellerRoleName} role does not exist");
+            var storyTellerRole = guild.GetRole(discordConstants.StoryTellerRoleName);
+            if (storyTellerRole == null) return (true, false, $"{discordConstants.StoryTellerRoleName} role does not exist");
+
+            var playerRole = guild.GetRole(discordConstants.PlayerRoleName);
+            if (playerRole == null) return (true, false, $"{discordConstants.PlayerRoleName} role does not exist");
+
+            var spectatorRole = guild.GetRole(discordConstants.SpectatorRoleName);
+            if (spectatorRole == null) return (true, false, $"{discordConstants.SpectatorRoleName} role does not exist");
 
             var dayCategory = guild.GetCategoryChannelByName(name: discordConstants.DayCategoryName);
             if (dayCategory == null) return (true, false, "Missing day category");
@@ -76,6 +82,8 @@ public class DiscordTownService(
             var nightCategory = guild.GetCategoryChannelByName(name: discordConstants.NightCategoryName);
             if (nightCategory != null) await nightCategory.DeleteAsync();
             await guild.DeleteRoleAsync(discordConstants.StoryTellerRoleName);
+            await guild.DeleteRoleAsync(discordConstants.PlayerRoleName);
+            await guild.DeleteRoleAsync(discordConstants.SpectatorRoleName);
 
             return (true, "Town deleted");
         }
@@ -92,7 +100,11 @@ public class DiscordTownService(
             var guild = bot.GetGuild(guildId);
             if (guild is null) return (false, GuildNotFoundMessage);
             var storyTellerRole = await guild.CreateRoleAsync(discordConstants.StoryTellerRoleName, Color.Gold);
-            if (storyTellerRole is null) return (false, "Failed to create role");
+            if (storyTellerRole is null) return (false, $"Failed to create {discordConstants.StoryTellerRoleName} role");
+            var playerRole = await guild.CreateRoleAsync(discordConstants.PlayerRoleName, Color.Green);
+            if (playerRole is null) return (false, $"Failed to create {discordConstants.PlayerRoleName} role");
+            var spectatorRole = await guild.CreateRoleAsync(discordConstants.SpectatorRoleName, Color.DarkerGrey);
+            if (spectatorRole is null) return (false, $"Failed to create {discordConstants.SpectatorRoleName} role");
 
             var dayCategory = await guild.CreateCategoryAsync(discordConstants.DayCategoryName, true);
             var dayCreated = await guild.CreateVoiceChannelsForCategoryAsync(discordConstants.DayRoomNames, dayCategory.Id);
@@ -114,26 +126,25 @@ public class DiscordTownService(
         }
     }
 
-    public async Task<(bool success, string message)> ToggleStoryTeller(string gameId, string userId)
+    public async Task<Result<string>> SetUserType(string gameId, string userId, UserType userType)
     {
         try
         {
-            var validationResult = ValidateToggleStoryTellerRequest(gameId, userId);
-            if (!validationResult.status.success) return validationResult.status;
-            var (role, user) = validationResult.data;
+            var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+            if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+            var guild = bot.GetGuild(gamePerspective.GuildId);
+            if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+            var user = guild.GetUser(userId);
+            if (user is null) return Result.Fail<string>(ErrorKind.NotFound, "user.not_found", $"User '{userId}' was not found");
 
-            bool isStoryTellerAlready = user.DoesUserHaveRole(role.Id);
+            var result = await UpdateUserType(gameId, user, guild, userType);
 
-            EnsureUserPerspectiveExistsForGame(gameId, user);
-
-            if (isStoryTellerAlready)
-                return await RemoveStoryTellerRole(gameId, user, role);
-
-            return await AddStoryTellerRole(gameId, user, role);
+            await notificationService.BroadcastDiscordTownUpdate(gameId);
+            return result.success ? Result.Ok($"({gameId}) {user.DisplayName} set to {userType}") : Result.Fail<string>(ErrorKind.Unexpected, "set-user-type.unexpected", $"Failed to set userType for user '{userId}' in game '{gameId}' to '{userType}'. {result.message}");
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            return (false, ex.Message);
+            return Result.Fail<string>(ErrorKind.Unexpected, "set-user-type.unexpected", $"Failed to set userType for user '{userId}' in game '{gameId}' to '{userType}'. {e.Message}");
         }
     }
 
@@ -271,44 +282,33 @@ public class DiscordTownService(
         }
     }
 
-    private ((bool success, string message) status, (IDiscordRole role, IDiscordGuildUser user) data) ValidateToggleStoryTellerRequest(string gameId, string userId)
+    private async Task<(bool success, string message)> UpdateUserType(string gameId, IDiscordGuildUser user, IDiscordGuild guild, UserType userType)
     {
-        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
-        if (gamePerspective is null) return ((false, $"Couldn't find game with id: {gameId}"), default);
-
-        var guild = bot.GetGuild(gamePerspective.GuildId);
-        if (guild is null) return ((false, GuildNotFoundMessage), default);
-
-        var role = guild.GetRole(discordConstants.StoryTellerRoleName);
-        if (role is null) return ((false, $"{discordConstants.StoryTellerRoleName} role does not exist"), default);
-
-        var user = guild.GetUser(userId);
-        if (user is null) return ((false, "User not found"), default);
-
-        return ((true, string.Empty), (role, user));
-    }
+        var storyTellerRole = guild.GetRole(discordConstants.StoryTellerRoleName);
+        if (storyTellerRole is null) return (false, $"{discordConstants.StoryTellerRoleName} role does not exist");
+        var playerRole = guild.GetRole(discordConstants.PlayerRoleName);
+        if (playerRole is null) return (false, $"{discordConstants.PlayerRoleName} role does not exist");
+        var spectatorRole = guild.GetRole(discordConstants.SpectatorRoleName);
+        if (spectatorRole is null) return (false, $"{discordConstants.SpectatorRoleName} role does not exist");
 
 
-    private void EnsureUserPerspectiveExistsForGame(string gameId, IDiscordGuildUser user)
-    {
-        var thisUser = gamePerspectiveStore.Get(gameId, user.Id);
-        if (thisUser is null) gamePerspectiveStore.AddUserToGame(gameId, user.AsGameUser());
-    }
+        var roleMap = new Dictionary<UserType, IDiscordRole>
+        {
+            { UserType.StoryTeller, storyTellerRole },
+            { UserType.Player, playerRole },
+            { UserType.Spectator, spectatorRole }
+        };
 
-    private async Task<(bool success, string message)> RemoveStoryTellerRole(string gameId, IDiscordGuildUser user, IDiscordRole role)
-    {
-        await user.RemoveRoleAsync(role);
-        gamePerspectiveStore.UpdateUser(gameId, user.Id, UserType.Spectator);
-        await notificationService.BroadcastDiscordTownUpdate(gameId);
-        return (true, $"User {user.DisplayName} is no longer a {discordConstants.StoryTellerRoleName}");
-    }
+        if (!roleMap.TryGetValue(userType, out var targetRole)) return (false, $"Unsupported user type: {userType}");
 
-    private async Task<(bool success, string message)> AddStoryTellerRole(string gameId, IDiscordGuildUser user, IDiscordRole role)
-    {
-        await user.AddRoleAsync(role);
-        gamePerspectiveStore.UpdateUser(gameId, user.Id, UserType.StoryTeller);
-        await notificationService.BroadcastDiscordTownUpdate(gameId);
-        return (true, $"User {user.DisplayName} is now a {discordConstants.StoryTellerRoleName}");
+        foreach (var role in roleMap.Values)
+        {
+            await user.RemoveRoleAsync(role);
+        }
+
+        await user.AddRoleAsync(targetRole);
+        gamePerspectiveStore.UpdateUser(gameId, user.Id, userType);
+        return (true, string.Empty);
     }
 
     private ((bool success, string message) status, (IDiscordGuildUser user, IDiscordVoiceChannel channel) data) ValidateMoveUserRequest(string guildId, string userId, string channelId)
