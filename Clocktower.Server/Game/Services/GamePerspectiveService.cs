@@ -7,7 +7,7 @@ using Clocktower.Server.Socket;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gamePerspectiveStore, IFileSystem fileSystem, INotificationService notificationService) : IGamePerspectiveService
+public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gamePerspectiveStore, IDiscordTownManager discordTownManager, IFileSystem fileSystem, INotificationService notificationService) : IGamePerspectiveService
 {
     public IEnumerable<GamePerspective> GetGames() => gamePerspectiveStore.GetAll();
 
@@ -77,10 +77,15 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
 
     public (bool success, GamePerspective? gamePerspective, string message) StartNewGame(string guildId, string gameId, string userId)
     {
-        var user = bot.GetUser(userId);
+        var guild = bot.GetGuild(guildId);
+        if (guild is null) return (false, null, "Couldn't find guild");
+        var user = guild.GetUser(userId);
         if (user is null) return (false, null, "Couldn't find user");
+
         var gameUser = user.AsGameUser();
         gameUser.UserType = UserType.StoryTeller;
+        var townUser = user.AsTownUser();
+        discordTownManager.UpdateUserIdentity(townUser);
         var newGamePerspective = new GamePerspective(gameId, userId, guildId, gameUser, DateTime.UtcNow)
         {
             Users = [gameUser]
@@ -114,17 +119,35 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
     {
         var game = gamePerspectiveStore.GetFirstPerspective(gameId);
         if (game is null) return Result.Fail<IEnumerable<UserDto>>(Errors.GameNotFound(gameId));
-        var guildId = game.GuildId;
-
-        var guild = bot.GetGuild(guildId);
+        var guild = bot.GetGuild(game.GuildId);
         if (guild is null) return Result.Fail<IEnumerable<UserDto>>(Errors.InvalidGuildId());
 
         var gameUsersIds = game.Users.Select(o => o.Id).ToHashSet();
 
         var users = guild.Users
             .Where(u => !u.IsBot && !gameUsersIds.Contains(u.Id))
-            .Select(u => UserDto.FromTownUser(u.AsTownUser()));
+            .Select(u => UserDto.FromTownUser(u.AsTownUser()))
+            .ToArray();
 
-        return Result.Ok(users);
+        return Result.Ok<IEnumerable<UserDto>>(users);
+    }
+
+    public async Task<Result<string>> AddUserToGame(string gameId, string userId)
+    {
+        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var user = guild.GetUser(userId);
+        if (user is null) return Result.Fail<string>(ErrorKind.NotFound, "user.not_found", $"User '{userId}' was not found");
+
+        var townUser = user.AsTownUser();
+        discordTownManager.UpdateUserIdentity(townUser);
+        var gameUser = user.AsGameUser(gamePerspective);
+        gameUser.UserType = UserType.Player;
+
+        gamePerspectiveStore.AddUserToGame(gameId, gameUser);
+        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        return Result.Ok($"{user.DisplayName} added to game: {gameId}");
     }
 }

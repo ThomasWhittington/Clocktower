@@ -765,6 +765,38 @@ export type ToggleStoryTellerApiResponses = {
 
 export type ToggleStoryTellerApiResponse = ToggleStoryTellerApiResponses[keyof ToggleStoryTellerApiResponses];
 
+export type AddUserToGameApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/add-user/{userId}';
+};
+
+export type AddUserToGameApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type AddUserToGameApiError = AddUserToGameApiErrors[keyof AddUserToGameApiErrors];
+
+export type AddUserToGameApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type AddUserToGameApiResponse = AddUserToGameApiResponses[keyof AddUserToGameApiResponses];
+
 export type DeleteGameApiData = {
     body?: never;
     path: {

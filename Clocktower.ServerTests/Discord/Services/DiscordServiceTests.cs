@@ -188,13 +188,13 @@ public class DiscordServiceTests
         var guilds = new List<IDiscordGuild>
         {
             MockMaker.CreateMockDiscordGuild("1", "guild1", [
-                MockMaker.CreateMockDiscordGuildUser(userId, true)
+                MockMaker.CreateMockDiscordGuildUser(userId, isAdmin: true)
             ]),
             MockMaker.CreateMockDiscordGuild("2", "guild2", [
                 MockMaker.CreateMockDiscordGuildUser(userId)
             ]),
             MockMaker.CreateMockDiscordGuild("3", "guild3", [
-                MockMaker.CreateMockDiscordGuildUser(userId, true)
+                MockMaker.CreateMockDiscordGuildUser(userId, isAdmin: true)
             ]),
             MockMaker.CreateMockDiscordGuild("4", "guild4")
         };

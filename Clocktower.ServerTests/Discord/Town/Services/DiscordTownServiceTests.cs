@@ -1012,6 +1012,90 @@ public class DiscordTownServiceTests
 
     #endregion
 
+    #region InviteAll
+
+    private void Setup_InviteAll(string[] userIds, Dictionary<string, (InviteUserOutcome outcome, string message)>? outcomes = null)
+    {
+        var perspectives = userIds.Select(id => new GamePerspective(GameId, id, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow) { UserId = id }).ToArray();
+        _mockGamePerspectiveStore.Setup(o => o.GetAllPerspectivesForGame(GameId)).Returns(perspectives);
+
+        if (outcomes == null) return;
+
+        foreach (var userId in userIds)
+        {
+            if (outcomes.TryGetValue(userId, out var result))
+            {
+                var hasUser = result.outcome != InviteUserOutcome.UserNotFoundError;
+                var hasDm = result.outcome == InviteUserOutcome.InviteSent;
+
+                var gamePerspective = CommonMethods.GetGamePerspective(GameId, guildId: GuildId);
+                _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(gamePerspective);
+                _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(_guild.Object);
+                _guild.Setup(o => o.Id).Returns(GuildId);
+
+                var userMock = StrictMockFactory.Create<IDiscordGuildUser>();
+                userMock.Setup(o => o.Id).Returns(userId);
+                userMock.Setup(o => o.AsGameUser(It.IsAny<GamePerspective>())).Returns(new GameUser(userId));
+                userMock.Setup(o => o.AsTownUser()).Returns(new TownUser(userId, "name", "avatar"));
+                userMock.Setup(o => o.CreateDmChannelAsync()).ReturnsAsync(hasDm ? _dmChannel.Object : null);
+                _dmChannel.Setup(o => o.SendMessageAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
+
+                _guild.Setup(o => o.GetUser(userId)).Returns(hasUser ? userMock.Object : null);
+            }
+        }
+
+        _mockJwtWriter.Setup(o => o.GetJwtToken(It.IsAny<GameUser>())).Returns(Jwt);
+        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(Key);
+        _mockCache.Setup(o => o.CreateEntry(It.IsAny<object>())).Returns(_cacheEntry.Object);
+        _cacheEntry.SetupAllProperties();
+        _cacheEntry.Setup(o => o.Dispose());
+    }
+
+    [TestMethod]
+    public async Task InviteAll_ReturnsOk_WhenAllSucceed()
+    {
+        var users = new[] { "u1", "u2" };
+        var outcomes = users.ToDictionary(u => u, _ => (InviteUserOutcome.InviteSent, "Sent message to user"));
+        Setup_InviteAll(users, outcomes);
+
+        var result = await _sut.InviteAll(GameId, true);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be("Invites sent to all 2 users");
+    }
+
+    [TestMethod]
+    public async Task InviteAll_ReturnsPartialOk_WhenSomeFail()
+    {
+        var users = new[] { "u1", "u2" };
+        var outcomes = new Dictionary<string, (InviteUserOutcome, string)>
+        {
+            { "u1", (InviteUserOutcome.InviteSent, "Sent message to user") },
+            { "u2", (InviteUserOutcome.UserNotFoundError, "Couldn't find user: u2") }
+        };
+        Setup_InviteAll(users, outcomes);
+
+        var result = await _sut.InviteAll(GameId, true);
+
+        result.ShouldSucceedWith<string>("Sent 1 invites. Failures: User u2: Couldn't find user: u2");
+    }
+
+    [TestMethod]
+    public async Task InviteAll_ReturnsFail_WhenAllFail()
+    {
+        var users = new[] { "u1" };
+        var outcomes = new Dictionary<string, (InviteUserOutcome, string)>
+        {
+            { "u1", (InviteUserOutcome.UserNotFoundError, "Couldn't find user: u1") }
+        };
+        Setup_InviteAll(users, outcomes);
+
+        var result = await _sut.InviteAll(GameId, true);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "invite.all_failed");
+    }
+
+    #endregion
 
     private static DiscordTown GetDummyDiscordTown(bool hasDayCategory = false, bool hasNightCategory = false)
     {

@@ -5,6 +5,9 @@ import {client} from './client.gen';
 import type {
     AddBotApiData,
     AddBotApiErrors,
+    AddUserToGameApiData,
+    AddUserToGameApiErrors,
+    AddUserToGameApiResponses,
     BotCallbackApiData,
     BotCallbackApiResponses,
     CallbackApiData,
@@ -532,6 +535,24 @@ export const toggleStoryTellerApi = <ThrowOnError extends boolean = false>(optio
             }
         ],
         url: '/api/discord/town/{gameId}/{userId}',
+        ...options
+    });
+};
+
+/**
+ * Adds user to the game
+ *
+ * Adds user to the game
+ */
+export const addUserToGameApi = <ThrowOnError extends boolean = false>(options: Options<AddUserToGameApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<AddUserToGameApiResponses, AddUserToGameApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/add-user/{userId}',
         ...options
     });
 };

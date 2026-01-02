@@ -5,21 +5,13 @@ namespace Clocktower.ServerTests.TestHelpers;
 
 public static class MockMaker
 {
-    public static IDiscordUser CreateMockDiscordUser(string id, string globalName, string avatarUrl)
-    {
-        var mockUser = Mock.Of<IDiscordUser>(u =>
-            u.Id == id &&
-            u.GlobalName == globalName &&
-            u.DisplayAvatarUrl == avatarUrl &&
-            u.AsGameUser() == new GameUser(id.ToString()));
-        return mockUser;
-    }
-
-    public static IDiscordGuildUser CreateMockDiscordGuildUser(string id, bool isAdmin = false)
+    public static IDiscordGuildUser CreateMockDiscordGuildUser(string id, string name = "", string avatar = "", bool isAdmin = false)
     {
         return Mock.Of<IDiscordGuildUser>(u =>
             u.Id == id &&
-            u.IsAdministrator() == isAdmin
+            u.IsAdministrator() == isAdmin &&
+            u.AsGameUser() == new GameUser(id) &&
+            u.AsTownUser() == new TownUser(id, name, avatar)
         );
     }
 
