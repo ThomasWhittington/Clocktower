@@ -16,7 +16,7 @@ public class GameAndUserRequestValidatorTests
     }
 
     [TestMethod]
-    public void Validate_ShouldHaveError_WhenGameIdInvalid()
+    public void Validate_ShouldNotHaveError_WhenGameIdInvalid()
     {
         var request = new GameAndUserRequest("valid-game", ValidSnowflake);
 

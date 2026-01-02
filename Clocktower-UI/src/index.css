@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import '@/components/features/discordTownPanel/discordtownpanel.css';
-
+@import '@/components/features/gameWindow/gamewindow.css';
+@import '@/components/ui/ui.css';
 :root {
     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
@@ -80,19 +81,19 @@ h1 {
 }
 
 .btn-primary {
-    @apply bg-[#5865F2] hover:bg-[#4754b8] text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer;
+    @apply bg-[#5865F2] hover:enabled:bg-[#4754b8] text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20;
 }
 
 .btn-secondary {
-    @apply bg-gray-600 hover:bg-gray-700 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer;
+    @apply bg-gray-600 hover:enabled:bg-gray-700 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20;
 }
 
 .btn-danger {
-    @apply bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer;
+    @apply bg-red-600 hover:enabled:bg-red-700 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20;
 }
 
 .btn-outline {
-    @apply bg-transparent hover:bg-[#5865F2] text-[#5865F2] hover:text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-[#5865F2] cursor-pointer;
+    @apply bg-transparent hover:enabled:bg-[#5865F2] text-[#5865F2] hover:enabled:text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-[#5865F2] cursor-pointer disabled:cursor-not-allowed disabled:opacity-20;
 }
 
 .loading {
@@ -118,6 +119,10 @@ h1 {
 
 .image-container:hover .logout-icon {
     opacity: 1;
+}
+
+.discord-user-avatar {
+    @apply border-2 border-discord-icon;
 }
 
 @theme {

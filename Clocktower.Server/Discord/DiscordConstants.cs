@@ -10,6 +10,8 @@ public interface IDiscordConstantsService
     string NightCategoryName { get; }
     string CottageName { get; }
     string StoryTellerRoleName { get; }
+    string PlayerRoleName { get; }
+    string SpectatorRoleName { get; }
     int CottageCount { get; }
     string[] DayRoomNames { get; }
     string[] GetNightRoomNames();
@@ -24,6 +26,8 @@ public class DiscordConstantsService : IDiscordConstantsService
     public string NightCategoryName => "🌙 Night BOTC ✨";
     public string CottageName => "🛌 Cottage";
     public string StoryTellerRoleName => "StoryTeller";
+    public string PlayerRoleName => "Player";
+    public string SpectatorRoleName => "Spectator";
     public int CottageCount => 15;
 
     public string[] GetNightRoomNames() => Enumerable.Range(0, CottageCount).Select(_ => CottageName).ToArray();

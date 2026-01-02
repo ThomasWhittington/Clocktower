@@ -14,6 +14,7 @@ public interface IGamePerspectiveStore
     IEnumerable<GamePerspective> GetUserGames(string userId);
     IEnumerable<GamePerspective> GetAll();
     void AddUserToGame(string gameId, GameUser gameUser);
+    void RemoveUserFromGame(string gameId, string userId);
     void SetTime(string gameId, GameTime gameTime);
     bool UpdateUser(string gameId, string affectedUserId, UserType? userType = null, bool? isPlaying = null);
 }

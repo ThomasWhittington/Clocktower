@@ -9,8 +9,7 @@ public class InviteUser : IEndpoint
         .MapPost("/{gameId}/invite/{userId}", Handle)
         .RequireAuthorization("StoryTellerForGame")
         .SetOpenApiOperationId<InviteUser>()
-        .WithSummary("Invites user to the specified game")
-        .WithDescription("Invites user to the specified game")
+        .WithSummaryAndDescription("Invites user to the specified game")
         .WithRequestValidation<GameAndUserRequest>();
 
     internal static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> Handle(

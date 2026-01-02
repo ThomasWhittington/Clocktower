@@ -1,3 +1,4 @@
-﻿export * from './validation.ts'
-export * from './discordTownUtils.ts'
-export * from './resetState.ts'
+﻿export * from './validation'
+export * from './discordTownUtils'
+export * from './userUtils'
+export * from './resetState'

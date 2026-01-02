@@ -9,5 +9,4 @@ public interface IDiscordUser
     IDiscordGuildUser? GetGuildUser();
 
     Task<IDiscordDmChannel?> CreateDmChannelAsync();
-    GameUser AsGameUser();
 }

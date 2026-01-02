@@ -10,6 +10,7 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
     public string GuildId => user.Guild.Id.ToString();
     public string DisplayName => user.DisplayName;
     public string DisplayAvatarUrl => user.GetDisplayAvatarUrl();
+    public bool IsBot => user.IsBot;
     public bool IsServerMuted => user.IsMuted;
     public bool IsServerDeafened => user.IsDeafened;
     public bool IsSelfMuted => user.IsSelfMuted;
@@ -81,4 +82,6 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
 
         return result;
     }
+
+    public override string ToString() => DisplayName + " " + base.ToString();
 }

@@ -1,5 +1,6 @@
 ﻿import {PlayerNameLabel} from "@/components/features/townSquare/components";
 import type {User} from "@/types";
+import {UserAvatar} from "@/components/ui";
 
 export function PlayerIcon({x, y, size, player}: Readonly<{ x: number; y: number; size: number; player: User }>) {
     const isTopHalf = y < 0;
@@ -12,15 +13,7 @@ export function PlayerIcon({x, y, size, player}: Readonly<{ x: number; y: number
                 <PlayerNameLabel name={player.name}/>
             )}
 
-            <div
-                className="rounded-full">
-                {player.avatarUrl ? (
-                    <img className="object-cover rounded-full" src={player.avatarUrl} alt={player.name} style={{width: size, height: size}}/>
-                ) : (
-                    <div className="rounded-full bg-gray-600 flex items-center justify-center" style={{width: size, height: size}}>
-                        {player.name.charAt(0).toUpperCase()}
-                    </div>
-                )}            </div>
+            <UserAvatar user={player} size={size}/>
 
             {!isTopHalf && (
                 <PlayerNameLabel name={player.name}/>

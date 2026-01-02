@@ -5,6 +5,9 @@ import {client} from './client.gen';
 import type {
     AddBotApiData,
     AddBotApiErrors,
+    AddUserToGameApiData,
+    AddUserToGameApiErrors,
+    AddUserToGameApiResponses,
     BotCallbackApiData,
     BotCallbackApiResponses,
     CallbackApiData,
@@ -29,6 +32,9 @@ import type {
     GetAuthDataApiResponses,
     GetAuthTokenApiData,
     GetAuthTokenApiErrors,
+    GetAvailableGameUsersApiData,
+    GetAvailableGameUsersApiErrors,
+    GetAvailableGameUsersApiResponses,
     GetDiscordTownApiData,
     GetDiscordTownApiErrors,
     GetDiscordTownApiResponses,
@@ -54,6 +60,9 @@ import type {
     GetTownStatusApiResponses,
     HealthApiData,
     HealthApiResponses,
+    InviteAllApiData,
+    InviteAllApiErrors,
+    InviteAllApiResponses,
     InviteUserApiData,
     InviteUserApiErrors,
     InviteUserApiResponses,
@@ -68,6 +77,9 @@ import type {
     PingUserApiData,
     PingUserApiErrors,
     PingUserApiResponses,
+    RemoveUserFromGameApiData,
+    RemoveUserFromGameApiErrors,
+    RemoveUserFromGameApiResponses,
     SendMessageApiData,
     SendMessageApiErrors,
     SendMessageApiResponses,
@@ -83,15 +95,15 @@ import type {
     SetTimeApiData,
     SetTimeApiErrors,
     SetTimeApiResponses,
+    SetUserTypeApiData,
+    SetUserTypeApiErrors,
+    SetUserTypeApiResponses,
     StartGameApiData,
     StartGameApiErrors,
     StartGameApiResponses,
     StartOrEditTimerApiData,
     StartOrEditTimerApiErrors,
-    StartOrEditTimerApiResponses,
-    ToggleStoryTellerApiData,
-    ToggleStoryTellerApiErrors,
-    ToggleStoryTellerApiResponses
+    StartOrEditTimerApiResponses
 } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
@@ -441,6 +453,24 @@ export const getTownStatusApi = <ThrowOnError extends boolean = false>(options: 
 };
 
 /**
+ * Invites all users to the specified game
+ *
+ * Invites all users to the specified game
+ */
+export const inviteAllApi = <ThrowOnError extends boolean = false>(options: Options<InviteAllApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<InviteAllApiResponses, InviteAllApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/discord/town/{gameId}/invite-all',
+        ...options
+    });
+};
+
+/**
  * Invites user to the specified game
  *
  * Invites user to the specified game
@@ -495,19 +525,37 @@ export const pingUserApi = <ThrowOnError extends boolean = false>(options: Optio
 };
 
 /**
- * Toggles the storyteller role for a user
+ * Sets the userType for a user
  *
- * Adds or removes the storyteller role for the specified user
+ * Sets the userType for a user
  */
-export const toggleStoryTellerApi = <ThrowOnError extends boolean = false>(options: Options<ToggleStoryTellerApiData, ThrowOnError>) => {
-    return (options.client ?? client).post<ToggleStoryTellerApiResponses, ToggleStoryTellerApiErrors, ThrowOnError>({
+export const setUserTypeApi = <ThrowOnError extends boolean = false>(options: Options<SetUserTypeApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetUserTypeApiResponses, SetUserTypeApiErrors, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
                 type: 'http'
             }
         ],
-        url: '/api/discord/town/{gameId}/{userId}',
+        url: '/api/discord/town/{gameId}/{userId}/set-type/{userType}',
+        ...options
+    });
+};
+
+/**
+ * Adds user to the game
+ *
+ * Adds user to the game
+ */
+export const addUserToGameApi = <ThrowOnError extends boolean = false>(options: Options<AddUserToGameApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<AddUserToGameApiResponses, AddUserToGameApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/add-user/{userId}',
         ...options
     });
 };
@@ -526,6 +574,24 @@ export const deleteGameApi = <ThrowOnError extends boolean = false>(options: Opt
             }
         ],
         url: '/api/games/{gameId}/delete',
+        ...options
+    });
+};
+
+/**
+ * Get available guild users for a game
+ *
+ * Gets all users that are in the games guild but are not yet added to the game
+ */
+export const getAvailableGameUsersApi = <ThrowOnError extends boolean = false>(options: Options<GetAvailableGameUsersApiData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetAvailableGameUsersApiResponses, GetAvailableGameUsersApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/available-users',
         ...options
     });
 };
@@ -598,6 +664,24 @@ export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?
             }
         ],
         url: '/api/games/load',
+        ...options
+    });
+};
+
+/**
+ * Removes user from the game
+ *
+ * Removes user from the game
+ */
+export const removeUserFromGameApi = <ThrowOnError extends boolean = false>(options: Options<RemoveUserFromGameApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<RemoveUserFromGameApiResponses, RemoveUserFromGameApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/remove-user/{userId}',
         ...options
     });
 };

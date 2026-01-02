@@ -40,8 +40,8 @@ public class StartGameTests
     public void Map_RegistersCorrectly()
     {
         var builder = EndpointFactory.CreateBuilder();
-
         StartGame.Map(builder);
+
 
         builder.GetEndpoint("/{gameId}/start/{guildId}/{userId}")
             .ShouldHaveMethod(HttpMethod.Post)

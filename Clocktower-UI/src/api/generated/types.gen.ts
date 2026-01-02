@@ -620,6 +620,37 @@ export type GetTownStatusApiResponses = {
 
 export type GetTownStatusApiResponse = GetTownStatusApiResponses[keyof GetTownStatusApiResponses];
 
+export type InviteAllApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/discord/town/{gameId}/invite-all';
+};
+
+export type InviteAllApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type InviteAllApiError = InviteAllApiErrors[keyof InviteAllApiErrors];
+
+export type InviteAllApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type InviteAllApiResponse = InviteAllApiResponses[keyof InviteAllApiResponses];
+
 export type InviteUserApiData = {
     body?: never;
     path: {
@@ -706,33 +737,70 @@ export type PingUserApiResponses = {
     200: unknown;
 };
 
-export type ToggleStoryTellerApiData = {
+export type SetUserTypeApiData = {
     body?: never;
     path: {
         gameId: string;
         userId: string;
+        userType: ClocktowerServerDataTypesEnumUserType;
     };
     query?: never;
-    url: '/api/discord/town/{gameId}/{userId}';
+    url: '/api/discord/town/{gameId}/{userId}/set-type/{userType}';
 };
 
-export type ToggleStoryTellerApiErrors = {
+export type SetUserTypeApiErrors = {
     /**
      * Bad Request
      */
     400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
 };
 
-export type ToggleStoryTellerApiError = ToggleStoryTellerApiErrors[keyof ToggleStoryTellerApiErrors];
+export type SetUserTypeApiError = SetUserTypeApiErrors[keyof SetUserTypeApiErrors];
 
-export type ToggleStoryTellerApiResponses = {
+export type SetUserTypeApiResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type ToggleStoryTellerApiResponse = ToggleStoryTellerApiResponses[keyof ToggleStoryTellerApiResponses];
+export type SetUserTypeApiResponse = SetUserTypeApiResponses[keyof SetUserTypeApiResponses];
+
+export type AddUserToGameApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/add-user/{userId}';
+};
+
+export type AddUserToGameApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type AddUserToGameApiError = AddUserToGameApiErrors[keyof AddUserToGameApiErrors];
+
+export type AddUserToGameApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type AddUserToGameApiResponse = AddUserToGameApiResponses[keyof AddUserToGameApiResponses];
 
 export type DeleteGameApiData = {
     body?: never;
@@ -758,6 +826,37 @@ export type DeleteGameApiResponses = {
      */
     200: unknown;
 };
+
+export type GetAvailableGameUsersApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/available-users';
+};
+
+export type GetAvailableGameUsersApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type GetAvailableGameUsersApiError = GetAvailableGameUsersApiErrors[keyof GetAvailableGameUsersApiErrors];
+
+export type GetAvailableGameUsersApiResponses = {
+    /**
+     * OK
+     */
+    200: Array<ClocktowerServerDataDtoUserDto>;
+};
+
+export type GetAvailableGameUsersApiResponse = GetAvailableGameUsersApiResponses[keyof GetAvailableGameUsersApiResponses];
 
 export type GetGamePerspectivesApiData = {
     body?: never;
@@ -844,6 +943,38 @@ export type LoadDummyGamesApiResponses = {
 };
 
 export type LoadDummyGamesApiResponse = LoadDummyGamesApiResponses[keyof LoadDummyGamesApiResponses];
+
+export type RemoveUserFromGameApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/remove-user/{userId}';
+};
+
+export type RemoveUserFromGameApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type RemoveUserFromGameApiError = RemoveUserFromGameApiErrors[keyof RemoveUserFromGameApiErrors];
+
+export type RemoveUserFromGameApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type RemoveUserFromGameApiResponse = RemoveUserFromGameApiResponses[keyof RemoveUserFromGameApiResponses];
 
 export type SetTimeApiData = {
     body?: never;

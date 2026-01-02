@@ -1,5 +1,5 @@
-﻿import {type ClocktowerServerDataTypesEnumGameTime, getAuthDataApi, getGuildsWithUserApi, getJoinDataApi, inviteUserApi, moveUserToChannelApi, pingUserApi, sendToCottagesApi, sendToTownSquareApi, setTimeApi} from '@/api';
-import {GameTime, mapToMiniGuild, type MiniGuild} from "@/types";
+﻿import {type ClocktowerServerDataTypesEnumGameTime, type ClocktowerServerDataTypesEnumUserType, getAuthDataApi, getGuildsWithUserApi, getJoinDataApi, inviteAllApi, inviteUserApi, moveUserToChannelApi, pingUserApi, sendToCottagesApi, sendToTownSquareApi, setTimeApi, setUserTypeApi} from '@/api';
+import {GameTime, mapToMiniGuild, type MiniGuild, UserType} from "@/types";
 import {apiClient} from "@/api/api-client.ts";
 
 async function moveUserToChannel(guildId: string, userId: string, channelId: string): Promise<string> {
@@ -73,6 +73,24 @@ async function inviteUser(gameId: string, userId: string): Promise<boolean> {
     return true;
 }
 
+async function inviteAll(gameId: string): Promise<boolean> {
+    const {
+        error
+    } = await inviteAllApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+        }
+    });
+
+    if (error) {
+        console.error('Failed to invite all:', error);
+        throw new Error(error.toString());
+    }
+
+    return true;
+}
+
 async function getJoinData(key: string) {
     return await getJoinDataApi({
         client: apiClient,
@@ -114,6 +132,27 @@ async function sendToCottages(gameId: string) {
 
     if (error) {
         console.error('Failed to send users to cottages:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
+
+async function setUserType(gameId: string, userId: string, userType: UserType) {
+    const {
+        data,
+        error
+    } = await setUserTypeApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId,
+            userType: mapUserType(userType)
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set userType for user:', error);
         throw new Error(getMessage(error));
     }
 
@@ -175,14 +214,19 @@ const getMessage = (err: unknown): string =>
         : typeof err === "object" && err && typeof (err as any).message === "string" ? (err as any).message
             : "Unknown error";
 
+function mapUserType(type: UserType): ClocktowerServerDataTypesEnumUserType {
+    return type as unknown as ClocktowerServerDataTypesEnumUserType;
+}
 export const discordService = {
     getGuildsWithUser,
     moveUserToChannel,
     getAuthData,
     inviteUser,
+    inviteAll,
     getJoinData,
     setTime,
     pingUser,
     sendToCottages,
-    sendToTownSquare
+    sendToTownSquare,
+    setUserType
 }

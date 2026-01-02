@@ -31,10 +31,10 @@ public class PingUserTests
     }
 
     [TestMethod]
-    public async Task Handle_ReturnsOk_WhenServiceToggleStoryTellerReturnsTrue()
+    public async Task Handle_ReturnsOk_WhenServiceReturnsTrue()
     {
         var request = new UserIdRequest(CommonMethods.GetRandomSnowflakeStringId());
-     
+
         var result = await PingUser.Handle(request, _mockDiscordTownService.Object);
 
         _mockDiscordTownService.Verify(o => o.PingUser(request.UserId.Trim()), Times.Once);

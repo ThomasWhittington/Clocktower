@@ -1,0 +1,11 @@
+﻿export {default as ArrowRightCircle} from "@/../public/icons/arrowRightCircle.svg?react";
+export {default as OpenLetter} from "@/../public/icons/openLetter.svg?react";
+export {default as SelfMutedIcon} from "@/../public/icons/selfMuted.svg?react";
+export {default as ServerMutedIcon} from "@/../public/icons/serverMuted.svg?react";
+export {default as SelfDeafenedIcon} from "@/../public/icons/selfDeafened.svg?react";
+export {default as ServerDeafenedIcon} from "@/../public/icons/serverDeafened.svg?react";
+export {default as AddUserIcon} from "@/../public/icons/addUser.svg?react";
+export {default as Quill} from "@/../public/icons/quill.svg?react";
+export {default as Eye} from "@/../public/icons/eye.svg?react";
+export {default as Person} from "@/../public/icons/person.svg?react";
+export {default as RemoveIcon} from "@/../public/icons/removeIcon.svg?react";

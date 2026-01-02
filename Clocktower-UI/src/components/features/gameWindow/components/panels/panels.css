@@ -1,0 +1,42 @@
+﻿@layer components {
+    .user-manager {
+        @apply flex-1 flex gap-4;
+
+        & .column {
+            @apply p-4;
+        }
+
+        & .add-users-view {
+            @apply flex-1;
+        }
+
+        & .user-list {
+            @apply flex-2;
+        }
+
+        & .title {
+            @apply text-white font-bold mb-2;
+        }
+
+        & .user-group-players,
+        & .user-group-spectators {
+            @apply mt-8;
+        }
+    }
+
+    .user-row {
+        @apply flex items-center justify-between gap-2;
+    }
+
+    .user-row-section {
+        @apply flex items-center gap-2;
+    }
+
+    .available-user {
+        @apply flex items-center gap-2 hover:bg-gray-700 transition-colors duration-200 p-2 rounded-2xl cursor-pointer;
+    }
+
+    .user-type-change {
+        @apply flex items-center;
+    }
+}
