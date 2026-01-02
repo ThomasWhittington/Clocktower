@@ -3,6 +3,6 @@
 export const UserUtils = {
     isStoryTeller(user: User | undefined): boolean {
         if (!user) return false;
-        return user.userType == UserType.StoryTeller;
+        return user.userType === UserType.StoryTeller;
     }
 }

@@ -9,7 +9,7 @@ export const CloseButton = ({
                             }: CloseButtonProps) => {
 
     return (
-        <button className="btn-close"
+        <button className={`btn-close ${className}`}
                 {...props}
         >✕</button>
     );

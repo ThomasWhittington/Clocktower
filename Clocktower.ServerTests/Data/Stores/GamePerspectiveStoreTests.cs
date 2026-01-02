@@ -192,15 +192,20 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void RemoveUserFromGame_ChangesNothing_WhenGameNotFound()
     {
-        _sut.Set(_game1 with { UserId = UserId1 });
-        _sut.Set(_game1 with { UserId = UserId2 });
-        _sut.Set(_game2 with { UserId = UserId1 });
+        var user1 = CommonMethods.GetRandomGameUser(UserId1);
+        var user2 = CommonMethods.GetRandomGameUser(UserId2);
+        _sut.Set(_game1 with { UserId = UserId1, Users = [user1] });
+        _sut.Set(_game1 with { UserId = UserId2, Users = [user1] });
+        _sut.Set(_game2 with { UserId = UserId1, Users = [user2] });
 
         _sut.RemoveUserFromGame(GameId3, UserId3);
 
-        _sut.Get(GameId1, UserId1)!.Users.Should().NotContain(o => o.Id == UserId3);
-        _sut.Get(GameId1, UserId2)!.Users.Should().NotContain(o => o.Id == UserId3);
-        _sut.Get(GameId2, UserId1)!.Users.Should().NotContain(o => o.Id == UserId3);
+        _sut.Get(GameId1, UserId1).Should().NotBeNull();
+        _sut.Get(GameId1, UserId2).Should().NotBeNull();
+        _sut.Get(GameId2, UserId1).Should().NotBeNull();
+        _sut.Get(GameId1, UserId1)!.Users.Should().ContainSingle().Which.Id.Should().Be(UserId1);
+        _sut.Get(GameId1, UserId2)!.Users.Should().ContainSingle().Which.Id.Should().Be(UserId1);
+        _sut.Get(GameId2, UserId1)!.Users.Should().ContainSingle().Which.Id.Should().Be(UserId2);
     }
 
     [TestMethod]

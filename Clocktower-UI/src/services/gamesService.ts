@@ -27,7 +27,7 @@ async function loadDummyData(): Promise<string | undefined> {
         throw new Error('Failed to load dummy data');
     }
 
-    return data;
+    return data ?? '';
 }
 
 async function startGame(gameId: string, guildId: string, userId: string): Promise<GamePerspective | null> {
@@ -86,7 +86,7 @@ async function addUserToGame(gameId: string, userId: string): Promise<string> {
         console.error('Failed to add user:', error);
         throw new Error(error.toString());
     }
-    return data;
+    return data ?? '';
 }
 
 async function removeUserFromGame(gameId: string, userId: string): Promise<string> {
@@ -106,7 +106,7 @@ async function removeUserFromGame(gameId: string, userId: string): Promise<strin
         throw new Error(error.toString());
     }
 
-    return data;
+    return data ?? '';
 }
 
 export const gamesService = {

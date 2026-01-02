@@ -348,7 +348,7 @@ public class DiscordTownServiceTests
         _nightRestCategory.Setup(o => o.Id).Returns(NightCategoryId);
 
         _guild.Setup(o => o.CreateRoleAsync(StoryTellerRoleName, It.IsAny<Color>())).ReturnsAsync(storyTellerRoleCreated ? _storyTellerRole.Object : null!);
-        _guild.Setup(o => o.CreateRoleAsync(PlayerRoleName, It.IsAny<Color>())).ReturnsAsync(playerRoleCreated ? _spectatorRole.Object : null!);
+        _guild.Setup(o => o.CreateRoleAsync(PlayerRoleName, It.IsAny<Color>())).ReturnsAsync(playerRoleCreated ? _playerRole.Object : null!);
         _guild.Setup(o => o.CreateRoleAsync(SpectatorRoleName, It.IsAny<Color>())).ReturnsAsync(spectatorRoleCreated ? _spectatorRole.Object : null!);
         _guild.Setup(o => o.CreateCategoryAsync(DayCategoryName, everyoneCanSee: true)).ReturnsAsync(_dayRestCategory.Object);
         _guild.Setup(o => o.CreateCategoryAsync(NightCategoryName, everyoneCanSee: false, _storyTellerRole.Object)).ReturnsAsync(_nightRestCategory.Object);
@@ -1027,10 +1027,6 @@ public class DiscordTownServiceTests
 
     public void Setup_SetUserType(bool hasGame = true, bool hasGuild = true, bool hasUser = true, bool storyTellerRoleExists = true, bool playerRoleExists = true, bool spectatorRoleExists = true)
     {
-        _storyTellerRole.Setup(o => o.Id).Returns("StoryTellerRoleId");
-        _storyTellerRole.Setup(o => o.Id).Returns("PlayerRoleId");
-        _storyTellerRole.Setup(o => o.Id).Returns("SpectatorRoleId");
-
         _user.Setup(o => o.Id).Returns(UserId);
         _user.Setup(o => o.DisplayName).Returns(DisplayName);
 

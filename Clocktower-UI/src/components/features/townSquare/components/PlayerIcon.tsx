@@ -1,6 +1,6 @@
 ﻿import {PlayerNameLabel} from "@/components/features/townSquare/components";
 import type {User} from "@/types";
-import {UserAvatar} from "@/components/ui/UserAvatar.tsx";
+import {UserAvatar} from "@/components/ui";
 
 export function PlayerIcon({x, y, size, player}: Readonly<{ x: number; y: number; size: number; player: User }>) {
     const isTopHalf = y < 0;

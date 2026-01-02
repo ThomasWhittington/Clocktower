@@ -16,7 +16,7 @@ export function UserAvatar({user, size = 40, className = ""}: Readonly<UserAvata
                 />
             ) : (
                 <div className="w-full h-full bg-gray-600 flex items-center justify-center text-white font-medium">
-                    {user.name.charAt(0).toUpperCase()}
+                    {user.name?.charAt(0)?.toUpperCase() || "?"}
                 </div>
             )}
         </div>

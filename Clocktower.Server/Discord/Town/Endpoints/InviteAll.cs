@@ -16,8 +16,7 @@ public class InviteAll : IEndpoint
         [AsParameters] GameIdRequest request,
         [FromServices] IDiscordTownService discordTownService)
     {
-        var gameId = request.GameId.Trim();
-        bool sendInvite = !gameId.StartsWith("test");
+        bool sendInvite = !request.GameId.StartsWith("test");
         var result = await discordTownService.InviteAll(request.GameId, sendInvite);
         return result.ToHttpResult();
     }
