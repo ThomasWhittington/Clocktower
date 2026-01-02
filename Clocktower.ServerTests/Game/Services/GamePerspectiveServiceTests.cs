@@ -570,5 +570,70 @@ public class GamePerspectiveServiceTests
 
     #endregion
 
+    #region RemoveUserFromGame
+
+    private void Setup_RemoveUserFromGame(bool hasGame = true, bool hasGuild = true, bool hasUser = true, string? displayName = null)
+    {
+        var guildMock = StrictMockFactory.Create<IDiscordGuild>();
+        var userMock = StrictMockFactory.Create<IDiscordGuildUser>();
+        userMock.Setup(o => o.DisplayName).Returns(displayName!);
+        var perspective = new GamePerspective(GameId, UserId, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow);
+        var townUser = new TownUser(UserId, displayName!, "avatar");
+        var gameUser = new GameUser(UserId);
+        userMock.Setup(o => o.AsTownUser()).Returns(townUser);
+        userMock.Setup(o => o.AsGameUser(perspective)).Returns(gameUser);
+
+        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? perspective : null);
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guildMock.Object : null);
+        guildMock.Setup(o => o.GetUser(UserId)).Returns(hasUser ? userMock.Object : null);
+    }
+
+    [TestMethod]
+    public async Task RemoveUserFromGame_ReturnsError_WhenGameNotFound()
+    {
+        Setup_RemoveUserFromGame(hasGame: false);
+
+        var result = await Sut.RemoveUserFromGame(GameId, UserId);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task RemoveUserFromGame_ReturnsError_WhenGuildNotFound()
+    {
+        Setup_RemoveUserFromGame(hasGuild: false);
+
+        var result = await Sut.RemoveUserFromGame(GameId, UserId);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
+    }
+
+
+    [TestMethod]
+    public async Task RemoveUserFromGame_ReturnsError_WhenUserNotFound()
+    {
+        Setup_RemoveUserFromGame(hasUser: false);
+
+        var result = await Sut.RemoveUserFromGame(GameId, UserId);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+
+    [TestMethod]
+    public async Task RemoveUserFromGame_ReturnsOk_RemovesUserCorrectly()
+    {
+        const string displayName = "display name";
+        Setup_RemoveUserFromGame(displayName: displayName);
+
+        var result = await Sut.RemoveUserFromGame(GameId, UserId);
+
+        _mockGamePerspectiveStore.Verify(o => o.RemoveUserFromGame(GameId, UserId));
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        result.ShouldSucceedWith<string>($"{displayName} removed from game: {GameId}");
+    }
+
+    #endregion
+
     private static IEnumerable<object[]> GetGameTimeValues() => TestDataProvider.GetAllEnumValues<GameTime>();
 }

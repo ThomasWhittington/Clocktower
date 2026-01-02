@@ -77,6 +77,9 @@ import type {
     PingUserApiData,
     PingUserApiErrors,
     PingUserApiResponses,
+    RemoveUserFromGameApiData,
+    RemoveUserFromGameApiErrors,
+    RemoveUserFromGameApiResponses,
     SendMessageApiData,
     SendMessageApiErrors,
     SendMessageApiResponses,
@@ -661,6 +664,24 @@ export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?
             }
         ],
         url: '/api/games/load',
+        ...options
+    });
+};
+
+/**
+ * Removes user from the game
+ *
+ * Removes user from the game
+ */
+export const removeUserFromGameApi = <ThrowOnError extends boolean = false>(options: Options<RemoveUserFromGameApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<RemoveUserFromGameApiResponses, RemoveUserFromGameApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/remove-user/{userId}',
         ...options
     });
 };

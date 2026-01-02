@@ -8,3 +8,4 @@ export {default as AddUserIcon} from "@/../public/icons/addUser.svg?react";
 export {default as Quill} from "@/../public/icons/quill.svg?react";
 export {default as Eye} from "@/../public/icons/eye.svg?react";
 export {default as Person} from "@/../public/icons/person.svg?react";
+export {default as RemoveIcon} from "@/../public/icons/removeIcon.svg?react";

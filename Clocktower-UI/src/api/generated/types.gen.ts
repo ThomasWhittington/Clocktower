@@ -939,6 +939,38 @@ export type LoadDummyGamesApiResponses = {
 
 export type LoadDummyGamesApiResponse = LoadDummyGamesApiResponses[keyof LoadDummyGamesApiResponses];
 
+export type RemoveUserFromGameApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/remove-user/{userId}';
+};
+
+export type RemoveUserFromGameApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type RemoveUserFromGameApiError = RemoveUserFromGameApiErrors[keyof RemoveUserFromGameApiErrors];
+
+export type RemoveUserFromGameApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type RemoveUserFromGameApiResponse = RemoveUserFromGameApiResponses[keyof RemoveUserFromGameApiResponses];
+
 export type SetTimeApiData = {
     body?: never;
     path: {

@@ -147,7 +147,23 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         gameUser.UserType = UserType.Player;
 
         gamePerspectiveStore.AddUserToGame(gameId, gameUser);
+
         await notificationService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok($"{user.DisplayName} added to game: {gameId}");
+    }
+
+    public async Task<Result<string>> RemoveUserFromGame(string gameId, string userId)
+    {
+        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var user = guild.GetUser(userId);
+        if (user is null) return Result.Fail<string>(ErrorKind.NotFound, "user.not_found", $"User '{userId}' was not found");
+
+        gamePerspectiveStore.RemoveUserFromGame(gameId, userId);
+
+        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        return Result.Ok($"{user.DisplayName} removed from game: {gameId}");
     }
 }

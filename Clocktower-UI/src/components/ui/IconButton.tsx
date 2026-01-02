@@ -3,7 +3,7 @@
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     icon: ReactNode | ReactNode[];
     text?: string;
-    variant?: "primary" | "secondary" | "outline";
+    variant?: "primary" | "secondary" | "outline" | "danger";
     isActive?: boolean;
     isEnabled?: boolean;
 }

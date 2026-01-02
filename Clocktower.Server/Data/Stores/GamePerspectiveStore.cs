@@ -67,13 +67,24 @@ public class GamePerspectiveStore : IGamePerspectiveStore
             var publicNewUser = ToPublicUser(gameUser);
             UpdateAllPerspectives(gameId, state =>
             {
-                if (state.UserId == gameUser.Id) return state;
+                var userToAdd = state.UserId == gameUser.Id ? gameUser : publicNewUser;
+                if (state.Users.Any(u => u.Id == gameUser.Id)) return state;
                 return state with
                 {
-                    Users = [.. state.Users, publicNewUser]
+                    Users = [.. state.Users, userToAdd]
                 };
             });
         }
+    }
+
+    public void RemoveUserFromGame(string gameId, string userId)
+    {
+        RemovePerspective(gameId, userId);
+
+        UpdateAllPerspectives(gameId, state => state with
+        {
+            Users = state.Users.Where(u => u.Id != userId).ToList()
+        });
     }
 
     public void SetTime(string gameId, GameTime gameTime)
@@ -88,7 +99,7 @@ public class GamePerspectiveStore : IGamePerspectiveStore
     {
         bool updated = false;
 
-        GamePerspective UpdateFunction(GamePerspective state)
+        UpdateAllPerspectives(gameId, state =>
         {
             var user = state.Users.FirstOrDefault(u => u.Id == affectedUserId);
             if (user is null || (userType == null || user.UserType == userType) && (isPlaying == null || user.IsPlaying == isPlaying)) return state;
@@ -97,9 +108,7 @@ public class GamePerspectiveStore : IGamePerspectiveStore
             var updatedUser = user with { UserType = userType ?? user.UserType, IsPlaying = isPlaying ?? user.IsPlaying };
 
             return state with { Users = state.Users.Select(u => u.Id == affectedUserId ? updatedUser : u).ToList() };
-        }
-
-        UpdateAllPerspectives(gameId, UpdateFunction);
+        });
 
         return updated;
     }

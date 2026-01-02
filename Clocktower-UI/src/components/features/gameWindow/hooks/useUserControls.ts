@@ -41,28 +41,33 @@ export const useUserControls = () => {
     const inviteAll = useCallback(async () => {
         if (!gameId) return;
         await runAction(async () => {
-            await discordService.inviteAll(gameId);
-            return "All players invited";
+            return await discordService.inviteAll(gameId);
         });
     }, [gameId, runAction]);
 
     const inviteUser = useCallback(async (user: User) => {
         if (!gameId) return;
         await runAction(async () => {
-            await discordService.inviteUser(gameId, user.id);
-            return `Invite ${user.name}`;
+            return await discordService.inviteUser(gameId, user.id);
+        });
+    }, [gameId, runAction]);
+
+    const removeUser = useCallback(async (user: User) => {
+        if (!gameId) return;
+        await runAction(async () => {
+            return await gamesService.removeUserFromGame(gameId, user.id);
         });
     }, [gameId, runAction]);
     const addUserToGame = useCallback(async (user: User) => {
         if (!gameId) return;
         await runAction(async () => {
-            await gamesService.addUserToGame(gameId, user.id);
-            return `Added ${user.name}`;
+            return await gamesService.addUserToGame(gameId, user.id);
         });
     }, [gameId, runAction]);
     const changeUserType = useCallback(async (user: User, userType: UserType) => {
         if (!gameId) return;
         await runAction(async () => {
+            console.log(`Changing ${user.name} to ${UserType[userType]}`);
             return `Change ${user.name} to ${UserType[userType]}`;
         });
     }, [gameId, runAction]);
@@ -83,6 +88,7 @@ export const useUserControls = () => {
         changeUserType,
         getAvailableGameUsers,
         addUserToGame,
+        removeUser,
         availableUsers,
         isLoading,
         error,

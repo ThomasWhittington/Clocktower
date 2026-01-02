@@ -1,5 +1,5 @@
 ﻿import {type GamePerspective, mapToGamePerspective, mapToUser, type User,} from "@/types";
-import {addUserToGameApi, getAvailableGameUsersApi, getGamesApi, loadDummyGamesApi, startGameApi} from "@/api";
+import {addUserToGameApi, getAvailableGameUsersApi, getGamesApi, loadDummyGamesApi, removeUserFromGameApi, startGameApi} from "@/api";
 import {apiClient} from "@/api/api-client.ts";
 
 async function getGames(): Promise<GamePerspective[]> {
@@ -70,8 +70,9 @@ async function getAvailableGameUsers(gameId: string): Promise<User[]> {
     return data?.map(mapToUser) ?? [];
 }
 
-async function addUserToGame(gameId: string, userId: string): Promise<boolean> {
+async function addUserToGame(gameId: string, userId: string): Promise<string> {
     const {
+        data,
         error
     } = await addUserToGameApi({
         client: apiClient,
@@ -85,10 +86,28 @@ async function addUserToGame(gameId: string, userId: string): Promise<boolean> {
         console.error('Failed to add user:', error);
         throw new Error(error.toString());
     }
-
-    return true;
+    return data;
 }
 
+async function removeUserFromGame(gameId: string, userId: string): Promise<string> {
+    const {
+        data,
+        error
+    } = await removeUserFromGameApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to remove user:', error);
+        throw new Error(error.toString());
+    }
+
+    return data;
+}
 
 export const gamesService = {
     getGames,
@@ -96,4 +115,5 @@ export const gamesService = {
     startGame,
     getAvailableGameUsers,
     addUserToGame,
+    removeUserFromGame
 }

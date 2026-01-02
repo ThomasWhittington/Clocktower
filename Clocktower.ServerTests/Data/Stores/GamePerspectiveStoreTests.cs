@@ -190,6 +190,52 @@ public class GamePerspectiveStoreTests
     }
 
     [TestMethod]
+    public void RemoveUserFromGame_ChangesNothing_WhenGameNotFound()
+    {
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game1 with { UserId = UserId2 });
+        _sut.Set(_game2 with { UserId = UserId1 });
+
+        _sut.RemoveUserFromGame(GameId3, UserId3);
+
+        _sut.Get(GameId1, UserId1)!.Users.Should().NotContain(o => o.Id == UserId3);
+        _sut.Get(GameId1, UserId2)!.Users.Should().NotContain(o => o.Id == UserId3);
+        _sut.Get(GameId2, UserId1)!.Users.Should().NotContain(o => o.Id == UserId3);
+    }
+
+    [TestMethod]
+    public void RemoveUserFromGame_RemovesUserForAllPerspectivesInGame()
+    {
+        var user = CommonMethods.GetRandomGameUser(UserId1);
+        _sut.Set(_game1 with { UserId = UserId1, Users = [user] });
+        _sut.Set(_game1 with { UserId = UserId2, Users = [user] });
+        _sut.Set(_game2 with { UserId = UserId1, Users = [user] });
+
+        _sut.RemoveUserFromGame(GameId1, UserId1);
+
+        _sut.Get(GameId1, UserId1).Should().BeNull();
+        _sut.Get(GameId2, UserId1).Should().NotBeNull();
+        _sut.Get(GameId1, UserId2)!.Users.Should().NotContain(o => o.Id == UserId1);
+    }
+
+
+    [TestMethod]
+    public void RemoveUserFromGame_ChangesNothing_WhenUserNotInGame()
+    {
+        var user = CommonMethods.GetRandomGameUser(UserId1);
+        _sut.Set(_game1 with { UserId = UserId1, Users = [user] });
+        _sut.Set(_game1 with { UserId = UserId2, Users = [user] });
+
+        _sut.RemoveUserFromGame(GameId1, UserId3);
+
+        _sut.Get(GameId1, UserId1)!.Users.Should().Contain(o => o.Id == UserId1);
+        _sut.Get(GameId1, UserId1)!.Users.Should().HaveCount(1);
+        _sut.Get(GameId1, UserId2)!.Users.Should().Contain(o => o.Id == UserId1);
+        _sut.Get(GameId1, UserId2)!.Users.Should().HaveCount(1);
+    }
+
+
+    [TestMethod]
     public void GetAll_ReturnsAll()
     {
         _sut.Set(_game1 with { UserId = UserId1 });
