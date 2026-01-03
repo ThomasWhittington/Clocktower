@@ -43,6 +43,8 @@ jobs:
             
             # 2. Update the systemd service file with the latest GitHub Secrets
             cat <<EOF > /etc/systemd/system/clocktower.service
+            chmod 600 /etc/systemd/system/clocktower.service
+            
             [Unit]
             Description=Clocktower Server
             After=network.target
@@ -58,6 +60,13 @@ jobs:
             Environment=ASPNETCORE_URLS=http://*:5000
             
             # Secrets from GitHub
+            Environment=Secrets__DiscordBotToken=${{ secrets.DISCORD_BOT_TOKEN }}
+            Environment=Secrets__DiscordClientId=${{ secrets.DISCORD_CLIENT_ID }}
+            Environment=Secrets__DiscordClientSecret=${{ secrets.DISCORD_CLIENT_SECRET }}
+            Environment=Secrets__ServerUri=${{ vars.CLOCKTOWER_SERVER_URI }}
+            Environment=Secrets__FeUri=${{ vars.FE_URI }}
+            Environment=Secrets__Jwt__SigningKey=${{ secrets.JWT_SIGNING_KEY }}
+            Environment=Secrets__Jwt__Audience=clocktower-user
             
             [Install]
             WantedBy=multi-user.target
