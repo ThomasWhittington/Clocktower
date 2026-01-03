@@ -79,6 +79,8 @@ const createConnection = async () => {
 
     globalConnection = new signalR.HubConnectionBuilder()
         .withUrl(import.meta.env.VITE_CLOCKTOWER_SERVER_URI + '/serverHub', {
+            transport: signalR.HttpTransportType.WebSockets,
+            skipNegotiation: true,
             accessTokenFactory: () => {
                 const {jwt} = useAppStore.getState();
                 return jwt ?? '';

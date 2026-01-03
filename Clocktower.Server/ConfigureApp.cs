@@ -23,6 +23,7 @@ public static class ConfigureApp
         app.UseAuthorization();
         app.MapEndpoints();
 
+        app.UseWebSockets();
         app.MapHub<DiscordNotificationHub>("/serverHub");
     }
 }
