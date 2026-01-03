@@ -45,6 +45,11 @@ internal abstract class Program
             builder.AddServices();
 
             var secrets = builder.Configuration.GetSection(nameof(Secrets)).Get<Secrets>()!;
+            if (secrets is null)
+            {
+                throw new InvalidConfigurationException("Secrets not found");
+            }
+
             var secretsValidation = secrets.HasAllSecrets();
             if (!secretsValidation.success)
             {
