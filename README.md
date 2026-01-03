@@ -1,2 +1,3 @@
 [![Build and Test Server](https://github.com/ThomasWhittington/Clocktower/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/ThomasWhittington/Clocktower/actions/workflows/build-and-test.yml)
 [![Deploy to Firebase Hosting](https://github.com/ThomasWhittington/Clocktower/actions/workflows/firebase-hosting.yml/badge.svg)](https://github.com/ThomasWhittington/Clocktower/actions/workflows/firebase-hosting.yml)
+[![Deploy to DigitalOcean](https://github.com/ThomasWhittington/Clocktower/actions/workflows/deploy-server.yml/badge.svg)](https://github.com/ThomasWhittington/Clocktower/actions/workflows/deploy-server.yml)
