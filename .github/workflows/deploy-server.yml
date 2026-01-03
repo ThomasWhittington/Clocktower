@@ -1,0 +1,68 @@
+﻿name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish App
+        run: dotnet publish -c Release -r linux-x64 --self-contained true -o ./publish
+
+      - name: Copy files to Droplet
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USERNAME }}
+          password: ${{ secrets.DROPLET_PASSWORD }}
+          source: "./publish/*"
+          target: "/var/www/clocktower"
+          strip_components: 1
+
+      - name: Update Service and Restart
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USERNAME }}
+          password: ${{ secrets.DROPLET_PASSWORD }}
+          script: |
+            # 1. Ensure the binary is executable
+            chmod +x /var/www/clocktower/Clocktower.Server
+            
+            # 2. Update the systemd service file with the latest GitHub Secrets
+            cat <<EOF > /etc/systemd/system/clocktower.service
+            [Unit]
+            Description=Clocktower Server
+            After=network.target
+            
+            [Service]
+            WorkingDirectory=/var/www/clocktower
+            ExecStart=/var/www/clocktower/Clocktower.Server
+            Restart=always
+            RestartSec=10
+            KillSignal=SIGINT
+            SyslogIdentifier=clocktower-server
+            Environment=ASPNETCORE_ENVIRONMENT=Production
+            Environment=ASPNETCORE_URLS=http://*:5000
+            
+            # Secrets from GitHub
+            
+            [Install]
+            WantedBy=multi-user.target
+            EOF
+            
+            # 3. Reload and Restart
+            systemctl daemon-reload
+            systemctl restart clocktower.service
