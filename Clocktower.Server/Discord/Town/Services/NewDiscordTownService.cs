@@ -256,8 +256,7 @@ public class DiscordTownService(
 
             var user = guild.GetUser(userId);
             if (user is null) return (InviteUserOutcome.UserNotFoundError, $"Couldn't find user: {userId}");
-            var dmChannel = await guild.GetUser("285398267854848000")!.CreateDmChannelAsync();
-            // var dmChannel = await user.CreateDmChannelAsync(); TODO change back after testing
+            var dmChannel = await user.CreateDmChannelAsync();
             if (dmChannel is null) return (InviteUserOutcome.DmChannelError, "Couldn't open dm channel with user");
 
             var townUser = user.AsTownUser();
@@ -271,7 +270,7 @@ public class DiscordTownService(
             cache.Set($"join_data_{tempKey}", response, TimeSpan.FromMinutes(5));
             var url = _secrets.FeUri + $"/join?key={tempKey}";
 
-            if (sendInvite) await dmChannel.SendMessageAsync($"[Join here {user.DisplayName}]({url})");
+            if (sendInvite) await dmChannel.SendMessageAsync($"[Join here]({url})");
 
             gamePerspectiveStore.AddUserToGame(gameId, thisGameUser);
             await notificationService.BroadcastDiscordTownUpdate(gameId);
