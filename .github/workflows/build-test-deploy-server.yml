@@ -1,14 +1,32 @@
-﻿name: Deploy to DigitalOcean
+﻿name: Build, Test, and Deploy Server
 
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build-and-test:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -38,17 +56,13 @@ jobs:
           username: ${{ secrets.DROPLET_USERNAME }}
           password: ${{ secrets.DROPLET_PASSWORD }}
           script: |
-            # 1. Ensure the binary is executable
             chmod +x /var/www/clocktower/Clocktower.Server
             
-            # 2. Update the systemd service file with the latest GitHub Secrets
             cat <<EOF > /etc/systemd/system/clocktower.service
-            chmod 600 /etc/systemd/system/clocktower.service
-            
             [Unit]
             Description=Clocktower Server
             After=network.target
-            
+
             [Service]
             WorkingDirectory=/var/www/clocktower
             ExecStart=/var/www/clocktower/Clocktower.Server
@@ -58,7 +72,7 @@ jobs:
             SyslogIdentifier=clocktower-server
             Environment=ASPNETCORE_ENVIRONMENT=Production
             Environment=ASPNETCORE_URLS=http://*:5000
-            
+
             # Secrets from GitHub
             Environment=Secrets__DiscordBotToken=${{ secrets.DISCORD_BOT_TOKEN }}
             Environment=Secrets__DiscordClientId=${{ secrets.DISCORD_CLIENT_ID }}
@@ -67,11 +81,12 @@ jobs:
             Environment=Secrets__FeUri=${{ vars.FE_URI }}
             Environment=Secrets__Jwt__SigningKey=${{ secrets.JWT_SIGNING_KEY }}
             Environment=Secrets__Jwt__Audience=clocktower-user
-            
+
             [Install]
             WantedBy=multi-user.target
             EOF
             
-            # 3. Reload and Restart
+            chmod 600 /etc/systemd/system/clocktower.service
+
             systemctl daemon-reload
             systemctl restart clocktower.service
