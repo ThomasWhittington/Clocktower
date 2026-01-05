@@ -8,6 +8,7 @@ using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Game.Services;
 using Clocktower.Server.Socket;
+using Range = Moq.Range;
 
 namespace Clocktower.ServerTests.Game.Services;
 
@@ -631,6 +632,105 @@ public class GamePerspectiveServiceTests
         _mockGamePerspectiveStore.Verify(o => o.RemoveUserFromGame(GameId, UserId));
         _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
         result.ShouldSucceedWith<string>($"{displayName} removed from game: {GameId}");
+    }
+
+    #endregion
+
+    #region RandomiseSeatingPositions
+
+    [TestMethod]
+    public async Task RandomiseSeatingPositions_ReturnsError_WhenGameNotFound()
+    {
+        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns((GamePerspective)null!);
+
+        var result = await Sut.RandomiseSeatingPositions(GameId);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task RandomiseSeatingPositions_UpdatesAllPlayersWithNewPositions()
+    {
+        var players = new[]
+        {
+            new GameUser("user1") { UserType = UserType.Player, IsPlaying = true, SeatingPosition = 0 },
+            new GameUser("user2") { UserType = UserType.Player, IsPlaying = true, SeatingPosition = 1 },
+            new GameUser("user3") { UserType = UserType.Player, IsPlaying = true, SeatingPosition = 2 }
+        };
+        var perspective = CommonMethods.GetGamePerspective(GameId) with { Users = players.ToList() };
+        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(perspective);
+
+        var result = await Sut.RandomiseSeatingPositions(GameId);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().HaveCount(3);
+
+        foreach (var player in players)
+        {
+            _mockGamePerspectiveStore.Verify(o => o.UpdateUser(
+                    GameId,
+                    player.Id,
+                    null, null,
+                    It.IsInRange(0, 2, Range.Inclusive)),
+                Times.Once);
+        }
+
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    #endregion
+
+    #region SwapSeatingPositions
+
+    [TestMethod]
+    public async Task SwapSeatingPositions_ReturnsError_WhenGameNotFound()
+    {
+        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns((GamePerspective)null!);
+
+        var result = await Sut.SwapSeatingPositions(GameId, UserId + 1, UserId + 2);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task SwapSeatingPositions_ReturnsError_WhenUser1NotFound()
+    {
+        var perspective = CommonMethods.GetGamePerspective(GameId) with { Users = [new GameUser(UserId + 2)] };
+        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(perspective);
+
+        var result = await Sut.SwapSeatingPositions(GameId, "non-existent", UserId + 2);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SwapSeatingPositions_ReturnsError_WhenUser2NotFound()
+    {
+        var perspective = CommonMethods.GetGamePerspective(GameId) with { Users = [new GameUser(UserId + 1)] };
+        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(perspective);
+
+        var result = await Sut.SwapSeatingPositions(GameId, UserId + 1, "non-existent");
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SwapSeatingPositions_SwapsPositionsCorrectly()
+    {
+        var u1 = new GameUser(UserId + 1) { SeatingPosition = 5 };
+        var u2 = new GameUser(UserId + 2) { SeatingPosition = 10 };
+        var perspective = CommonMethods.GetGamePerspective(GameId) with { Users = [u1, u2] };
+
+        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(perspective);
+
+        var result = await Sut.SwapSeatingPositions(GameId, UserId + 1, UserId + 2);
+
+        result.ShouldSucceedWith("Users swapped");
+
+        _mockGamePerspectiveStore.Verify(o => o.UpdateUser(GameId, UserId + 1, null, null, 10), Times.Once);
+        _mockGamePerspectiveStore.Verify(o => o.UpdateUser(GameId, UserId + 2, null, null, 5), Times.Once);
+
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     #endregion

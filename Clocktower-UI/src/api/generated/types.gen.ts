@@ -54,6 +54,7 @@ export type ClocktowerServerDataDtoUserDto = {
     isPresent?: boolean;
     isPlaying?: boolean;
     userType?: ClocktowerServerDataTypesEnumUserType;
+    seatingPosition?: number;
 };
 
 export type ClocktowerServerDataGamePerspective = {
@@ -73,6 +74,7 @@ export type ClocktowerServerDataGameUser = {
     id?: string | null;
     isPlaying?: boolean;
     userType?: ClocktowerServerDataTypesEnumUserType;
+    seatingPosition?: number;
 };
 
 export type ClocktowerServerDataMiniChannel = {
@@ -944,6 +946,37 @@ export type LoadDummyGamesApiResponses = {
 
 export type LoadDummyGamesApiResponse = LoadDummyGamesApiResponses[keyof LoadDummyGamesApiResponses];
 
+export type RandomiseSeatingPositionsApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/randomise-seating-positions';
+};
+
+export type RandomiseSeatingPositionsApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type RandomiseSeatingPositionsApiError = RandomiseSeatingPositionsApiErrors[keyof RandomiseSeatingPositionsApiErrors];
+
+export type RandomiseSeatingPositionsApiResponses = {
+    /**
+     * OK
+     */
+    200: Array<string>;
+};
+
+export type RandomiseSeatingPositionsApiResponse = RandomiseSeatingPositionsApiResponses[keyof RandomiseSeatingPositionsApiResponses];
+
 export type RemoveUserFromGameApiData = {
     body?: never;
     path: {
@@ -1033,6 +1066,39 @@ export type StartGameApiResponses = {
 };
 
 export type StartGameApiResponse = StartGameApiResponses[keyof StartGameApiResponses];
+
+export type SwapSeatingPositionsApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId1: string;
+        userId2: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/swap-seating-positions/{userId1}/{userId2}';
+};
+
+export type SwapSeatingPositionsApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SwapSeatingPositionsApiError = SwapSeatingPositionsApiErrors[keyof SwapSeatingPositionsApiErrors];
+
+export type SwapSeatingPositionsApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SwapSeatingPositionsApiResponse = SwapSeatingPositionsApiResponses[keyof SwapSeatingPositionsApiResponses];
 
 export type GetRolesApiData = {
     body?: never;

@@ -139,12 +139,13 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         var guild = bot.GetGuild(gamePerspective.GuildId);
         if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
         var user = guild.GetUser(userId);
-        if (user is null) return Result.Fail<string>(ErrorKind.NotFound, "user.not_found", $"User '{userId}' was not found");
+        if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
 
         var townUser = user.AsTownUser();
         discordTownManager.UpdateUserIdentity(townUser);
         var gameUser = user.AsGameUser(gamePerspective);
         gameUser.UserType = UserType.Player;
+        gameUser.SeatingPosition = gamePerspectiveStore.GetNextAvailableSeatingPosition(gameId);
 
         gamePerspectiveStore.AddUserToGame(gameId, gameUser);
 
@@ -159,11 +160,51 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         var guild = bot.GetGuild(gamePerspective.GuildId);
         if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
         var user = guild.GetUser(userId);
-        if (user is null) return Result.Fail<string>(ErrorKind.NotFound, "user.not_found", $"User '{userId}' was not found");
+        if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
 
         gamePerspectiveStore.RemoveUserFromGame(gameId, userId);
 
         await notificationService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok($"{user.DisplayName} removed from game: {gameId}");
+    }
+
+    public async Task<Result<string[]>> RandomiseSeatingPositions(string gameId)
+    {
+        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string[]>(Errors.GameNotFound(gameId));
+
+        var shuffledPlayers = gamePerspective.Players.OrderBy(_ => Guid.NewGuid()).ToArray();
+
+        foreach (GameUser shuffledPlayer in shuffledPlayers)
+        {
+            gamePerspectiveStore.UpdateUser(
+                gameId,
+                shuffledPlayer.Id,
+                seatingPosition: Array.IndexOf(shuffledPlayers, shuffledPlayer)
+            );
+        }
+
+        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        return Result.Ok(shuffledPlayers.Select(u => u.Id).ToArray());
+    }
+
+    public async Task<Result<string>> SwapSeatingPositions(string gameId, string userId1, string userId2)
+    {
+        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        if (gamePerspective is null)
+            return Result.Fail<string>(Errors.GameNotFound(gameId));
+
+        var user1 = gamePerspective.Users.FirstOrDefault(u => u.Id == userId1);
+        if (user1 is null) return Result.Fail<string>(Errors.UserNotFound(userId1));
+
+        var user2 = gamePerspective.Users.FirstOrDefault(u => u.Id == userId2);
+        if (user2 is null) return Result.Fail<string>(Errors.UserNotFound(userId2));
+
+        var tempPosition = user1.SeatingPosition;
+        gamePerspectiveStore.UpdateUser(gameId, userId1, seatingPosition: user2.SeatingPosition);
+        gamePerspectiveStore.UpdateUser(gameId, userId2, seatingPosition: tempPosition);
+
+        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        return Result.Ok("Users swapped");
     }
 }

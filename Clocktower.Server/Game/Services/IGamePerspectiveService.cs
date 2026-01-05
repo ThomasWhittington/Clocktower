@@ -14,4 +14,6 @@ public interface IGamePerspectiveService
     Result<IEnumerable<UserDto>> GetAvailableGameUsers(string gameId);
     Task<Result<string>> AddUserToGame(string gameId, string userId);
     Task<Result<string>> RemoveUserFromGame(string gameId, string userId);
+    Task<Result<string[]>> RandomiseSeatingPositions(string gameId);
+    Task<Result<string>> SwapSeatingPositions(string gameId, string userId1, string userId2);
 }

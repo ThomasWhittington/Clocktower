@@ -15,15 +15,19 @@ export class DiscordTown {
     }
 
     get players(): User[] {
-        return this.gameUsers.filter(u => u.userType === UserType.Player) ?? [];
+        return this.gameUsers.filter(u => u.userType === UserType.Player)
+                .sort((a, b) => (a.seatingPosition ?? 0) - (b.seatingPosition ?? 0))
+            ?? [];
     }
 
     get storyTellers(): User[] {
-        return this.gameUsers.filter(u => u.userType === UserType.StoryTeller) ?? [];
+        return this.gameUsers.filter(u => u.userType === UserType.StoryTeller)
+            ?? [];
     }
 
     get spectators(): User[] {
-        return this.gameUsers.filter(u => u.userType === UserType.Spectator) ?? [];
+        return this.gameUsers.filter(u => u.userType === UserType.Spectator)
+            ?? [];
     }
 }
 

@@ -7,6 +7,7 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
     [UsedImplicitly] public bool IsPresent { get; set; }
     [UsedImplicitly] public bool IsPlaying { get; set; }
     [UsedImplicitly] public UserType UserType { get; set; } = UserType.Unknown;
+    [UsedImplicitly] public int SeatingPosition { get; set; }
 
     public static UserDto FromTownUser(TownUser townUser, GameUser? gameUser = null)
     {
@@ -15,7 +16,8 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
             VoiceState = townUser.VoiceState,
             IsPresent = townUser.IsPresent,
             IsPlaying = gameUser?.IsPlaying ?? false,
-            UserType = gameUser?.UserType ?? UserType.Unknown
+            UserType = gameUser?.UserType ?? UserType.Unknown,
+            SeatingPosition = gameUser?.SeatingPosition ?? -1
         };
     }
 
@@ -26,7 +28,8 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
             VoiceState = townUser?.VoiceState ?? new VoiceState(false, false, false, false),
             IsPresent = townUser?.IsPresent ?? false,
             IsPlaying = gameUser.IsPlaying,
-            UserType = gameUser.UserType
+            UserType = gameUser.UserType,
+            SeatingPosition = gameUser.SeatingPosition
         };
     }
 }

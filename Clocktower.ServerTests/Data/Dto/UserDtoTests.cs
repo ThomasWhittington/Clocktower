@@ -16,7 +16,8 @@ public class UserDtoTests
     private readonly GameUser _gameUser = CommonMethods.GetRandomGameUser() with
     {
         UserType = UserType.Player,
-        IsPlaying = true
+        IsPlaying = true,
+        SeatingPosition = 5
     };
 
     [TestMethod]
@@ -31,6 +32,7 @@ public class UserDtoTests
         result.IsPresent.Should().Be(_townUser.IsPresent);
         result.IsPlaying.Should().BeFalse();
         result.UserType.Should().Be(UserType.Unknown);
+        result.SeatingPosition.Should().Be(-1);
     }
 
     [TestMethod]
@@ -45,6 +47,7 @@ public class UserDtoTests
         result.IsPresent.Should().Be(_townUser.IsPresent);
         result.IsPlaying.Should().Be(_gameUser.IsPlaying);
         result.UserType.Should().Be(_gameUser.UserType);
+        result.SeatingPosition.Should().Be(_gameUser.SeatingPosition);
     }
 
     [TestMethod]
@@ -59,6 +62,7 @@ public class UserDtoTests
         result.IsPresent.Should().BeFalse();
         result.IsPlaying.Should().Be(_gameUser.IsPlaying);
         result.UserType.Should().Be(_gameUser.UserType);
+        result.SeatingPosition.Should().Be(_gameUser.SeatingPosition);
     }
 
     [TestMethod]
@@ -73,5 +77,6 @@ public class UserDtoTests
         result.IsPresent.Should().Be(_townUser.IsPresent);
         result.IsPlaying.Should().Be(_gameUser.IsPlaying);
         result.UserType.Should().Be(_gameUser.UserType);
+        result.SeatingPosition.Should().Be(_gameUser.SeatingPosition);
     }
 }

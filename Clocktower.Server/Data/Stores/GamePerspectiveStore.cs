@@ -85,6 +85,24 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         {
             Users = state.Users.Where(u => u.Id != userId).ToList()
         });
+
+        var perspective = GetFirstPerspective(gameId);
+        if (perspective is null) return;
+
+        var sortedUsers = perspective.Players
+            .OrderBy(u => u.SeatingPosition)
+            .ToList();
+
+        UpdateAllPerspectives(gameId, state =>
+        {
+            var updatedUsers = state.Users.Select(user =>
+            {
+                var newPosition = sortedUsers.FindIndex(u => u.Id == user.Id);
+                return newPosition >= 0 ? user with { SeatingPosition = newPosition } : user;
+            }).ToList();
+
+            return state with { Users = updatedUsers };
+        });
     }
 
     public void SetTime(string gameId, GameTime gameTime)
@@ -95,22 +113,44 @@ public class GamePerspectiveStore : IGamePerspectiveStore
     public bool UpdateUser(string gameId,
         string affectedUserId,
         UserType? userType = null,
-        bool? isPlaying = null)
+        bool? isPlaying = null,
+        int? seatingPosition = null
+    )
     {
         bool updated = false;
 
         UpdateAllPerspectives(gameId, state =>
         {
             var user = state.Users.FirstOrDefault(u => u.Id == affectedUserId);
-            if (user is null || (userType == null || user.UserType == userType) && (isPlaying == null || user.IsPlaying == isPlaying)) return state;
+            if (user is null ||
+                (userType == null || user.UserType == userType) &&
+                (isPlaying == null || user.IsPlaying == isPlaying) &&
+                (seatingPosition == null || user.SeatingPosition == seatingPosition))
+                return state;
             updated = true;
 
-            var updatedUser = user with { UserType = userType ?? user.UserType, IsPlaying = isPlaying ?? user.IsPlaying };
+            var updatedUser = user with
+            {
+                UserType = userType ?? user.UserType,
+                IsPlaying = isPlaying ?? user.IsPlaying,
+                SeatingPosition = seatingPosition ?? user.SeatingPosition
+            };
 
             return state with { Users = state.Users.Select(u => u.Id == affectedUserId ? updatedUser : u).ToList() };
         });
 
         return updated;
+    }
+
+    public int GetNextAvailableSeatingPosition(string gameId)
+    {
+        var perspective = GetFirstPerspective(gameId);
+        if (perspective is null) return -1;
+        var currentPlayers = perspective.Players.ToArray();
+        if (!currentPlayers.Any()) return 0;
+
+        var maxPosition = currentPlayers.Max(u => u.SeatingPosition);
+        return maxPosition + 1;
     }
 
 
@@ -138,6 +178,7 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         new(user.Id)
         {
             UserType = user.UserType,
-            IsPlaying = user.IsPlaying
+            IsPlaying = user.IsPlaying,
+            SeatingPosition = user.SeatingPosition
         };
 }
