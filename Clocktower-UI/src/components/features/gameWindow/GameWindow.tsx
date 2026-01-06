@@ -3,13 +3,13 @@ import {useAppStore} from "@/store";
 import {useState} from "react";
 import {BottomHud, CenterHud, StoryTellerHud, TopHud, UserManagerPanel} from "@/components/features/gameWindow/components";
 import {UserUtils} from "@/utils";
-import {useUser} from "@/components/features/discordTownPanel/hooks";
+import {useDiscordTown, useUser} from "@/components/features/discordTownPanel/hooks";
 
 export default function GameWindow() {
     const {gameId, currentUser} = useAppStore();
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const {thisUser} = useUser(currentUser?.id);
-
+    const {discordTown} = useDiscordTown();
     return (
         <div className="game-window-controls">
             <TownSquare/>
@@ -27,7 +27,7 @@ export default function GameWindow() {
             }
             <CenterHud/>
             <TopHud/>
-            <BottomHud gameId={gameId}/>
+            <BottomHud gameId={gameId} storyTellers={discordTown?.storyTellers ?? []}/>
         </div>
     );
 };

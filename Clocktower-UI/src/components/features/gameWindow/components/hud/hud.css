@@ -1,6 +1,4 @@
-﻿@import "tailwindcss";
-
-@layer components {
+﻿@layer components {
     .icon-button {
         @apply w-6 h-6 text-white;
     }
@@ -18,10 +16,19 @@
     }
 
     .controls-bottom {
-        @apply absolute bottom-8 right-0 -translate-x-1/2 pointer-events-none z-50;
+        @apply absolute bottom-8 right-8 pointer-events-none z-50 flex flex-col gap-2 items-end;
     }
 
     .game-id-label {
-        @apply bg-black/50 backdrop-blur-sm p-3 rounded-lg pointer-events-auto text-white select-none;
+        @apply bg-black/50 backdrop-blur-sm p-3 rounded-lg pointer-events-auto select-none text-sm;
     }
+
+    .story-teller-label {
+        @apply gap-1 items-center text-sm inline-block ml-1 select-none text-gray-400;
+
+        > svg {
+            @apply inline-block w-4 h-4;
+        }
+    }
+
 } 

@@ -22,7 +22,7 @@ export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, glow
     return (
         <div className="player-icon" style={playerIconStyle}>
             {isTopHalf && (
-                <PlayerNameLabel name={player.name} onClick={onNameClick}>{children}</PlayerNameLabel>
+                <PlayerNameLabel player={player} onClick={onNameClick}>{children}</PlayerNameLabel>
             )}
 
             <div className="avatar-container" style={glowColorStyle}>
@@ -31,7 +31,7 @@ export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, glow
             </div>
 
             {!isTopHalf && (
-                <PlayerNameLabel name={player.name} onClick={onNameClick}>{children}</PlayerNameLabel>
+                <PlayerNameLabel player={player} onClick={onNameClick}>{children}</PlayerNameLabel>
             )}
         </div>
     );

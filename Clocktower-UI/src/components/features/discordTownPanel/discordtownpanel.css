@@ -49,7 +49,7 @@
     }
 
     .user-status-icon-self {
-        @apply text-discord-icon;
+        @apply text-white;
     }
 
     .user-status-icon-server {
