@@ -79,6 +79,10 @@
     }
 
     .avatar-container {
-        @apply relative;
+        --glow-color: transparent;
+
+        @apply relative rounded-full border-4;
+        border-color: var(--glow-color);
+        box-shadow: 0 0 50px var(--glow-color);
     }
 }
