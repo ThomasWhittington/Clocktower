@@ -32,7 +32,6 @@ body {
     place-items: center;
     min-width: 320px;
     min-height: 100vh;
-    user-select: none;
 }
 
 h1 {
@@ -54,6 +53,7 @@ h1 {
 
 .unstyled-button {
     all: unset;
+    user-select: none;
 }
 
 .btn-default:hover {
@@ -80,20 +80,21 @@ h1 {
     }
 }
 
+
 .btn-primary {
-    @apply bg-[#5865F2] hover:enabled:bg-[#4754b8] text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20;
+    @apply bg-[#5865F2] hover:enabled:bg-[#4754b8] text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .btn-secondary {
-    @apply bg-gray-600 hover:enabled:bg-gray-700 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20;
+    @apply bg-gray-600 hover:enabled:bg-gray-700 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .btn-danger {
-    @apply bg-red-600 hover:enabled:bg-red-700 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20;
+    @apply bg-red-600 hover:enabled:bg-red-700 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .btn-outline {
-    @apply bg-transparent hover:enabled:bg-[#5865F2] text-[#5865F2] hover:enabled:text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-[#5865F2] cursor-pointer disabled:cursor-not-allowed disabled:opacity-20;
+    @apply bg-transparent hover:enabled:bg-[#5865F2] text-[#5865F2] hover:enabled:text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-[#5865F2] cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .loading {
@@ -123,6 +124,10 @@ h1 {
 
 .image-container:hover .logout-icon {
     opacity: 1;
+}
+
+br {
+    @apply select-none;
 }
 
 @theme {

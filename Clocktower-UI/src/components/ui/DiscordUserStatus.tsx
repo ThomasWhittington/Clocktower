@@ -1,9 +1,5 @@
-﻿import {
-    useAppStore
-} from "@/store";
-import {
-    resetAllApplicationState
-} from "@/utils";
+﻿import {useAppStore} from "@/store";
+import {resetAllApplicationState} from "@/utils";
 
 export const DiscordUserStatus = () => {
     const currentUser = useAppStore((state) => state.currentUser);
@@ -19,7 +15,7 @@ export const DiscordUserStatus = () => {
         <>
             {currentUser &&
                 <div
-                    className="relative group w-10">
+                    className="relative group w-10 select-none">
                     <img
                         src={currentUser.avatarUrl}
                         alt={currentUser.name}

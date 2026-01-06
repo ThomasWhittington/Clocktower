@@ -1,4 +1,4 @@
-﻿@reference "tailwindcss";
+﻿@import "tailwindcss";
 
 @layer components {
     .btn-close {
@@ -38,7 +38,7 @@
     }
 
     .user-avatar {
-        @apply shrink-0 rounded-full overflow-hidden;
+        @apply shrink-0 rounded-full overflow-hidden select-none;
     }
 
     .user-avatar > img {

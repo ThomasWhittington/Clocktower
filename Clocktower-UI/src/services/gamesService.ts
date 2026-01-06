@@ -125,7 +125,7 @@ async function randomiseSeatingPositions(gameId: string): Promise<string[]> {
         throw new Error(error.toString());
     }
 
-    return data ?? '';
+    return data ?? [];
 }
 
 async function swapSeatingPositions(gameId: string, userId1: string, userId2: string): Promise<string> {

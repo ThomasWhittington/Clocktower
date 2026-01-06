@@ -465,8 +465,8 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void GetNextAvailableSeatingPosition_ReturnsNextAvailablePosition()
     {
-        var user1 = CommonMethods.GetRandomGameUser(UserId3) with { UserType = UserType.Player, SeatingPosition = 0 };
-        var user2 = CommonMethods.GetRandomGameUser(UserId3) with { UserType = UserType.Player, SeatingPosition = 1 };
+        var user1 = CommonMethods.GetRandomGameUser(UserId1) with { UserType = UserType.Player, SeatingPosition = 0 };
+        var user2 = CommonMethods.GetRandomGameUser(UserId2) with { UserType = UserType.Player, SeatingPosition = 1 };
         var user3 = CommonMethods.GetRandomGameUser(UserId3) with { UserType = UserType.Player, SeatingPosition = 2 };
         _sut.Set(_game1 with { Users = [user1, user2, user3] });
 

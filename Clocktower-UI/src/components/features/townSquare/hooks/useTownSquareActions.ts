@@ -27,11 +27,15 @@ export function useTownSquareActions() {
 
     const confirmSwap = useCallback(async (target: User) => {
         if (swappingPlayer && gameId) {
-            await runAction(async () => {
+            const result = await runAction(async () => {
                 return await gamesService.swapSeatingPositions(gameId, swappingPlayer.id, target.id);
             });
+            if (result) {
+                setSwappingPlayer(null);
+            }
+        } else {
+            setSwappingPlayer(null);
         }
-        setSwappingPlayer(null);
     }, [swappingPlayer, gameId, runAction]);
 
     const cancelSwap = useCallback(() => {

@@ -20,7 +20,7 @@ export const playerActions: PlayerAction[] = [
         id: "swap-seats",
         label: "Swap Seats",
         icon: "🔄",
-        isVisible: (player, currentUser) => UserUtils.isStoryTeller(currentUser),
+        isVisible: (_, currentUser) => UserUtils.isStoryTeller(currentUser),
         execute: (player, {initiateSwap}) => {
             initiateSwap(player);
         },

@@ -2,7 +2,7 @@
 @import '@/components/features/discordTownPanel/discordtownpanel.css';
 @import '@/components/features/gameWindow/gamewindow.css';
 
-@reference "tailwindcss";
+@import "tailwindcss";
 
 @layer components {
     .discord-user-avatar {

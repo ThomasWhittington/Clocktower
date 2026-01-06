@@ -1,4 +1,5 @@
-﻿import {playerActions} from '../config';
+﻿import {type PlayerActionContext, playerActions} from '../config';
+import type {User} from "@/types";
 
 interface PlayerActionMenuProps {
     player: User;

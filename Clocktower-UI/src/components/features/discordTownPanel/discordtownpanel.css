@@ -1,4 +1,4 @@
-﻿@reference "tailwindcss";
+﻿@import "tailwindcss";
 
 @layer components {
     .category-header {
@@ -14,7 +14,7 @@
     }
 
     .channel-button {
-        @apply absolute -top-3 left-4 bg-discord px-2 text-sm font-semibold text-white! rounded-2xl hover:bg-forestgreen;
+        @apply absolute -top-3 left-4 bg-discord px-2 text-sm font-semibold text-white! rounded-2xl hover:bg-forestgreen select-none;
     }
 
     .channel-button-enabled {
@@ -42,10 +42,10 @@
 
     .town-user-status {
         @apply flex flex-row w-1/2 gap-2;
-    }
 
-    .town-user-status > p {
-        @apply content-center;
+        > p {
+            @apply content-center select-none;
+        }
     }
 
     .user-status-icon-self {
