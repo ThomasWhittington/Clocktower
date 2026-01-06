@@ -32,6 +32,7 @@ public class SwapSeatingPositions : IEndpoint
             RuleFor(x => x.GameId).MustBeValidGameId();
             RuleFor(x => x.UserId1).MustBeValidSnowflake(nameof(Request.UserId1));
             RuleFor(x => x.UserId2).MustBeValidSnowflake(nameof(Request.UserId2));
+            RuleFor(x => x).Must(r => r.UserId1 != r.UserId2).WithMessage("Cannot swap a user with themselves");
         }
     }
 }

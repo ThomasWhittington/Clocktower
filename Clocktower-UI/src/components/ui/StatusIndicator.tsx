@@ -1,7 +1,7 @@
 ﻿export function StatusIndicator({color = "yellow"}: Readonly<{ color?: "yellow" | "red" | "green" }>) {
     const colorClass = {
         yellow: "bg-yellow-400",
-        red: "bg-red-500",
+        red: "bg-discord-warning",
         green: "bg-green-500"
     }[color];
 

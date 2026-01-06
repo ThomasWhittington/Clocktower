@@ -3,6 +3,7 @@
 [UsedImplicitly]
 public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITownUser
 {
+    public const int NoSeatingPosition = -1;
     [UsedImplicitly] public VoiceState VoiceState { get; set; } = new(false, false, false, false);
     [UsedImplicitly] public bool IsPresent { get; set; }
     [UsedImplicitly] public bool IsPlaying { get; set; }
@@ -17,7 +18,7 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
             IsPresent = townUser.IsPresent,
             IsPlaying = gameUser?.IsPlaying ?? false,
             UserType = gameUser?.UserType ?? UserType.Unknown,
-            SeatingPosition = gameUser?.SeatingPosition ?? -1
+            SeatingPosition = gameUser?.SeatingPosition ?? NoSeatingPosition
         };
     }
 

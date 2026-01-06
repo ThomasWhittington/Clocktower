@@ -22,6 +22,6 @@ export function mapToUser(userDto: ClocktowerServerDataDtoUserDto): User {
         voiceState: userDto.voiceState ? mapToVoiceState(userDto.voiceState) : undefined,
         isPlaying: userDto.isPlaying ?? false,
         userType: (UserType[userDto.userType as keyof typeof UserType]) ?? UserType.Unknown,
-        seatingPosition: userDto.seatingPosition ?? undefined
+        seatingPosition: userDto.seatingPosition ?? -1
     };
 }

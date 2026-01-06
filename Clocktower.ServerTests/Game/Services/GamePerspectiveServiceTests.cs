@@ -664,6 +664,8 @@ public class GamePerspectiveServiceTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().HaveCount(3);
+        result.Value.Should().OnlyHaveUniqueItems("each player should appear exactly once");
+        result.Value.Should().Contain(["user1", "user2", "user3"]);
 
         foreach (var player in players)
         {

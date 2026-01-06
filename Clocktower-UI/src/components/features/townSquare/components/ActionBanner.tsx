@@ -5,16 +5,17 @@ interface ActionBannerProps {
     message: ReactNode;
     onCancel: () => void;
     cancelText?: string;
+    statusColor?: "yellow" | "red" | "green";
 }
 
-export function ActionBanner({message, onCancel, cancelText = "Cancel"}: Readonly<ActionBannerProps>) {
+export function ActionBanner({message, onCancel, cancelText = "Cancel", statusColor = "yellow"}: Readonly<ActionBannerProps>) {
     return (
         <div className="action-banner">
             <div className="action-banner-content">
-                <StatusIndicator/>
+                <StatusIndicator color={statusColor}/>
                 {message}
             </div>
-            <button onClick={onCancel} className="btn-danger">
+            <button onClick={onCancel} className="btn-danger" aria-label="Cancel">
                 {cancelText}
             </button>
         </div>

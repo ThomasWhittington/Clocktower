@@ -18,11 +18,21 @@ public class SwapSeatingPositionsRequestValidatorTests
     [TestMethod]
     public void Validate_ShouldNotHaveErrors_WhenRequestIsValid()
     {
-        var request = new SwapSeatingPositions.Request("valid-game", ValidSnowflake, ValidSnowflake);
+        var request = new SwapSeatingPositions.Request("valid-game", CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomSnowflakeStringId());
 
         var result = _validator.TestValidate(request);
 
         result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    [TestMethod]
+    public void Validate_ShouldHaveError_WhenUsersAreSame()
+    {
+        var request = new SwapSeatingPositions.Request("valid-game", ValidSnowflake, ValidSnowflake);
+
+        var result = _validator.TestValidate(request);
+
+        result.ShouldHaveValidationErrorFor(x => x).WithErrorMessage("Cannot swap a user with themselves");
     }
 
     #region GameId Tests

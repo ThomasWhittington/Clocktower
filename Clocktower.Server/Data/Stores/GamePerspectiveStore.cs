@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using Clocktower.Server.Data.Dto;
 
 namespace Clocktower.Server.Data.Stores;
 
@@ -145,7 +146,7 @@ public class GamePerspectiveStore : IGamePerspectiveStore
     public int GetNextAvailableSeatingPosition(string gameId)
     {
         var perspective = GetFirstPerspective(gameId);
-        if (perspective is null) return -1;
+        if (perspective is null) return UserDto.NoSeatingPosition;
         var currentPlayers = perspective.Players.ToArray();
         if (!currentPlayers.Any()) return 0;
 

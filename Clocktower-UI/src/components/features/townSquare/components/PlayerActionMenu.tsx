@@ -15,7 +15,7 @@ export function PlayerActionMenu({player, context}: Readonly<PlayerActionMenuPro
 
 
     return (
-        <div className="player-action-menu" onPointerDown={(e) => e.stopPropagation()}>
+        <div className="player-action-menu" role="menu" aria-label={`Actions for ${player.name}`} onPointerDown={(e) => e.stopPropagation()}>
             <div className="player-action-menu-header">
                 <p className="descriptor">Player Actions</p>
                 <p className="title">{player.name}</p>
@@ -24,6 +24,7 @@ export function PlayerActionMenu({player, context}: Readonly<PlayerActionMenuPro
                 {visibleActions.map((action) => (
                     <button
                         key={action.id}
+                        role="menuitem"
                         className="player-action-menu-item"
                         onClick={() => action.execute(player, context)}
                     >
