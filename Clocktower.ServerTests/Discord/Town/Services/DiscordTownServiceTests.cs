@@ -1218,7 +1218,7 @@ public class DiscordTownServiceTests
     [DataRow(UserType.StoryTeller)]
     [DataRow(UserType.Player)]
     [DataRow(UserType.Spectator)]
-    public async Task SetUserType_ReturnsOk_UpdatesUser(UserType userType)
+    public async Task SetUserType_ReturnsOk_UpdatesUser_HasNoRoles(UserType userType)
     {
         Setup_SetUserType(userRoles:
         [
