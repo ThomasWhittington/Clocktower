@@ -2,21 +2,14 @@
 @import '@/components/components.css';
 
 :root {
-    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-    font-weight: 400;
-
-    color-scheme: dark;
-
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    @apply font-sans leading-normal font-normal;
+    @apply scheme-dark bg-[#242424];
+    @apply antialiased;
 }
 
 .unstyled-button {
     all: unset;
-    user-select: none;
+    @apply select-none;
 }
 
 .btn-primary {
@@ -47,22 +40,10 @@
     object-fit: cover;
 }
 
-.logout-icon {
-    position: absolute;
-    width: 15px;
-    height: 15px;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-    cursor: pointer;
-}
-
 .error-text {
     @apply text-red-500 text-sm;
 }
 
-.image-container:hover .logout-icon {
-    opacity: 1;
-}
 
 @theme {
     --color-discord: #1f2936;
