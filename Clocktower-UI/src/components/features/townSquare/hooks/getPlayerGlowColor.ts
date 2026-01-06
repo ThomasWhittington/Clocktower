@@ -2,13 +2,13 @@
 import {DiscordTown, type User} from "@/types";
 import {DiscordTownUtils} from "@/utils";
 
-interface UsePlayerGlowColorProps {
+interface GetPlayerGlowColorProps {
     player: User;
     currentUser: User | undefined;
     discordTown: DiscordTown | undefined;
 }
 
-export function usePlayerGlowColor({player, currentUser, discordTown}: UsePlayerGlowColorProps): ColorKey | undefined {
+export function getPlayerGlowColor({player, currentUser, discordTown}: GetPlayerGlowColorProps): ColorKey | undefined {
     if (player.id === currentUser?.id) {
         return "discordPrimary";
     }

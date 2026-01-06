@@ -1,6 +1,6 @@
 ﻿import type {PlayerActionContext} from "@/components/features/townSquare/config";
 import {ActionBanner, PlayerActionMenu, PlayerIcon} from "@/components/features/townSquare/components";
-import {useCircleLayout, usePlayerGlowColor, useTownSquareActions} from "@/components/features/townSquare/hooks";
+import {getPlayerGlowColor, useCircleLayout, useTownSquareActions} from "@/components/features/townSquare/hooks";
 import {useDiscordTown, useUser} from "@/components/features/discordTownPanel/hooks";
 import {useElementSize} from "@/hooks";
 import {Spinner} from "@/components/ui";
@@ -46,7 +46,7 @@ export default function TownSquare() {
 
                 const isSwappingTarget = swappingPlayer !== null && swappingPlayer.id !== player.id;
 
-                const glowColor = usePlayerGlowColor({
+                const glowColor = getPlayerGlowColor({
                     player,
                     currentUser: thisUser,
                     discordTown

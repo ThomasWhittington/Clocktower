@@ -1,3 +1,3 @@
 ﻿export * from './useCircleLayout';
 export * from './useTownSquareActions';
-export * from './usePlayerGlowColor';
+export * from './getPlayerGlowColor';
