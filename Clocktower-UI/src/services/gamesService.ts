@@ -1,5 +1,5 @@
 ﻿import {type GamePerspective, mapToGamePerspective, mapToUser, type User,} from "@/types";
-import {addUserToGameApi, getAvailableGameUsersApi, getGamesApi, loadDummyGamesApi, removeUserFromGameApi, startGameApi} from "@/api";
+import {addUserToGameApi, getAvailableGameUsersApi, getGamesApi, loadDummyGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, startGameApi, swapSeatingPositionsApi} from "@/api";
 import {apiClient} from "@/api/api-client.ts";
 
 async function getGames(): Promise<GamePerspective[]> {
@@ -109,11 +109,54 @@ async function removeUserFromGame(gameId: string, userId: string): Promise<strin
     return data ?? '';
 }
 
+async function randomiseSeatingPositions(gameId: string): Promise<string[]> {
+    const {
+        data,
+        error
+    } = await randomiseSeatingPositionsApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+        }
+    });
+
+    if (error) {
+        console.error('Failed to randomise seating positions:', error);
+        throw new Error(error.toString());
+    }
+
+    return data ?? '';
+}
+
+async function swapSeatingPositions(gameId: string, userId1: string, userId2: string): Promise<string> {
+    const {
+        data,
+        error
+    } = await swapSeatingPositionsApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId1: userId1,
+            userId2: userId2
+        }
+    });
+
+    if (error) {
+        console.error('Failed to swap player seats:', error);
+        throw new Error(error.toString());
+    }
+
+    return data ?? '';
+}
+
+
 export const gamesService = {
     getGames,
     loadDummyData,
     startGame,
     getAvailableGameUsers,
     addUserToGame,
-    removeUserFromGame
+    removeUserFromGame,
+    randomiseSeatingPositions,
+    swapSeatingPositions
 }

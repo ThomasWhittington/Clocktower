@@ -1,0 +1,11 @@
+﻿@import '@/components/features/townSquare/townsquare.css';
+@import '@/components/features/discordTownPanel/discordtownpanel.css';
+@import '@/components/features/gameWindow/gamewindow.css';
+
+@reference "tailwindcss";
+
+@layer components {
+    .discord-user-avatar {
+        @apply border-2 border-discord-icon;
+    }
+}

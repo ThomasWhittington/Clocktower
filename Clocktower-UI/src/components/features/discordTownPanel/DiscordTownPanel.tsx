@@ -25,7 +25,7 @@ function DiscordTownPanel() {
             {isLoading &&
                 <Spinner/>}
             {error &&
-                <p className="text-red-500 text-sm">{error}</p>}
+                <p className="error-text">{error}</p>}
             {discordTown &&
                 <div
                     id="discord-town"

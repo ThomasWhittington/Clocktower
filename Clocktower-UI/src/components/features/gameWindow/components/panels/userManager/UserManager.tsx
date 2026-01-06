@@ -1,6 +1,6 @@
 ﻿import {useUserControls} from "@/components/features/gameWindow/hooks";
 import {useDiscordTown} from "@/components/features/discordTownPanel/hooks";
-import {OpenLetter} from "@/components/ui/icons";
+import {OpenLetter, Randomise} from "@/components/ui/icons";
 import {IconButton, Spinner} from "@/components/ui";
 import {UserGroup} from "@/components/features/gameWindow/components/panels/userManager/UserGroup.tsx";
 
@@ -8,12 +8,24 @@ export const UserManager = () => {
     const {discordTown} = useDiscordTown();
     const {
         inviteAll,
+        randomiseSeatingPositions,
         isLoading: isControlsLoading,
         canRun: userControlsCanRun
     } = useUserControls();
 
     return (
         <div className="column user-list">
+
+            {userControlsCanRun &&
+                <IconButton
+                    icon={<Randomise/>}
+                    className="ml-auto"
+                    text="Randomise seat positions"
+                    variant="secondary"
+                    onClick={randomiseSeatingPositions}
+                />
+            }
+
             <UserGroup className="user-group-storytellers" title="StoryTellers" users={discordTown?.storyTellers}/>
             <UserGroup className="user-group-players" title="Players" users={discordTown?.players}/>
             <UserGroup className="user-group-spectators" title="Spectators" users={discordTown?.spectators}/>

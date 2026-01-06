@@ -36,7 +36,7 @@ function DiscordAdminPanel() {
             {result &&
                 <p className="text-green-500 text-sm">{result}</p>}
             {error &&
-                <p className="text-red-500 text-sm">{error}</p>}
+                <p className="error-text">{error}</p>}
             <div>
                 {discordActionsCanRun &&
                     <>
@@ -53,7 +53,7 @@ function DiscordAdminPanel() {
                 {timerResult &&
                     <p className="text-green-500 text-sm">{timerResult}</p>}
                 {timerError &&
-                    <p className="text-red-500 text-sm">{timerError}</p>}
+                    <p className="error-text">{timerError}</p>}
 
                 {timerActionsCanRun &&
                     <>

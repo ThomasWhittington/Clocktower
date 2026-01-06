@@ -1,22 +1,36 @@
 ﻿import {PlayerNameLabel} from "@/components/features/townSquare/components";
 import type {User} from "@/types";
 import {UserAvatar} from "@/components/ui";
+import type {ReactNode, MouseEvent, CSSProperties} from "react";
 
-export function PlayerIcon({x, y, size, player}: Readonly<{ x: number; y: number; size: number; player: User }>) {
+export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, children}: Readonly<{
+    x: number;
+    y: number;
+    size: number;
+    player: User;
+    onNameClick: (e: MouseEvent) => void;
+    avatarOverlay?: ReactNode;
+    children?: ReactNode;
+}>) {
     const isTopHalf = y < 0;
     return (
-        <div
-            className="absolute top-1/2 left-1/2 flex flex-col items-center gap-1.5 transition-transform duration-700 ease-out"
-            style={{transform: `translate(-50%, -50%) translate(${x}px, ${y}px)`}}
-        >
+        <div className="player-icon" style={
+            {
+                '--player-x': `${x}px`,
+                '--player-y': `${y}px`
+            } as CSSProperties
+        }>
             {isTopHalf && (
-                <PlayerNameLabel name={player.name}/>
+                <PlayerNameLabel name={player.name} onClick={onNameClick}>{children}</PlayerNameLabel>
             )}
 
-            <UserAvatar user={player} size={size}/>
+            <div className="avatar-container">
+                <UserAvatar user={player} size={size}/>
+                {avatarOverlay}
+            </div>
 
             {!isTopHalf && (
-                <PlayerNameLabel name={player.name}/>
+                <PlayerNameLabel name={player.name} onClick={onNameClick}>{children}</PlayerNameLabel>
             )}
         </div>
     );

@@ -44,6 +44,12 @@ export const useUserControls = () => {
             return await discordService.inviteAll(gameId);
         });
     }, [gameId, runAction]);
+    const randomiseSeatingPositions = useCallback(async () => {
+        if (!gameId) return;
+        await runAction(async () => {
+            return await gamesService.randomiseSeatingPositions(gameId);
+        });
+    }, [gameId, runAction]);
 
     const inviteUser = useCallback(async (user: User) => {
         if (!gameId) return;
@@ -88,10 +94,12 @@ export const useUserControls = () => {
         getAvailableGameUsers,
         addUserToGame,
         removeUser,
+        randomiseSeatingPositions,
         availableUsers,
         isLoading,
         error,
         result,
         canRun: Boolean(gameId) && !isLoading,
+        runAction
     };
 }

@@ -1,4 +1,6 @@
-﻿@layer components {
+﻿@reference "tailwindcss";
+
+@layer components {
     .category-header {
         @apply w-full text-left text-sm font-semibold mb-2 cursor-pointer bg-transparent border-none p-0 hover:underline focus:outline-none focus:ring-0;
     }

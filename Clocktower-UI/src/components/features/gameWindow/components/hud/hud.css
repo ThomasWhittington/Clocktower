@@ -1,4 +1,6 @@
-﻿@layer components {
+﻿@reference "tailwindcss";
+
+@layer components {
     .icon-button {
         @apply w-6 h-6 text-white;
     }
