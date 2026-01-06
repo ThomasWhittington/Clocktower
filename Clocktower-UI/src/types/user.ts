@@ -10,7 +10,7 @@ export type User = {
     voiceState: VoiceState | undefined;
     isPlaying: boolean;
     userType: UserType;
-    seatingPosition: number | undefined;
+    seatingPosition: number;
 };
 
 export function mapToUser(userDto: ClocktowerServerDataDtoUserDto): User {

@@ -25,7 +25,7 @@
 }
 
 .btn-outline {
-    @apply bg-transparent hover:bg-discord-primary text-[#5865F2] hover:enabled:text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-[#5865F2] cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
+    @apply bg-transparent hover:bg-discord-primary text-discord-primary hover:enabled:text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-discord-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .loading {

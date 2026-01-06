@@ -8,6 +8,7 @@ public class SwapSeatingPositionsRequestValidatorTests
 {
     private SwapSeatingPositions.RequestValidator _validator = null!;
     private const string ValidSnowflake = "123456789012345678";
+    private const string ValidSnowflake2 = "987654321098765432";
 
     [TestInitialize]
     public void Setup()
@@ -42,7 +43,7 @@ public class SwapSeatingPositionsRequestValidatorTests
     [DataRow("")]
     public void Validate_ShouldHaveError_WhenGameIdIsTooShort(string invalidGameId)
     {
-        var request = new SwapSeatingPositions.Request(invalidGameId, ValidSnowflake, ValidSnowflake);
+        var request = new SwapSeatingPositions.Request(invalidGameId, ValidSnowflake, ValidSnowflake2);
 
         var result = _validator.TestValidate(request);
 
@@ -54,7 +55,7 @@ public class SwapSeatingPositionsRequestValidatorTests
     public void Validate_ShouldHaveError_WhenGameIdIsTooLong()
     {
         var longGameId = new string('a', 33);
-        var request = new SwapSeatingPositions.Request(longGameId, ValidSnowflake, ValidSnowflake);
+        var request = new SwapSeatingPositions.Request(longGameId, ValidSnowflake, ValidSnowflake2);
 
         var result = _validator.TestValidate(request);
 
@@ -65,7 +66,7 @@ public class SwapSeatingPositionsRequestValidatorTests
     [TestMethod]
     public void Validate_ShouldPass_WhenGameIdHasWhitespaceButTrimsToValidLength()
     {
-        var request = new SwapSeatingPositions.Request("  abc  ", ValidSnowflake, ValidSnowflake);
+        var request = new SwapSeatingPositions.Request("  abc  ", ValidSnowflake, ValidSnowflake2);
 
         var result = _validator.TestValidate(request);
 
