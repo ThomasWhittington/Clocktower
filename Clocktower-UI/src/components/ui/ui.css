@@ -1,4 +1,6 @@
-﻿@layer components {
+﻿@import "tailwindcss";
+
+@layer components {
     .btn-close {
         @apply text-gray-400 hover:text-white text-2xl;
     }
@@ -36,7 +38,7 @@
     }
 
     .user-avatar {
-        @apply shrink-0 rounded-full overflow-hidden;
+        @apply shrink-0 rounded-full overflow-hidden select-none;
     }
 
     .user-avatar > img {

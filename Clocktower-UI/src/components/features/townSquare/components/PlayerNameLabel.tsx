@@ -1,7 +1,17 @@
-﻿export function PlayerNameLabel({name}: Readonly<{
+﻿import type {MouseEvent, ReactNode} from "react";
+
+export function PlayerNameLabel({name, onClick, children}: Readonly<{
     name: string;
+    onClick?: (e: MouseEvent) => void;
+    children?: ReactNode;
 }>) {
     return (
-        <p className="px-2 py-1.5 rounded-md text-center text-3xl">{name}</p>
+
+        <div className="player-name-container">
+            <button onClick={onClick}>
+                {name}
+            </button>
+            {children}
+        </div>
     );
 }

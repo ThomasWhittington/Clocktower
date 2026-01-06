@@ -177,7 +177,7 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void AddUserToGame_ChangesNothing_WhenUserAlreadyInGame()
     {
-        var user = CommonMethods.GetRandomGameUser(UserId1);
+        var user = CommonMethods.GetRandomGameUser(UserId1) with { SeatingPosition = 0 };
         _sut.Set(_game1 with { UserId = UserId1, Users = [user] });
         _sut.Set(_game1 with { UserId = UserId2, Users = [user] });
 
@@ -192,8 +192,8 @@ public class GamePerspectiveStoreTests
     [TestMethod]
     public void RemoveUserFromGame_ChangesNothing_WhenGameNotFound()
     {
-        var user1 = CommonMethods.GetRandomGameUser(UserId1);
-        var user2 = CommonMethods.GetRandomGameUser(UserId2);
+        var user1 = CommonMethods.GetRandomGameUser(UserId1) with { SeatingPosition = 0 };
+        var user2 = CommonMethods.GetRandomGameUser(UserId2) with { SeatingPosition = 1 };
         _sut.Set(_game1 with { UserId = UserId1, Users = [user1] });
         _sut.Set(_game1 with { UserId = UserId2, Users = [user1] });
         _sut.Set(_game2 with { UserId = UserId1, Users = [user2] });
@@ -239,6 +239,42 @@ public class GamePerspectiveStoreTests
         _sut.Get(GameId1, UserId2)!.Users.Should().HaveCount(1);
     }
 
+    [TestMethod]
+    public void RemoveUserFromGame_ReIndexesRemainingUsersCorrectly()
+    {
+        var user0 = CommonMethods.GetRandomGameUser(UserId1) with { UserType = UserType.Player, SeatingPosition = 0, IsPlaying = true };
+        var user1 = CommonMethods.GetRandomGameUser(UserId2) with { UserType = UserType.Player, SeatingPosition = 1, IsPlaying = true };
+        var user2 = CommonMethods.GetRandomGameUser(UserId3) with { UserType = UserType.Player, SeatingPosition = 2, IsPlaying = true };
+
+        _sut.Set(_game1 with { UserId = UserId1, Users = [user0, user1, user2] });
+        _sut.Set(_game1 with { UserId = UserId3, Users = [user0, user1, user2] });
+
+        _sut.RemoveUserFromGame(GameId1, UserId2);
+
+        var perspective1 = _sut.Get(GameId1, UserId1);
+        perspective1.Should().NotBeNull();
+        perspective1!.Users.Should().HaveCount(2);
+
+        perspective1.Users.First(u => u.Id == UserId1).SeatingPosition.Should().Be(0);
+        perspective1.Users.First(u => u.Id == UserId3).SeatingPosition.Should().Be(1);
+
+        var perspective3 = _sut.Get(GameId1, UserId3);
+        perspective3!.Users.First(u => u.Id == UserId3).SeatingPosition.Should().Be(1);
+    }
+
+    [TestMethod]
+    public void RemoveUserFromGame_MaintainsZeroIndex_WhenFirstUserRemoved()
+    {
+        var user0 = CommonMethods.GetRandomGameUser(UserId1) with { UserType = UserType.Player, SeatingPosition = 0, IsPlaying = true };
+        var user1 = CommonMethods.GetRandomGameUser(UserId2) with { UserType = UserType.Player, SeatingPosition = 1, IsPlaying = true };
+        _sut.Set(_game1 with { UserId = UserId2, Users = [user0, user1] });
+
+        _sut.RemoveUserFromGame(GameId1, UserId1);
+
+        var perspective = _sut.Get(GameId1, UserId2);
+        perspective!.Users.Should().HaveCount(1);
+        perspective.Users.Single().SeatingPosition.Should().Be(0, "the remaining user should shift from position 1 to 0");
+    }
 
     [TestMethod]
     public void GetAll_ReturnsAll()
@@ -318,6 +354,7 @@ public class GamePerspectiveStoreTests
         result.Should().Contain(o => o.Id == GameId3);
     }
 
+
     #region UpdateUser
 
     [TestMethod]
@@ -343,7 +380,7 @@ public class GamePerspectiveStoreTests
         var user = CommonMethods.GetRandomGameUser(UserId3);
         _sut.AddUserToGame(GameId1, user);
 
-        var result = _sut.UpdateUser(GameId1, UserId3, userType: user.UserType, isPlaying: user.IsPlaying);
+        var result = _sut.UpdateUser(GameId1, UserId3, userType: user.UserType, isPlaying: user.IsPlaying, seatingPosition: user.SeatingPosition);
 
         result.Should().BeFalse();
         _sut.Get(GameId1, UserId1)!.Users.Should().Contain(user);
@@ -384,8 +421,74 @@ public class GamePerspectiveStoreTests
         _sut.Get(GameId1, UserId2)!.Users[0].IsPlaying.Should().Be(isPlaying);
     }
 
+    [TestMethod]
+    public void UpdateUser_Updates_SeatingPosition()
+    {
+        const int seatingPosition = 5;
+        _sut.Set(_game1 with { UserId = UserId1 });
+        _sut.Set(_game1 with { UserId = UserId2 });
+        var user = CommonMethods.GetRandomGameUser(UserId3) with { SeatingPosition = 0 };
+        _sut.AddUserToGame(GameId1, user);
+
+        var result = _sut.UpdateUser(GameId1, UserId3, seatingPosition: seatingPosition);
+
+        result.Should().BeTrue();
+        _sut.Get(GameId1, UserId1)!.Users[0].SeatingPosition.Should().Be(seatingPosition);
+        _sut.Get(GameId1, UserId2)!.Users[0].SeatingPosition.Should().Be(seatingPosition);
+    }
+
     #endregion
 
+
+    #region GetNextAvailableSeatingPosition
+
+    [TestMethod]
+    public void GetNextAvailableSeatingPosition_Returns0ForFirstPlayer()
+    {
+        var user1 = CommonMethods.GetRandomGameUser(UserId3) with { UserType = UserType.StoryTeller, SeatingPosition = 0 };
+        _sut.Set(_game1 with { Users = [user1] });
+
+        var result = _sut.GetNextAvailableSeatingPosition(GameId1);
+
+        result.Should().Be(0);
+    }
+
+    [TestMethod]
+    public void GetNextAvailableSeatingPosition_ReturnsNeg1_WhenGameNotFound()
+    {
+        var result = _sut.GetNextAvailableSeatingPosition(GameId1);
+
+        result.Should().Be(-1);
+    }
+
+
+    [TestMethod]
+    public void GetNextAvailableSeatingPosition_ReturnsNextAvailablePosition()
+    {
+        var user1 = CommonMethods.GetRandomGameUser(UserId1) with { UserType = UserType.Player, SeatingPosition = 0 };
+        var user2 = CommonMethods.GetRandomGameUser(UserId2) with { UserType = UserType.Player, SeatingPosition = 1 };
+        var user3 = CommonMethods.GetRandomGameUser(UserId3) with { UserType = UserType.Player, SeatingPosition = 2 };
+        _sut.Set(_game1 with { Users = [user1, user2, user3] });
+
+        var result = _sut.GetNextAvailableSeatingPosition(GameId1);
+
+        result.Should().Be(3);
+    }
+
+    [TestMethod]
+    public void GetNextAvailableSeatingPosition_ReturnsMaxPlusOne_WithNonContiguousPositions()
+    {
+        var user1 = CommonMethods.GetRandomGameUser(UserId1) with { UserType = UserType.Player, SeatingPosition = 0 };
+        var user2 = CommonMethods.GetRandomGameUser(UserId2) with { UserType = UserType.Player, SeatingPosition = 2 };
+        var user3 = CommonMethods.GetRandomGameUser(UserId3) with { UserType = UserType.Player, SeatingPosition = 5 };
+        _sut.Set(_game1 with { Users = [user1, user2, user3] });
+
+        var result = _sut.GetNextAvailableSeatingPosition(GameId1);
+
+        result.Should().Be(6, "method returns max position + 1, not first gap");
+    }
+
+    #endregion
 
     private static IEnumerable<object[]> GetGameTimeValues() => TestDataProvider.GetAllEnumValues<GameTime>();
     private static IEnumerable<object[]> GetUserTypeValues() => TestDataProvider.GetAllEnumValues<UserType>();

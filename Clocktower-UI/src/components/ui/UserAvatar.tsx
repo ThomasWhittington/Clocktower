@@ -13,9 +13,10 @@ export function UserAvatar({user, size = 40, className = ""}: Readonly<UserAvata
                 <img
                     src={user.avatarUrl}
                     alt={user.name}
+                    draggable="false"
                 />
             ) : (
-                <div className="w-full h-full bg-gray-600 flex items-center justify-center text-white font-medium">
+                <div className="w-full h-full bg-gray-600 flex items-center justify-center text-white font-medium select-none">
                     {user.name?.charAt(0)?.toUpperCase() || "?"}
                 </div>
             )}

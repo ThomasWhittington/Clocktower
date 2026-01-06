@@ -1,4 +1,6 @@
-﻿@layer components {
+﻿@import "tailwindcss";
+
+@layer components {
     .user-manager {
         @apply flex-1 flex gap-4;
 

@@ -1,4 +1,6 @@
-﻿@layer components {
+﻿@import "tailwindcss";
+
+@layer components {
     .category-header {
         @apply w-full text-left text-sm font-semibold mb-2 cursor-pointer bg-transparent border-none p-0 hover:underline focus:outline-none focus:ring-0;
     }
@@ -12,7 +14,7 @@
     }
 
     .channel-button {
-        @apply absolute -top-3 left-4 bg-discord px-2 text-sm font-semibold text-white! rounded-2xl hover:bg-forestgreen;
+        @apply absolute -top-3 left-4 bg-discord px-2 text-sm font-semibold text-white! rounded-2xl hover:bg-forestgreen select-none;
     }
 
     .channel-button-enabled {
@@ -40,10 +42,10 @@
 
     .town-user-status {
         @apply flex flex-row w-1/2 gap-2;
-    }
 
-    .town-user-status > p {
-        @apply content-center;
+        > p {
+            @apply content-center select-none;
+        }
     }
 
     .user-status-icon-self {

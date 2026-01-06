@@ -1,17 +1,13 @@
-﻿import {
-    useAppStore
-} from "@/store";
-import {
-    resetAllApplicationState
-} from "@/utils";
+﻿import {useAppStore} from "@/store";
+import {resetAllApplicationState} from "@/utils";
 
 export const DiscordUserStatus = () => {
-    const currentUser = useAppStore((state) => state.currentUser);
+    const {currentUser} = useAppStore();
 
     const handleLogout = async () => {
-        if (window.confirm("Continue log out?")) {
+        if (globalThis.confirm("Continue log out?")) {
             resetAllApplicationState();
-            window.location.href = '/';
+            globalThis.location.href = '/';
         }
     };
 
@@ -19,7 +15,7 @@ export const DiscordUserStatus = () => {
         <>
             {currentUser &&
                 <div
-                    className="relative group w-10">
+                    className="relative group w-10 select-none">
                     <img
                         src={currentUser.avatarUrl}
                         alt={currentUser.name}
@@ -27,7 +23,7 @@ export const DiscordUserStatus = () => {
 
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="absolute top-1/2 left-1/2 w-8 h-8 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer text-red-600 scale-x-[-1]"
+                        className="absolute top-1/2 left-1/2 w-8 h-8 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer text-discord-warning scale-x-[-1]"
                         fill="currentColor"
                         viewBox="0 0 24 24"
                         onClick={handleLogout}

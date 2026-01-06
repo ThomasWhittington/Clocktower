@@ -1,4 +1,6 @@
-﻿@layer components {
+﻿@import "tailwindcss";
+
+@layer components {
     .icon-button {
         @apply w-6 h-6 text-white;
     }
@@ -20,6 +22,6 @@
     }
 
     .game-id-label {
-        @apply bg-black/50 backdrop-blur-sm p-3 rounded-lg pointer-events-auto text-white;
+        @apply bg-black/50 backdrop-blur-sm p-3 rounded-lg pointer-events-auto text-white select-none;
     }
 } 

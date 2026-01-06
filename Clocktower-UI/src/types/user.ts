@@ -9,7 +9,8 @@ export type User = {
     isPresent: boolean,
     voiceState: VoiceState | undefined;
     isPlaying: boolean;
-    userType: UserType
+    userType: UserType;
+    seatingPosition: number;
 };
 
 export function mapToUser(userDto: ClocktowerServerDataDtoUserDto): User {
@@ -20,6 +21,7 @@ export function mapToUser(userDto: ClocktowerServerDataDtoUserDto): User {
         isPresent: userDto.isPresent ?? false,
         voiceState: userDto.voiceState ? mapToVoiceState(userDto.voiceState) : undefined,
         isPlaying: userDto.isPlaying ?? false,
-        userType: (UserType[userDto.userType as keyof typeof UserType]) ?? UserType.Unknown
+        userType: (UserType[userDto.userType as keyof typeof UserType]) ?? UserType.Unknown,
+        seatingPosition: userDto.seatingPosition ?? -1
     };
 }

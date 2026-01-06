@@ -36,7 +36,7 @@ function DiscordAdminPanel() {
             {result &&
                 <p className="text-green-500 text-sm">{result}</p>}
             {error &&
-                <p className="text-red-500 text-sm">{error}</p>}
+                <p className="error-text">{error}</p>}
             <div>
                 {discordActionsCanRun &&
                     <>
@@ -53,12 +53,12 @@ function DiscordAdminPanel() {
                 {timerResult &&
                     <p className="text-green-500 text-sm">{timerResult}</p>}
                 {timerError &&
-                    <p className="text-red-500 text-sm">{timerError}</p>}
+                    <p className="error-text">{timerError}</p>}
 
                 {timerActionsCanRun &&
                     <>
                         <input type="number" min={1} value={timerSeconds} onChange={(e) => setTimerSeconds(Number(e.target.value))} placeholder="Seconds" className="input-primary w-24"/>
-                        <input type="text" value={timerLabel} onChange={(e) => setTimerLabel(e.target.value)} placeholder="Label (optional)" className="input-primary w-32"/>
+                        <input type="text" value={timerLabel} onChange={(e) => setTimerLabel(e.target.value)} placeholder="Label (optional)" className="input-primary w-32 placeholder:select-none"/>
                         <button className="btn-primary" aria-label="Start or edit timer" disabled={!canSubmitTimer} onClick={() => startOrEditTimer(timerSeconds, timerLabel.trim() || undefined)}>
                             ⌛
                         </button>

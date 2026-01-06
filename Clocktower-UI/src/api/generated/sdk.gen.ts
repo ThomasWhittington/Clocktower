@@ -77,6 +77,9 @@ import type {
     PingUserApiData,
     PingUserApiErrors,
     PingUserApiResponses,
+    RandomiseSeatingPositionsApiData,
+    RandomiseSeatingPositionsApiErrors,
+    RandomiseSeatingPositionsApiResponses,
     RemoveUserFromGameApiData,
     RemoveUserFromGameApiErrors,
     RemoveUserFromGameApiResponses,
@@ -103,7 +106,10 @@ import type {
     StartGameApiResponses,
     StartOrEditTimerApiData,
     StartOrEditTimerApiErrors,
-    StartOrEditTimerApiResponses
+    StartOrEditTimerApiResponses,
+    SwapSeatingPositionsApiData,
+    SwapSeatingPositionsApiErrors,
+    SwapSeatingPositionsApiResponses
 } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
@@ -669,6 +675,24 @@ export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?
 };
 
 /**
+ * Randomises seating positions for players in the game
+ *
+ * Randomises seating positions for players in the game
+ */
+export const randomiseSeatingPositionsApi = <ThrowOnError extends boolean = false>(options: Options<RandomiseSeatingPositionsApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<RandomiseSeatingPositionsApiResponses, RandomiseSeatingPositionsApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/randomise-seating-positions',
+        ...options
+    });
+};
+
+/**
  * Removes user from the game
  *
  * Removes user from the game
@@ -718,6 +742,24 @@ export const startGameApi = <ThrowOnError extends boolean = false>(options: Opti
             }
         ],
         url: '/api/games/{gameId}/start/{guildId}/{userId}',
+        ...options
+    });
+};
+
+/**
+ * Swaps the seats for two players in the game
+ *
+ * Swaps the seats for two players in the game
+ */
+export const swapSeatingPositionsApi = <ThrowOnError extends boolean = false>(options: Options<SwapSeatingPositionsApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SwapSeatingPositionsApiResponses, SwapSeatingPositionsApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/swap-seating-positions/{userId1}/{userId2}',
         ...options
     });
 };
