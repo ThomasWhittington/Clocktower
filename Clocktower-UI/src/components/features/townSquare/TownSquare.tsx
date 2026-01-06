@@ -1,12 +1,16 @@
-﻿import {ActionBanner, PlayerActionMenu, PlayerIcon} from "@/components/features/townSquare/components";
+﻿import type {PlayerActionContext} from "@/components/features/townSquare/config";
+import {ActionBanner, PlayerActionMenu, PlayerIcon} from "@/components/features/townSquare/components";
 import {useCircleLayout, useTownSquareActions} from "@/components/features/townSquare/hooks";
-import {useDiscordTown} from "@/components/features/discordTownPanel/hooks";
+import {useDiscordTown, useUser} from "@/components/features/discordTownPanel/hooks";
 import {useElementSize} from "@/hooks";
 import {Spinner} from "@/components/ui";
+import {useAppStore} from "@/store";
 
 export default function TownSquare() {
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
     const {discordTown, isLoading, error} = useDiscordTown();
+    const {currentUser, gameId} = useAppStore();
+    const {thisUser} = useUser(currentUser?.id);
 
     const {
         activeMenuPlayerId,
@@ -24,6 +28,11 @@ export default function TownSquare() {
         containerHeight: parentSize.height,
     });
 
+    const actionContext: PlayerActionContext = {
+        gameId: gameId ?? "",
+        currentUser: thisUser,
+        initiateSwap
+    };
     return (
         <div ref={containerRef} className="townsquare" onClick={closeMenu}>
             {isLoading && <Spinner/>}
@@ -52,11 +61,10 @@ export default function TownSquare() {
                         )}
                     >
                         {activeMenuPlayerId === player.id && (
-                            <PlayerActionMenu playerName={player.name}>
-                                <button className="player-action-menu-item" onClick={() => initiateSwap(player)}>
-                                    <span>🔄</span> Swap Seats
-                                </button>
-                            </PlayerActionMenu>
+                            <PlayerActionMenu
+                                player={player}
+                                context={actionContext}
+                            />
                         )}
                     </PlayerIcon>
                 );

@@ -1,6 +1,6 @@
-﻿import {useState, useCallback} from "react";
+﻿import type {MouseEvent} from "react";
+import {useCallback, useState} from "react";
 import type {User} from "@/types";
-import type {MouseEvent} from "react";
 import {useUserControls} from "@/components/features/gameWindow/hooks";
 import {gamesService} from "@/services";
 import {useAppStore} from "@/store";

@@ -1,19 +1,34 @@
-﻿import type {ReactNode} from "react";
+﻿import {playerActions} from '../config';
 
 interface PlayerActionMenuProps {
-    playerName: string;
-    children: ReactNode;
+    player: User;
+    context: PlayerActionContext;
 }
 
-export function PlayerActionMenu({playerName, children}: Readonly<PlayerActionMenuProps>) {
+export function PlayerActionMenu({player, context}: Readonly<PlayerActionMenuProps>) {
+    const visibleActions = playerActions.filter((action) =>
+        action.isVisible(player, context.currentUser)
+    );
+
+    if (visibleActions.length === 0) return null;
+
+
     return (
         <div className="player-action-menu" onPointerDown={(e) => e.stopPropagation()}>
             <div className="player-action-menu-header">
                 <p className="descriptor">Player Actions</p>
-                <p className="title">{playerName}</p>
+                <p className="title">{player.name}</p>
             </div>
             <div className="player-action-menu-items">
-                {children}
+                {visibleActions.map((action) => (
+                    <button
+                        key={action.id}
+                        className="player-action-menu-item"
+                        onClick={() => action.execute(player, context)}
+                    >
+                        <span>{action.icon}</span> {action.label}
+                    </button>
+                ))}
             </div>
         </div>
     );

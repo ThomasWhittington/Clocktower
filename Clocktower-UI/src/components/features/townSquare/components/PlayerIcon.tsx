@@ -1,7 +1,7 @@
 ﻿import {PlayerNameLabel} from "@/components/features/townSquare/components";
 import type {User} from "@/types";
 import {UserAvatar} from "@/components/ui";
-import type {ReactNode, MouseEvent, CSSProperties} from "react";
+import type {CSSProperties, MouseEvent, ReactNode} from "react";
 
 export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, children}: Readonly<{
     x: number;

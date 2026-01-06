@@ -117,7 +117,7 @@ h1 {
     cursor: pointer;
 }
 
-.error-text{
+.error-text {
     @apply text-red-500 text-sm;
 }
 
