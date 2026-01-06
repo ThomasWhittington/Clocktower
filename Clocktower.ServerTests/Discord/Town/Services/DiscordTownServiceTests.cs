@@ -1155,6 +1155,48 @@ public class DiscordTownServiceTests
     [DataRow(UserType.StoryTeller)]
     [DataRow(UserType.Player)]
     [DataRow(UserType.Spectator)]
+    public async Task SetUserType_ReturnsOk_UpdatesUser_HasOnlyTargetRole(UserType userType)
+    {
+        Setup_SetUserType(userRoles:
+        [
+            (UserType.StoryTeller, userType == UserType.StoryTeller),
+            (UserType.Player, userType == UserType.Player),
+            (UserType.Spectator, userType == UserType.Spectator)
+        ]);
+
+        var result = await _sut.SetUserType(GameId, UserId, userType);
+
+        result.ShouldSucceedWith<string>($"({GameId}) {DisplayName} set to {userType}");
+        _user.Verify(o => o.RemoveRoleAsync(It.IsAny<IDiscordRole>()), Times.Never);
+        _user.Verify(o => o.AddRoleAsync(GetRoleForUserType(userType).Object), Times.Never);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    [DataRow(UserType.StoryTeller)]
+    [DataRow(UserType.Player)]
+    [DataRow(UserType.Spectator)]
+    public async Task SetUserType_ReturnsOk_UpdatesUser_HasOnlyNonTargetRole(UserType userType)
+    {
+        Setup_SetUserType(userRoles:
+        [
+            (UserType.StoryTeller, userType != UserType.StoryTeller),
+            (UserType.Player, userType != UserType.Player),
+            (UserType.Spectator, userType != UserType.Spectator)
+        ]);
+
+        var result = await _sut.SetUserType(GameId, UserId, userType);
+
+        result.ShouldSucceedWith<string>($"({GameId}) {DisplayName} set to {userType}");
+        _user.Verify(o => o.RemoveRoleAsync(It.IsAny<IDiscordRole>()), Times.Exactly(2));
+        _user.Verify(o => o.AddRoleAsync(GetRoleForUserType(userType).Object), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    [DataRow(UserType.StoryTeller)]
+    [DataRow(UserType.Player)]
+    [DataRow(UserType.Spectator)]
     public async Task SetUserType_ReturnsOk_UpdatesUser_HasAllRolesAlready(UserType userType)
     {
         Setup_SetUserType(userRoles:
