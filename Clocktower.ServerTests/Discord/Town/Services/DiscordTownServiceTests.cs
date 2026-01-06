@@ -1025,8 +1025,9 @@ public class DiscordTownServiceTests
 
     #region SetUserType
 
-    public void Setup_SetUserType(bool hasGame = true, bool hasGuild = true, bool hasUser = true, bool storyTellerRoleExists = true, bool playerRoleExists = true, bool spectatorRoleExists = true)
+    public void Setup_SetUserType(bool hasGame = true, bool hasGuild = true, bool hasUser = true, bool storyTellerRoleExists = true, bool playerRoleExists = true, bool spectatorRoleExists = true, (UserType userType, bool hasRole)[]? userRoles = null)
     {
+        userRoles ??= [];
         _user.Setup(o => o.Id).Returns(UserId);
         _user.Setup(o => o.DisplayName).Returns(DisplayName);
 
@@ -1041,6 +1042,22 @@ public class DiscordTownServiceTests
         _guild.Setup(o => o.GetRole(StoryTellerRoleName)).Returns(storyTellerRoleExists ? _storyTellerRole.Object : null);
         _guild.Setup(o => o.GetRole(PlayerRoleName)).Returns(playerRoleExists ? _playerRole.Object : null);
         _guild.Setup(o => o.GetRole(SpectatorRoleName)).Returns(spectatorRoleExists ? _spectatorRole.Object : null);
+
+        _storyTellerRole.Setup(o => o.Id).Returns("123");
+        _playerRole.Setup(o => o.Id).Returns("456");
+        _spectatorRole.Setup(o => o.Id).Returns("789");
+
+        var roleMap = new Dictionary<UserType, IDiscordRole>
+        {
+            { UserType.StoryTeller, _storyTellerRole.Object },
+            { UserType.Player, _playerRole.Object },
+            { UserType.Spectator, _spectatorRole.Object }
+        };
+
+        foreach (var (userType, hasRole) in userRoles)
+        {
+            _user.Setup(o => o.DoesUserHaveRole(roleMap[userType].Id)).Returns(hasRole);
+        }
 
         _user.Setup(o => o.AddRoleAsync(_storyTellerRole.Object)).Returns(Task.CompletedTask);
         _user.Setup(o => o.AddRoleAsync(_playerRole.Object)).Returns(Task.CompletedTask);
@@ -1138,16 +1155,84 @@ public class DiscordTownServiceTests
     [DataRow(UserType.StoryTeller)]
     [DataRow(UserType.Player)]
     [DataRow(UserType.Spectator)]
-    public async Task SetUserType_ReturnsOk_UpdatesUser(UserType userType)
+    public async Task SetUserType_ReturnsOk_UpdatesUser_HasOnlyTargetRole(UserType userType)
     {
-        Setup_SetUserType();
+        Setup_SetUserType(userRoles:
+        [
+            (UserType.StoryTeller, userType == UserType.StoryTeller),
+            (UserType.Player, userType == UserType.Player),
+            (UserType.Spectator, userType == UserType.Spectator)
+        ]);
 
         var result = await _sut.SetUserType(GameId, UserId, userType);
 
-        _user.Verify(o => o.RemoveRoleAsync(It.IsAny<IDiscordRole>()), Times.Exactly(3));
+        result.ShouldSucceedWith<string>($"({GameId}) {DisplayName} set to {userType}");
+        _user.Verify(o => o.RemoveRoleAsync(It.IsAny<IDiscordRole>()), Times.Never);
+        _user.Verify(o => o.AddRoleAsync(GetRoleForUserType(userType).Object), Times.Never);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    [DataRow(UserType.StoryTeller)]
+    [DataRow(UserType.Player)]
+    [DataRow(UserType.Spectator)]
+    public async Task SetUserType_ReturnsOk_UpdatesUser_HasOnlyNonTargetRole(UserType userType)
+    {
+        Setup_SetUserType(userRoles:
+        [
+            (UserType.StoryTeller, userType != UserType.StoryTeller),
+            (UserType.Player, userType != UserType.Player),
+            (UserType.Spectator, userType != UserType.Spectator)
+        ]);
+
+        var result = await _sut.SetUserType(GameId, UserId, userType);
+
+        result.ShouldSucceedWith<string>($"({GameId}) {DisplayName} set to {userType}");
+        _user.Verify(o => o.RemoveRoleAsync(It.IsAny<IDiscordRole>()), Times.Exactly(2));
         _user.Verify(o => o.AddRoleAsync(GetRoleForUserType(userType).Object), Times.Once);
         _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    [DataRow(UserType.StoryTeller)]
+    [DataRow(UserType.Player)]
+    [DataRow(UserType.Spectator)]
+    public async Task SetUserType_ReturnsOk_UpdatesUser_HasAllRolesAlready(UserType userType)
+    {
+        Setup_SetUserType(userRoles:
+        [
+            (UserType.StoryTeller, true),
+            (UserType.Player, true),
+            (UserType.Spectator, true)
+        ]);
+
+        var result = await _sut.SetUserType(GameId, UserId, userType);
+
         result.ShouldSucceedWith<string>($"({GameId}) {DisplayName} set to {userType}");
+        _user.Verify(o => o.RemoveRoleAsync(It.IsAny<IDiscordRole>()), Times.Exactly(2));
+        _user.Verify(o => o.AddRoleAsync(GetRoleForUserType(userType).Object), Times.Never);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    [DataRow(UserType.StoryTeller)]
+    [DataRow(UserType.Player)]
+    [DataRow(UserType.Spectator)]
+    public async Task SetUserType_ReturnsOk_UpdatesUser_HasNoRoles(UserType userType)
+    {
+        Setup_SetUserType(userRoles:
+        [
+            (UserType.StoryTeller, false),
+            (UserType.Player, false),
+            (UserType.Spectator, false)
+        ]);
+
+        var result = await _sut.SetUserType(GameId, UserId, userType);
+
+        result.ShouldSucceedWith<string>($"({GameId}) {DisplayName} set to {userType}");
+        _user.Verify(o => o.RemoveRoleAsync(It.IsAny<IDiscordRole>()), Times.Never);
+        _user.Verify(o => o.AddRoleAsync(GetRoleForUserType(userType).Object), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     #endregion
