@@ -6,9 +6,7 @@
     line-height: 1.5;
     font-weight: 400;
 
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
+    color-scheme: dark;
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -16,85 +14,25 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-    font-weight: 500;
-    color: #646cff;
-    text-decoration: inherit;
-}
-
-a:hover {
-    color: #535bf2;
-}
-
-body {
-    margin: 0;
-    display: flex;
-    place-items: center;
-    min-width: 320px;
-    min-height: 100vh;
-}
-
-h1 {
-    font-size: 3.2em;
-    line-height: 1.1;
-}
-
-.btn-default {
-    border-radius: 8px;
-    border: 1px solid transparent;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    background-color: #1a1a1a;
-    cursor: pointer;
-    transition: border-color 0.25s;
-}
-
 .unstyled-button {
     all: unset;
     user-select: none;
 }
 
-.btn-default:hover {
-    border-color: #646cff;
-}
-
-.btn-default:focus,
-.btn-default:focus-visible {
-    outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-    :root {
-        color: #213547;
-        background-color: #ffffff;
-    }
-
-    a:hover {
-        color: #747bff;
-    }
-
-    button {
-        background-color: #f9f9f9;
-    }
-}
-
-
 .btn-primary {
-    @apply bg-[#5865F2] hover:enabled:bg-[#4754b8] text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
+    @apply bg-discord-primary hover:bg-discord-primary/70 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .btn-secondary {
-    @apply bg-gray-600 hover:enabled:bg-gray-700 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
+    @apply bg-discord-secondary hover:enabled:bg-discord-secondary/70 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .btn-danger {
-    @apply bg-red-600 hover:enabled:bg-red-700 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
+    @apply bg-discord-warning hover:bg-discord-warning/70 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .btn-outline {
-    @apply bg-transparent hover:enabled:bg-[#5865F2] text-[#5865F2] hover:enabled:text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-[#5865F2] cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
+    @apply bg-transparent hover:bg-discord-primary text-[#5865F2] hover:enabled:text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-[#5865F2] cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .loading {
@@ -126,14 +64,13 @@ h1 {
     opacity: 1;
 }
 
-br {
-    @apply select-none;
-}
-
 @theme {
     --color-discord: #1f2936;
-    --color-discord-icon: #76777e;
+    --color-discord-primary: #5c68ee;
+    --color-discord-secondary: #36363b;
+    --color-discord-secondary--hover: #3d3e44;
     --color-discord-warning: #c6383d;
+    --color-discord-icon: #76777e;
     --color-forestgreen: #4d8e53;
 }
 

@@ -16,7 +16,7 @@ export class DiscordTown {
 
     get players(): User[] {
         return this.gameUsers.filter(u => u.userType === UserType.Player)
-            .sort((a, b) => (a.seatingPosition ?? 0) - (b.seatingPosition ?? 0));
+            .sort((a, b) => (a.seatingPosition ?? Infinity) - (b.seatingPosition ?? Infinity));
     }
 
     get storyTellers(): User[] {

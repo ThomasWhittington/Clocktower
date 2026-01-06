@@ -475,6 +475,19 @@ public class GamePerspectiveStoreTests
         result.Should().Be(3);
     }
 
+    [TestMethod]
+    public void GetNextAvailableSeatingPosition_ReturnsMaxPlusOne_WithNonContiguousPositions()
+    {
+        var user1 = CommonMethods.GetRandomGameUser(UserId1) with { UserType = UserType.Player, SeatingPosition = 0 };
+        var user2 = CommonMethods.GetRandomGameUser(UserId2) with { UserType = UserType.Player, SeatingPosition = 2 };
+        var user3 = CommonMethods.GetRandomGameUser(UserId3) with { UserType = UserType.Player, SeatingPosition = 5 };
+        _sut.Set(_game1 with { Users = [user1, user2, user3] });
+
+        var result = _sut.GetNextAvailableSeatingPosition(GameId1);
+
+        result.Should().Be(6, "method returns max position + 1, not first gap");
+    }
+
     #endregion
 
     private static IEnumerable<object[]> GetGameTimeValues() => TestDataProvider.GetAllEnumValues<GameTime>();

@@ -1,12 +1,6 @@
-﻿import type {
-    MiniCategory
-} from "@/types";
-import {
-    DiscordTownChannel
-} from "./index.ts";
-import {
-    useState
-} from "react";
+﻿import type {MiniCategory} from "@/types";
+import {DiscordTownChannel} from "./index.ts";
+import {useState} from "react";
 
 function DiscordTownCategory({category}: Readonly<{
     category: MiniCategory
@@ -34,7 +28,7 @@ function DiscordTownCategory({category}: Readonly<{
                             channel={channel}
                         />
                     ))}
-                    <br/>
+                    <br className="select-none"/>
                 </div>
             )}
         </div>
