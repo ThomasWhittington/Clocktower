@@ -18,7 +18,7 @@ export function usePlayerBadgeActions(player: User) {
             console.log(result);
             return result;
         });
-    }, [player.name, player.id, gameId, runAction]);
+    }, [player.isDead, player.id, gameId, runAction]);
 
     const handleVoteTokenClick = useCallback(async (e: MouseEvent) => {
         e.stopPropagation();
@@ -29,7 +29,7 @@ export function usePlayerBadgeActions(player: User) {
             console.log(result);
             return result;
         });
-    }, [player.name, player.id, gameId, runAction]);
+    }, [player.hasVoteToken, player.isDead, player.id, gameId, runAction]);
 
     return {
         handleShroudClick,
