@@ -145,10 +145,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         var gameUser = user.AsGameUser(gamePerspective);
         gameUser.UserType = UserType.Player;
         gameUser.SeatingPosition = gamePerspectiveStore.GetNextAvailableSeatingPosition(gameId);
-        //TODO remove test data
-        gameUser.HasVoteToken = Random.Shared.Next(0, 2) == 1;
-        gameUser.IsDead = Random.Shared.Next(0, 2) == 1;
-        gameUser.IsMarked = Random.Shared.Next(0, 2) == 1;
+
         gamePerspectiveStore.AddUserToGame(gameId, gameUser);
 
         await notificationService.BroadcastDiscordTownUpdate(gameId);
@@ -218,13 +215,44 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         return Result.Ok("Users swapped");
     }
 
-    public Task<Result<string>> SetPlayerIsDead(string gameId, string userId, bool isDead)
+    public async Task<Result<string>> SetPlayerIsDead(string gameId, string userId, bool isDead)
     {
-        throw new NotImplementedException();
+        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var user = guild.GetUser(userId);
+        if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
+
+        var updateOccurred = gamePerspectiveStore.UpdatePublicUser(gameId, userId, new GameUserUpdate
+        {
+            IsDead = isDead,
+            HasVoteToken = isDead ? true : null
+        });
+
+        if (updateOccurred) await notificationService.BroadcastDiscordTownUpdate(gameId);
+        string updateOccuredString = updateOccurred ? "now" : "already";
+        string expectedTokenStatus = isDead ? "dead" : "alive";
+        return Result.Ok($"{user.DisplayName} is {updateOccuredString} {expectedTokenStatus}");
     }
 
-    public Task<Result<string>> SetPlayerHasVoteToken(string gameId, string userId, bool hasVoteToken)
+    public async Task<Result<string>> SetPlayerHasVoteToken(string gameId, string userId, bool hasVoteToken)
     {
-        throw new NotImplementedException();
+        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var user = guild.GetUser(userId);
+        if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
+
+        var updateOccurred = gamePerspectiveStore.UpdatePublicUser(gameId, userId, new GameUserUpdate
+        {
+            HasVoteToken = hasVoteToken
+        });
+
+        if (updateOccurred) await notificationService.BroadcastDiscordTownUpdate(gameId);
+        string updateOccuredString = updateOccurred ? "now" : "already";
+        string expectedTokenStatus = hasVoteToken ? "has token" : "does not have token";
+        return Result.Ok($"{user.DisplayName} {updateOccuredString} {expectedTokenStatus}");
     }
 }

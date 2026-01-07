@@ -19,6 +19,7 @@ public class GamePerspectiveServiceTests
     private const string GameId = "game-id";
     private const string UserId = "123";
     private const string GuildId = "789";
+    private const string DisplayName = "display name";
 
     private Mock<IDiscordBot> _mockBot = null!;
     private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
@@ -503,13 +504,13 @@ public class GamePerspectiveServiceTests
 
     #region AddUserToGame
 
-    private void Setup_AddUserToGame(bool hasGame = true, bool hasGuild = true, bool hasUser = true, string? displayName = null)
+    private void Setup_AddUserToGame(bool hasGame = true, bool hasGuild = true, bool hasUser = true)
     {
         var guildMock = StrictMockFactory.Create<IDiscordGuild>();
         var userMock = StrictMockFactory.Create<IDiscordGuildUser>();
-        userMock.Setup(o => o.DisplayName).Returns(displayName!);
+        userMock.Setup(o => o.DisplayName).Returns(DisplayName!);
         var perspective = new GamePerspective(GameId, UserId, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow);
-        var townUser = new TownUser(UserId, displayName!, "avatar");
+        var townUser = new TownUser(UserId, DisplayName!, "avatar");
         var gameUser = new GameUser(UserId);
         userMock.Setup(o => o.AsTownUser()).Returns(townUser);
         userMock.Setup(o => o.AsGameUser(perspective)).Returns(gameUser);
@@ -555,8 +556,7 @@ public class GamePerspectiveServiceTests
     [TestMethod]
     public async Task AddUserToGame_ReturnsOk_AddsUserCorrectly()
     {
-        const string displayName = "display name";
-        Setup_AddUserToGame(displayName: displayName);
+        Setup_AddUserToGame();
 
         var result = await Sut.AddUserToGame(GameId, UserId);
 
@@ -566,20 +566,20 @@ public class GamePerspectiveServiceTests
             gameUser.UserType == UserType.Player
         )));
         _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
-        result.ShouldSucceedWith<string>($"{displayName} added to game: {GameId}");
+        result.ShouldSucceedWith<string>($"{DisplayName} added to game: {GameId}");
     }
 
     #endregion
 
     #region RemoveUserFromGame
 
-    private void Setup_RemoveUserFromGame(bool hasGame = true, bool hasGuild = true, bool hasUser = true, string? displayName = null)
+    private void Setup_RemoveUserFromGame(bool hasGame = true, bool hasGuild = true, bool hasUser = true)
     {
         var guildMock = StrictMockFactory.Create<IDiscordGuild>();
         var userMock = StrictMockFactory.Create<IDiscordGuildUser>();
-        userMock.Setup(o => o.DisplayName).Returns(displayName!);
+        userMock.Setup(o => o.DisplayName).Returns(DisplayName!);
         var perspective = new GamePerspective(GameId, UserId, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow);
-        var townUser = new TownUser(UserId, displayName!, "avatar");
+        var townUser = new TownUser(UserId, DisplayName!, "avatar");
         var gameUser = new GameUser(UserId);
         userMock.Setup(o => o.AsTownUser()).Returns(townUser);
         userMock.Setup(o => o.AsGameUser(perspective)).Returns(gameUser);
@@ -624,14 +624,13 @@ public class GamePerspectiveServiceTests
     [TestMethod]
     public async Task RemoveUserFromGame_ReturnsOk_RemovesUserCorrectly()
     {
-        const string displayName = "display name";
-        Setup_RemoveUserFromGame(displayName: displayName);
+        Setup_RemoveUserFromGame();
 
         var result = await Sut.RemoveUserFromGame(GameId, UserId);
 
         _mockGamePerspectiveStore.Verify(o => o.RemoveUserFromGame(GameId, UserId));
         _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
-        result.ShouldSucceedWith<string>($"{displayName} removed from game: {GameId}");
+        result.ShouldSucceedWith<string>($"{DisplayName} removed from game: {GameId}");
     }
 
     #endregion
@@ -729,6 +728,165 @@ public class GamePerspectiveServiceTests
         _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId + 1, new GameUserUpdate { SeatingPosition = 10 }), Times.Once);
         _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId + 2, new GameUserUpdate { SeatingPosition = 5 }), Times.Once);
         _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    #endregion
+
+    private void Setup_GameUserStatusToggle(bool hasGame = true, bool hasGuild = true, bool hasUser = true, bool updateOccurred = true)
+    {
+        var guildMock = StrictMockFactory.Create<IDiscordGuild>();
+        var userMock = StrictMockFactory.Create<IDiscordGuildUser>();
+        userMock.Setup(o => o.DisplayName).Returns(DisplayName!);
+        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? CommonMethods.GetGamePerspective(GameId, guildId: GuildId) : null);
+        guildMock.Setup(o => o.GetUser(UserId)).Returns(hasUser ? userMock.Object : null);
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guildMock.Object : null);
+        _mockGamePerspectiveStore.Setup(o => o.UpdatePublicUser(GameId, UserId, It.IsAny<GameUserUpdate>())).Returns(updateOccurred);
+        _mockNotificationService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+    }
+
+    #region SetPlayerHasVoteToken
+
+    [TestMethod]
+    public async Task SetPlayerHasVoteToken_ReturnsError_WhenGameNotFound()
+    {
+        const bool hasVoteToken = true;
+        Setup_GameUserStatusToggle(hasGame: false);
+
+        var result = await Sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetPlayerHasVoteToken_ReturnsError_WhenGuildNotFound()
+    {
+        const bool hasVoteToken = true;
+        Setup_GameUserStatusToggle(hasGuild: false);
+
+        var result = await Sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
+    }
+
+    [TestMethod]
+    public async Task SetPlayerHasVoteToken_ReturnsError_WhenUserNotFound()
+    {
+        const bool hasVoteToken = true;
+        Setup_GameUserStatusToggle(hasUser: false);
+
+        var result = await Sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public async Task SetPlayerHasVoteToken_ReturnsOk_WhenChangesHappen(bool hasVoteToken)
+    {
+        Setup_GameUserStatusToggle(updateOccurred: true);
+
+        var result = await Sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
+
+        string expectedTokenStatus = hasVoteToken ? "has token" : "does not have token";
+        result.ShouldSucceedWith($"{DisplayName} now {expectedTokenStatus}");
+        _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { HasVoteToken = hasVoteToken }), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public async Task SetPlayerHasVoteToken_ReturnsOk_WhenNoChangesHappen(bool hasVoteToken)
+    {
+        Setup_GameUserStatusToggle(updateOccurred: false);
+
+        var result = await Sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
+
+        string expectedTokenStatus = hasVoteToken ? "has token" : "does not have token";
+        result.ShouldSucceedWith($"{DisplayName} already {expectedTokenStatus}");
+        _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { HasVoteToken = hasVoteToken }), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+    }
+
+    #endregion
+
+    #region SetPlayerIsDead
+
+    [TestMethod]
+    public async Task SetPlayerIsDead_ReturnsError_WhenGameNotFound()
+    {
+        const bool hasVoteToken = true;
+        Setup_GameUserStatusToggle(hasGame: false);
+
+        var result = await Sut.SetPlayerIsDead(GameId, UserId, hasVoteToken);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetPlayerIsDead_ReturnsError_WhenGuildNotFound()
+    {
+        const bool hasVoteToken = true;
+        Setup_GameUserStatusToggle(hasGuild: false);
+
+        var result = await Sut.SetPlayerIsDead(GameId, UserId, hasVoteToken);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
+    }
+
+    [TestMethod]
+    public async Task SetPlayerIsDead_ReturnsError_WhenUserNotFound()
+    {
+        const bool hasVoteToken = true;
+        Setup_GameUserStatusToggle(hasUser: false);
+
+        var result = await Sut.SetPlayerIsDead(GameId, UserId, hasVoteToken);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetPlayerIsDead_ReturnsOk_WhenIsDeadFalse()
+    {
+        const bool isDead = false;
+        Setup_GameUserStatusToggle(updateOccurred: true);
+
+        var result = await Sut.SetPlayerIsDead(GameId, UserId, isDead);
+
+        const string expectedDeadStatus = isDead ? "dead" : "alive";
+        result.ShouldSucceedWith($"{DisplayName} is now {expectedDeadStatus}");
+        _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { IsDead = isDead }), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task SetPlayerIsDead_ReturnsOk_WhenIsDeadTrue()
+    {
+        const bool isDead = true;
+        Setup_GameUserStatusToggle(updateOccurred: true);
+
+        var result = await Sut.SetPlayerIsDead(GameId, UserId, isDead);
+
+        const string expectedDeadStatus = isDead ? "dead" : "alive";
+        result.ShouldSucceedWith($"{DisplayName} is now {expectedDeadStatus}");
+        _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { IsDead = isDead, HasVoteToken = true }), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+
+    [TestMethod]
+    public async Task SetPlayerIsDead_ReturnsOk_WhenNoChangesHappen()
+    {
+        const bool isDead = true;
+        Setup_GameUserStatusToggle(updateOccurred: false);
+
+        var result = await Sut.SetPlayerIsDead(GameId, UserId, isDead);
+
+        const string expectedDeadStatus = isDead ? "dead" : "alive";
+        result.ShouldSucceedWith($"{DisplayName} is already {expectedDeadStatus}");
+        _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { IsDead = isDead, HasVoteToken = true }), Times.Once);
+        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
     }
 
     #endregion
