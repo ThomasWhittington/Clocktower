@@ -1,14 +1,14 @@
 ﻿import type {MouseEvent} from "react";
 import {useCallback, useState} from "react";
 import type {User} from "@/types";
-import {useUserControls} from "@/components/features/gameWindow/hooks";
 import {gamesService} from "@/services";
 import {useAppStore} from "@/store";
+import {useAction} from "@/hooks";
 
 export function useTownSquareActions() {
     const [activeMenuPlayerId, setActiveMenuPlayerId] = useState<string | null>(null);
     const [swappingPlayer, setSwappingPlayer] = useState<User | null>(null);
-    const {runAction} = useUserControls();
+    const {runAction} = useAction();
     const {gameId} = useAppStore();
 
     const closeMenu = useCallback(() => {

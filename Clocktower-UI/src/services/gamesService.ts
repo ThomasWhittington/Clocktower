@@ -149,6 +149,47 @@ async function swapSeatingPositions(gameId: string, userId1: string, userId2: st
     return data ?? '';
 }
 
+async function setPlayerDead(gameId: string, userId: string, isDead: boolean): Promise<string> {
+    const {
+        data,
+        error
+    } = await setPlayerDeadApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId,
+            isDead: isDead
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set player dead state:', error);
+        throw new Error(error.toString());
+    }
+
+    return data ?? '';
+}
+
+async function setPlayerVoteToken(gameId: string, userId: string, hasVoteToken: boolean): Promise<string> {
+    const {
+        data,
+        error
+    } = await setPlayerVoteTokenApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId,
+            hasVoteToken: hasVoteToken
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set player has vote token state:', error);
+        throw new Error(error.toString());
+    }
+
+    return data ?? '';
+}
 
 export const gamesService = {
     getGames,
@@ -158,5 +199,7 @@ export const gamesService = {
     addUserToGame,
     removeUserFromGame,
     randomiseSeatingPositions,
-    swapSeatingPositions
+    swapSeatingPositions,
+    setPlayerDead,
+    setPlayerVoteToken
 }
