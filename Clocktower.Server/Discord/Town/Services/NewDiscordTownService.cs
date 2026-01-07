@@ -306,7 +306,6 @@ public class DiscordTownService(
         foreach (var role in roleMap.Values.Where(role => role != targetRole && user.DoesUserHaveRole(role.Id))) await user.RemoveRoleAsync(role);
         if (!user.DoesUserHaveRole(targetRole.Id)) await user.AddRoleAsync(targetRole);
 
-        await user.AddRoleAsync(targetRole);
         gamePerspectiveStore.UpdatePublicUser(gameId, user.Id, new GameUserUpdate
         {
             UserType = userType
