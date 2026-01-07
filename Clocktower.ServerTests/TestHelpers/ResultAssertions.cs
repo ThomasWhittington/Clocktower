@@ -6,20 +6,19 @@ public static class ResultAssertions
     {
         public void ShouldFailWith(ErrorKind kind, string code, string? message = null)
         {
-            result.IsSuccess.Should().BeFalse();
             result.Error.Should().NotBeNull();
-            result.Error!.Kind.Should().Be(kind);
-            result.Error.Code.Should().Be(code);
-
             if (message is not null)
                 result.Error.Message.Should().Be(message);
+            result.Error.Kind.Should().Be(kind);
+            result.Error.Code.Should().Be(code);
+            result.IsSuccess.Should().BeFalse();
         }
 
         public void ShouldSucceedWith(T expectedValue)
         {
-            result.IsSuccess.Should().BeTrue();
             result.Error.Should().BeNull();
             result.Value.Should().Be(expectedValue);
+            result.IsSuccess.Should().BeTrue();
         }
     }
 
