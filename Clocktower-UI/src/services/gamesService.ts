@@ -1,5 +1,5 @@
 ﻿import {type GamePerspective, mapToGamePerspective, mapToUser, type User,} from "@/types";
-import {addUserToGameApi, getAvailableGameUsersApi, getGamesApi, loadDummyGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, startGameApi, swapSeatingPositionsApi} from "@/api";
+import {addUserToGameApi, getAvailableGameUsersApi, getGamesApi, loadDummyGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, setPlayerHasVoteTokenApi, setPlayerIsDeadApi, startGameApi, swapSeatingPositionsApi} from "@/api";
 import {apiClient} from "@/api/api-client.ts";
 
 async function getGames(): Promise<GamePerspective[]> {
@@ -149,11 +149,11 @@ async function swapSeatingPositions(gameId: string, userId1: string, userId2: st
     return data ?? '';
 }
 
-async function setPlayerDead(gameId: string, userId: string, isDead: boolean): Promise<string> {
+async function setPlayerIsDead(gameId: string, userId: string, isDead: boolean): Promise<string> {
     const {
         data,
         error
-    } = await setPlayerDeadApi({
+    } = await setPlayerIsDeadApi({
         client: apiClient,
         path: {
             gameId: gameId,
@@ -170,11 +170,11 @@ async function setPlayerDead(gameId: string, userId: string, isDead: boolean): P
     return data ?? '';
 }
 
-async function setPlayerVoteToken(gameId: string, userId: string, hasVoteToken: boolean): Promise<string> {
+async function setPlayerHasVoteToken(gameId: string, userId: string, hasVoteToken: boolean): Promise<string> {
     const {
         data,
         error
-    } = await setPlayerVoteTokenApi({
+    } = await setPlayerHasVoteTokenApi({
         client: apiClient,
         path: {
             gameId: gameId,
@@ -200,6 +200,6 @@ export const gamesService = {
     removeUserFromGame,
     randomiseSeatingPositions,
     swapSeatingPositions,
-    setPlayerDead,
-    setPlayerVoteToken
+    setPlayerIsDead,
+    setPlayerHasVoteToken
 }

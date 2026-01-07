@@ -146,7 +146,9 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         var gameUser = user.AsGameUser(gamePerspective);
         gameUser.UserType = UserType.Player;
         gameUser.SeatingPosition = gamePerspectiveStore.GetNextAvailableSeatingPosition(gameId);
-
+        gameUser.HasVoteToken = Random.Shared.Next(0, 2) == 1;
+        gameUser.IsDead = Random.Shared.Next(0, 2) == 1;
+        gameUser.IsMarked = Random.Shared.Next(0, 2) == 1;
         gamePerspectiveStore.AddUserToGame(gameId, gameUser);
 
         await notificationService.BroadcastDiscordTownUpdate(gameId);
@@ -206,5 +208,15 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
 
         await notificationService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok("Users swapped");
+    }
+
+    public Task<Result<string>> SetPlayerIsDead(string gameId, string userId, bool isDead)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Result<string>> SetPlayerHasVoteToken(string gameId, string userId, bool hasVoteToken)
+    {
+        throw new NotImplementedException();
     }
 }

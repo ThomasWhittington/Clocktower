@@ -95,6 +95,12 @@ import type {
     SetMuteAllPlayersApiData,
     SetMuteAllPlayersApiErrors,
     SetMuteAllPlayersApiResponses,
+    SetPlayerHasVoteTokenApiData,
+    SetPlayerHasVoteTokenApiErrors,
+    SetPlayerHasVoteTokenApiResponses,
+    SetPlayerIsDeadApiData,
+    SetPlayerIsDeadApiErrors,
+    SetPlayerIsDeadApiResponses,
     SetTimeApiData,
     SetTimeApiErrors,
     SetTimeApiResponses,
@@ -706,6 +712,42 @@ export const removeUserFromGameApi = <ThrowOnError extends boolean = false>(opti
             }
         ],
         url: '/api/games/{gameId}/remove-user/{userId}',
+        ...options
+    });
+};
+
+/**
+ * Sets if a player has a vote token in the game
+ *
+ * Sets if a player has a vote token in the game
+ */
+export const setPlayerHasVoteTokenApi = <ThrowOnError extends boolean = false>(options: Options<SetPlayerHasVoteTokenApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetPlayerHasVoteTokenApiResponses, SetPlayerHasVoteTokenApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/set-player-has-vote-toke/{userId}/{hasVoteToken}',
+        ...options
+    });
+};
+
+/**
+ * Sets a player's dead status in the game
+ *
+ * Sets a player's dead status in the game
+ */
+export const setPlayerIsDeadApi = <ThrowOnError extends boolean = false>(options: Options<SetPlayerIsDeadApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetPlayerIsDeadApiResponses, SetPlayerIsDeadApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/set-player-is-dead/{userId}/{isDead}',
         ...options
     });
 };

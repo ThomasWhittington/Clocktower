@@ -14,7 +14,7 @@ export function usePlayerBadgeActions(player: User) {
         if (!gameId) return;
 
         await runAction(async () => {
-            const result = await gamesService.setPlayerDead(gameId, player.id, !player.isDead);
+            const result = await gamesService.setPlayerIsDead(gameId, player.id, !player.isDead);
             console.log(result);
             return result;
         });
@@ -25,7 +25,7 @@ export function usePlayerBadgeActions(player: User) {
         if (!gameId) return;
 
         await runAction(async () => {
-            const result = await gamesService.setPlayerVoteToken(gameId, player.id, !player.hasVoteToken);
+            const result = await gamesService.setPlayerHasVoteToken(gameId, player.id, !player.hasVoteToken);
             console.log(result);
             return result;
         });

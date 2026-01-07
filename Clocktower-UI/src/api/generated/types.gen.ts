@@ -1017,6 +1017,72 @@ export type RemoveUserFromGameApiResponses = {
 
 export type RemoveUserFromGameApiResponse = RemoveUserFromGameApiResponses[keyof RemoveUserFromGameApiResponses];
 
+export type SetPlayerHasVoteTokenApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+        hasVoteToken: boolean;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/set-player-has-vote-toke/{userId}/{hasVoteToken}';
+};
+
+export type SetPlayerHasVoteTokenApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetPlayerHasVoteTokenApiError = SetPlayerHasVoteTokenApiErrors[keyof SetPlayerHasVoteTokenApiErrors];
+
+export type SetPlayerHasVoteTokenApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetPlayerHasVoteTokenApiResponse = SetPlayerHasVoteTokenApiResponses[keyof SetPlayerHasVoteTokenApiResponses];
+
+export type SetPlayerIsDeadApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+        isDead: boolean;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/set-player-is-dead/{userId}/{isDead}';
+};
+
+export type SetPlayerIsDeadApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetPlayerIsDeadApiError = SetPlayerIsDeadApiErrors[keyof SetPlayerIsDeadApiErrors];
+
+export type SetPlayerIsDeadApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetPlayerIsDeadApiResponse = SetPlayerIsDeadApiResponses[keyof SetPlayerIsDeadApiResponses];
+
 export type SetTimeApiData = {
     body?: never;
     path: {
