@@ -99,6 +99,19 @@ const clocktowerServerDataDtoUserDtoSchemaResponseTransformer = (data: any) => {
     if (data.userType) {
         data.userType = clocktowerServerDataTypesEnumUserTypeSchemaResponseTransformer(data.userType);
     }
+    if (data.role) {
+        data.role = clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(data.role);
+    }
+    return data;
+};
+
+const clocktowerServerDataTypesRoleRoleSchemaResponseTransformer = (data: any) => {
+    if (data.type) {
+        data.type = clocktowerServerDataTypesEnumRoleTypeSchemaResponseTransformer(data.type);
+    }
+    if (data.edition) {
+        data.edition = clocktowerServerDataTypesEnumEditionSchemaResponseTransformer(data.edition);
+    }
     return data;
 };
 
@@ -117,6 +130,9 @@ const clocktowerServerDataTypesJoinDataSchemaResponseTransformer = (data: any) =
 const clocktowerServerDataGameUserSchemaResponseTransformer = (data: any) => {
     if (data.userType) {
         data.userType = clocktowerServerDataTypesEnumUserTypeSchemaResponseTransformer(data.userType);
+    }
+    if (data.role) {
+        data.role = clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(data.role);
     }
     return data;
 };
@@ -212,16 +228,6 @@ const clocktowerServerRolesEndpointsGetRolesResponseSchemaResponseTransformer = 
         data.roles = data.roles.map((item: any) => {
             return clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(item);
         });
-    }
-    return data;
-};
-
-const clocktowerServerDataTypesRoleRoleSchemaResponseTransformer = (data: any) => {
-    if (data.type) {
-        data.type = clocktowerServerDataTypesEnumRoleTypeSchemaResponseTransformer(data.type);
-    }
-    if (data.edition) {
-        data.edition = clocktowerServerDataTypesEnumEditionSchemaResponseTransformer(data.edition);
     }
     return data;
 };

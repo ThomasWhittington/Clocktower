@@ -1,7 +1,4 @@
-﻿namespace Clocktower.Server.Data.Types.Enum;
-
-public enum Edition
-{
+﻿export enum Edition {
     Unknown = 0,
     TroubleBrewing = 1,
     SectsAndViolets = 2,

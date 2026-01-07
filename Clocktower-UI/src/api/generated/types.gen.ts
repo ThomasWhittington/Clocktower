@@ -55,6 +55,10 @@ export type ClocktowerServerDataDtoUserDto = {
     isPlaying?: boolean;
     userType?: ClocktowerServerDataTypesEnumUserType;
     seatingPosition?: number;
+    hasVoteToken?: boolean;
+    isDead?: boolean;
+    isMarked?: boolean;
+    role?: ClocktowerServerDataTypesRoleRole;
 };
 
 export type ClocktowerServerDataGamePerspective = {
@@ -75,6 +79,10 @@ export type ClocktowerServerDataGameUser = {
     isPlaying?: boolean;
     userType?: ClocktowerServerDataTypesEnumUserType;
     seatingPosition?: number;
+    hasVoteToken?: boolean;
+    isDead?: boolean;
+    isMarked?: boolean;
+    role?: ClocktowerServerDataTypesRoleRole;
 };
 
 export type ClocktowerServerDataMiniChannel = {
@@ -101,11 +109,11 @@ export type ClocktowerServerDataTownUser = {
     isPresent?: boolean;
 };
 
-export type ClocktowerServerDataTypesEnumEdition = 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
+export type ClocktowerServerDataTypesEnumEdition = 'Unknown' | 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
 
 export type ClocktowerServerDataTypesEnumGameTime = 'Unknown' | 'Day' | 'Evening' | 'Night';
 
-export type ClocktowerServerDataTypesEnumRoleType = 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
+export type ClocktowerServerDataTypesEnumRoleType = 'Unknown' | 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
 
 export type ClocktowerServerDataTypesEnumUserType = 'Unknown' | 'Player' | 'StoryTeller' | 'Spectator';
 

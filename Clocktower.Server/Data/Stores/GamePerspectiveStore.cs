@@ -154,6 +154,21 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         return maxPosition + 1;
     }
 
+    public void SetUserRole(string gameId, string userId, Role role)
+    {
+        var allPerspectives = GetAllPerspectivesForGame(gameId);
+
+        foreach (var perspective in allPerspectives)
+        {
+            if (!ShouldUpdateRoleForPerspective(perspective, userId)) continue;
+
+            TryUpdate(gameId, perspective.UserId, state => state with
+            {
+                Users = state.Users.Select(user => user.Id == userId ? user with { Role = role } : user).ToList()
+            });
+        }
+    }
+
 
     private void UpdateAllPerspectives(string gameId, Func<GamePerspective, GamePerspective> updateFunction)
     {
@@ -175,11 +190,22 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         );
     }
 
+    private static bool ShouldUpdateRoleForPerspective(GamePerspective perspective, string userId)
+    {
+        if (perspective.UserId == userId) return true;
+
+        var perspectiveOwner = perspective.Users.FirstOrDefault(u => u.Id == perspective.UserId);
+        return perspectiveOwner?.UserType is UserType.StoryTeller or UserType.Spectator;
+    }
+
     private GameUser ToPublicUser(GameUser user) =>
         new(user.Id)
         {
             UserType = user.UserType,
             IsPlaying = user.IsPlaying,
-            SeatingPosition = user.SeatingPosition
+            SeatingPosition = user.SeatingPosition,
+            IsDead = user.IsDead,
+            IsMarked = user.IsMarked,
+            HasVoteToken = user.HasVoteToken
         };
 }
