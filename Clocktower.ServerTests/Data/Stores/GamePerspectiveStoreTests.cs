@@ -1,6 +1,7 @@
 ﻿using Clocktower.Server.Data;
 using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
+using Clocktower.Server.Data.Types.Role;
 
 namespace Clocktower.ServerTests.Data.Stores;
 
@@ -13,6 +14,7 @@ public class GamePerspectiveStoreTests
     private const string UserId1 = "123";
     private const string UserId2 = "456";
     private const string UserId3 = "789";
+    private const string UserId4 = "987";
     private const string GuildId = "123456789";
     private IGamePerspectiveStore _sut = null!;
 
@@ -486,6 +488,35 @@ public class GamePerspectiveStoreTests
         var result = _sut.GetNextAvailableSeatingPosition(GameId1);
 
         result.Should().Be(6, "method returns max position + 1, not first gap");
+    }
+
+    #endregion
+
+    #region SetUserRole
+
+    [TestMethod]
+    public void SetUserRole_UpdatesExpectedUsersOfChange()
+    {
+        Role role = Role.Gunslinger();
+
+        var targetUser = CommonMethods.GetRandomGameUser(UserId1) with { UserType = UserType.Player };
+        var storyTeller = CommonMethods.GetRandomGameUser(UserId2) with { UserType = UserType.StoryTeller };
+        var spectator = CommonMethods.GetRandomGameUser(UserId3) with { UserType = UserType.Spectator };
+        var otherPlayer = CommonMethods.GetRandomGameUser(UserId4) with { UserType = UserType.Player };
+
+        _sut.Set(_game1 with { UserId = UserId1, Users = [targetUser, storyTeller, spectator, otherPlayer] });
+        _sut.Set(_game1 with { UserId = UserId2, Users = [targetUser, storyTeller, spectator, otherPlayer] });
+        _sut.Set(_game1 with { UserId = UserId3, Users = [targetUser, storyTeller, spectator, otherPlayer] });
+        _sut.Set(_game1 with { UserId = UserId4, Users = [targetUser, storyTeller, spectator, otherPlayer] });
+        _sut.Set(_game2 with { UserId = UserId1, Users = [targetUser, storyTeller, spectator, otherPlayer] });
+
+        _sut.SetUserRole(GameId1, targetUser.Id, role);
+
+        _sut.Get(GameId1, UserId1)!.Users.First(o => o.Id == targetUser.Id).Role.Should().BeEquivalentTo(role);
+        _sut.Get(GameId1, UserId2)!.Users.First(o => o.Id == targetUser.Id).Role.Should().BeEquivalentTo(role);
+        _sut.Get(GameId1, UserId3)!.Users.First(o => o.Id == targetUser.Id).Role.Should().BeEquivalentTo(role);
+        _sut.Get(GameId1, UserId4)!.Users.First(o => o.Id == targetUser.Id).Role.Should().NotBeEquivalentTo(role);
+        _sut.Get(GameId2, UserId1)!.Users.First(o => o.Id == targetUser.Id).Role.Should().NotBeEquivalentTo(role);
     }
 
     #endregion
