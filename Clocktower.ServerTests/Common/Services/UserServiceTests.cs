@@ -8,7 +8,6 @@ namespace Clocktower.ServerTests.Common.Services;
 public class UserServiceTests
 {
     private Mock<IDiscordTownStore> _mockDiscordTownStore = null!;
-    private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private IUserService _sut = null!;
 
@@ -16,10 +15,9 @@ public class UserServiceTests
     public void SetUp()
     {
         _mockDiscordTownStore = StrictMockFactory.Create<IDiscordTownStore>();
-        _mockGamePerspectiveStore = StrictMockFactory.Create<IGamePerspectiveStore>();
         _mockDiscordTownManager = StrictMockFactory.Create<IDiscordTownManager>();
 
-        _sut = new UserService(_mockDiscordTownStore.Object, _mockGamePerspectiveStore.Object, _mockDiscordTownManager.Object);
+        _sut = new UserService(_mockDiscordTownStore.Object, _mockDiscordTownManager.Object);
     }
 
     #region GetUserName

@@ -1,6 +1,6 @@
 ﻿namespace Clocktower.Server.Common.Services;
 
-public class UserService(IDiscordTownStore discordTownStore, IGamePerspectiveStore gameStore, IDiscordTownManager discordTownManager)
+public class UserService(IDiscordTownStore discordTownStore, IDiscordTownManager discordTownManager)
     : IUserService
 {
     public IEnumerable<TownUser> GetTownUsersForGameUsers(
