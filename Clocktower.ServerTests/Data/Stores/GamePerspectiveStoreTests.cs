@@ -1,4 +1,5 @@
-﻿using Clocktower.Server.Data;
+﻿using Clocktower.Server.Common.UpdateModels;
+using Clocktower.Server.Data;
 using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Data.Types.Role;
@@ -356,91 +357,122 @@ public class GamePerspectiveStoreTests
         result.Should().Contain(o => o.Id == GameId3);
     }
 
-
-    #region UpdateUser
+    #region UpdatePublicUser
 
     [TestMethod]
-    public void UpdateUser_DoesNotChange_WhenNoUserFound()
+    public void UpdatePublicUser_ReturnsFalse_WhenUserNotFound()
     {
         _sut.Set(_game1 with { UserId = UserId1 });
-        _sut.Set(_game1 with { UserId = UserId2 });
-        var user = CommonMethods.GetRandomGameUser(UserId3);
-        _sut.AddUserToGame(GameId1, user);
 
-        var result = _sut.UpdateUser(GameId1, UserId1);
+        var result = _sut.UpdatePublicUser(GameId1, "missing-user", new GameUserUpdate());
 
         result.Should().BeFalse();
-        _sut.Get(GameId1, UserId1)!.Users.Should().Contain(user);
-        _sut.Get(GameId1, UserId2)!.Users.Should().Contain(user);
     }
 
     [TestMethod]
-    public void UpdateUser_ReturnsOriginal_NoChangesRequested()
+    public void UpdatePublicUser_ReturnsFalse_WhenNoChangesProvided()
     {
-        _sut.Set(_game1 with { UserId = UserId1 });
-        _sut.Set(_game1 with { UserId = UserId2 });
-        var user = CommonMethods.GetRandomGameUser(UserId3);
-        _sut.AddUserToGame(GameId1, user);
+        var user = CommonMethods.GetRandomGameUser(UserId1);
+        _sut.Set(_game1 with { UserId = UserId2, Users = [user] });
 
-        var result = _sut.UpdateUser(GameId1, UserId3, userType: user.UserType, isPlaying: user.IsPlaying, seatingPosition: user.SeatingPosition);
+        var result = _sut.UpdatePublicUser(GameId1, UserId1, new GameUserUpdate());
 
         result.Should().BeFalse();
-        _sut.Get(GameId1, UserId1)!.Users.Should().Contain(user);
-        _sut.Get(GameId1, UserId2)!.Users.Should().Contain(user);
     }
 
     [TestMethod]
-    [DynamicData(nameof(GetUserTypeValues))]
-    public void UpdateUser_Updates_UserType(UserType userType)
+    public void UpdatePublicUser_ReturnsFalse_WhenAllPropertiesAlreadyMatch()
     {
-        _sut.Set(_game1 with { UserId = UserId1 });
-        _sut.Set(_game1 with { UserId = UserId2 });
-        var user = CommonMethods.GetRandomGameUser(UserId3);
-        if (userType == UserType.Unknown) user = user with { UserType = UserType.Player };
-        _sut.AddUserToGame(GameId1, user);
+        var user = CommonMethods.GetRandomGameUser(UserId1) with
+        {
+            UserType = UserType.Player,
+            IsPlaying = true
+        };
+        _sut.Set(_game1 with { UserId = UserId2, Users = [user] });
 
-        var result = _sut.UpdateUser(GameId1, UserId3, userType: userType);
+        var result = _sut.UpdatePublicUser(GameId1, UserId1, new GameUserUpdate
+        {
+            UserType = UserType.Player,
+            IsPlaying = true
+        });
 
-        result.Should().BeTrue();
-        _sut.Get(GameId1, UserId1)!.Users[0].UserType.Should().Be(userType);
-        _sut.Get(GameId1, UserId2)!.Users[0].UserType.Should().Be(userType);
+        result.Should().BeFalse();
     }
 
     [TestMethod]
-    [DataRow(true)]
-    [DataRow(false)]
-    public void UpdateUser_Updates_IsPlaying(bool isPlaying)
+    public void UpdatePublicUser_UpdatesSingleProperty()
     {
-        _sut.Set(_game1 with { UserId = UserId1 });
-        _sut.Set(_game1 with { UserId = UserId2 });
-        var user = CommonMethods.GetRandomGameUser(UserId3) with { IsPlaying = !isPlaying };
-        _sut.AddUserToGame(GameId1, user);
+        var user = CommonMethods.GetRandomGameUser(UserId1) with { IsDead = false };
+        _sut.Set(_game1 with { UserId = UserId2, Users = [user] });
 
-        var result = _sut.UpdateUser(GameId1, UserId3, isPlaying: isPlaying);
+        var result = _sut.UpdatePublicUser(GameId1, UserId1, new GameUserUpdate { IsDead = true });
 
         result.Should().BeTrue();
-        _sut.Get(GameId1, UserId1)!.Users[0].IsPlaying.Should().Be(isPlaying);
-        _sut.Get(GameId1, UserId2)!.Users[0].IsPlaying.Should().Be(isPlaying);
+        _sut.Get(GameId1, UserId2)!.Users[0].IsDead.Should().BeTrue();
     }
 
     [TestMethod]
-    public void UpdateUser_Updates_SeatingPosition()
+    public void UpdatePublicUser_UpdatesMultipleProperties()
     {
-        const int seatingPosition = 5;
-        _sut.Set(_game1 with { UserId = UserId1 });
-        _sut.Set(_game1 with { UserId = UserId2 });
-        var user = CommonMethods.GetRandomGameUser(UserId3) with { SeatingPosition = 0 };
-        _sut.AddUserToGame(GameId1, user);
+        var user = CommonMethods.GetRandomGameUser(UserId1) with
+        {
+            IsDead = false,
+            IsMarked = false,
+            HasVoteToken = false
+        };
+        _sut.Set(_game1 with { UserId = UserId2, Users = [user] });
 
-        var result = _sut.UpdateUser(GameId1, UserId3, seatingPosition: seatingPosition);
+        var result = _sut.UpdatePublicUser(GameId1, UserId1, new GameUserUpdate
+        {
+            IsDead = true,
+            IsMarked = true,
+            HasVoteToken = true
+        });
 
         result.Should().BeTrue();
-        _sut.Get(GameId1, UserId1)!.Users[0].SeatingPosition.Should().Be(seatingPosition);
-        _sut.Get(GameId1, UserId2)!.Users[0].SeatingPosition.Should().Be(seatingPosition);
+        var updatedUser = _sut.Get(GameId1, UserId2)!.Users[0];
+        updatedUser.IsDead.Should().BeTrue();
+        updatedUser.IsMarked.Should().BeTrue();
+        updatedUser.HasVoteToken.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void UpdatePublicUser_UpdatesAllPerspectives()
+    {
+        var user = CommonMethods.GetRandomGameUser(UserId3) with { IsDead = false };
+        _sut.Set(_game1 with { UserId = UserId1, Users = [user] });
+        _sut.Set(_game1 with { UserId = UserId2, Users = [user] });
+
+        _sut.UpdatePublicUser(GameId1, UserId3, new GameUserUpdate { IsDead = true });
+
+        _sut.Get(GameId1, UserId1)!.Users[0].IsDead.Should().BeTrue();
+        _sut.Get(GameId1, UserId2)!.Users[0].IsDead.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void UpdatePublicUser_OnlyUpdatesChangedProperties()
+    {
+        var user = CommonMethods.GetRandomGameUser(UserId1) with
+        {
+            UserType = UserType.Player,
+            IsDead = false,
+            SeatingPosition = 5
+        };
+        _sut.Set(_game1 with { UserId = UserId2, Users = [user] });
+
+        _sut.UpdatePublicUser(GameId1, UserId1, new GameUserUpdate
+        {
+            UserType = UserType.Player,
+            IsDead = true
+        });
+
+        var updatedUser = _sut.Get(GameId1, UserId2)!.Users[0];
+        updatedUser.UserType.Should().Be(UserType.Player);
+        updatedUser.IsDead.Should().BeTrue();
+        updatedUser.SeatingPosition.Should().Be(5);
     }
 
     #endregion
-
 
     #region GetNextAvailableSeatingPosition
 
@@ -522,5 +554,4 @@ public class GamePerspectiveStoreTests
     #endregion
 
     private static IEnumerable<object[]> GetGameTimeValues() => TestDataProvider.GetAllEnumValues<GameTime>();
-    private static IEnumerable<object[]> GetUserTypeValues() => TestDataProvider.GetAllEnumValues<UserType>();
 }

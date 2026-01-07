@@ -2,7 +2,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Clocktower.Server.Common.Services;
-using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Socket;
 
 namespace Clocktower.Server.Game.Services;
@@ -146,6 +145,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         var gameUser = user.AsGameUser(gamePerspective);
         gameUser.UserType = UserType.Player;
         gameUser.SeatingPosition = gamePerspectiveStore.GetNextAvailableSeatingPosition(gameId);
+        //TODO remove test data
         gameUser.HasVoteToken = Random.Shared.Next(0, 2) == 1;
         gameUser.IsDead = Random.Shared.Next(0, 2) == 1;
         gameUser.IsMarked = Random.Shared.Next(0, 2) == 1;
@@ -179,10 +179,13 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
 
         foreach (GameUser shuffledPlayer in shuffledPlayers)
         {
-            gamePerspectiveStore.UpdateUser(
+            gamePerspectiveStore.UpdatePublicUser(
                 gameId,
                 shuffledPlayer.Id,
-                seatingPosition: Array.IndexOf(shuffledPlayers, shuffledPlayer)
+                new GameUserUpdate
+                {
+                    SeatingPosition = Array.IndexOf(shuffledPlayers, shuffledPlayer)
+                }
             );
         }
 
@@ -203,9 +206,14 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         if (user2 is null) return Result.Fail<string>(Errors.UserNotFound(userId2));
 
         var tempPosition = user1.SeatingPosition;
-        gamePerspectiveStore.UpdateUser(gameId, userId1, seatingPosition: user2.SeatingPosition);
-        gamePerspectiveStore.UpdateUser(gameId, userId2, seatingPosition: tempPosition);
-
+        gamePerspectiveStore.UpdatePublicUser(gameId, userId1, new GameUserUpdate
+        {
+            SeatingPosition = user2.SeatingPosition
+        });
+        gamePerspectiveStore.UpdatePublicUser(gameId, userId2, new GameUserUpdate
+        {
+            SeatingPosition = tempPosition
+        });
         await notificationService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok("Users swapped");
     }

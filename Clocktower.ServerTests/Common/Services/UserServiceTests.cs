@@ -1,7 +1,6 @@
 ﻿using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data;
 using Clocktower.Server.Data.Stores;
-using Clocktower.Server.Data.Types.Enum;
 
 namespace Clocktower.ServerTests.Common.Services;
 
@@ -58,30 +57,6 @@ public class UserServiceTests
         var result = _sut.GetUserName(userId);
 
         result.Should().BeNull();
-    }
-
-    #endregion
-
-    #region UpdateGameUser
-
-    private void SetUp_UpdateGameUser(string gameId, string userId, UserType userType, bool? isPlaying, bool updateReturn)
-    {
-        _mockGamePerspectiveStore.Setup(o => o.UpdateUser(gameId, userId, userType, isPlaying)).Returns(updateReturn);
-    }
-
-    [TestMethod]
-    public void UpdateGameUser_PassesParametersToStore_AndReturnsStoreResult()
-    {
-        const string gameId = "test-game";
-        const string userId = "123456";
-        const UserType userType = UserType.Player;
-        const bool isPlaying = true;
-        const bool updateReturn = false;
-        SetUp_UpdateGameUser(gameId, userId, userType, isPlaying, updateReturn);
-
-        var result = _sut.UpdateGameUser(gameId, userId, userType, isPlaying);
-
-        result.Should().Be(updateReturn);
     }
 
     #endregion

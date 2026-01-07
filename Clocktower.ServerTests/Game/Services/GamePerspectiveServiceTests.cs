@@ -1,6 +1,7 @@
 ﻿using System.IO.Abstractions;
 using System.Text.Json;
 using Clocktower.Server.Common.Services;
+using Clocktower.Server.Common.UpdateModels;
 using Clocktower.Server.Data;
 using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Data.Stores;
@@ -8,7 +9,6 @@ using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Game.Services;
 using Clocktower.Server.Socket;
-using Range = Moq.Range;
 
 namespace Clocktower.ServerTests.Game.Services;
 
@@ -669,12 +669,9 @@ public class GamePerspectiveServiceTests
 
         foreach (var player in players)
         {
-            _mockGamePerspectiveStore.Verify(o => o.UpdateUser(
-                    GameId,
-                    player.Id,
-                    null, null,
-                    It.IsInRange(0, 2, Range.Inclusive)),
-                Times.Once);
+            _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, player.Id,
+                It.Is<GameUserUpdate>(u => u.SeatingPosition.HasValue)
+            ), Times.Once);
         }
 
         _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
@@ -729,9 +726,8 @@ public class GamePerspectiveServiceTests
 
         result.ShouldSucceedWith("Users swapped");
 
-        _mockGamePerspectiveStore.Verify(o => o.UpdateUser(GameId, UserId + 1, null, null, 10), Times.Once);
-        _mockGamePerspectiveStore.Verify(o => o.UpdateUser(GameId, UserId + 2, null, null, 5), Times.Once);
-
+        _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId + 1, new GameUserUpdate { SeatingPosition = 10 }), Times.Once);
+        _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId + 2, new GameUserUpdate { SeatingPosition = 5 }), Times.Once);
         _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 

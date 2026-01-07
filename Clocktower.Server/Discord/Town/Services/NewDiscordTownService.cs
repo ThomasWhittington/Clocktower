@@ -1,5 +1,4 @@
 using Clocktower.Server.Common.Services;
-using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Socket;
 using Discord;
@@ -231,7 +230,10 @@ public class DiscordTownService(
     {
         if (cache.TryGetValue($"join_data_{key}", out var joinData) && joinData is JoinData response)
         {
-            gamePerspectiveStore.UpdateUser(response.GameId, response.User.Id, isPlaying: true);
+            gamePerspectiveStore.UpdatePublicUser(response.GameId, response.User.Id, new GameUserUpdate
+            {
+                IsPlaying = true
+            });
             cache.Remove($"join_data_{key}");
             await notificationService.BroadcastDiscordTownUpdate(response.GameId);
             return response;
@@ -307,7 +309,10 @@ public class DiscordTownService(
         }
 
         await user.AddRoleAsync(targetRole);
-        gamePerspectiveStore.UpdateUser(gameId, user.Id, userType);
+        gamePerspectiveStore.UpdatePublicUser(gameId, user.Id, new GameUserUpdate
+        {
+            UserType = userType
+        });
         return (true, string.Empty);
     }
 
