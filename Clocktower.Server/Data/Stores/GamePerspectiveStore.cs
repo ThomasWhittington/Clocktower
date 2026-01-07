@@ -156,17 +156,15 @@ public class GamePerspectiveStore : IGamePerspectiveStore
 
     public void SetUserRole(string gameId, string userId, Role role)
     {
-        var allPerspectives = GetAllPerspectivesForGame(gameId);
-
-        foreach (var perspective in allPerspectives)
+        UpdateAllPerspectives(gameId, state =>
         {
-            if (!ShouldUpdateRoleForPerspective(perspective, userId)) continue;
+            if (!ShouldUpdateRoleForPerspective(state, userId)) return state;
 
-            TryUpdate(gameId, perspective.UserId, state => state with
+            return state with
             {
                 Users = state.Users.Select(user => user.Id == userId ? user with { Role = role } : user).ToList()
-            });
-        }
+            };
+        });
     }
 
 
