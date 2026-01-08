@@ -66,10 +66,10 @@ public class SetPlayerHasVoteTokenRequestValidatorTests
 
     #endregion
 
-    #region UserId1 Tests
+    #region UserId Tests
 
     [TestMethod]
-    public void Validate_ShouldHaveError_WhenUserId1IsEmpty()
+    public void Validate_ShouldHaveError_WhenUserIdIsEmpty()
     {
         var request = new SetPlayerHasVoteToken.Request("valid-game", "", RandomBool);
 
@@ -80,7 +80,7 @@ public class SetPlayerHasVoteTokenRequestValidatorTests
     }
 
     [TestMethod]
-    public void Validate_ShouldHaveError_WhenUserId1IsNotSnowflake()
+    public void Validate_ShouldHaveError_WhenUserIdIsNotSnowflake()
     {
         var request = new SetPlayerHasVoteToken.Request("valid-game", "invalid-user", RandomBool);
 

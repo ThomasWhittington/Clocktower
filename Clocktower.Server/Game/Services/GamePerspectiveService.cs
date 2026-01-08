@@ -231,9 +231,9 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         });
 
         if (updateOccurred) await notificationService.BroadcastDiscordTownUpdate(gameId);
-        string updateOccuredString = updateOccurred ? "now" : "already";
+        string updateOccurredString = updateOccurred ? "now" : "already";
         string expectedTokenStatus = isDead ? "dead" : "alive";
-        return Result.Ok($"{user.DisplayName} is {updateOccuredString} {expectedTokenStatus}");
+        return Result.Ok($"{user.DisplayName} is {updateOccurredString} {expectedTokenStatus}");
     }
 
     public async Task<Result<string>> SetPlayerHasVoteToken(string gameId, string userId, bool hasVoteToken)

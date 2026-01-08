@@ -10,8 +10,8 @@ export type Role = {
 
 export function mapToRole(roleDto: ClocktowerServerDataTypesRoleRole): Role {
     return {
-        name: roleDto.name!,
-        description: roleDto.description!,
+        name: roleDto.name ?? '',
+        description: roleDto.description ?? '',
         type: (RoleType[roleDto.type as keyof typeof RoleType]) ?? RoleType.Unknown,
         edition: (Edition[roleDto.edition as keyof typeof Edition]) ?? Edition.Unknown
     };

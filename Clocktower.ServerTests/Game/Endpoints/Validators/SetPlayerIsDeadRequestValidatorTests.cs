@@ -9,7 +9,7 @@ public class SetPlayerIsDeadRequestValidatorTests
     private SetPlayerIsDead.RequestValidator _validator = null!;
     private const string ValidSnowflake = "123456789012345678";
 
-    public static bool RandomBool => new Random().Next(2) == 0;
+    public static bool RandomBool => Random.Shared.Next(2) == 0;
 
     [TestInitialize]
     public void Setup()
@@ -66,10 +66,10 @@ public class SetPlayerIsDeadRequestValidatorTests
 
     #endregion
 
-    #region UserId1 Tests
+    #region UserId Tests
 
     [TestMethod]
-    public void Validate_ShouldHaveError_WhenUserId1IsEmpty()
+    public void Validate_ShouldHaveError_WhenUserIdIsEmpty()
     {
         var request = new SetPlayerIsDead.Request("valid-game", "", RandomBool);
 
@@ -80,7 +80,7 @@ public class SetPlayerIsDeadRequestValidatorTests
     }
 
     [TestMethod]
-    public void Validate_ShouldHaveError_WhenUserId1IsNotSnowflake()
+    public void Validate_ShouldHaveError_WhenUserIdIsNotSnowflake()
     {
         var request = new SetPlayerIsDead.Request("valid-game", "invalid-user", RandomBool);
 

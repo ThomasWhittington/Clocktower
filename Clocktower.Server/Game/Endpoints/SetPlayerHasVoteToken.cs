@@ -31,7 +31,6 @@ public class SetPlayerHasVoteToken : IEndpoint
         {
             RuleFor(x => x.GameId).MustBeValidGameId();
             RuleFor(x => x.UserId).MustBeValidSnowflake(nameof(Request.UserId));
-            RuleFor(x => x.HasVoteToken).NotNull();
         }
     }
 }
