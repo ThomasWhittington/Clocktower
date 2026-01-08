@@ -729,7 +729,7 @@ export const setPlayerHasVoteTokenApi = <ThrowOnError extends boolean = false>(o
                 type: 'http'
             }
         ],
-        url: '/api/games/{gameId}/set-player-has-vote-toke/{userId}/{hasVoteToken}',
+        url: '/api/games/{gameId}/set-player-has-vote-token/{userId}/{hasVoteToken}',
         ...options
     });
 };

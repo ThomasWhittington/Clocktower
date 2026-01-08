@@ -1025,7 +1025,7 @@ export type SetPlayerHasVoteTokenApiData = {
         hasVoteToken: boolean;
     };
     query?: never;
-    url: '/api/games/{gameId}/set-player-has-vote-toke/{userId}/{hasVoteToken}';
+    url: '/api/games/{gameId}/set-player-has-vote-token/{userId}/{hasVoteToken}';
 };
 
 export type SetPlayerHasVoteTokenApiErrors = {
