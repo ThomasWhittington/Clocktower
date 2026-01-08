@@ -1,5 +1,6 @@
 ﻿using Clocktower.Server.Common;
 using Clocktower.Server.Common.Services;
+using Clocktower.Server.Common.UpdateModels;
 using Clocktower.Server.Data;
 using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Data.Stores;
@@ -240,13 +241,12 @@ public class DiscordTownServiceTests
 
         var result = await _sut.GetJoinData(Key);
 
-        _mockGamePerspectiveStore.Verify(o => o.UpdateUser(joinData.GameId, joinData.User.Id, null, true), Times.Once());
+        _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(joinData.GameId, joinData.User.Id, new GameUserUpdate { IsPlaying = true }), Times.Once());
         _mockCache.Verify(o => o.Remove($"join_data_{Key}"), Times.Once);
         result.Should().Be(joinData);
     }
 
     #endregion
-
 
     #region PingUser
 
@@ -606,7 +606,6 @@ public class DiscordTownServiceTests
     }
 
     #endregion
-
 
     #region GetDiscordTown
 
@@ -1066,7 +1065,7 @@ public class DiscordTownServiceTests
         _user.Setup(o => o.RemoveRoleAsync(_playerRole.Object)).Returns(Task.CompletedTask);
         _user.Setup(o => o.RemoveRoleAsync(_spectatorRole.Object)).Returns(Task.CompletedTask);
 
-        _mockGamePerspectiveStore.Setup(o => o.UpdateUser(GameId, UserId, It.IsAny<UserType>())).Returns(true);
+        _mockGamePerspectiveStore.Setup(o => o.UpdatePublicUser(GameId, UserId, It.IsAny<GameUserUpdate>())).Returns(true);
         _mockNotificationService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
     }
 

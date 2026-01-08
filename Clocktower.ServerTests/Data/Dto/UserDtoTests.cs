@@ -1,6 +1,7 @@
 ﻿using Clocktower.Server.Data;
 using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Data.Types.Enum;
+using Clocktower.Server.Data.Types.Role;
 
 namespace Clocktower.ServerTests.Data.Dto;
 
@@ -17,7 +18,11 @@ public class UserDtoTests
     {
         UserType = UserType.Player,
         IsPlaying = true,
-        SeatingPosition = 5
+        SeatingPosition = 5,
+        HasVoteToken = true,
+        IsDead = true,
+        IsMarked = true,
+        Role = Role.Empath()
     };
 
     [TestMethod]
@@ -33,6 +38,10 @@ public class UserDtoTests
         result.IsPlaying.Should().BeFalse();
         result.UserType.Should().Be(UserType.Unknown);
         result.SeatingPosition.Should().Be(-1);
+        result.HasVoteToken.Should().BeFalse();
+        result.IsDead.Should().BeFalse();
+        result.IsMarked.Should().BeFalse();
+        result.Role.Should().BeNull();
     }
 
     [TestMethod]
@@ -48,6 +57,10 @@ public class UserDtoTests
         result.IsPlaying.Should().Be(_gameUser.IsPlaying);
         result.UserType.Should().Be(_gameUser.UserType);
         result.SeatingPosition.Should().Be(_gameUser.SeatingPosition);
+        result.HasVoteToken.Should().Be(_gameUser.HasVoteToken);
+        result.IsDead.Should().Be(_gameUser.IsDead);
+        result.IsMarked.Should().Be(_gameUser.IsMarked);
+        result.Role.Should().Be(_gameUser.Role);
     }
 
     [TestMethod]
@@ -63,6 +76,10 @@ public class UserDtoTests
         result.IsPlaying.Should().Be(_gameUser.IsPlaying);
         result.UserType.Should().Be(_gameUser.UserType);
         result.SeatingPosition.Should().Be(_gameUser.SeatingPosition);
+        result.HasVoteToken.Should().Be(_gameUser.HasVoteToken);
+        result.IsDead.Should().Be(_gameUser.IsDead);
+        result.IsMarked.Should().Be(_gameUser.IsMarked);
+        result.Role.Should().Be(_gameUser.Role);
     }
 
     [TestMethod]
@@ -78,5 +95,9 @@ public class UserDtoTests
         result.IsPlaying.Should().Be(_gameUser.IsPlaying);
         result.UserType.Should().Be(_gameUser.UserType);
         result.SeatingPosition.Should().Be(_gameUser.SeatingPosition);
+        result.HasVoteToken.Should().Be(_gameUser.HasVoteToken);
+        result.IsDead.Should().Be(_gameUser.IsDead);
+        result.IsMarked.Should().Be(_gameUser.IsMarked);
+        result.Role.Should().Be(_gameUser.Role);
     }
 }

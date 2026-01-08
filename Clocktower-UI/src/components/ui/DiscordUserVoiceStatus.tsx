@@ -1,23 +1,23 @@
 ﻿import type {VoiceState} from "@/types/voiceState.ts";
 import {SelfDeafenedIcon, SelfMutedIcon, ServerDeafenedIcon, ServerMutedIcon} from "@/components/ui/icons";
 
-export const DiscordUserVoiceStatus = ({voiceState}: {
-    voiceState: VoiceState
+export const DiscordUserVoiceStatus = ({voiceState, iconSize = 20}: {
+    voiceState: VoiceState,
+    iconSize?: number
 }) => {
-    const iconWidth = 20;
     return (
         <div className="discord-user-voice-status">
             {voiceState.isSelfMuted && !voiceState.isServerMuted &&
-                <SelfMutedIcon width={iconWidth}/>
+                <SelfMutedIcon width={iconSize} height={iconSize}/>
             }
             {voiceState.isServerMuted &&
-                <ServerMutedIcon width={iconWidth}/>
+                <ServerMutedIcon width={iconSize} height={iconSize}/>
             }
             {voiceState.isSelfDeafened && !voiceState.isServerDeafened &&
-                <SelfDeafenedIcon width={iconWidth}/>
+                <SelfDeafenedIcon width={iconSize} height={iconSize}/>
             }
             {voiceState.isServerDeafened &&
-                <ServerDeafenedIcon width={iconWidth}/>
+                <ServerDeafenedIcon width={iconSize} height={iconSize}/>
             }
         </div>
     );

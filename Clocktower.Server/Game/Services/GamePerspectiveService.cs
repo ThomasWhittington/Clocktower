@@ -2,7 +2,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Clocktower.Server.Common.Services;
-using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Socket;
 
 namespace Clocktower.Server.Game.Services;
@@ -177,10 +176,13 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
 
         foreach (GameUser shuffledPlayer in shuffledPlayers)
         {
-            gamePerspectiveStore.UpdateUser(
+            gamePerspectiveStore.UpdatePublicUser(
                 gameId,
                 shuffledPlayer.Id,
-                seatingPosition: Array.IndexOf(shuffledPlayers, shuffledPlayer)
+                new GameUserUpdate
+                {
+                    SeatingPosition = Array.IndexOf(shuffledPlayers, shuffledPlayer)
+                }
             );
         }
 
@@ -201,10 +203,56 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         if (user2 is null) return Result.Fail<string>(Errors.UserNotFound(userId2));
 
         var tempPosition = user1.SeatingPosition;
-        gamePerspectiveStore.UpdateUser(gameId, userId1, seatingPosition: user2.SeatingPosition);
-        gamePerspectiveStore.UpdateUser(gameId, userId2, seatingPosition: tempPosition);
-
+        gamePerspectiveStore.UpdatePublicUser(gameId, userId1, new GameUserUpdate
+        {
+            SeatingPosition = user2.SeatingPosition
+        });
+        gamePerspectiveStore.UpdatePublicUser(gameId, userId2, new GameUserUpdate
+        {
+            SeatingPosition = tempPosition
+        });
         await notificationService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok("Users swapped");
+    }
+
+    public async Task<Result<string>> SetPlayerIsDead(string gameId, string userId, bool isDead)
+    {
+        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var user = guild.GetUser(userId);
+        if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
+
+        var updateOccurred = gamePerspectiveStore.UpdatePublicUser(gameId, userId, new GameUserUpdate
+        {
+            IsDead = isDead,
+            HasVoteToken = isDead ? true : null
+        });
+
+        if (updateOccurred) await notificationService.BroadcastDiscordTownUpdate(gameId);
+        string updateOccurredString = updateOccurred ? "now" : "already";
+        string expectedTokenStatus = isDead ? "dead" : "alive";
+        return Result.Ok($"{user.DisplayName} is {updateOccurredString} {expectedTokenStatus}");
+    }
+
+    public async Task<Result<string>> SetPlayerHasVoteToken(string gameId, string userId, bool hasVoteToken)
+    {
+        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var user = guild.GetUser(userId);
+        if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
+
+        var updateOccurred = gamePerspectiveStore.UpdatePublicUser(gameId, userId, new GameUserUpdate
+        {
+            HasVoteToken = hasVoteToken
+        });
+
+        if (updateOccurred) await notificationService.BroadcastDiscordTownUpdate(gameId);
+        string updateOccurredString = updateOccurred ? "now" : "already";
+        string expectedTokenStatus = hasVoteToken ? "has token" : "does not have token";
+        return Result.Ok($"{user.DisplayName} {updateOccurredString} {expectedTokenStatus}");
     }
 }

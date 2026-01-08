@@ -1,5 +1,5 @@
 ﻿import {type GamePerspective, mapToGamePerspective, mapToUser, type User,} from "@/types";
-import {addUserToGameApi, getAvailableGameUsersApi, getGamesApi, loadDummyGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, startGameApi, swapSeatingPositionsApi} from "@/api";
+import {addUserToGameApi, getAvailableGameUsersApi, getGamesApi, loadDummyGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, setPlayerHasVoteTokenApi, setPlayerIsDeadApi, startGameApi, swapSeatingPositionsApi} from "@/api";
 import {apiClient} from "@/api/api-client.ts";
 
 async function getGames(): Promise<GamePerspective[]> {
@@ -149,6 +149,47 @@ async function swapSeatingPositions(gameId: string, userId1: string, userId2: st
     return data ?? '';
 }
 
+async function setPlayerIsDead(gameId: string, userId: string, isDead: boolean): Promise<string> {
+    const {
+        data,
+        error
+    } = await setPlayerIsDeadApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId,
+            isDead: isDead
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set player dead state:', error);
+        throw new Error(error.toString());
+    }
+
+    return data ?? '';
+}
+
+async function setPlayerHasVoteToken(gameId: string, userId: string, hasVoteToken: boolean): Promise<string> {
+    const {
+        data,
+        error
+    } = await setPlayerHasVoteTokenApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId,
+            hasVoteToken: hasVoteToken
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set player has vote token state:', error);
+        throw new Error(error.toString());
+    }
+
+    return data ?? '';
+}
 
 export const gamesService = {
     getGames,
@@ -158,5 +199,7 @@ export const gamesService = {
     addUserToGame,
     removeUserFromGame,
     randomiseSeatingPositions,
-    swapSeatingPositions
+    swapSeatingPositions,
+    setPlayerIsDead,
+    setPlayerHasVoteToken
 }

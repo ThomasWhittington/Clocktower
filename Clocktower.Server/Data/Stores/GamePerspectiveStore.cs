@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using Clocktower.Server.Data.Dto;
 
 namespace Clocktower.Server.Data.Stores;
 
@@ -111,30 +110,25 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         UpdateAllPerspectives(gameId, state => state with { GameTime = gameTime });
     }
 
-    public bool UpdateUser(string gameId,
-        string affectedUserId,
-        UserType? userType = null,
-        bool? isPlaying = null,
-        int? seatingPosition = null
-    )
+    public bool UpdatePublicUser(string gameId, string affectedUserId, GameUserUpdate update)
     {
         bool updated = false;
 
         UpdateAllPerspectives(gameId, state =>
         {
             var user = state.Users.FirstOrDefault(u => u.Id == affectedUserId);
-            if (user is null ||
-                (userType == null || user.UserType == userType) &&
-                (isPlaying == null || user.IsPlaying == isPlaying) &&
-                (seatingPosition == null || user.SeatingPosition == seatingPosition))
-                return state;
+            if (user is null || !HasChanges(user, update)) return state;
+
             updated = true;
 
             var updatedUser = user with
             {
-                UserType = userType ?? user.UserType,
-                IsPlaying = isPlaying ?? user.IsPlaying,
-                SeatingPosition = seatingPosition ?? user.SeatingPosition
+                UserType = update.UserType ?? user.UserType,
+                IsPlaying = update.IsPlaying ?? user.IsPlaying,
+                SeatingPosition = update.SeatingPosition ?? user.SeatingPosition,
+                IsDead = update.IsDead ?? user.IsDead,
+                IsMarked = update.IsMarked ?? user.IsMarked,
+                HasVoteToken = update.HasVoteToken ?? user.HasVoteToken
             };
 
             return state with { Users = state.Users.Select(u => u.Id == affectedUserId ? updatedUser : u).ToList() };
@@ -152,6 +146,19 @@ public class GamePerspectiveStore : IGamePerspectiveStore
 
         var maxPosition = currentPlayers.Max(u => u.SeatingPosition);
         return maxPosition + 1;
+    }
+
+    public void SetUserRole(string gameId, string userId, Role role)
+    {
+        UpdateAllPerspectives(gameId, state =>
+        {
+            if (!ShouldUpdateRoleForPerspective(state, userId)) return state;
+
+            return state with
+            {
+                Users = state.Users.Select(user => user.Id == userId ? user with { Role = role } : user).ToList()
+            };
+        });
     }
 
 
@@ -175,11 +182,30 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         );
     }
 
+    private static bool ShouldUpdateRoleForPerspective(GamePerspective perspective, string userId)
+    {
+        if (perspective.UserId == userId) return true;
+
+        var perspectiveOwner = perspective.Users.FirstOrDefault(u => u.Id == perspective.UserId);
+        return perspectiveOwner?.UserType is UserType.StoryTeller or UserType.Spectator;
+    }
+
     private GameUser ToPublicUser(GameUser user) =>
         new(user.Id)
         {
             UserType = user.UserType,
             IsPlaying = user.IsPlaying,
-            SeatingPosition = user.SeatingPosition
+            SeatingPosition = user.SeatingPosition,
+            IsDead = user.IsDead,
+            IsMarked = user.IsMarked,
+            HasVoteToken = user.HasVoteToken
         };
+
+    private static bool HasChanges(GameUser user, GameUserUpdate update) =>
+        (update.UserType != null && user.UserType != update.UserType) ||
+        (update.IsPlaying != null && user.IsPlaying != update.IsPlaying) ||
+        (update.SeatingPosition != null && user.SeatingPosition != update.SeatingPosition) ||
+        (update.HasVoteToken != null && user.HasVoteToken != update.HasVoteToken) ||
+        (update.IsDead != null && user.IsDead != update.IsDead) ||
+        (update.IsMarked != null && user.IsMarked != update.IsMarked);
 }

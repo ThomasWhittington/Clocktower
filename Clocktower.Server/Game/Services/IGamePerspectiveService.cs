@@ -16,4 +16,6 @@ public interface IGamePerspectiveService
     Task<Result<string>> RemoveUserFromGame(string gameId, string userId);
     Task<Result<string[]>> RandomiseSeatingPositions(string gameId);
     Task<Result<string>> SwapSeatingPositions(string gameId, string userId1, string userId2);
+    Task<Result<string>> SetPlayerIsDead(string gameId, string userId, bool isDead);
+    Task<Result<string>> SetPlayerHasVoteToken(string gameId, string userId, bool hasVoteToken);
 }

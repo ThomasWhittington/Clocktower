@@ -1,7 +1,4 @@
-﻿namespace Clocktower.Server.Data.Types.Enum;
-
-public enum RoleType
-{
+﻿export enum RoleType {
     Unknown = 0,
     Townsfolk = 1,
     Outsider = 2,

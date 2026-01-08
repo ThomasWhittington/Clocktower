@@ -99,7 +99,6 @@ export const useUserControls = () => {
         isLoading,
         error,
         result,
-        canRun: Boolean(gameId) && !isLoading,
-        runAction
+        canRun: Boolean(gameId) && !isLoading
     };
 }

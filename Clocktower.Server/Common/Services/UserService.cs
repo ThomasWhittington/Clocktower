@@ -1,6 +1,6 @@
 ﻿namespace Clocktower.Server.Common.Services;
 
-public class UserService(IDiscordTownStore discordTownStore, IGamePerspectiveStore gameStore, IDiscordTownManager discordTownManager)
+public class UserService(IDiscordTownStore discordTownStore, IDiscordTownManager discordTownManager)
     : IUserService
 {
     public IEnumerable<TownUser> GetTownUsersForGameUsers(
@@ -28,9 +28,6 @@ public class UserService(IDiscordTownStore discordTownStore, IGamePerspectiveSto
 
     public bool UpdateDiscordPresence(string userId, string guildId, bool isPresent, VoiceState voiceState) =>
         discordTownManager.UpdateUserStatus(guildId, userId, isPresent: isPresent, discordVoiceState: voiceState);
-
-    public bool UpdateGameUser(string gameId, string userId, UserType? userType = null, bool? isPlaying = null) =>
-        gameStore.UpdateUser(gameId, userId, userType: userType, isPlaying: isPlaying);
 
     public string? GetUserName(string userId) => discordTownManager.GetTownUser(userId)?.Name;
 }

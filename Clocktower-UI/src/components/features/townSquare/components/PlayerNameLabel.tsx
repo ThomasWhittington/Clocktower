@@ -1,6 +1,5 @@
 ﻿import type {MouseEvent, ReactNode} from "react";
-import type {User} from "@/types";
-import {DiscordUserVoiceStatus} from "@/components/ui";
+import {type User} from "@/types";
 
 export function PlayerNameLabel({player, onClick, children}: Readonly<{
     player: User;
@@ -8,11 +7,10 @@ export function PlayerNameLabel({player, onClick, children}: Readonly<{
     children?: ReactNode;
 }>) {
     return (
-
         <div className="player-name-container">
             <button onClick={onClick}>
                 <span className="flex items-center justify-center gap-1">
-                    {player.name} {player.voiceState && <DiscordUserVoiceStatus voiceState={player.voiceState}/>}
+                    {player.name}
                 </span>
             </button>
             {children}

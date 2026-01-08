@@ -15,6 +15,8 @@ global using Clocktower.Server.Data.Stores;
 global using Microsoft.AspNetCore.Mvc;
 global using Clocktower.Server.Data.Extensions;
 global using Clocktower.Server.Common.Types;
+global using Clocktower.Server.Common.UpdateModels;
+global using Clocktower.Server.Data.Dto;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;

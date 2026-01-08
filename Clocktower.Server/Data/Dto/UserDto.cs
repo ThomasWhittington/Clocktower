@@ -9,6 +9,10 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
     [UsedImplicitly] public bool IsPlaying { get; set; }
     [UsedImplicitly] public UserType UserType { get; set; } = UserType.Unknown;
     [UsedImplicitly] public int SeatingPosition { get; set; }
+    [UsedImplicitly] public bool HasVoteToken { get; set; }
+    [UsedImplicitly] public bool IsDead { get; set; }
+    [UsedImplicitly] public bool IsMarked { get; set; }
+    [UsedImplicitly] public Role? Role { get; set; }
 
     public static UserDto FromTownUser(TownUser townUser, GameUser? gameUser = null)
     {
@@ -18,7 +22,11 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
             IsPresent = townUser.IsPresent,
             IsPlaying = gameUser?.IsPlaying ?? false,
             UserType = gameUser?.UserType ?? UserType.Unknown,
-            SeatingPosition = gameUser?.SeatingPosition ?? NoSeatingPosition
+            SeatingPosition = gameUser?.SeatingPosition ?? NoSeatingPosition,
+            HasVoteToken = gameUser?.HasVoteToken ?? false,
+            IsDead = gameUser?.IsDead ?? false,
+            IsMarked = gameUser?.IsMarked ?? false,
+            Role = gameUser?.Role ?? null
         };
     }
 
@@ -30,7 +38,11 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
             IsPresent = townUser?.IsPresent ?? false,
             IsPlaying = gameUser.IsPlaying,
             UserType = gameUser.UserType,
-            SeatingPosition = gameUser.SeatingPosition
+            SeatingPosition = gameUser.SeatingPosition,
+            HasVoteToken = gameUser.HasVoteToken,
+            IsDead = gameUser.IsDead,
+            IsMarked = gameUser.IsMarked,
+            Role = gameUser.Role
         };
     }
 }

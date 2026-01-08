@@ -16,6 +16,7 @@ public interface IGamePerspectiveStore
     void AddUserToGame(string gameId, GameUser gameUser);
     void RemoveUserFromGame(string gameId, string userId);
     void SetTime(string gameId, GameTime gameTime);
-    bool UpdateUser(string gameId, string affectedUserId, UserType? userType = null, bool? isPlaying = null, int? seatingPosition = null);
+    bool UpdatePublicUser(string gameId, string affectedUserId, GameUserUpdate update);
     int GetNextAvailableSeatingPosition(string gameId);
+    void SetUserRole(string gameId, string userId, Role role);
 }

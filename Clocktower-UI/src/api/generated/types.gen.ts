@@ -55,6 +55,10 @@ export type ClocktowerServerDataDtoUserDto = {
     isPlaying?: boolean;
     userType?: ClocktowerServerDataTypesEnumUserType;
     seatingPosition?: number;
+    hasVoteToken?: boolean;
+    isDead?: boolean;
+    isMarked?: boolean;
+    role?: ClocktowerServerDataTypesRoleRole;
 };
 
 export type ClocktowerServerDataGamePerspective = {
@@ -75,6 +79,10 @@ export type ClocktowerServerDataGameUser = {
     isPlaying?: boolean;
     userType?: ClocktowerServerDataTypesEnumUserType;
     seatingPosition?: number;
+    hasVoteToken?: boolean;
+    isDead?: boolean;
+    isMarked?: boolean;
+    role?: ClocktowerServerDataTypesRoleRole;
 };
 
 export type ClocktowerServerDataMiniChannel = {
@@ -101,11 +109,11 @@ export type ClocktowerServerDataTownUser = {
     isPresent?: boolean;
 };
 
-export type ClocktowerServerDataTypesEnumEdition = 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
+export type ClocktowerServerDataTypesEnumEdition = 'Unknown' | 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
 
 export type ClocktowerServerDataTypesEnumGameTime = 'Unknown' | 'Day' | 'Evening' | 'Night';
 
-export type ClocktowerServerDataTypesEnumRoleType = 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
+export type ClocktowerServerDataTypesEnumRoleType = 'Unknown' | 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
 
 export type ClocktowerServerDataTypesEnumUserType = 'Unknown' | 'Player' | 'StoryTeller' | 'Spectator';
 
@@ -1008,6 +1016,72 @@ export type RemoveUserFromGameApiResponses = {
 };
 
 export type RemoveUserFromGameApiResponse = RemoveUserFromGameApiResponses[keyof RemoveUserFromGameApiResponses];
+
+export type SetPlayerHasVoteTokenApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+        hasVoteToken: boolean;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/set-player-has-vote-token/{userId}/{hasVoteToken}';
+};
+
+export type SetPlayerHasVoteTokenApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetPlayerHasVoteTokenApiError = SetPlayerHasVoteTokenApiErrors[keyof SetPlayerHasVoteTokenApiErrors];
+
+export type SetPlayerHasVoteTokenApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetPlayerHasVoteTokenApiResponse = SetPlayerHasVoteTokenApiResponses[keyof SetPlayerHasVoteTokenApiResponses];
+
+export type SetPlayerIsDeadApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+        isDead: boolean;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/set-player-is-dead/{userId}/{isDead}';
+};
+
+export type SetPlayerIsDeadApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetPlayerIsDeadApiError = SetPlayerIsDeadApiErrors[keyof SetPlayerIsDeadApiErrors];
+
+export type SetPlayerIsDeadApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetPlayerIsDeadApiResponse = SetPlayerIsDeadApiResponses[keyof SetPlayerIsDeadApiResponses];
 
 export type SetTimeApiData = {
     body?: never;
