@@ -251,8 +251,8 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         });
 
         if (updateOccurred) await notificationService.BroadcastDiscordTownUpdate(gameId);
-        string updateOccuredString = updateOccurred ? "now" : "already";
+        string updateOccurredString = updateOccurred ? "now" : "already";
         string expectedTokenStatus = hasVoteToken ? "has token" : "does not have token";
-        return Result.Ok($"{user.DisplayName} {updateOccuredString} {expectedTokenStatus}");
+        return Result.Ok($"{user.DisplayName} {updateOccurredString} {expectedTokenStatus}");
     }
 }

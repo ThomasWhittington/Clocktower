@@ -14,9 +14,7 @@ export function usePlayerBadgeActions(player: User) {
         if (!gameId) return;
 
         await runAction(async () => {
-            const result = await gamesService.setPlayerIsDead(gameId, player.id, !player.isDead);
-            console.log(result);
-            return result;
+            return await gamesService.setPlayerIsDead(gameId, player.id, !player.isDead);
         });
     }, [player.isDead, player.id, gameId, runAction]);
 
@@ -25,11 +23,9 @@ export function usePlayerBadgeActions(player: User) {
         if (!gameId) return;
 
         await runAction(async () => {
-            const result = await gamesService.setPlayerHasVoteToken(gameId, player.id, !player.hasVoteToken);
-            console.log(result);
-            return result;
+            return await gamesService.setPlayerHasVoteToken(gameId, player.id, !player.hasVoteToken);
         });
-    }, [player.hasVoteToken, player.isDead, player.id, gameId, runAction]);
+    }, [player.hasVoteToken, player.id, gameId, runAction]);
 
     return {
         handleShroudClick,

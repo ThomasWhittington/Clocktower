@@ -21,7 +21,7 @@ public class SetPlayerHasVoteTokenTests
 
         SetPlayerHasVoteToken.Map(builder);
 
-        builder.GetEndpoint("/{gameId}/set-player-has-vote-toke/{userId}/{hasVoteToken:bool}")
+        builder.GetEndpoint("/{gameId}/set-player-has-vote-token/{userId}/{hasVoteToken:bool}")
             .ShouldHaveMethod(HttpMethod.Post)
             .ShouldHaveStorytellerAuthorization()
             .ShouldHaveOperationId("setPlayerHasVoteTokenApi")

@@ -9,7 +9,7 @@ public class SetPlayerHasVoteTokenRequestValidatorTests
     private SetPlayerHasVoteToken.RequestValidator _validator = null!;
     private const string ValidSnowflake = "123456789012345678";
 
-    public static bool RandomBool => Random.Shared.Next(1, 2) == 1;
+    public static bool RandomBool => new Random().Next(2) == 0;
 
     [TestInitialize]
     public void Setup()

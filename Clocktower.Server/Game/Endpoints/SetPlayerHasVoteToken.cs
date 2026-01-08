@@ -5,7 +5,7 @@ public class SetPlayerHasVoteToken : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapPost("/{gameId}/set-player-has-vote-toke/{userId}/{hasVoteToken:bool}", Handle)
+        app.MapPost("/{gameId}/set-player-has-vote-token/{userId}/{hasVoteToken:bool}", Handle)
             .RequireAuthorization("StoryTellerForGame")
             .SetOpenApiOperationId<SetPlayerHasVoteToken>()
             .WithSummaryAndDescription("Sets if a player has a vote token in the game")
