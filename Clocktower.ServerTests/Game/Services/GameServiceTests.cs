@@ -13,7 +13,7 @@ using Clocktower.Server.Socket.Services;
 namespace Clocktower.ServerTests.Game.Services;
 
 [TestClass]
-public class GamePerspectiveServiceTests
+public class GameServiceTests
 {
     private const string DummyJsonFile = "dummyState.json";
     private const string GameId = "game-id";
@@ -27,7 +27,7 @@ public class GamePerspectiveServiceTests
     private Mock<IGameBroadcastService> _mockGameBroadcastService = null!;
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
 
-    private IGamePerspectiveService _sut = null!;
+    private IGameService _sut = null!;
 
     [TestInitialize]
     public void Setup()
@@ -38,7 +38,7 @@ public class GamePerspectiveServiceTests
         _mockGameBroadcastService = new Mock<IGameBroadcastService>();
         _mockDiscordTownManager = StrictMockFactory.Create<IDiscordTownManager>();
 
-        _sut = new GamePerspectiveService(
+        _sut = new GameService(
             _mockBot.Object,
             _mockGamePerspectiveStore.Object,
             _mockDiscordTownManager.Object,

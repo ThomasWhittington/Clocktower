@@ -7,17 +7,17 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class GetPlayerGamesTests
 {
-    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
+    private Mock<IGameService> _mockGameService = null!;
 
     private void MockResponse(string userId, MiniGamePerspective[] playerGames)
     {
-        _mockGamePerspectiveService.Setup(o => o.GetPlayerGames(userId)).Returns(playerGames);
+        _mockGameService.Setup(o => o.GetPlayerGames(userId)).Returns(playerGames);
     }
 
     [TestInitialize]
     public void Setup()
     {
-        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
+        _mockGameService = new Mock<IGameService>();
     }
 
     [TestMethod]
@@ -44,9 +44,9 @@ public class GetPlayerGamesTests
 
         MockResponse(userId, playerGames);
 
-        var result = GetPlayerGames.Handle(userId, _mockGamePerspectiveService.Object);
+        var result = GetPlayerGames.Handle(userId, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.GetPlayerGames(userId.Trim()), Times.Once);
+        _mockGameService.Verify(o => o.GetPlayerGames(userId.Trim()), Times.Once);
 
         var response = result.Should().BeOfType<Ok<IEnumerable<MiniGamePerspective>>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);

@@ -14,9 +14,9 @@ public class RandomiseSeatingPositions : IEndpoint
 
     internal static async Task<Results<Ok<string[]>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle(
         [AsParameters] GameIdRequest request,
-        [FromServices] IGamePerspectiveService gamePerspectiveService)
+        [FromServices] IGameService gameService)
     {
-        var result = await gamePerspectiveService.RandomiseSeatingPositions(request.GameId);
+        var result = await gameService.RandomiseSeatingPositions(request.GameId);
         return result.ToHttpResult();
     }
 }

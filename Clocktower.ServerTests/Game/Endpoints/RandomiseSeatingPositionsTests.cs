@@ -7,12 +7,12 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class RandomiseSeatingPositionsTests
 {
-    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
+    private Mock<IGameService> _mockGameService = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
+        _mockGameService = new Mock<IGameService>();
     }
 
     [TestMethod]
@@ -36,11 +36,11 @@ public class RandomiseSeatingPositionsTests
         var request = new GameIdRequest(CommonMethods.GetRandomString());
 
         var error = Result.Fail<string[]>(ErrorKind.Invalid, "error code", "error message");
-        _mockGamePerspectiveService.Setup(o => o.RandomiseSeatingPositions(request.GameId)).ReturnsAsync(error);
+        _mockGameService.Setup(o => o.RandomiseSeatingPositions(request.GameId)).ReturnsAsync(error);
 
-        var result = await RandomiseSeatingPositions.Handle(request, _mockGamePerspectiveService.Object);
+        var result = await RandomiseSeatingPositions.Handle(request, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.RandomiseSeatingPositions(request.GameId), Times.Once);
+        _mockGameService.Verify(o => o.RandomiseSeatingPositions(request.GameId), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
@@ -53,11 +53,11 @@ public class RandomiseSeatingPositionsTests
 
         var success = Result.Ok(new[] { "expected1", "expected2" });
 
-        _mockGamePerspectiveService.Setup(o => o.RandomiseSeatingPositions(request.GameId)).ReturnsAsync(success);
+        _mockGameService.Setup(o => o.RandomiseSeatingPositions(request.GameId)).ReturnsAsync(success);
 
-        var result = await RandomiseSeatingPositions.Handle(request, _mockGamePerspectiveService.Object);
+        var result = await RandomiseSeatingPositions.Handle(request, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.RandomiseSeatingPositions(request.GameId), Times.Once);
+        _mockGameService.Verify(o => o.RandomiseSeatingPositions(request.GameId), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<string[]>>().Subject;
         response.Value.Should().BeEquivalentTo(success.Value);

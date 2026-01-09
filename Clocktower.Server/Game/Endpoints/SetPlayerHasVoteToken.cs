@@ -14,9 +14,9 @@ public class SetPlayerHasVoteToken : IEndpoint
 
     internal static async Task<Results<Ok<string>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle(
         [AsParameters] Request request,
-        [FromServices] IGamePerspectiveService gamePerspectiveService)
+        [FromServices] IGameService gameService)
     {
-        var result = await gamePerspectiveService.SetPlayerHasVoteToken(request.GameId, request.UserId, request.HasVoteToken);
+        var result = await gameService.SetPlayerHasVoteToken(request.GameId, request.UserId, request.HasVoteToken);
         return result.ToHttpResult();
     }
 

@@ -9,9 +9,9 @@ public class DeleteGame : IEndpoint
         .WithSummaryAndDescription("Deletes a game by id");
 
 
-    internal static Results<Ok, NotFound<string>> Handle(string gameId, [FromServices] IGamePerspectiveService gamePerspectiveService)
+    internal static Results<Ok, NotFound<string>> Handle(string gameId, [FromServices] IGameService gameService)
     {
-        var result = gamePerspectiveService.DeleteGame(gameId.Trim());
+        var result = gameService.DeleteGame(gameId.Trim());
 
         return result.success
             ? TypedResults.Ok()

@@ -6,12 +6,12 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class SetPlayerHasVoteTokenTests
 {
-    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
+    private Mock<IGameService> _mockGameService = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
+        _mockGameService = new Mock<IGameService>();
     }
 
     [TestMethod]
@@ -35,11 +35,11 @@ public class SetPlayerHasVoteTokenTests
         var request = new SetPlayerHasVoteToken.Request(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId(), new Random().Next(2) == 0);
 
         var error = Result.Fail<string>(ErrorKind.Invalid, "error code", "error message");
-        _mockGamePerspectiveService.Setup(o => o.SetPlayerHasVoteToken(request.GameId, request.UserId, request.HasVoteToken)).ReturnsAsync(error);
+        _mockGameService.Setup(o => o.SetPlayerHasVoteToken(request.GameId, request.UserId, request.HasVoteToken)).ReturnsAsync(error);
 
-        var result = await SetPlayerHasVoteToken.Handle(request, _mockGamePerspectiveService.Object);
+        var result = await SetPlayerHasVoteToken.Handle(request, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.SetPlayerHasVoteToken(request.GameId, request.UserId, request.HasVoteToken), Times.Once);
+        _mockGameService.Verify(o => o.SetPlayerHasVoteToken(request.GameId, request.UserId, request.HasVoteToken), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
@@ -52,11 +52,11 @@ public class SetPlayerHasVoteTokenTests
 
         var success = Result.Ok("expected");
 
-        _mockGamePerspectiveService.Setup(o => o.SetPlayerHasVoteToken(request.GameId, request.UserId, request.HasVoteToken)).ReturnsAsync(success);
+        _mockGameService.Setup(o => o.SetPlayerHasVoteToken(request.GameId, request.UserId, request.HasVoteToken)).ReturnsAsync(success);
 
-        var result = await SetPlayerHasVoteToken.Handle(request, _mockGamePerspectiveService.Object);
+        var result = await SetPlayerHasVoteToken.Handle(request, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.SetPlayerHasVoteToken(request.GameId, request.UserId, request.HasVoteToken), Times.Once);
+        _mockGameService.Verify(o => o.SetPlayerHasVoteToken(request.GameId, request.UserId, request.HasVoteToken), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.Value.Should().BeEquivalentTo(success.Value);

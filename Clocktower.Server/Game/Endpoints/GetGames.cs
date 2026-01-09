@@ -8,9 +8,9 @@ public class GetGames : IEndpoint
         .SetOpenApiOperationId<GetGames>()
         .WithSummaryAndDescription("Gets all games perspectives");
 
-    internal static Ok<IEnumerable<GamePerspective>> Handle([FromServices] IGamePerspectiveService gamePerspectiveService)
+    internal static Ok<IEnumerable<GamePerspective>> Handle([FromServices] IGameService gameService)
     {
-        var games = gamePerspectiveService.GetGames();
+        var games = gameService.GetGames();
         return TypedResults.Ok(games);
     }
 }

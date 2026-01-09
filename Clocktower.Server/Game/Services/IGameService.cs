@@ -1,8 +1,6 @@
-﻿using Clocktower.Server.Data.Dto;
+﻿namespace Clocktower.Server.Game.Services;
 
-namespace Clocktower.Server.Game.Services;
-
-public interface IGamePerspectiveService
+public interface IGameService
 {
     (bool success, GamePerspective? gamePerspective, string message) StartNewGame(string guildId, string gameId, string userId);
     (bool success, string message) DeleteGame(string gameId);

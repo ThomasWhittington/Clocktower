@@ -80,7 +80,7 @@ public static class ConfigureServices
 
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IDiscordAuthService, DiscordAuthService>();
-            builder.Services.AddScoped<IGamePerspectiveService, GamePerspectiveService>();
+            builder.Services.AddScoped<IGameService, GameService>();
             builder.Services.AddScoped<IDiscordGameActionService, DiscordGameActionService>();
             builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddScoped<IGameAuthorizationService, GameAuthorizationService>();

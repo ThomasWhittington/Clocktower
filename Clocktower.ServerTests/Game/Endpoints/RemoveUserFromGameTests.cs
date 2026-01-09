@@ -7,12 +7,12 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class RemoveUserFromGameTests
 {
-    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
+    private Mock<IGameService> _mockGameService = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
+        _mockGameService = new Mock<IGameService>();
     }
 
     [TestMethod]
@@ -35,11 +35,11 @@ public class RemoveUserFromGameTests
         var request = new GameAndUserRequest(CommonMethods.GetRandomString(), CommonMethods.GetRandomString());
 
         var error = Result.Fail<string>(ErrorKind.Invalid, "error code", "error message");
-        _mockGamePerspectiveService.Setup(o => o.RemoveUserFromGame(request.GameId, request.UserId)).ReturnsAsync(error);
+        _mockGameService.Setup(o => o.RemoveUserFromGame(request.GameId, request.UserId)).ReturnsAsync(error);
 
-        var result = await RemoveUserFromGame.Handle(request, _mockGamePerspectiveService.Object);
+        var result = await RemoveUserFromGame.Handle(request, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.RemoveUserFromGame(request.GameId, request.UserId), Times.Once);
+        _mockGameService.Verify(o => o.RemoveUserFromGame(request.GameId, request.UserId), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
@@ -52,11 +52,11 @@ public class RemoveUserFromGameTests
 
         var success = Result.Ok("expected");
 
-        _mockGamePerspectiveService.Setup(o => o.RemoveUserFromGame(request.GameId, request.UserId)).ReturnsAsync(success);
+        _mockGameService.Setup(o => o.RemoveUserFromGame(request.GameId, request.UserId)).ReturnsAsync(success);
 
-        var result = await RemoveUserFromGame.Handle(request, _mockGamePerspectiveService.Object);
+        var result = await RemoveUserFromGame.Handle(request, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.RemoveUserFromGame(request.GameId, request.UserId), Times.Once);
+        _mockGameService.Verify(o => o.RemoveUserFromGame(request.GameId, request.UserId), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.Value.Should().Be(success.Value);

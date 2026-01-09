@@ -14,9 +14,9 @@ public class SetPlayerIsDead : IEndpoint
 
     internal static async Task<Results<Ok<string>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle(
         [AsParameters] Request request,
-        [FromServices] IGamePerspectiveService gamePerspectiveService)
+        [FromServices] IGameService gameService)
     {
-        var result = await gamePerspectiveService.SetPlayerIsDead(request.GameId, request.UserId, request.IsDead);
+        var result = await gameService.SetPlayerIsDead(request.GameId, request.UserId, request.IsDead);
         return result.ToHttpResult();
     }
 

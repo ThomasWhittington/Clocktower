@@ -6,7 +6,7 @@ using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gamePerspectiveStore, IDiscordTownManager discordTownManager, IFileSystem fileSystem, IGameBroadcastService gameBroadcastService) : IGamePerspectiveService
+public class GameService(IDiscordBot bot, IGamePerspectiveStore gamePerspectiveStore, IDiscordTownManager discordTownManager, IFileSystem fileSystem, IGameBroadcastService gameBroadcastService) : IGameService
 {
     public IEnumerable<GamePerspective> GetGames() => gamePerspectiveStore.GetAll();
 

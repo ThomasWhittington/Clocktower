@@ -6,12 +6,12 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class SwapSeatingPositionsTests
 {
-    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
+    private Mock<IGameService> _mockGameService = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
+        _mockGameService = new Mock<IGameService>();
     }
 
     [TestMethod]
@@ -35,11 +35,11 @@ public class SwapSeatingPositionsTests
         var request = new SwapSeatingPositions.Request(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomSnowflakeStringId());
 
         var error = Result.Fail<string>(ErrorKind.Invalid, "error code", "error message");
-        _mockGamePerspectiveService.Setup(o => o.SwapSeatingPositions(request.GameId, request.UserId1, request.UserId2)).ReturnsAsync(error);
+        _mockGameService.Setup(o => o.SwapSeatingPositions(request.GameId, request.UserId1, request.UserId2)).ReturnsAsync(error);
 
-        var result = await SwapSeatingPositions.Handle(request, _mockGamePerspectiveService.Object);
+        var result = await SwapSeatingPositions.Handle(request, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.SwapSeatingPositions(request.GameId, request.UserId1, request.UserId2), Times.Once);
+        _mockGameService.Verify(o => o.SwapSeatingPositions(request.GameId, request.UserId1, request.UserId2), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
@@ -52,11 +52,11 @@ public class SwapSeatingPositionsTests
 
         var success = Result.Ok("expected");
 
-        _mockGamePerspectiveService.Setup(o => o.SwapSeatingPositions(request.GameId, request.UserId1, request.UserId2)).ReturnsAsync(success);
+        _mockGameService.Setup(o => o.SwapSeatingPositions(request.GameId, request.UserId1, request.UserId2)).ReturnsAsync(success);
 
-        var result = await SwapSeatingPositions.Handle(request, _mockGamePerspectiveService.Object);
+        var result = await SwapSeatingPositions.Handle(request, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.SwapSeatingPositions(request.GameId, request.UserId1, request.UserId2), Times.Once);
+        _mockGameService.Verify(o => o.SwapSeatingPositions(request.GameId, request.UserId1, request.UserId2), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.Value.Should().BeEquivalentTo(success.Value);
