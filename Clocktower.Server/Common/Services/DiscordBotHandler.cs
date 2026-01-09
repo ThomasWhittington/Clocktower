@@ -5,7 +5,7 @@ using Clocktower.Server.Socket.Services;
 namespace Clocktower.Server.Common.Services;
 
 public class DiscordBotHandler(
-    IGamePerspectiveStore gamePerspectiveStore,
+    IGamePerspectiveService gamePerspectiveService,
     IDiscordTownManager discordDiscordTownManager,
     IUserService userService,
     IGameBroadcastService gameBroadcastService,
@@ -18,7 +18,7 @@ public class DiscordBotHandler(
         if (guildId is null) return;
         var guildUser = user.GetGuildUser();
         if (guildUser is null) return;
-        var guildGameIds = gamePerspectiveStore.GetGuildGameIds(guildId);
+        var guildGameIds = gamePerspectiveService.GetGuildGameIds(guildId);
 
         var channelsAreSame = before.VoiceChannel?.Id == after.VoiceChannel?.Id;
         Func<string, Task> updateAction = channelsAreSame

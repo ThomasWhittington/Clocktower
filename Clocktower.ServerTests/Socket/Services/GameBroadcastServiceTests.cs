@@ -153,7 +153,7 @@ public class GameBroadcastServiceTests
         const string storyTellerId = "storyteller-id";
         var storyTeller = CommonMethods.GetRandomGameUser(storyTellerId)with { UserType = UserType.StoryTeller };
 
-        var omniscientPerspective = CommonMethods.GetGamePerspective(GameId, GamePerspectiveStore.OmniscientKey, GuildId);
+        var omniscientPerspective = CommonMethods.GetGamePerspective(GameId, IGamePerspectiveStore.OmniscientKey, GuildId);
         omniscientPerspective = omniscientPerspective with { Users = new List<GameUser> { storyTeller } };
 
         var omniscientTown = new DiscordTownDto(GameId, new List<MiniCategoryDto>());
@@ -190,7 +190,7 @@ public class GameBroadcastServiceTests
         const string spectatorId = "spectator-id";
         var spectator = CommonMethods.GetRandomGameUser(spectatorId)with { UserType = UserType.Spectator };
 
-        var omniscientPerspective = CommonMethods.GetGamePerspective(GameId, GamePerspectiveStore.OmniscientKey, GuildId);
+        var omniscientPerspective = CommonMethods.GetGamePerspective(GameId, IGamePerspectiveStore.OmniscientKey, GuildId);
         omniscientPerspective = omniscientPerspective with { Users = new List<GameUser> { spectator } };
 
         var omniscientTown = new DiscordTownDto(GameId, new List<MiniCategoryDto>());
@@ -232,7 +232,7 @@ public class GameBroadcastServiceTests
         var spectator = CommonMethods.GetRandomGameUser(spectatorId)with { UserType = UserType.Spectator };
         var player = CommonMethods.GetRandomGameUser(playerId)with { UserType = UserType.Player };
 
-        var omniscientPerspective = CommonMethods.GetGamePerspective(GameId, GamePerspectiveStore.OmniscientKey, GuildId);
+        var omniscientPerspective = CommonMethods.GetGamePerspective(GameId, IGamePerspectiveStore.OmniscientKey, GuildId);
         omniscientPerspective = omniscientPerspective with { Users = new List<GameUser> { storyTeller, spectator, player } };
 
         var omniscientTown = new DiscordTownDto(GameId, []);
@@ -276,7 +276,7 @@ public class GameBroadcastServiceTests
 
         var playerPerspective = CommonMethods.GetGamePerspective(GameId, playerId, GuildId) with { Users = playerUsers };
 
-        var omniscientPerspective = CommonMethods.GetGamePerspective(GameId, GamePerspectiveStore.OmniscientKey, GuildId) with { Users = omniscientUsers };
+        var omniscientPerspective = CommonMethods.GetGamePerspective(GameId, IGamePerspectiveStore.OmniscientKey, GuildId) with { Users = omniscientUsers };
 
         var playerTown = new DiscordTownDto(GameId, []);
         var redactedPlayerTown = new DiscordTownDto(GameId, []);
@@ -341,7 +341,7 @@ public class GameBroadcastServiceTests
         const string storyTellerId = "storyteller-id";
         var storyTeller = CommonMethods.GetRandomGameUser(storyTellerId)with { UserType = UserType.StoryTeller };
 
-        var omniscientPerspective = CommonMethods.GetGamePerspective(GameId, GamePerspectiveStore.OmniscientKey, GuildId);
+        var omniscientPerspective = CommonMethods.GetGamePerspective(GameId, IGamePerspectiveStore.OmniscientKey, GuildId);
         omniscientPerspective = omniscientPerspective with { Users = new List<GameUser> { storyTeller } };
 
         _mockGamePerspectiveStore
@@ -367,7 +367,7 @@ public class GameBroadcastServiceTests
     [TestMethod]
     public async Task BroadcastDiscordTownUpdate_SkipsOmniscientKeyInRegularProcessing()
     {
-        var omniscientPerspective = CommonMethods.GetGamePerspective(GameId, GamePerspectiveStore.OmniscientKey, GuildId);
+        var omniscientPerspective = CommonMethods.GetGamePerspective(GameId, IGamePerspectiveStore.OmniscientKey, GuildId);
         omniscientPerspective = omniscientPerspective with { Users = new List<GameUser>() };
 
         _mockGamePerspectiveStore
@@ -385,7 +385,7 @@ public class GameBroadcastServiceTests
         await _sut.BroadcastDiscordTownUpdate(GameId);
 
         _mockDiscordTownManager.Verify(
-            x => x.RedactTownDto(It.IsAny<DiscordTownDto>(), GamePerspectiveStore.OmniscientKey),
+            x => x.RedactTownDto(It.IsAny<DiscordTownDto>(), IGamePerspectiveStore.OmniscientKey),
             Times.Never);
     }
 

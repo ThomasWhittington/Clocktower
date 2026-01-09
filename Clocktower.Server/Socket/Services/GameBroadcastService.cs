@@ -30,7 +30,7 @@ public class GameBroadcastService(
 
     private IEnumerable<UserNotification> BuildNotifications(string gameId, string guildId, List<GamePerspective> perspectives)
     {
-        foreach (var perspective in perspectives.Where(p => p.UserId != GamePerspectiveStore.OmniscientKey))
+        foreach (var perspective in perspectives.Where(p => p.UserId != IGamePerspectiveStore.OmniscientKey))
         {
             var town = CreateRedactedTownForPlayer(guildId, gameId, perspective);
             if (town != null)
@@ -39,7 +39,7 @@ public class GameBroadcastService(
             }
         }
 
-        var omniscientPerspective = perspectives.FirstOrDefault(p => p.UserId == GamePerspectiveStore.OmniscientKey);
+        var omniscientPerspective = perspectives.FirstOrDefault(p => p.UserId == IGamePerspectiveStore.OmniscientKey);
         if (omniscientPerspective != null)
         {
             var omniscientTown = discordTownManager.GetDiscordTownDto(guildId, gameId, omniscientPerspective.Users);

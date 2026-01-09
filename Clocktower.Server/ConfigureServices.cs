@@ -77,6 +77,7 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IFileSystem, FileSystem>();
             builder.Services.AddSingleton<IDiscordAuthApiService, DiscordAuthApiService>();
             builder.Services.AddSingleton<IDiscordConstantsService, DiscordConstantsService>();
+            builder.Services.AddSingleton<IGamePerspectiveService, GamePerspectiveService>();
 
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IDiscordAuthService, DiscordAuthService>();

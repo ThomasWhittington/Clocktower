@@ -1,7 +1,6 @@
 ﻿using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data;
 using Clocktower.Server.Data.Dto;
-using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Socket.Services;
 
@@ -10,7 +9,7 @@ namespace Clocktower.ServerTests.Socket.Services;
 [TestClass]
 public class HubStateManagerTests
 {
-    private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
+    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private Mock<IJwtWriter> _mockJwtWriter = null!;
     private Mock<ITimerCoordinator> _mockTimerCoordinator = null!;
@@ -19,12 +18,12 @@ public class HubStateManagerTests
     [TestInitialize]
     public void SetUp()
     {
-        _mockGamePerspectiveStore = StrictMockFactory.Create<IGamePerspectiveStore>();
+        _mockGamePerspectiveService = StrictMockFactory.Create<IGamePerspectiveService>();
         _mockDiscordTownManager = StrictMockFactory.Create<IDiscordTownManager>();
         _mockJwtWriter = StrictMockFactory.Create<IJwtWriter>();
         _mockTimerCoordinator = StrictMockFactory.Create<ITimerCoordinator>();
 
-        _sut = new HubStateManager(_mockGamePerspectiveStore.Object,
+        _sut = new HubStateManager(_mockGamePerspectiveService.Object,
             _mockDiscordTownManager.Object,
             _mockJwtWriter.Object,
             _mockTimerCoordinator.Object
@@ -37,7 +36,7 @@ public class HubStateManagerTests
     {
         const string gameId = "non-existent-game";
         const string userId = "user-123";
-        _mockGamePerspectiveStore.Setup(s => s.Get(gameId, userId)).Returns((GamePerspective?)null);
+        _mockGamePerspectiveService.Setup(s => s.GetPerspective(gameId, userId)).Returns((GamePerspective?)null);
 
         var result = _sut.GetState(gameId, userId);
 
@@ -51,7 +50,7 @@ public class HubStateManagerTests
         const string userId = "non-existent-user";
         var gamePerspective = CommonMethods.GetGamePerspective(gameId);
 
-        _mockGamePerspectiveStore.Setup(s => s.Get(gameId, userId)).Returns(gamePerspective);
+        _mockGamePerspectiveService.Setup(s => s.GetPerspective(gameId, userId)).Returns(gamePerspective);
 
         var result = _sut.GetState(gameId, userId);
 
@@ -77,7 +76,7 @@ public class HubStateManagerTests
         };
         var discordTownDto = new DiscordTownDto(gameId, [new MiniCategoryDto(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
         const string expectedJwt = "jwt-token-123";
-        _mockGamePerspectiveStore.Setup(s => s.Get(gameId, userId)).Returns(gamePerspective);
+        _mockGamePerspectiveService.Setup(s => s.GetPerspective(gameId, userId)).Returns(gamePerspective);
         _mockDiscordTownManager.Setup(s => s.GetDiscordTownDto(guildId, gameId, new List<GameUser> { gameUser })).Returns(discordTownDto);
         _mockDiscordTownManager.Setup(o => o.RedactTownDto(It.IsAny<DiscordTownDto>(), userId)).Returns(new DiscordTownDto(gameId, []));
         _mockJwtWriter.Setup(j => j.GetJwtToken(gameUser)).Returns(expectedJwt);
@@ -85,7 +84,7 @@ public class HubStateManagerTests
 
         var result = _sut.GetState(gameId, userId);
 
-        _mockGamePerspectiveStore.Verify(o => o.Get(gameId, userId), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetPerspective(gameId, userId), Times.Once);
         _mockDiscordTownManager.Verify(o => o.GetDiscordTownDto(guildId, gameId, new List<GameUser> { gameUser }), Times.Once);
         _mockDiscordTownManager.Verify(o => o.RedactTownDto(It.IsAny<DiscordTownDto>(), userId), Times.Once);
         _mockJwtWriter.Verify(o => o.GetJwtToken(gameUser), Times.Once);
@@ -116,14 +115,14 @@ public class HubStateManagerTests
         };
         var discordTownDto = new DiscordTownDto(gameId, [new MiniCategoryDto(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
         const string expectedJwt = "jwt-token-123";
-        _mockGamePerspectiveStore.Setup(s => s.Get(gameId, userId)).Returns(gamePerspective);
+        _mockGamePerspectiveService.Setup(s => s.GetPerspective(gameId, userId)).Returns(gamePerspective);
         _mockDiscordTownManager.Setup(s => s.GetDiscordTownDto(guildId, gameId, new List<GameUser> { gameUser })).Returns(discordTownDto);
         _mockJwtWriter.Setup(j => j.GetJwtToken(gameUser)).Returns(expectedJwt);
         _mockTimerCoordinator.Setup(t => t.Get(gameId)).Returns(timer);
 
         var result = _sut.GetState(gameId, userId);
 
-        _mockGamePerspectiveStore.Verify(o => o.Get(gameId, userId), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.GetPerspective(gameId, userId), Times.Once);
         _mockDiscordTownManager.Verify(o => o.GetDiscordTownDto(guildId, gameId, new List<GameUser> { gameUser }), Times.Once);
         _mockJwtWriter.Verify(o => o.GetJwtToken(gameUser), Times.Once);
         result.Should().NotBeNull();

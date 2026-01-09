@@ -3,7 +3,6 @@ using Clocktower.Server.Common.Services;
 using Clocktower.Server.Common.UpdateModels;
 using Clocktower.Server.Data;
 using Clocktower.Server.Data.Dto;
-using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types;
 using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Data.Wrappers;
@@ -44,7 +43,7 @@ public class DiscordTownServiceTests
 
     private Mock<IDiscordBot> _mockBot = null!;
     private Mock<IGameBroadcastService> _mockGameBroadcastService = null!;
-    private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
+    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private Mock<IJwtWriter> _mockJwtWriter = null!;
     private Mock<IMemoryCache> _mockCache = null!;
@@ -91,7 +90,7 @@ public class DiscordTownServiceTests
 
         _mockBot = new Mock<IDiscordBot>();
         _mockGameBroadcastService = new Mock<IGameBroadcastService>();
-        _mockGamePerspectiveStore = new Mock<IGamePerspectiveStore>();
+        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
         _mockDiscordTownManager = new Mock<IDiscordTownManager>();
         _mockJwtWriter = new Mock<IJwtWriter>();
         _mockCache = new Mock<IMemoryCache>();
@@ -104,7 +103,7 @@ public class DiscordTownServiceTests
         _sut = new DiscordTownService(
             _mockBot.Object,
             _mockGameBroadcastService.Object,
-            _mockGamePerspectiveStore.Object,
+            _mockGamePerspectiveService.Object,
             _mockDiscordTownManager.Object,
             _mockJwtWriter.Object,
             _mockCache.Object,
@@ -241,7 +240,7 @@ public class DiscordTownServiceTests
 
         var result = await _sut.GetJoinData(Key);
 
-        _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(joinData.GameId, joinData.User.Id, new GameUserUpdate { IsPlaying = true }), Times.Once());
+        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(joinData.GameId, joinData.User.Id, new GameUserUpdate { IsPlaying = true }), Times.Once());
         _mockCache.Verify(o => o.Remove($"join_data_{Key}"), Times.Once);
         result.Should().Be(joinData);
     }
@@ -622,7 +621,7 @@ public class DiscordTownServiceTests
         _guild.Setup(o => o.GetMiniCategory(DayCategory.Name)).Returns(hasDayCategory ? DayCategory : null);
         _guild.Setup(o => o.GetMiniCategory(NightCategory.Name)).Returns(hasNightCategory ? NightCategory : null);
 
-        _mockGamePerspectiveStore.Setup(o => o.GetGuildGameIds(GuildId)).Returns(gameFound ? [GameId] : []);
+        _mockGamePerspectiveService.Setup(o => o.GetGuildGameIds(GuildId)).Returns(gameFound ? [GameId] : []);
     }
 
     [TestMethod]
@@ -713,7 +712,7 @@ public class DiscordTownServiceTests
             }
             : [];
 
-        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(gameId)).Returns(hasGamePerspective ? CommonMethods.GetGamePerspective(GameId, guildId: guildId) with { Users = users } : null);
+        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(gameId)).Returns(hasGamePerspective ? CommonMethods.GetGamePerspective(GameId, guildId: guildId) with { Users = users } : null);
         _mockDiscordTownManager.Setup(o => o.GetDiscordTown(guildId)).Returns(hasTown ? _discordTown : null);
         if (hasTown)
         {
@@ -775,7 +774,7 @@ public class DiscordTownServiceTests
         _townUser = CommonMethods.GetRandomTownUser(UserId);
         var gamePerspective = CommonMethods.GetGamePerspective(GameId, guildId: guildId);
 
-        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasPerspective ? gamePerspective : null);
+        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasPerspective ? gamePerspective : null);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? _guild.Object : null);
 
         _guild.Setup(o => o.Id).Returns(guildId!);
@@ -802,7 +801,7 @@ public class DiscordTownServiceTests
     [TestMethod]
     public async Task InviteUser_ReturnsError_WhenExceptionThrown()
     {
-        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Throws<Exception>();
+        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Throws<Exception>();
 
         var (outcome, message) = await _sut.InviteUser(GameId, UserId, true);
 
@@ -920,7 +919,7 @@ public class DiscordTownServiceTests
         var (outcome, message) = await _sut.InviteUser(GameId, UserId, true);
 
         _dmChannel.Verify(o => o.SendMessageAsync($"[Join here]({FeUrl + $"/join?key={Key}"})"), Times.Once);
-        _mockGamePerspectiveStore.Verify(o => o.AddUserToGame(GameId, It.Is<GameUser>(g => g.Id == UserId && g.UserType == UserType.Player)), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.AddUserToGame(GameId, It.Is<GameUser>(g => g.Id == UserId && g.UserType == UserType.Player)), Times.Once);
         outcome.Should().Be(InviteUserOutcome.InviteSent);
         message.Should().Be("Sent message to user");
     }
@@ -932,7 +931,7 @@ public class DiscordTownServiceTests
 
         _ = await _sut.InviteUser(GameId, UserId, true);
 
-        _mockGamePerspectiveStore.Verify(o => o.AddUserToGame(GameId, _gameUser), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.AddUserToGame(GameId, _gameUser), Times.Once);
     }
 
     #endregion
@@ -942,7 +941,7 @@ public class DiscordTownServiceTests
     private void Setup_InviteAll(string[] userIds, Dictionary<string, (InviteUserOutcome outcome, string message)>? outcomes = null)
     {
         var perspectives = userIds.Select(id => new GamePerspective(GameId, id, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow) { UserId = id }).ToArray();
-        _mockGamePerspectiveStore.Setup(o => o.GetAllPerspectivesForGame(GameId)).Returns(perspectives);
+        _mockGamePerspectiveService.Setup(o => o.GetAllPerspectivesForGame(GameId)).Returns(perspectives);
 
         if (outcomes == null) return;
 
@@ -954,7 +953,7 @@ public class DiscordTownServiceTests
                 var hasDm = result.outcome == InviteUserOutcome.InviteSent;
 
                 var gamePerspective = CommonMethods.GetGamePerspective(GameId, guildId: GuildId);
-                _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(gamePerspective);
+                _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(gamePerspective);
                 _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(_guild.Object);
                 _guild.Setup(o => o.Id).Returns(GuildId);
 
@@ -1030,7 +1029,7 @@ public class DiscordTownServiceTests
         _user.Setup(o => o.Id).Returns(UserId);
         _user.Setup(o => o.DisplayName).Returns(DisplayName);
 
-        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? CommonMethods.GetGamePerspective(GameId, guildId: GuildId) : null);
+        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? CommonMethods.GetGamePerspective(GameId, guildId: GuildId) : null);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? _guild.Object : null);
         _guild.Setup(o => o.GetUser(UserId)).Returns(hasUser ? _user.Object : null);
 
@@ -1065,7 +1064,7 @@ public class DiscordTownServiceTests
         _user.Setup(o => o.RemoveRoleAsync(_playerRole.Object)).Returns(Task.CompletedTask);
         _user.Setup(o => o.RemoveRoleAsync(_spectatorRole.Object)).Returns(Task.CompletedTask);
 
-        _mockGamePerspectiveStore.Setup(o => o.UpdatePublicUser(GameId, UserId, It.IsAny<GameUserUpdate>())).Returns(true);
+        _mockGamePerspectiveService.Setup(o => o.UpdatePublicUser(GameId, UserId, It.IsAny<GameUserUpdate>())).Returns(true);
         _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
     }
 
@@ -1073,7 +1072,7 @@ public class DiscordTownServiceTests
     public async Task SetUserType_ReturnsError_WhenExceptionThrown()
     {
         const string responseMessage = "Response message";
-        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Throws(new Exception(responseMessage));
+        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Throws(new Exception(responseMessage));
 
         var result = await _sut.SetUserType(GameId, UserId, UserType.Player);
 

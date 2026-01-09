@@ -1,0 +1,20 @@
+﻿namespace Clocktower.Server.Common.Services;
+
+public interface IGamePerspectiveService
+{
+    IEnumerable<GamePerspective> GetAll();
+    bool GameExists(string gameId);
+    bool RemoveGame(string gameId);
+    GamePerspective? GetPerspective(string gameId, string userId);
+    GamePerspective? GetFirstPerspective(string gameId);
+    void RemoveUserFromGame(string gameId, string userId);
+    void SetUserRole(string gameId, string userId, Role role);
+    bool UpdatePublicUser(string gameId, string userId, GameUserUpdate update);
+    bool AddUserToGame(string gameId, GameUser gameUser);
+    GamePerspective? InitializeGame(string gameId, string guildId, GameUser initialUser);
+    IEnumerable<GamePerspective> GetAllPerspectivesForGame(string gameId);
+    int GetNextAvailableSeatingPosition(string gameId);
+    IEnumerable<GamePerspective> GetUserGames(string userId);
+    IEnumerable<string> GetGuildGameIds(string guildId);
+    void SetTime(string gameId, GameTime gameTime);
+}
