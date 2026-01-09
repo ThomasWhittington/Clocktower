@@ -240,7 +240,7 @@ public class DiscordTownServiceTests
 
         var result = await _sut.GetJoinData(Key);
 
-        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(joinData.GameId, joinData.User.Id, new GameUserUpdate { IsPlaying = true }), Times.Once());
+        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(joinData.GameId, joinData.User.Id, new PublicGameUserUpdate { IsPlaying = true }), Times.Once());
         _mockCache.Verify(o => o.Remove($"join_data_{Key}"), Times.Once);
         result.Should().Be(joinData);
     }
@@ -1064,7 +1064,7 @@ public class DiscordTownServiceTests
         _user.Setup(o => o.RemoveRoleAsync(_playerRole.Object)).Returns(Task.CompletedTask);
         _user.Setup(o => o.RemoveRoleAsync(_spectatorRole.Object)).Returns(Task.CompletedTask);
 
-        _mockGamePerspectiveService.Setup(o => o.UpdatePublicUser(GameId, UserId, It.IsAny<GameUserUpdate>())).Returns(true);
+        _mockGamePerspectiveService.Setup(o => o.UpdatePublicUser(GameId, UserId, It.IsAny<PublicGameUserUpdate>())).Returns(true);
         _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
     }
 

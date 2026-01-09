@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Clocktower.Server.Data.Stores;
 
@@ -45,7 +44,6 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         }
     }
 
-    [ExcludeFromCodeCoverage(Justification = "This just runs a delegate, the value not found issue is covered in the calling functions")]
     public void TryUpdate(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction)
     {
         _store.AddOrUpdate((gameId, userId),

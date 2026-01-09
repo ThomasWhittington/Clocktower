@@ -8,8 +8,8 @@ public interface IGamePerspectiveService
     GamePerspective? GetPerspective(string gameId, string userId);
     GamePerspective? GetFirstPerspective(string gameId);
     void RemoveUserFromGame(string gameId, string userId);
-    void SetUserRole(string gameId, string userId, Role role);
-    bool UpdatePublicUser(string gameId, string userId, GameUserUpdate update);
+    bool UpdatePublicUser(string gameId, string userId, PublicGameUserUpdate update);
+    bool UpdatePrivateUser(string gameId, string userId, PrivateGameUserUpdate update);
     bool AddUserToGame(string gameId, GameUser gameUser);
     GamePerspective? InitializeGame(string gameId, string guildId, GameUser initialUser);
     IEnumerable<GamePerspective> GetAllPerspectivesForGame(string gameId);

@@ -1,5 +1,5 @@
 ﻿import {type GamePerspective, mapToGamePerspective, mapToUser, type User,} from "@/types";
-import {addUserToGameApi, getAvailableGameUsersApi, getGamesApi, loadDummyGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, setPlayerHasVoteTokenApi, setPlayerIsDeadApi, startGameApi, swapSeatingPositionsApi} from "@/api";
+import {addUserToGameApi, getAvailableGameUsersApi, getGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, setPlayerHasVoteTokenApi, setPlayerIsDeadApi, startGameApi, swapSeatingPositionsApi} from "@/api";
 import {apiClient} from "@/api/api-client.ts";
 
 async function getGames(): Promise<GamePerspective[]> {
@@ -14,20 +14,6 @@ async function getGames(): Promise<GamePerspective[]> {
         throw new Error('Failed to fetch games');
     }
     return data?.map(mapToGamePerspective) ?? [];
-}
-
-async function loadDummyData(): Promise<string | undefined> {
-    const {
-        data,
-        error
-    } = await loadDummyGamesApi({client: apiClient});
-
-    if (error) {
-        console.error('Failed to load dummy data:', error);
-        throw new Error('Failed to load dummy data');
-    }
-
-    return data ?? '';
 }
 
 async function startGame(gameId: string, guildId: string, userId: string): Promise<GamePerspective | null> {
@@ -193,7 +179,6 @@ async function setPlayerHasVoteToken(gameId: string, userId: string, hasVoteToke
 
 export const gamesService = {
     getGames,
-    loadDummyData,
     startGame,
     getAvailableGameUsers,
     addUserToGame,

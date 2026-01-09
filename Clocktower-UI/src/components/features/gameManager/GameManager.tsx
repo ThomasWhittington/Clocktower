@@ -31,15 +31,6 @@ function GameManager() {
         setError(errorMessage);
         setHasError(true);
     };
-
-    const loadDummyData = async () => {
-        clearError();
-        setIsLoading(true);
-        gamesService.loadDummyData()
-            .catch((err) => handleError(err))
-            .finally(() => setIsLoading(false));
-    };
-
     const getGames = async () => {
         clearError();
         setIsLoading(true);
@@ -106,10 +97,6 @@ function GameManager() {
 
                         <h1>Current Game: {gameId}</h1>
 
-                        <button onClick={loadDummyData} className="btn-primary">
-                            Load Dummy Data
-                        </button>
-                        <br/>
                         <button onClick={getGames} className="btn-primary">
                             Get games
                         </button>

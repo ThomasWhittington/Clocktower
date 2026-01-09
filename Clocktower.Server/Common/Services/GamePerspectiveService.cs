@@ -6,6 +6,12 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
 
     public bool GameExists(string gameId) => store.GetAllPerspectivesForGame(gameId).Any();
 
+    public GamePerspective? GetFirstPerspective(string gameId)
+    {
+        var gamePerspectives = store.GetAllPerspectivesForGame(gameId);
+        return gamePerspectives.FirstOrDefault();
+    }
+
     public GamePerspective? GetPerspective(string gameId, string userId)
     {
         var personal = store.Get(gameId, userId);
@@ -16,12 +22,6 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         var user = omniscient.Users.FirstOrDefault(u => u.Id == userId);
         if (IsOmniscient(user?.UserType)) return omniscient;
         return null;
-    }
-
-    public GamePerspective? GetFirstPerspective(string gameId)
-    {
-        var gamePerspectives = store.GetAllPerspectivesForGame(gameId);
-        return gamePerspectives.FirstOrDefault();
     }
 
     public void RemoveUserFromGame(string gameId, string userId)
@@ -50,15 +50,7 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         });
     }
 
-    public void SetUserRole(string gameId, string userId, Role role)
-    {
-        store.UpdateUserInOwnAndOmniscientPerspectives(gameId, userId, state => state with
-        {
-            Users = state.Users.Select(user => user.Id == userId ? user with { Role = role } : user).ToList()
-        });
-    }
-
-    public bool UpdatePublicUser(string gameId, string userId, GameUserUpdate update)
+    public bool UpdatePublicUser(string gameId, string userId, PublicGameUserUpdate update)
     {
         bool updated = false;
 
@@ -67,7 +59,7 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         store.UpdateAllPerspectives(gameId, state =>
         {
             var user = state.Users.FirstOrDefault(u => u.Id == userId);
-            if (user is null || !UserHasChanges(user, update)) return state;
+            if (user is null || !UserHasPublicChanges(user, update)) return state;
 
             updated = true;
 
@@ -87,17 +79,46 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         return updated;
     }
 
+    public bool UpdatePrivateUser(string gameId, string userId, PrivateGameUserUpdate update)
+    {
+        bool updated = false;
+
+        store.UpdateUserInOwnAndOmniscientPerspectives(gameId, userId, state =>
+        {
+            var user = state.Users.FirstOrDefault(u => u.Id == userId);
+            if (user is null || !UserHasPrivateChanges(user, update)) return state;
+
+            updated = true;
+
+            var updatedUser = user with
+            {
+                Role = update.Role ?? user.Role
+            };
+
+            return state with { Users = state.Users.Select(u => u.Id == userId ? updatedUser : u).ToList() };
+        });
+
+        return updated;
+    }
+
+
     public bool AddUserToGame(string gameId, GameUser gameUser)
     {
         var existingPerspective = GetFirstPerspective(gameId);
-        if (existingPerspective is null) return false;
-        if (existingPerspective.Users.Any(u => u.Id == gameUser.Id)) return false;
+        if (existingPerspective is null)
+            return false;
+        if (existingPerspective.Users.Any(u => u.Id == gameUser.Id))
+            return false;
 
-        bool added = IsOmniscient(gameUser.UserType)
-            ? AddOmniscientUserToGame(gameId, gameUser, existingPerspective)
-            : AddPlayerToGame(gameId, gameUser, existingPerspective);
+        if (IsOmniscient(gameUser.UserType))
+        {
+            AddOmniscientUserToGame(gameId, gameUser, existingPerspective);
+        }
+        else
+        {
+            AddPlayerToGame(gameId, gameUser, existingPerspective);
+        }
 
-        if (!added) return false;
         AddUserToAllPerspectives(gameId, gameUser);
         return true;
     }
@@ -167,7 +188,7 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         return userType is UserType.StoryTeller or UserType.Spectator;
     }
 
-    private static bool UserHasChanges(GameUser user, GameUserUpdate update) =>
+    private static bool UserHasPublicChanges(GameUser user, PublicGameUserUpdate update) =>
         (update.UserType != null && user.UserType != update.UserType) ||
         (update.IsPlaying != null && user.IsPlaying != update.IsPlaying) ||
         (update.SeatingPosition != null && user.SeatingPosition != update.SeatingPosition) ||
@@ -175,17 +196,20 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         (update.IsDead != null && user.IsDead != update.IsDead) ||
         (update.IsMarked != null && user.IsMarked != update.IsMarked);
 
+    private static bool UserHasPrivateChanges(GameUser user, PrivateGameUserUpdate update) =>
+        update.Role != null && user.Role != update.Role;
+
     private void HandleUserTypeTransition(string gameId, string userId, UserType newUserType)
     {
         var currentPerspective = GetPerspective(gameId, userId);
         if (currentPerspective is null) return;
 
         var currentUser = currentPerspective.Users.FirstOrDefault(u => u.Id == userId);
-        if (currentUser is null) return;
 
-        var wasOmniscient = IsOmniscient(currentUser.UserType);
+        var wasOmniscient = IsOmniscient(currentUser!.UserType);
         var isNowOmniscient = IsOmniscient(newUserType);
-        if (wasOmniscient == isNowOmniscient) return;
+        if (wasOmniscient == isNowOmniscient)
+            return;
 
         if (isNowOmniscient)
         {
@@ -211,17 +235,18 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         }
     }
 
-    private bool AddOmniscientUserToGame(string gameId, GameUser gameUser, GamePerspective templatePerspective)
+    private void AddOmniscientUserToGame(string gameId, GameUser gameUser, GamePerspective templatePerspective)
     {
-        var omniscientPerspective = CreateOmniscientPerspective(templatePerspective);
-        var added = store.Add(gameId, IGamePerspectiveStore.OmniscientKey, omniscientPerspective);
+        var existingOmniscient = store.Get(gameId, IGamePerspectiveStore.OmniscientKey);
+        if (existingOmniscient is null)
+        {
+            var omniscientPerspective = CreateOmniscientPerspective(templatePerspective);
+            store.Add(gameId, IGamePerspectiveStore.OmniscientKey, omniscientPerspective);
+        }
 
         store.TryUpdate(gameId, IGamePerspectiveStore.OmniscientKey, state =>
-        {
-            if (state.Users.Any(u => u.Id == gameUser.Id)) return state;
-            return state with { Users = [.. state.Users, gameUser] };
-        });
-        return added;
+            state with { Users = [.. state.Users, gameUser] }
+        );
     }
 
     private static GamePerspective CreateOmniscientPerspective(GamePerspective template)
@@ -233,7 +258,7 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         };
     }
 
-    private bool AddPlayerToGame(string gameId, GameUser gameUser, GamePerspective templatePerspective)
+    private void AddPlayerToGame(string gameId, GameUser gameUser, GamePerspective templatePerspective)
     {
         var playerPerspective = templatePerspective with
         {
@@ -241,7 +266,7 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
             Users = templatePerspective.Users.Select(ToPublicUser).Append(gameUser).ToList()
         };
 
-        return store.Add(gameId, gameUser.Id, playerPerspective);
+        store.Add(gameId, gameUser.Id, playerPerspective);
     }
 
     private void AddUserToAllPerspectives(string gameId, GameUser gameUser)

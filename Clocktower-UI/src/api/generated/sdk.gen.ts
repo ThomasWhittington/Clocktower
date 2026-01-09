@@ -66,9 +66,6 @@ import type {
     InviteUserApiData,
     InviteUserApiErrors,
     InviteUserApiResponses,
-    LoadDummyGamesApiData,
-    LoadDummyGamesApiErrors,
-    LoadDummyGamesApiResponses,
     LoginApiData,
     LoginApiErrors,
     MoveUserToChannelApiData,
@@ -658,24 +655,6 @@ export const getPlayerGamesApi = <ThrowOnError extends boolean = false>(options:
             }
         ],
         url: '/api/games/player/{userId}',
-        ...options
-    });
-};
-
-/**
- * Loads dummy data from saved json file
- *
- * Loads dummy data from saved json file
- */
-export const loadDummyGamesApi = <ThrowOnError extends boolean = false>(options?: Options<LoadDummyGamesApiData, ThrowOnError>) => {
-    return (options?.client ?? client).post<LoadDummyGamesApiResponses, LoadDummyGamesApiErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/games/load',
         ...options
     });
 };

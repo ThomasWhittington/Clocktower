@@ -230,7 +230,7 @@ public class DiscordTownService(
     {
         if (cache.TryGetValue($"join_data_{key}", out var joinData) && joinData is JoinData response)
         {
-            gamePerspectiveService.UpdatePublicUser(response.GameId, response.User.Id, new GameUserUpdate
+            gamePerspectiveService.UpdatePublicUser(response.GameId, response.User.Id, new PublicGameUserUpdate
             {
                 IsPlaying = true
             });
@@ -306,7 +306,7 @@ public class DiscordTownService(
         foreach (var role in roleMap.Values.Where(role => role != targetRole && user.DoesUserHaveRole(role.Id))) await user.RemoveRoleAsync(role);
         if (!user.DoesUserHaveRole(targetRole.Id)) await user.AddRoleAsync(targetRole);
 
-        gamePerspectiveService.UpdatePublicUser(gameId, user.Id, new GameUserUpdate
+        gamePerspectiveService.UpdatePublicUser(gameId, user.Id, new PublicGameUserUpdate
         {
             UserType = userType
         });

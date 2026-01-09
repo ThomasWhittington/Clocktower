@@ -538,7 +538,7 @@ public class GameServiceTests
         foreach (var player in players)
         {
             _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, player.Id,
-                It.Is<GameUserUpdate>(u => u.SeatingPosition.HasValue)
+                It.Is<PublicGameUserUpdate>(u => u.SeatingPosition.HasValue)
             ), Times.Once);
         }
 
@@ -594,8 +594,8 @@ public class GameServiceTests
 
         result.ShouldSucceedWith("Users swapped");
 
-        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId + 1, new GameUserUpdate { SeatingPosition = 10 }), Times.Once);
-        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId + 2, new GameUserUpdate { SeatingPosition = 5 }), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId + 1, new PublicGameUserUpdate { SeatingPosition = 10 }), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId + 2, new PublicGameUserUpdate { SeatingPosition = 5 }), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
@@ -609,7 +609,7 @@ public class GameServiceTests
         _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? CommonMethods.GetGamePerspective(GameId, guildId: GuildId) : null);
         guildMock.Setup(o => o.GetUser(UserId)).Returns(hasUser ? userMock.Object : null);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guildMock.Object : null);
-        _mockGamePerspectiveService.Setup(o => o.UpdatePublicUser(GameId, UserId, It.IsAny<GameUserUpdate>())).Returns(updateOccurred);
+        _mockGamePerspectiveService.Setup(o => o.UpdatePublicUser(GameId, UserId, It.IsAny<PublicGameUserUpdate>())).Returns(updateOccurred);
         _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
     }
 
@@ -659,7 +659,7 @@ public class GameServiceTests
 
         string expectedTokenStatus = hasVoteToken ? "has token" : "does not have token";
         result.ShouldSucceedWith($"{DisplayName} now {expectedTokenStatus}");
-        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { HasVoteToken = hasVoteToken }), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new PublicGameUserUpdate { HasVoteToken = hasVoteToken }), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
@@ -674,7 +674,7 @@ public class GameServiceTests
 
         string expectedTokenStatus = hasVoteToken ? "has token" : "does not have token";
         result.ShouldSucceedWith($"{DisplayName} already {expectedTokenStatus}");
-        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { HasVoteToken = hasVoteToken }), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new PublicGameUserUpdate { HasVoteToken = hasVoteToken }), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
     }
 
@@ -725,7 +725,7 @@ public class GameServiceTests
 
         const string expectedDeadStatus = isDead ? "dead" : "alive";
         result.ShouldSucceedWith($"{DisplayName} is now {expectedDeadStatus}");
-        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { IsDead = isDead }), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new PublicGameUserUpdate { IsDead = isDead }), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
@@ -739,7 +739,7 @@ public class GameServiceTests
 
         const string expectedDeadStatus = isDead ? "dead" : "alive";
         result.ShouldSucceedWith($"{DisplayName} is now {expectedDeadStatus}");
-        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { IsDead = isDead, HasVoteToken = true }), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new PublicGameUserUpdate { IsDead = isDead, HasVoteToken = true }), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
@@ -754,7 +754,7 @@ public class GameServiceTests
 
         const string expectedDeadStatus = isDead ? "dead" : "alive";
         result.ShouldSucceedWith($"{DisplayName} is already {expectedDeadStatus}");
-        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { IsDead = isDead, HasVoteToken = true }), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new PublicGameUserUpdate { IsDead = isDead, HasVoteToken = true }), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
     }
 

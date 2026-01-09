@@ -134,7 +134,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
             gamePerspectiveService.UpdatePublicUser(
                 gameId,
                 shuffledPlayer.Id,
-                new GameUserUpdate
+                new PublicGameUserUpdate
                 {
                     SeatingPosition = Array.IndexOf(shuffledPlayers, shuffledPlayer)
                 }
@@ -158,11 +158,11 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         if (user2 is null) return Result.Fail<string>(Errors.UserNotFound(userId2));
 
         var tempPosition = user1.SeatingPosition;
-        gamePerspectiveService.UpdatePublicUser(gameId, userId1, new GameUserUpdate
+        gamePerspectiveService.UpdatePublicUser(gameId, userId1, new PublicGameUserUpdate
         {
             SeatingPosition = user2.SeatingPosition
         });
-        gamePerspectiveService.UpdatePublicUser(gameId, userId2, new GameUserUpdate
+        gamePerspectiveService.UpdatePublicUser(gameId, userId2, new PublicGameUserUpdate
         {
             SeatingPosition = tempPosition
         });
@@ -179,7 +179,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         var user = guild.GetUser(userId);
         if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
 
-        var updateOccurred = gamePerspectiveService.UpdatePublicUser(gameId, userId, new GameUserUpdate
+        var updateOccurred = gamePerspectiveService.UpdatePublicUser(gameId, userId, new PublicGameUserUpdate
         {
             IsDead = isDead,
             HasVoteToken = isDead ? true : null
@@ -200,7 +200,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         var user = guild.GetUser(userId);
         if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
 
-        var updateOccurred = gamePerspectiveService.UpdatePublicUser(gameId, userId, new GameUserUpdate
+        var updateOccurred = gamePerspectiveService.UpdatePublicUser(gameId, userId, new PublicGameUserUpdate
         {
             HasVoteToken = hasVoteToken
         });
