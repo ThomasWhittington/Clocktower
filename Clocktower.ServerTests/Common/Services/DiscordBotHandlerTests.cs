@@ -3,7 +3,7 @@ using Clocktower.Server.Data;
 using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Discord.Town.Services;
-using Clocktower.Server.Socket;
+using Clocktower.Server.Socket.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Clocktower.ServerTests.Common.Services;
@@ -22,7 +22,7 @@ public class DiscordBotHandlerTests
     private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private Mock<IUserService> _mockUserService = null!;
-    private Mock<INotificationService> _mockNotificationService = null!;
+    private Mock<IGameBroadcastService> _mockNotificationService = null!;
     private Mock<IServiceScopeFactory> _mockServiceScopeFactory = null!;
     private Mock<IServiceScope> _mockScope = null!;
     private Mock<IServiceProvider> _mockServiceProvider = null!;
@@ -41,7 +41,7 @@ public class DiscordBotHandlerTests
         _mockGamePerspectiveStore = new Mock<IGamePerspectiveStore>();
         _mockDiscordTownManager = new Mock<IDiscordTownManager>();
         _mockUserService = new Mock<IUserService>();
-        _mockNotificationService = new Mock<INotificationService>();
+        _mockNotificationService = new Mock<IGameBroadcastService>();
         _mockServiceScopeFactory = new Mock<IServiceScopeFactory>();
         _mockScope = new Mock<IServiceScope>();
         _mockServiceProvider = new Mock<IServiceProvider>();

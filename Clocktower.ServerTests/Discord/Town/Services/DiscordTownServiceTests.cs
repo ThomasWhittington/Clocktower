@@ -9,7 +9,7 @@ using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Discord;
 using Clocktower.Server.Discord.Town.Services;
-using Clocktower.Server.Socket;
+using Clocktower.Server.Socket.Services;
 using Discord;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -43,7 +43,7 @@ public class DiscordTownServiceTests
     private const string FeUrl = "fe-url";
 
     private Mock<IDiscordBot> _mockBot = null!;
-    private Mock<INotificationService> _mockNotificationService = null!;
+    private Mock<IGameBroadcastService> _mockGameBroadcastService = null!;
     private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private Mock<IJwtWriter> _mockJwtWriter = null!;
@@ -90,7 +90,7 @@ public class DiscordTownServiceTests
         _cacheEntry = StrictMockFactory.Create<ICacheEntry>();
 
         _mockBot = new Mock<IDiscordBot>();
-        _mockNotificationService = new Mock<INotificationService>();
+        _mockGameBroadcastService = new Mock<IGameBroadcastService>();
         _mockGamePerspectiveStore = new Mock<IGamePerspectiveStore>();
         _mockDiscordTownManager = new Mock<IDiscordTownManager>();
         _mockJwtWriter = new Mock<IJwtWriter>();
@@ -103,7 +103,7 @@ public class DiscordTownServiceTests
 
         _sut = new DiscordTownService(
             _mockBot.Object,
-            _mockNotificationService.Object,
+            _mockGameBroadcastService.Object,
             _mockGamePerspectiveStore.Object,
             _mockDiscordTownManager.Object,
             _mockJwtWriter.Object,
@@ -255,7 +255,7 @@ public class DiscordTownServiceTests
     {
         await _sut.PingUser(UserId);
 
-        _mockNotificationService.Verify(o => o.PingUser(UserId, "Ping!"), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.PingUser(UserId, "Ping!"), Times.Once);
     }
 
     #endregion
@@ -685,7 +685,7 @@ public class DiscordTownServiceTests
 
         _ = await _sut.GetDiscordTown(GuildId);
 
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
     }
 
     [TestMethod]
@@ -695,7 +695,7 @@ public class DiscordTownServiceTests
 
         _ = await _sut.GetDiscordTown(GuildId);
 
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     #endregion
@@ -1066,7 +1066,7 @@ public class DiscordTownServiceTests
         _user.Setup(o => o.RemoveRoleAsync(_spectatorRole.Object)).Returns(Task.CompletedTask);
 
         _mockGamePerspectiveStore.Setup(o => o.UpdatePublicUser(GameId, UserId, It.IsAny<GameUserUpdate>())).Returns(true);
-        _mockNotificationService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
     }
 
     [TestMethod]
@@ -1168,7 +1168,7 @@ public class DiscordTownServiceTests
         result.ShouldSucceedWith<string>($"({GameId}) {DisplayName} set to {userType}");
         _user.Verify(o => o.RemoveRoleAsync(It.IsAny<IDiscordRole>()), Times.Never);
         _user.Verify(o => o.AddRoleAsync(GetRoleForUserType(userType).Object), Times.Never);
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     [TestMethod]
@@ -1189,7 +1189,7 @@ public class DiscordTownServiceTests
         result.ShouldSucceedWith<string>($"({GameId}) {DisplayName} set to {userType}");
         _user.Verify(o => o.RemoveRoleAsync(It.IsAny<IDiscordRole>()), Times.Exactly(2));
         _user.Verify(o => o.AddRoleAsync(GetRoleForUserType(userType).Object), Times.Once);
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     [TestMethod]
@@ -1210,7 +1210,7 @@ public class DiscordTownServiceTests
         result.ShouldSucceedWith<string>($"({GameId}) {DisplayName} set to {userType}");
         _user.Verify(o => o.RemoveRoleAsync(It.IsAny<IDiscordRole>()), Times.Exactly(2));
         _user.Verify(o => o.AddRoleAsync(GetRoleForUserType(userType).Object), Times.Never);
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     [TestMethod]
@@ -1231,7 +1231,7 @@ public class DiscordTownServiceTests
         result.ShouldSucceedWith<string>($"({GameId}) {DisplayName} set to {userType}");
         _user.Verify(o => o.RemoveRoleAsync(It.IsAny<IDiscordRole>()), Times.Never);
         _user.Verify(o => o.AddRoleAsync(GetRoleForUserType(userType).Object), Times.Once);
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     #endregion

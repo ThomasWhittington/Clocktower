@@ -8,7 +8,7 @@ using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Game.Services;
-using Clocktower.Server.Socket;
+using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.ServerTests.Game.Services;
 
@@ -24,8 +24,10 @@ public class GamePerspectiveServiceTests
     private Mock<IDiscordBot> _mockBot = null!;
     private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
     private Mock<IFileSystem> _mockFileSystem = null!;
-    private Mock<INotificationService> _mockNotificationService = null!;
+    private Mock<IGameBroadcastService> _mockGameBroadcastService = null!;
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
+
+    private IGamePerspectiveService _sut = null!;
 
     [TestInitialize]
     public void Setup()
@@ -33,17 +35,17 @@ public class GamePerspectiveServiceTests
         _mockBot = new Mock<IDiscordBot>();
         _mockGamePerspectiveStore = new Mock<IGamePerspectiveStore>();
         _mockFileSystem = new Mock<IFileSystem>();
-        _mockNotificationService = new Mock<INotificationService>();
+        _mockGameBroadcastService = new Mock<IGameBroadcastService>();
         _mockDiscordTownManager = StrictMockFactory.Create<IDiscordTownManager>();
-    }
 
-    private IGamePerspectiveService Sut => new GamePerspectiveService(
-        _mockBot.Object,
-        _mockGamePerspectiveStore.Object,
-        _mockDiscordTownManager.Object,
-        _mockFileSystem.Object,
-        _mockNotificationService.Object
-    );
+        _sut = new GamePerspectiveService(
+            _mockBot.Object,
+            _mockGamePerspectiveStore.Object,
+            _mockDiscordTownManager.Object,
+            _mockFileSystem.Object,
+            _mockGameBroadcastService.Object
+        );
+    }
 
     #region GetGames
 
@@ -59,7 +61,7 @@ public class GamePerspectiveServiceTests
 
         _mockGamePerspectiveStore.Setup(o => o.GetAll()).Returns(allGames);
 
-        var result = Sut.GetGames();
+        var result = _sut.GetGames();
         result.Should().BeEquivalentTo(allGames);
 
         _mockGamePerspectiveStore.Verify(o => o.GetAll(), Times.Once);
@@ -83,7 +85,7 @@ public class GamePerspectiveServiceTests
 
         _mockGamePerspectiveStore.Setup(o => o.GetUserGames(userId)).Returns(allGames);
 
-        var result = Sut.GetPlayerGames(userId);
+        var result = _sut.GetPlayerGames(userId);
         result.Should().BeEquivalentTo(expected);
 
         _mockGamePerspectiveStore.Verify(o => o.GetUserGames(userId), Times.Once);
@@ -101,7 +103,7 @@ public class GamePerspectiveServiceTests
 
         _mockGamePerspectiveStore.Setup(o => o.GetAllPerspectivesForGame(gameId)).Returns([gamePerspective]);
 
-        var result = Sut.GetGamePerspectives(gameId);
+        var result = _sut.GetGamePerspectives(gameId);
 
         result.success.Should().BeTrue();
         result.perspectives.Should().BeEquivalentTo([gamePerspective]);
@@ -115,7 +117,7 @@ public class GamePerspectiveServiceTests
 
         _mockGamePerspectiveStore.Setup(o => o.GetAllPerspectivesForGame(gameId)).Returns([]);
 
-        var result = Sut.GetGamePerspectives(gameId);
+        var result = _sut.GetGamePerspectives(gameId);
 
         result.success.Should().BeFalse();
         result.perspectives.Should().BeEmpty();
@@ -133,7 +135,7 @@ public class GamePerspectiveServiceTests
 
         _mockGamePerspectiveStore.Setup(o => o.RemoveGame(gameId)).Returns(true);
 
-        var result = Sut.DeleteGame(gameId);
+        var result = _sut.DeleteGame(gameId);
 
         result.success.Should().BeTrue();
         result.message.Should().Be($"Game deleted successfully");
@@ -146,7 +148,7 @@ public class GamePerspectiveServiceTests
 
         _mockGamePerspectiveStore.Setup(o => o.RemoveGame(gameId)).Returns(false);
 
-        var result = Sut.DeleteGame(gameId);
+        var result = _sut.DeleteGame(gameId);
 
         result.success.Should().BeFalse();
         result.message.Should().Be($"Game ID '{gameId}' failed to be deleted");
@@ -165,7 +167,7 @@ public class GamePerspectiveServiceTests
 
         _mockBot.Setup(o => o.GetGuild(guildId)).Returns((IDiscordGuild)null!);
 
-        var result = Sut.StartNewGame(guildId, gameId, userId);
+        var result = _sut.StartNewGame(guildId, gameId, userId);
 
         result.success.Should().BeFalse();
         result.gamePerspective.Should().BeNull();
@@ -183,7 +185,7 @@ public class GamePerspectiveServiceTests
         _mockBot.Setup(o => o.GetGuild(guildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(userId)).Returns((IDiscordGuildUser)null!);
 
-        var result = Sut.StartNewGame(guildId, gameId, userId);
+        var result = _sut.StartNewGame(guildId, gameId, userId);
 
         result.success.Should().BeFalse();
         result.gamePerspective.Should().BeNull();
@@ -200,24 +202,24 @@ public class GamePerspectiveServiceTests
         {
             UserType = UserType.StoryTeller
         };
-        var expectedGamePerspective = CommonMethods.GetGamePerspective(gameId, userId: userId, guildId, createdBy: expectedGameUser) with { Users = [expectedGameUser] };
+        var expectedGamePerspective = CommonMethods.GetGamePerspective(gameId, userId: GamePerspectiveStore.OmniscientKey, guildId, createdBy: expectedGameUser) with { Users = [expectedGameUser] };
         var guild = StrictMockFactory.Create<IDiscordGuild>();
 
         _mockBot.Setup(o => o.GetGuild(guildId)).Returns(guild.Object);
         var mockedUser = MockMaker.CreateMockDiscordGuildUser(userId, "name", "avatar");
         guild.Setup(o => o.GetUser(userId)).Returns(mockedUser);
 
-        _mockGamePerspectiveStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId && g.UserId == userId))).Returns(true);
+        _mockGamePerspectiveStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId && g.UserId == GamePerspectiveStore.OmniscientKey))).Returns(true);
         _mockDiscordTownManager.Setup(o => o.UpdateUserIdentity(mockedUser.AsTownUser()));
 
-        var result = Sut.StartNewGame(guildId, gameId, userId);
+        var result = _sut.StartNewGame(guildId, gameId, userId);
 
         _mockDiscordTownManager.Verify(o => o.UpdateUserIdentity(mockedUser.AsTownUser()), Times.Once);
-        result.success.Should().BeTrue();
-        result.gamePerspective.Should().BeEquivalentTo(expectedGamePerspective, options => options
-            .Excluding(x => x.CreatedDate));
-        result.gamePerspective.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+
         result.message.Should().Be("Game started successfully");
+        result.gamePerspective.Should().BeEquivalentTo(expectedGamePerspective, options => options.Excluding(x => x.CreatedDate));
+        result.gamePerspective.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
+        result.success.Should().BeTrue();
     }
 
     [TestMethod]
@@ -233,7 +235,7 @@ public class GamePerspectiveServiceTests
         _mockGamePerspectiveStore.Setup(o => o.Set(It.Is<GamePerspective>(g => g.Id == gameId))).Returns(false);
         _mockDiscordTownManager.Setup(o => o.UpdateUserIdentity(mockedUser.AsTownUser()));
 
-        var result = Sut.StartNewGame(guildId, gameId, userId);
+        var result = _sut.StartNewGame(guildId, gameId, userId);
 
         _mockDiscordTownManager.Verify(o => o.UpdateUserIdentity(mockedUser.AsTownUser()), Times.Once);
         result.success.Should().BeFalse();
@@ -256,7 +258,7 @@ public class GamePerspectiveServiceTests
 
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(validJson);
 
-        var result = Sut.LoadDummyData();
+        var result = _sut.LoadDummyData();
 
         result.success.Should().BeTrue();
         result.message.Should().Be("Loaded dummy data");
@@ -271,7 +273,7 @@ public class GamePerspectiveServiceTests
         const string invalidJson = "{ invalid json }";
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(invalidJson);
 
-        var result = Sut.LoadDummyData();
+        var result = _sut.LoadDummyData();
 
         result.success.Should().BeFalse();
         result.message.Should().Be("Failed to deserialize json");
@@ -285,7 +287,7 @@ public class GamePerspectiveServiceTests
         const string nullJson = "null";
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(nullJson);
 
-        var result = Sut.LoadDummyData();
+        var result = _sut.LoadDummyData();
 
         result.success.Should().BeFalse();
         result.message.Should().Be("Failed to deserialize json");
@@ -298,7 +300,7 @@ public class GamePerspectiveServiceTests
         var validJson = JsonSerializer.Serialize(new[] { CommonMethods.GetGamePerspective() });
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(validJson);
 
-        Sut.LoadDummyData();
+        _sut.LoadDummyData();
 
         var invocations = _mockGamePerspectiveStore.Invocations.ToList();
         invocations.Should().HaveCountGreaterThan(0);
@@ -311,7 +313,7 @@ public class GamePerspectiveServiceTests
         const string emptyArrayJson = "[]";
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(emptyArrayJson);
 
-        var result = Sut.LoadDummyData();
+        var result = _sut.LoadDummyData();
 
         result.success.Should().BeTrue();
         result.message.Should().Be("Loaded dummy data");
@@ -325,7 +327,7 @@ public class GamePerspectiveServiceTests
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile))
             .Throws<FileNotFoundException>();
 
-        var result = Sut.LoadDummyData();
+        var result = _sut.LoadDummyData();
 
         result.success.Should().BeFalse();
         result.message.Should().Be("File not found");
@@ -338,7 +340,7 @@ public class GamePerspectiveServiceTests
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile))
             .Throws(new Exception("Custom error message"));
 
-        var result = Sut.LoadDummyData();
+        var result = _sut.LoadDummyData();
 
         result.success.Should().BeFalse();
         result.message.Should().Be($"Error loading dummy data: Custom error message");
@@ -357,7 +359,7 @@ public class GamePerspectiveServiceTests
         var validJson = JsonSerializer.Serialize(games);
         _mockFileSystem.Setup(f => f.File.ReadAllText(DummyJsonFile)).Returns(validJson);
 
-        var result = Sut.LoadDummyData();
+        var result = _sut.LoadDummyData();
 
         result.success.Should().BeTrue();
         _mockGamePerspectiveStore.Verify(s => s.Set(It.Is<GamePerspective>(g => g.Id == "first")), Times.Once);
@@ -375,7 +377,7 @@ public class GamePerspectiveServiceTests
         const string gameId = "game-id";
         _mockGamePerspectiveStore.Setup(o => o.GameExists(gameId)).Returns(false);
 
-        var result = await Sut.SetTime(gameId, GameTime.Evening);
+        var result = await _sut.SetTime(gameId, GameTime.Evening);
 
         result.success.Should().BeFalse();
         result.message.Should().Be("Game not found");
@@ -388,10 +390,10 @@ public class GamePerspectiveServiceTests
         const string gameId = "game-id";
         _mockGamePerspectiveStore.Setup(o => o.GameExists(gameId)).Returns(true);
 
-        var result = await Sut.SetTime(gameId, gameTime);
+        var result = await _sut.SetTime(gameId, gameTime);
 
         _mockGamePerspectiveStore.Verify(o => o.SetTime(gameId, gameTime), Times.Once);
-        _mockNotificationService.Verify(o => o.BroadcastTownTime(gameId, gameTime), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastTimeUpdate(gameId, gameTime), Times.Once);
         result.success.Should().BeTrue();
         result.message.Should().Be($"Time set to {gameTime}");
     }
@@ -403,7 +405,7 @@ public class GamePerspectiveServiceTests
         const string message = "message";
         _mockGamePerspectiveStore.Setup(o => o.GameExists(gameId)).Throws(new Exception(message));
 
-        var result = await Sut.SetTime(gameId, GameTime.Evening);
+        var result = await _sut.SetTime(gameId, GameTime.Evening);
 
         result.success.Should().BeFalse();
         result.message.Should().Be(message);
@@ -448,7 +450,7 @@ public class GamePerspectiveServiceTests
     {
         Setup_GetAvailableGameUsers(hasGame: false);
 
-        var result = Sut.GetAvailableGameUsers(GameId);
+        var result = _sut.GetAvailableGameUsers(GameId);
 
         result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
     }
@@ -458,7 +460,7 @@ public class GamePerspectiveServiceTests
     {
         Setup_GetAvailableGameUsers(hasGuild: false);
 
-        var result = Sut.GetAvailableGameUsers(GameId);
+        var result = _sut.GetAvailableGameUsers(GameId);
 
         result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
     }
@@ -468,7 +470,7 @@ public class GamePerspectiveServiceTests
     {
         Setup_GetAvailableGameUsers(users: []);
 
-        var result = Sut.GetAvailableGameUsers(GameId);
+        var result = _sut.GetAvailableGameUsers(GameId);
 
         var response = result.Value.Should().BeAssignableTo<IEnumerable<UserDto>>().Subject.ToArray();
         response.Should().NotBeNull();
@@ -488,7 +490,7 @@ public class GamePerspectiveServiceTests
         ];
         Setup_GetAvailableGameUsers(users: users);
 
-        var result = Sut.GetAvailableGameUsers(GameId);
+        var result = _sut.GetAvailableGameUsers(GameId);
 
         var response = result.Value.Should().BeAssignableTo<IEnumerable<UserDto>>().Subject.ToArray();
         response.Should().NotBeNull();
@@ -528,7 +530,7 @@ public class GamePerspectiveServiceTests
     {
         Setup_AddUserToGame(hasGame: false);
 
-        var result = await Sut.AddUserToGame(GameId, UserId);
+        var result = await _sut.AddUserToGame(GameId, UserId);
 
         result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
     }
@@ -538,7 +540,7 @@ public class GamePerspectiveServiceTests
     {
         Setup_AddUserToGame(hasGuild: false);
 
-        var result = await Sut.AddUserToGame(GameId, UserId);
+        var result = await _sut.AddUserToGame(GameId, UserId);
 
         result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
     }
@@ -548,7 +550,7 @@ public class GamePerspectiveServiceTests
     {
         Setup_AddUserToGame(hasUser: false);
 
-        var result = await Sut.AddUserToGame(GameId, UserId);
+        var result = await _sut.AddUserToGame(GameId, UserId);
 
         result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
     }
@@ -558,14 +560,14 @@ public class GamePerspectiveServiceTests
     {
         Setup_AddUserToGame();
 
-        var result = await Sut.AddUserToGame(GameId, UserId);
+        var result = await _sut.AddUserToGame(GameId, UserId);
 
         _mockDiscordTownManager.Verify(o => o.UpdateUserIdentity(It.Is<TownUser>(townUser => townUser.Id == UserId)));
         _mockGamePerspectiveStore.Verify(o => o.AddUserToGame(GameId, It.Is<GameUser>(gameUser =>
             gameUser.Id == UserId &&
             gameUser.UserType == UserType.Player
         )));
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
         result.ShouldSucceedWith<string>($"{DisplayName} added to game: {GameId}");
     }
 
@@ -594,7 +596,7 @@ public class GamePerspectiveServiceTests
     {
         Setup_RemoveUserFromGame(hasGame: false);
 
-        var result = await Sut.RemoveUserFromGame(GameId, UserId);
+        var result = await _sut.RemoveUserFromGame(GameId, UserId);
 
         result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
     }
@@ -604,7 +606,7 @@ public class GamePerspectiveServiceTests
     {
         Setup_RemoveUserFromGame(hasGuild: false);
 
-        var result = await Sut.RemoveUserFromGame(GameId, UserId);
+        var result = await _sut.RemoveUserFromGame(GameId, UserId);
 
         result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
     }
@@ -615,7 +617,7 @@ public class GamePerspectiveServiceTests
     {
         Setup_RemoveUserFromGame(hasUser: false);
 
-        var result = await Sut.RemoveUserFromGame(GameId, UserId);
+        var result = await _sut.RemoveUserFromGame(GameId, UserId);
 
         result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
     }
@@ -626,10 +628,10 @@ public class GamePerspectiveServiceTests
     {
         Setup_RemoveUserFromGame();
 
-        var result = await Sut.RemoveUserFromGame(GameId, UserId);
+        var result = await _sut.RemoveUserFromGame(GameId, UserId);
 
         _mockGamePerspectiveStore.Verify(o => o.RemoveUserFromGame(GameId, UserId));
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
         result.ShouldSucceedWith<string>($"{DisplayName} removed from game: {GameId}");
     }
 
@@ -642,7 +644,7 @@ public class GamePerspectiveServiceTests
     {
         _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns((GamePerspective)null!);
 
-        var result = await Sut.RandomiseSeatingPositions(GameId);
+        var result = await _sut.RandomiseSeatingPositions(GameId);
 
         result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
     }
@@ -659,7 +661,7 @@ public class GamePerspectiveServiceTests
         var perspective = CommonMethods.GetGamePerspective(GameId) with { Users = players.ToList() };
         _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(perspective);
 
-        var result = await Sut.RandomiseSeatingPositions(GameId);
+        var result = await _sut.RandomiseSeatingPositions(GameId);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().HaveCount(3);
@@ -673,7 +675,7 @@ public class GamePerspectiveServiceTests
             ), Times.Once);
         }
 
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     #endregion
@@ -685,7 +687,7 @@ public class GamePerspectiveServiceTests
     {
         _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns((GamePerspective)null!);
 
-        var result = await Sut.SwapSeatingPositions(GameId, UserId + 1, UserId + 2);
+        var result = await _sut.SwapSeatingPositions(GameId, UserId + 1, UserId + 2);
 
         result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
     }
@@ -696,7 +698,7 @@ public class GamePerspectiveServiceTests
         var perspective = CommonMethods.GetGamePerspective(GameId) with { Users = [new GameUser(UserId + 2)] };
         _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(perspective);
 
-        var result = await Sut.SwapSeatingPositions(GameId, "non-existent", UserId + 2);
+        var result = await _sut.SwapSeatingPositions(GameId, "non-existent", UserId + 2);
 
         result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
     }
@@ -707,7 +709,7 @@ public class GamePerspectiveServiceTests
         var perspective = CommonMethods.GetGamePerspective(GameId) with { Users = [new GameUser(UserId + 1)] };
         _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(perspective);
 
-        var result = await Sut.SwapSeatingPositions(GameId, UserId + 1, "non-existent");
+        var result = await _sut.SwapSeatingPositions(GameId, UserId + 1, "non-existent");
 
         result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
     }
@@ -721,13 +723,13 @@ public class GamePerspectiveServiceTests
 
         _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(perspective);
 
-        var result = await Sut.SwapSeatingPositions(GameId, UserId + 1, UserId + 2);
+        var result = await _sut.SwapSeatingPositions(GameId, UserId + 1, UserId + 2);
 
         result.ShouldSucceedWith("Users swapped");
 
         _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId + 1, new GameUserUpdate { SeatingPosition = 10 }), Times.Once);
         _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId + 2, new GameUserUpdate { SeatingPosition = 5 }), Times.Once);
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     #endregion
@@ -741,7 +743,7 @@ public class GamePerspectiveServiceTests
         guildMock.Setup(o => o.GetUser(UserId)).Returns(hasUser ? userMock.Object : null);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guildMock.Object : null);
         _mockGamePerspectiveStore.Setup(o => o.UpdatePublicUser(GameId, UserId, It.IsAny<GameUserUpdate>())).Returns(updateOccurred);
-        _mockNotificationService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
     }
 
     #region SetPlayerHasVoteToken
@@ -752,7 +754,7 @@ public class GamePerspectiveServiceTests
         const bool hasVoteToken = true;
         Setup_GameUserStatusToggle(hasGame: false);
 
-        var result = await Sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
+        var result = await _sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
 
         result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
     }
@@ -763,7 +765,7 @@ public class GamePerspectiveServiceTests
         const bool hasVoteToken = true;
         Setup_GameUserStatusToggle(hasGuild: false);
 
-        var result = await Sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
+        var result = await _sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
 
         result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
     }
@@ -774,7 +776,7 @@ public class GamePerspectiveServiceTests
         const bool hasVoteToken = true;
         Setup_GameUserStatusToggle(hasUser: false);
 
-        var result = await Sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
+        var result = await _sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
 
         result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
     }
@@ -786,12 +788,12 @@ public class GamePerspectiveServiceTests
     {
         Setup_GameUserStatusToggle(updateOccurred: true);
 
-        var result = await Sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
+        var result = await _sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
 
         string expectedTokenStatus = hasVoteToken ? "has token" : "does not have token";
         result.ShouldSucceedWith($"{DisplayName} now {expectedTokenStatus}");
         _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { HasVoteToken = hasVoteToken }), Times.Once);
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     [TestMethod]
@@ -801,12 +803,12 @@ public class GamePerspectiveServiceTests
     {
         Setup_GameUserStatusToggle(updateOccurred: false);
 
-        var result = await Sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
+        var result = await _sut.SetPlayerHasVoteToken(GameId, UserId, hasVoteToken);
 
         string expectedTokenStatus = hasVoteToken ? "has token" : "does not have token";
         result.ShouldSucceedWith($"{DisplayName} already {expectedTokenStatus}");
         _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { HasVoteToken = hasVoteToken }), Times.Once);
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
     }
 
     #endregion
@@ -819,7 +821,7 @@ public class GamePerspectiveServiceTests
         const bool hasVoteToken = true;
         Setup_GameUserStatusToggle(hasGame: false);
 
-        var result = await Sut.SetPlayerIsDead(GameId, UserId, hasVoteToken);
+        var result = await _sut.SetPlayerIsDead(GameId, UserId, hasVoteToken);
 
         result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
     }
@@ -830,7 +832,7 @@ public class GamePerspectiveServiceTests
         const bool hasVoteToken = true;
         Setup_GameUserStatusToggle(hasGuild: false);
 
-        var result = await Sut.SetPlayerIsDead(GameId, UserId, hasVoteToken);
+        var result = await _sut.SetPlayerIsDead(GameId, UserId, hasVoteToken);
 
         result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
     }
@@ -841,7 +843,7 @@ public class GamePerspectiveServiceTests
         const bool hasVoteToken = true;
         Setup_GameUserStatusToggle(hasUser: false);
 
-        var result = await Sut.SetPlayerIsDead(GameId, UserId, hasVoteToken);
+        var result = await _sut.SetPlayerIsDead(GameId, UserId, hasVoteToken);
 
         result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
     }
@@ -852,12 +854,12 @@ public class GamePerspectiveServiceTests
         const bool isDead = false;
         Setup_GameUserStatusToggle(updateOccurred: true);
 
-        var result = await Sut.SetPlayerIsDead(GameId, UserId, isDead);
+        var result = await _sut.SetPlayerIsDead(GameId, UserId, isDead);
 
         const string expectedDeadStatus = isDead ? "dead" : "alive";
         result.ShouldSucceedWith($"{DisplayName} is now {expectedDeadStatus}");
         _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { IsDead = isDead }), Times.Once);
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     [TestMethod]
@@ -866,12 +868,12 @@ public class GamePerspectiveServiceTests
         const bool isDead = true;
         Setup_GameUserStatusToggle(updateOccurred: true);
 
-        var result = await Sut.SetPlayerIsDead(GameId, UserId, isDead);
+        var result = await _sut.SetPlayerIsDead(GameId, UserId, isDead);
 
         const string expectedDeadStatus = isDead ? "dead" : "alive";
         result.ShouldSucceedWith($"{DisplayName} is now {expectedDeadStatus}");
         _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { IsDead = isDead, HasVoteToken = true }), Times.Once);
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
 
@@ -881,12 +883,12 @@ public class GamePerspectiveServiceTests
         const bool isDead = true;
         Setup_GameUserStatusToggle(updateOccurred: false);
 
-        var result = await Sut.SetPlayerIsDead(GameId, UserId, isDead);
+        var result = await _sut.SetPlayerIsDead(GameId, UserId, isDead);
 
         const string expectedDeadStatus = isDead ? "dead" : "alive";
         result.ShouldSucceedWith($"{DisplayName} is already {expectedDeadStatus}");
         _mockGamePerspectiveStore.Verify(o => o.UpdatePublicUser(GameId, UserId, new GameUserUpdate { IsDead = isDead, HasVoteToken = true }), Times.Once);
-        _mockNotificationService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
     }
 
     #endregion
