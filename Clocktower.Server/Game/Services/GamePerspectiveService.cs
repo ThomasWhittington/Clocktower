@@ -85,7 +85,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         gameUser.UserType = UserType.StoryTeller;
         var townUser = user.AsTownUser();
         discordTownManager.UpdateUserIdentity(townUser);
-        var newGamePerspective = new GamePerspective(gameId, userId, guildId, gameUser, DateTime.UtcNow)
+        var newGamePerspective = new GamePerspective(gameId, GamePerspectiveStore.OmniscientKey, guildId, gameUser, DateTime.UtcNow)
         {
             Users = [gameUser]
         };
@@ -145,6 +145,8 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         var gameUser = user.AsGameUser(gamePerspective);
         gameUser.UserType = UserType.Player;
         gameUser.SeatingPosition = gamePerspectiveStore.GetNextAvailableSeatingPosition(gameId);
+
+        gameUser.Role = Role.AllRoles[Random.Shared.Next(Role.AllRoles.Count)];
 
         gamePerspectiveStore.AddUserToGame(gameId, gameUser);
 
