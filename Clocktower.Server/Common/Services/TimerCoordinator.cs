@@ -1,9 +1,9 @@
 using System.Collections.Concurrent;
-using Clocktower.Server.Socket;
+using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.Server.Common.Services;
 
-public class TimerCoordinator(ILogger<TimerCoordinator> logger, INotificationService notifications) : ITimerCoordinator
+public class TimerCoordinator(ILogger<TimerCoordinator> logger, IGameBroadcastService gameBroadcastService) : ITimerCoordinator
 {
     internal sealed class TimerInstance
     {
@@ -50,7 +50,7 @@ public class TimerCoordinator(ILogger<TimerCoordinator> logger, INotificationSer
 
         _timers[gameId] = new TimerInstance { State = state, Cts = cts };
 
-        await notifications.BroadcastTimerUpdate(gameId, state);
+        await gameBroadcastService.BroadcastTimerUpdate(gameId, state);
 
         _ = FinishLaterAsync(gameId, end, cts.Token);
 
@@ -75,7 +75,7 @@ public class TimerCoordinator(ILogger<TimerCoordinator> logger, INotificationSer
 
         _timers[gameId] = new TimerInstance { State = state, Cts = new CancellationTokenSource() };
 
-        await notifications.BroadcastTimerUpdate(gameId, state);
+        await gameBroadcastService.BroadcastTimerUpdate(gameId, state);
         return state;
     }
 
@@ -90,7 +90,7 @@ public class TimerCoordinator(ILogger<TimerCoordinator> logger, INotificationSer
 
             if (!_timers.TryGetValue(gameId, out var inst))
                 return;
-            
+
             if (inst.State.Status != TimerStatus.Running || inst.State.EndUtc != endUtc)
                 return;
 
@@ -101,7 +101,7 @@ public class TimerCoordinator(ILogger<TimerCoordinator> logger, INotificationSer
             };
 
             inst.State = finished;
-            await notifications.BroadcastTimerUpdate(gameId, finished);
+            await gameBroadcastService.BroadcastTimerUpdate(gameId, finished);
         }
         catch (Exception ex)
         {

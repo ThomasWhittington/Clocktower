@@ -68,6 +68,7 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IUserIdentityStore, UserIdentityStore>();
             builder.Services.AddSingleton<IDiscordTownManager, DiscordTownManager>();
             builder.Services.AddSingleton<INotificationService, NotificationService>();
+            builder.Services.AddSingleton<IGameBroadcastService, GameBroadcastService>();
             builder.Services.AddSingleton<IDiscordBotHandler, DiscordBotHandler>();
             builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
             builder.Services.AddSingleton<IDiscordBot, DiscordBot>();

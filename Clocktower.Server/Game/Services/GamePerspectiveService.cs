@@ -2,11 +2,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Clocktower.Server.Common.Services;
-using Clocktower.Server.Socket;
+using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gamePerspectiveStore, IDiscordTownManager discordTownManager, IFileSystem fileSystem, INotificationService notificationService) : IGamePerspectiveService
+public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gamePerspectiveStore, IDiscordTownManager discordTownManager, IFileSystem fileSystem, IGameBroadcastService gameBroadcastService) : IGamePerspectiveService
 {
     public IEnumerable<GamePerspective> GetGames() => gamePerspectiveStore.GetAll();
 
@@ -105,7 +105,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
             if (!gamePerspective) return (false, "Game not found");
 
             gamePerspectiveStore.SetTime(gameId, gameTime);
-            await notificationService.BroadcastTownTime(gameId, gameTime);
+            await gameBroadcastService.BroadcastTimeUpdate(gameId, gameTime);
             return (true, $"Time set to {gameTime}");
         }
         catch (Exception ex)
@@ -150,7 +150,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
 
         gamePerspectiveStore.AddUserToGame(gameId, gameUser);
 
-        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok($"{user.DisplayName} added to game: {gameId}");
     }
 
@@ -165,7 +165,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
 
         gamePerspectiveStore.RemoveUserFromGame(gameId, userId);
 
-        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok($"{user.DisplayName} removed from game: {gameId}");
     }
 
@@ -188,7 +188,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
             );
         }
 
-        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok(shuffledPlayers.Select(u => u.Id).ToArray());
     }
 
@@ -213,7 +213,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         {
             SeatingPosition = tempPosition
         });
-        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok("Users swapped");
     }
 
@@ -232,7 +232,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
             HasVoteToken = isDead ? true : null
         });
 
-        if (updateOccurred) await notificationService.BroadcastDiscordTownUpdate(gameId);
+        if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         string updateOccurredString = updateOccurred ? "now" : "already";
         string expectedTokenStatus = isDead ? "dead" : "alive";
         return Result.Ok($"{user.DisplayName} is {updateOccurredString} {expectedTokenStatus}");
@@ -252,7 +252,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
             HasVoteToken = hasVoteToken
         });
 
-        if (updateOccurred) await notificationService.BroadcastDiscordTownUpdate(gameId);
+        if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         string updateOccurredString = updateOccurred ? "now" : "already";
         string expectedTokenStatus = hasVoteToken ? "has token" : "does not have token";
         return Result.Ok($"{user.DisplayName} {updateOccurredString} {expectedTokenStatus}");

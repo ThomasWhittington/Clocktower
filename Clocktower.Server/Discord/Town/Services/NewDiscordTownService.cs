@@ -1,6 +1,6 @@
 using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data.Wrappers;
-using Clocktower.Server.Socket;
+using Clocktower.Server.Socket.Services;
 using Discord;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -10,7 +10,7 @@ namespace Clocktower.Server.Discord.Town.Services;
 [UsedImplicitly]
 public class DiscordTownService(
     IDiscordBot bot,
-    INotificationService notificationService,
+    IGameBroadcastService gameBroadcastService,
     IGamePerspectiveStore gamePerspectiveStore,
     IDiscordTownManager discordTownManager,
     IJwtWriter jwtWriter,
@@ -138,7 +138,7 @@ public class DiscordTownService(
 
             var result = await UpdateUserType(gameId, user, guild, userType);
 
-            await notificationService.BroadcastDiscordTownUpdate(gameId);
+            await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
             return result.success ? Result.Ok($"({gameId}) {user.DisplayName} set to {userType}") : Result.Fail<string>(ErrorKind.Unexpected, "set-user-type.unexpected", $"Failed to set userType for user '{userId}' in game '{gameId}' to '{userType}'. {result.message}");
         }
         catch (Exception e)
@@ -202,7 +202,7 @@ public class DiscordTownService(
             discordTownManager.SetDiscordTown(guildId, discordTown);
 
             var gameId = gamePerspectiveStore.GetGuildGameIds(guildId).FirstOrDefault();
-            if (gameId is not null) await notificationService.BroadcastDiscordTownUpdate(gameId);
+            if (gameId is not null) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
             return (true, discordTown, $"Discord town {discordTown.UserCount}");
         }
         catch (Exception ex)
@@ -235,7 +235,7 @@ public class DiscordTownService(
                 IsPlaying = true
             });
             cache.Remove($"join_data_{key}");
-            await notificationService.BroadcastDiscordTownUpdate(response.GameId);
+            await gameBroadcastService.BroadcastDiscordTownUpdate(response.GameId);
             return response;
         }
 
@@ -244,7 +244,7 @@ public class DiscordTownService(
 
     public async Task PingUser(string userId)
     {
-        await notificationService.PingUser(userId, "Ping!");
+        await gameBroadcastService.PingUser(userId, "Ping!");
     }
 
     public async Task<(InviteUserOutcome outcome, string message)> InviteUser(string gameId, string userId, bool sendInvite)
@@ -275,7 +275,7 @@ public class DiscordTownService(
             if (sendInvite) await dmChannel.SendMessageAsync($"[Join here]({url})");
 
             gamePerspectiveStore.AddUserToGame(gameId, thisGameUser);
-            await notificationService.BroadcastDiscordTownUpdate(gameId);
+            await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
             return (InviteUserOutcome.InviteSent, "Sent message to user");
         }
         catch (Exception)
