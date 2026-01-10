@@ -71,10 +71,6 @@ public class GameBroadcastServiceTests
             .Setup(x => x.RedactTownDto(town, UserId))
             .Returns(redactedTown);
 
-        _mockNotificationService
-            .Setup(x => x.SendBulkDiscordTownUpdates(It.IsAny<IEnumerable<UserNotification>>()))
-            .Returns(Task.CompletedTask);
-
         List<UserNotification>? capturedNotifications = null;
         _mockNotificationService
             .Setup(x => x.SendBulkDiscordTownUpdates(It.IsAny<IEnumerable<UserNotification>>()))
@@ -129,10 +125,6 @@ public class GameBroadcastServiceTests
             .Setup(x => x.RedactTownDto(town2, userId2))
             .Returns(redactedTown2);
 
-        _mockNotificationService
-            .Setup(x => x.SendBulkDiscordTownUpdates(It.IsAny<IEnumerable<UserNotification>>()))
-            .Returns(Task.CompletedTask);
-
         List<UserNotification>? capturedNotifications = null;
         _mockNotificationService
             .Setup(x => x.SendBulkDiscordTownUpdates(It.IsAny<IEnumerable<UserNotification>>()))
@@ -166,10 +158,6 @@ public class GameBroadcastServiceTests
             .Setup(x => x.GetDiscordTownDto(GuildId, GameId, omniscientPerspective.Users))
             .Returns(omniscientTown);
 
-        _mockNotificationService
-            .Setup(x => x.SendBulkDiscordTownUpdates(It.IsAny<IEnumerable<UserNotification>>()))
-            .Returns(Task.CompletedTask);
-
         List<UserNotification>? capturedNotifications = null;
         _mockNotificationService
             .Setup(x => x.SendBulkDiscordTownUpdates(It.IsAny<IEnumerable<UserNotification>>()))
@@ -202,10 +190,6 @@ public class GameBroadcastServiceTests
         _mockDiscordTownManager
             .Setup(x => x.GetDiscordTownDto(GuildId, GameId, omniscientPerspective.Users))
             .Returns(omniscientTown);
-
-        _mockNotificationService
-            .Setup(x => x.SendBulkDiscordTownUpdates(It.IsAny<IEnumerable<UserNotification>>()))
-            .Returns(Task.CompletedTask);
 
         List<UserNotification>? capturedNotifications = null;
         _mockNotificationService
@@ -244,10 +228,6 @@ public class GameBroadcastServiceTests
         _mockDiscordTownManager
             .Setup(x => x.GetDiscordTownDto(GuildId, GameId, omniscientPerspective.Users))
             .Returns(omniscientTown);
-
-        _mockNotificationService
-            .Setup(x => x.SendBulkDiscordTownUpdates(It.IsAny<IEnumerable<UserNotification>>()))
-            .Returns(Task.CompletedTask);
 
         List<UserNotification>? capturedNotifications = null;
         _mockNotificationService

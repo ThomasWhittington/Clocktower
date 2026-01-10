@@ -33,22 +33,18 @@ public class GamePerspectiveStore : IGamePerspectiveStore
 
     public void UpdateUserInOwnAndOmniscientPerspectives(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction)
     {
-        if (_store.ContainsKey((gameId, userId)))
-        {
-            TryUpdate(gameId, userId, updateFunction);
-        }
-
-        if (_store.ContainsKey((gameId, IGamePerspectiveStore.OmniscientKey)))
-        {
-            TryUpdate(gameId, IGamePerspectiveStore.OmniscientKey, updateFunction);
-        }
+        TryUpdate(gameId, userId, updateFunction);
+        TryUpdate(gameId, IGamePerspectiveStore.OmniscientKey, updateFunction);
     }
 
     public void TryUpdate(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction)
     {
-        _store.AddOrUpdate((gameId, userId),
-            addValueFactory: _ => throw new InvalidOperationException("Key should exist"),
-            updateValueFactory: (_, existing) => updateFunction(existing)
-        );
+        var key = (gameId, userId);
+        while (true)
+        {
+            if (!_store.TryGetValue(key, out var existing)) return;
+            var updated = updateFunction(existing);
+            if (_store.TryUpdate(key, updated, existing)) return;
+        }
     }
 }

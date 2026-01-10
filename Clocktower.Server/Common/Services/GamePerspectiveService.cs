@@ -163,7 +163,7 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
     public IEnumerable<string> GetGuildGameIds(string guildId)
     {
         var all = store.GetAll();
-        return all.Where(g => g.GuildId == guildId).Select(g => g.Id);
+        return all.Where(g => g.GuildId == guildId).Select(g => g.Id).Distinct();
     }
 
     public bool RemoveGame(string gameId)
