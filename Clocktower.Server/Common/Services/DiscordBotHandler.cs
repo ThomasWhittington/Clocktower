@@ -1,14 +1,14 @@
 ﻿using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Discord.Town.Services;
-using Clocktower.Server.Socket;
+using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.Server.Common.Services;
 
 public class DiscordBotHandler(
-    IGamePerspectiveStore gamePerspectiveStore,
+    IGamePerspectiveService gamePerspectiveService,
     IDiscordTownManager discordDiscordTownManager,
     IUserService userService,
-    INotificationService notificationService,
+    IGameBroadcastService gameBroadcastService,
     IServiceScopeFactory serviceScopeFactory
 ) : IDiscordBotHandler
 {
@@ -18,7 +18,7 @@ public class DiscordBotHandler(
         if (guildId is null) return;
         var guildUser = user.GetGuildUser();
         if (guildUser is null) return;
-        var guildGameIds = gamePerspectiveStore.GetGuildGameIds(guildId);
+        var guildGameIds = gamePerspectiveService.GetGuildGameIds(guildId);
 
         var channelsAreSame = before.VoiceChannel?.Id == after.VoiceChannel?.Id;
         Func<string, Task> updateAction = channelsAreSame
@@ -39,7 +39,7 @@ public class DiscordBotHandler(
         if (!success || discordTown is null) return;
         discordDiscordTownManager.MoveUser(discordTown, user, after.VoiceChannel);
 
-        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
     }
 
     public virtual async Task UpdateVoiceStatus(IDiscordGuildUser user, IDiscordVoiceState after, string gameId, string guildId)
@@ -48,6 +48,6 @@ public class DiscordBotHandler(
         var discordVoiceState = new VoiceState(after.IsMuted, after.IsDeafened, after.IsSelfMuted, after.IsSelfDeafened);
         userService.UpdateDiscordPresence(user.Id, guildId, inVoice, discordVoiceState);
 
-        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
     }
 }

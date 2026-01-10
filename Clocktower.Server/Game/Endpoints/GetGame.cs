@@ -8,9 +8,9 @@ public class GetGamePerspectives : IEndpoint
         .SetOpenApiOperationId<GetGamePerspectives>()
         .WithSummaryAndDescription("Get the game perspective by id");
 
-    internal static Results<Ok<IEnumerable<GamePerspective>>, NotFound<string>> Handle(string gameId, [FromServices] IGamePerspectiveService gamePerspectiveService)
+    internal static Results<Ok<IEnumerable<GamePerspective>>, NotFound<string>> Handle(string gameId, [FromServices] IGameService gameService)
     {
-        var result = gamePerspectiveService.GetGamePerspectives(gameId.Trim());
+        var result = gameService.GetGamePerspectives(gameId.Trim());
 
         return result.success
             ? TypedResults.Ok(result.perspectives)

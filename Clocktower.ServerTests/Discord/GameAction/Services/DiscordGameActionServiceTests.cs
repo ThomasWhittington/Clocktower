@@ -1,6 +1,5 @@
 ﻿using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data;
-using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Discord;
@@ -15,7 +14,7 @@ public class DiscordGameActionServiceTests
     private const string GuildId = "123";
     private IDiscordGameActionService _sut = null!;
     private Mock<IDiscordBot> _mockBot = null!;
-    private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
+    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private Mock<IDiscordConstantsService> _mockDiscordConstantsService = null!;
     private Mock<IUserService> _mockUserService = null!;
@@ -50,14 +49,14 @@ public class DiscordGameActionServiceTests
                 .Returns(townUsers);
         }
 
-        _mockGamePerspectiveStore.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? _gamePerspective : null);
+        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? _gamePerspective : null);
     }
 
     [TestInitialize]
     public void SetUp()
     {
         _mockBot = new Mock<IDiscordBot>();
-        _mockGamePerspectiveStore = new Mock<IGamePerspectiveStore>();
+        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
         _mockUserService = new Mock<IUserService>();
         _mockDiscordTownManager = StrictMockFactory.Create<IDiscordTownManager>();
         _mockDiscordConstantsService = StrictMockFactory.Create<IDiscordConstantsService>();
@@ -66,7 +65,7 @@ public class DiscordGameActionServiceTests
 
         _sut = new DiscordGameActionService(
             _mockBot.Object,
-            _mockGamePerspectiveStore.Object,
+            _mockGamePerspectiveService.Object,
             _mockDiscordTownManager.Object,
             _mockDiscordConstantsService.Object,
             _mockUserService.Object

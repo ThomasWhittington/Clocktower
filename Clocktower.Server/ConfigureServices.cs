@@ -68,6 +68,7 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IUserIdentityStore, UserIdentityStore>();
             builder.Services.AddSingleton<IDiscordTownManager, DiscordTownManager>();
             builder.Services.AddSingleton<INotificationService, NotificationService>();
+            builder.Services.AddSingleton<IGameBroadcastService, GameBroadcastService>();
             builder.Services.AddSingleton<IDiscordBotHandler, DiscordBotHandler>();
             builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
             builder.Services.AddSingleton<IDiscordBot, DiscordBot>();
@@ -76,10 +77,11 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IFileSystem, FileSystem>();
             builder.Services.AddSingleton<IDiscordAuthApiService, DiscordAuthApiService>();
             builder.Services.AddSingleton<IDiscordConstantsService, DiscordConstantsService>();
+            builder.Services.AddSingleton<IGamePerspectiveService, GamePerspectiveService>();
 
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IDiscordAuthService, DiscordAuthService>();
-            builder.Services.AddScoped<IGamePerspectiveService, GamePerspectiveService>();
+            builder.Services.AddScoped<IGameService, GameService>();
             builder.Services.AddScoped<IDiscordGameActionService, DiscordGameActionService>();
             builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddScoped<IGameAuthorizationService, GameAuthorizationService>();

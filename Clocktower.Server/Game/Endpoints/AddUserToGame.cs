@@ -14,9 +14,9 @@ public class AddUserToGame : IEndpoint
 
     internal static async Task<Results<Ok<string>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle(
         [AsParameters] GameAndUserRequest request,
-        [FromServices] IGamePerspectiveService gamePerspectiveService)
+        [FromServices] IGameService gameService)
     {
-        var result = await gamePerspectiveService.AddUserToGame(request.GameId, request.UserId);
+        var result = await gameService.AddUserToGame(request.GameId, request.UserId);
         return result.ToHttpResult();
     }
 }

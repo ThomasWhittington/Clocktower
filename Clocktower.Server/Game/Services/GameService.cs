@@ -1,63 +1,22 @@
-﻿using System.IO.Abstractions;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Clocktower.Server.Common.Services;
-using Clocktower.Server.Socket;
+﻿using Clocktower.Server.Common.Services;
+using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gamePerspectiveStore, IDiscordTownManager discordTownManager, IFileSystem fileSystem, INotificationService notificationService) : IGamePerspectiveService
+public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiveService, IDiscordTownManager discordTownManager, IGameBroadcastService gameBroadcastService) : IGameService
 {
-    public IEnumerable<GamePerspective> GetGames() => gamePerspectiveStore.GetAll();
+    public IEnumerable<GamePerspective> GetGames() => gamePerspectiveService.GetAll();
 
     public IEnumerable<MiniGamePerspective> GetPlayerGames(string userId)
     {
-        var playerGames = gamePerspectiveStore.GetUserGames(userId);
+        var playerGames = gamePerspectiveService.GetUserGames(userId);
         var miniGamePerspectives = playerGames.Select(o => new MiniGamePerspective(o.Id, o.CreatedBy, o.CreatedDate));
         return miniGamePerspectives;
     }
 
-    public (bool success, string message) LoadDummyData(string filePath = "dummyState.json")
-    {
-        try
-        {
-            var json = fileSystem.File.ReadAllText(filePath);
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-            options.Converters.Add(new JsonStringEnumConverter());
-            var games = JsonSerializer.Deserialize<GamePerspective[]>(json, options);
-            if (games == null)
-            {
-                return (false, "Failed to deserialize json");
-            }
-
-            gamePerspectiveStore.Clear();
-            foreach (var gamePerspective in games)
-            {
-                gamePerspectiveStore.Set(gamePerspective);
-            }
-
-            return (true, "Loaded dummy data");
-        }
-        catch (JsonException)
-        {
-            return (false, "Failed to deserialize json");
-        }
-        catch (FileNotFoundException)
-        {
-            return (false, "File not found");
-        }
-        catch (Exception ex)
-        {
-            return (false, $"Error loading dummy data: {ex.Message}");
-        }
-    }
-
     public (bool success, IEnumerable<GamePerspective> perspectives, string message) GetGamePerspectives(string gameId)
     {
-        var game = gamePerspectiveStore.GetAllPerspectivesForGame(gameId).ToArray();
+        var game = gamePerspectiveService.GetAllPerspectivesForGame(gameId).ToArray();
 
         return game.Any()
             ? (true, game, "Game retrieved successfully")
@@ -67,7 +26,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
 
     public (bool success, string message) DeleteGame(string gameId)
     {
-        bool deleteSuccessful = gamePerspectiveStore.RemoveGame(gameId);
+        bool deleteSuccessful = gamePerspectiveService.RemoveGame(gameId);
 
         return deleteSuccessful
             ? (true, "Game deleted successfully")
@@ -81,18 +40,12 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         var user = guild.GetUser(userId);
         if (user is null) return (false, null, "Couldn't find user");
 
-        var gameUser = user.AsGameUser();
-        gameUser.UserType = UserType.StoryTeller;
-        var townUser = user.AsTownUser();
-        discordTownManager.UpdateUserIdentity(townUser);
-        var newGamePerspective = new GamePerspective(gameId, userId, guildId, gameUser, DateTime.UtcNow)
-        {
-            Users = [gameUser]
-        };
+        var gameUser = user.AsGameUser() with { UserType = UserType.StoryTeller };
+        discordTownManager.UpdateUserIdentity(user.AsTownUser());
 
-        bool addSuccessful = gamePerspectiveStore.Set(newGamePerspective);
+        var newGamePerspective = gamePerspectiveService.InitializeGame(gameId, guildId, gameUser);
 
-        return addSuccessful
+        return newGamePerspective is not null
             ? (true, newGamePerspective, "Game started successfully")
             : (false, null, $"Perspective for user '{userId}' for game '{gameId}' already exists");
     }
@@ -101,11 +54,11 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
     {
         try
         {
-            var gamePerspective = gamePerspectiveStore.GameExists(gameId);
+            var gamePerspective = gamePerspectiveService.GameExists(gameId);
             if (!gamePerspective) return (false, "Game not found");
 
-            gamePerspectiveStore.SetTime(gameId, gameTime);
-            await notificationService.BroadcastTownTime(gameId, gameTime);
+            gamePerspectiveService.SetTime(gameId, gameTime);
+            await gameBroadcastService.BroadcastTimeUpdate(gameId, gameTime);
             return (true, $"Time set to {gameTime}");
         }
         catch (Exception ex)
@@ -116,7 +69,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
 
     public Result<IEnumerable<UserDto>> GetAvailableGameUsers(string gameId)
     {
-        var game = gamePerspectiveStore.GetFirstPerspective(gameId);
+        var game = gamePerspectiveService.GetFirstPerspective(gameId);
         if (game is null) return Result.Fail<IEnumerable<UserDto>>(Errors.GameNotFound(gameId));
         var guild = bot.GetGuild(game.GuildId);
         if (guild is null) return Result.Fail<IEnumerable<UserDto>>(Errors.InvalidGuildId());
@@ -133,7 +86,7 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
 
     public async Task<Result<string>> AddUserToGame(string gameId, string userId)
     {
-        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
         if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
         var guild = bot.GetGuild(gamePerspective.GuildId);
         if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
@@ -144,55 +97,57 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         discordTownManager.UpdateUserIdentity(townUser);
         var gameUser = user.AsGameUser(gamePerspective);
         gameUser.UserType = UserType.Player;
-        gameUser.SeatingPosition = gamePerspectiveStore.GetNextAvailableSeatingPosition(gameId);
+        gameUser.SeatingPosition = gamePerspectiveService.GetNextAvailableSeatingPosition(gameId);
 
-        gamePerspectiveStore.AddUserToGame(gameId, gameUser);
+        gameUser.Role = Role.AllRoles[Random.Shared.Next(Role.AllRoles.Count)];
 
-        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        gamePerspectiveService.AddUserToGame(gameId, gameUser);
+
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok($"{user.DisplayName} added to game: {gameId}");
     }
 
     public async Task<Result<string>> RemoveUserFromGame(string gameId, string userId)
     {
-        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
         if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
         var guild = bot.GetGuild(gamePerspective.GuildId);
         if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
         var user = guild.GetUser(userId);
         if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
 
-        gamePerspectiveStore.RemoveUserFromGame(gameId, userId);
+        gamePerspectiveService.RemoveUserFromGame(gameId, userId);
 
-        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok($"{user.DisplayName} removed from game: {gameId}");
     }
 
     public async Task<Result<string[]>> RandomiseSeatingPositions(string gameId)
     {
-        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
         if (gamePerspective is null) return Result.Fail<string[]>(Errors.GameNotFound(gameId));
 
         var shuffledPlayers = gamePerspective.Players.OrderBy(_ => Guid.NewGuid()).ToArray();
 
         foreach (GameUser shuffledPlayer in shuffledPlayers)
         {
-            gamePerspectiveStore.UpdatePublicUser(
+            gamePerspectiveService.UpdatePublicUser(
                 gameId,
                 shuffledPlayer.Id,
-                new GameUserUpdate
+                new PublicGameUserUpdate
                 {
                     SeatingPosition = Array.IndexOf(shuffledPlayers, shuffledPlayer)
                 }
             );
         }
 
-        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok(shuffledPlayers.Select(u => u.Id).ToArray());
     }
 
     public async Task<Result<string>> SwapSeatingPositions(string gameId, string userId1, string userId2)
     {
-        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
         if (gamePerspective is null)
             return Result.Fail<string>(Errors.GameNotFound(gameId));
 
@@ -203,34 +158,34 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
         if (user2 is null) return Result.Fail<string>(Errors.UserNotFound(userId2));
 
         var tempPosition = user1.SeatingPosition;
-        gamePerspectiveStore.UpdatePublicUser(gameId, userId1, new GameUserUpdate
+        gamePerspectiveService.UpdatePublicUser(gameId, userId1, new PublicGameUserUpdate
         {
             SeatingPosition = user2.SeatingPosition
         });
-        gamePerspectiveStore.UpdatePublicUser(gameId, userId2, new GameUserUpdate
+        gamePerspectiveService.UpdatePublicUser(gameId, userId2, new PublicGameUserUpdate
         {
             SeatingPosition = tempPosition
         });
-        await notificationService.BroadcastDiscordTownUpdate(gameId);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok("Users swapped");
     }
 
     public async Task<Result<string>> SetPlayerIsDead(string gameId, string userId, bool isDead)
     {
-        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
         if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
         var guild = bot.GetGuild(gamePerspective.GuildId);
         if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
         var user = guild.GetUser(userId);
         if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
 
-        var updateOccurred = gamePerspectiveStore.UpdatePublicUser(gameId, userId, new GameUserUpdate
+        var updateOccurred = gamePerspectiveService.UpdatePublicUser(gameId, userId, new PublicGameUserUpdate
         {
             IsDead = isDead,
             HasVoteToken = isDead ? true : null
         });
 
-        if (updateOccurred) await notificationService.BroadcastDiscordTownUpdate(gameId);
+        if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         string updateOccurredString = updateOccurred ? "now" : "already";
         string expectedTokenStatus = isDead ? "dead" : "alive";
         return Result.Ok($"{user.DisplayName} is {updateOccurredString} {expectedTokenStatus}");
@@ -238,19 +193,19 @@ public class GamePerspectiveService(IDiscordBot bot, IGamePerspectiveStore gameP
 
     public async Task<Result<string>> SetPlayerHasVoteToken(string gameId, string userId, bool hasVoteToken)
     {
-        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
         if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
         var guild = bot.GetGuild(gamePerspective.GuildId);
         if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
         var user = guild.GetUser(userId);
         if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
 
-        var updateOccurred = gamePerspectiveStore.UpdatePublicUser(gameId, userId, new GameUserUpdate
+        var updateOccurred = gamePerspectiveService.UpdatePublicUser(gameId, userId, new PublicGameUserUpdate
         {
             HasVoteToken = hasVoteToken
         });
 
-        if (updateOccurred) await notificationService.BroadcastDiscordTownUpdate(gameId);
+        if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         string updateOccurredString = updateOccurred ? "now" : "already";
         string expectedTokenStatus = hasVoteToken ? "has token" : "does not have token";
         return Result.Ok($"{user.DisplayName} {updateOccurredString} {expectedTokenStatus}");

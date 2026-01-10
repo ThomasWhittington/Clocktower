@@ -1,9 +1,8 @@
 ﻿using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data;
-using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Discord.Town.Services;
-using Clocktower.Server.Socket;
+using Clocktower.Server.Socket.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Clocktower.ServerTests.Common.Services;
@@ -19,10 +18,10 @@ public class DiscordBotHandlerTests
     private const string UserId = "4";
 
     private Mock<DiscordBotHandler> _mockHandler = null!;
-    private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
+    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private Mock<IUserService> _mockUserService = null!;
-    private Mock<INotificationService> _mockNotificationService = null!;
+    private Mock<IGameBroadcastService> _mockNotificationService = null!;
     private Mock<IServiceScopeFactory> _mockServiceScopeFactory = null!;
     private Mock<IServiceScope> _mockScope = null!;
     private Mock<IServiceProvider> _mockServiceProvider = null!;
@@ -38,10 +37,10 @@ public class DiscordBotHandlerTests
     [TestInitialize]
     public void SetUp()
     {
-        _mockGamePerspectiveStore = new Mock<IGamePerspectiveStore>();
+        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
         _mockDiscordTownManager = new Mock<IDiscordTownManager>();
         _mockUserService = new Mock<IUserService>();
-        _mockNotificationService = new Mock<INotificationService>();
+        _mockNotificationService = new Mock<IGameBroadcastService>();
         _mockServiceScopeFactory = new Mock<IServiceScopeFactory>();
         _mockScope = new Mock<IServiceScope>();
         _mockServiceProvider = new Mock<IServiceProvider>();
@@ -63,7 +62,7 @@ public class DiscordBotHandlerTests
 
         _mockHandler = new Mock<DiscordBotHandler>
         (
-            _mockGamePerspectiveStore.Object,
+            _mockGamePerspectiveService.Object,
             _mockDiscordTownManager.Object,
             _mockUserService.Object,
             _mockNotificationService.Object,
@@ -114,7 +113,7 @@ public class DiscordBotHandlerTests
             _user.Setup(o => o.GetGuildUser()).Returns(_guildUser.Object);
         }
 
-        _mockGamePerspectiveStore.Setup(o => o.GetGuildGameIds(GuildId)).Returns(gameIds!);
+        _mockGamePerspectiveService.Setup(o => o.GetGuildGameIds(GuildId)).Returns(gameIds!);
 
         _voiceChannel1.Setup(o => o.Id).Returns(ChannelId1);
         _voiceChannel2.Setup(o => o.Id).Returns(ChannelId2);
@@ -139,7 +138,7 @@ public class DiscordBotHandlerTests
 
         await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
 
-        _mockGamePerspectiveStore.Verify(f => f.GetGuildGameIds(It.IsAny<string>()), Times.Never);
+        _mockGamePerspectiveService.Verify(f => f.GetGuildGameIds(It.IsAny<string>()), Times.Never);
     }
 
 
@@ -150,7 +149,7 @@ public class DiscordBotHandlerTests
 
         await Sut.HandleUserVoiceStateUpdate(_user.Object, _before.Object, _after.Object);
 
-        _mockGamePerspectiveStore.Verify(f => f.GetGuildGameIds(GuildId), Times.Once);
+        _mockGamePerspectiveService.Verify(f => f.GetGuildGameIds(GuildId), Times.Once);
     }
 
     [TestMethod]

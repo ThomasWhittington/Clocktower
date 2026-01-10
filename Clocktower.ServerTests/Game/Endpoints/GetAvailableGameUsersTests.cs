@@ -8,12 +8,12 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class GetAvailableGameUsersTests
 {
-    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
+    private Mock<IGameService> _mockGameService = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
+        _mockGameService = new Mock<IGameService>();
     }
 
     [TestMethod]
@@ -37,11 +37,11 @@ public class GetAvailableGameUsersTests
         var request = new GameIdRequest(CommonMethods.GetRandomString());
 
         var error = Result.Fail<IEnumerable<UserDto>>(ErrorKind.Invalid, "error code", "error message");
-        _mockGamePerspectiveService.Setup(o => o.GetAvailableGameUsers(request.GameId)).Returns(error);
+        _mockGameService.Setup(o => o.GetAvailableGameUsers(request.GameId)).Returns(error);
 
-        var result = GetAvailableGameUsers.Handle(request, _mockGamePerspectiveService.Object);
+        var result = GetAvailableGameUsers.Handle(request, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.GetAvailableGameUsers(request.GameId), Times.Once);
+        _mockGameService.Verify(o => o.GetAvailableGameUsers(request.GameId), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
@@ -57,11 +57,11 @@ public class GetAvailableGameUsersTests
         };
         var success = Result.Ok(expected.AsEnumerable());
 
-        _mockGamePerspectiveService.Setup(o => o.GetAvailableGameUsers(request.GameId)).Returns(success);
+        _mockGameService.Setup(o => o.GetAvailableGameUsers(request.GameId)).Returns(success);
 
-        var result = GetAvailableGameUsers.Handle(request, _mockGamePerspectiveService.Object);
+        var result = GetAvailableGameUsers.Handle(request, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.GetAvailableGameUsers(request.GameId), Times.Once);
+        _mockGameService.Verify(o => o.GetAvailableGameUsers(request.GameId), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<IEnumerable<UserDto>>>().Subject;
         response.Value.Should().BeEquivalentTo(expected);

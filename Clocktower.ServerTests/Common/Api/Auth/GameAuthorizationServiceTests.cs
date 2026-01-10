@@ -1,6 +1,6 @@
 ﻿using Clocktower.Server.Common.Api.Auth;
+using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data;
-using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
 
 namespace Clocktower.ServerTests.Common.Api.Auth;
@@ -8,22 +8,22 @@ namespace Clocktower.ServerTests.Common.Api.Auth;
 [TestClass]
 public class GameAuthorizationServiceTests
 {
-    private Mock<IGamePerspectiveStore> _mockGamePerspectiveStore = null!;
-    private IGameAuthorizationService Sut => new GameAuthorizationService(_mockGamePerspectiveStore.Object);
+    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
+    private IGameAuthorizationService _sut = null!;
 
 
     private void MockResponse(string gameId, string userId, GamePerspective gamePerspective)
     {
-        _mockGamePerspectiveStore.Setup(o =>
-                o.Get(gameId, userId))
-            .Returns(gamePerspective);
+        _mockGamePerspectiveService.Setup(o => o.GetPerspective(gameId, userId)).Returns(gamePerspective);
     }
 
 
     [TestInitialize]
     public void Setup()
     {
-        _mockGamePerspectiveStore = new Mock<IGamePerspectiveStore>();
+        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
+
+        _sut = new GameAuthorizationService(_mockGamePerspectiveService.Object);
     }
 
 
@@ -53,7 +53,7 @@ public class GameAuthorizationServiceTests
         var gamePerspective = CreateGamePerspective("dummy", [new ValueTuple<string, UserType>(userId, UserType.StoryTeller)]);
         MockResponse("dummy", userId, gamePerspective);
 
-        var result = Sut.IsStoryTellerForGame(userId, gameId);
+        var result = _sut.IsStoryTellerForGame(userId, gameId);
 
         result.Should().BeFalse();
     }
@@ -66,7 +66,7 @@ public class GameAuthorizationServiceTests
         var gamePerspective = CommonMethods.GetGamePerspective(gameId);
         MockResponse(gameId, userId, gamePerspective);
 
-        var result = Sut.IsStoryTellerForGame(userId, gameId);
+        var result = _sut.IsStoryTellerForGame(userId, gameId);
 
         result.Should().BeFalse();
     }
@@ -79,7 +79,7 @@ public class GameAuthorizationServiceTests
         var gamePerspective = CommonMethods.GetGamePerspective("dummy");
         MockResponse(gameId, userId, gamePerspective);
 
-        var result = Sut.IsStoryTellerForGame(userId, gameId);
+        var result = _sut.IsStoryTellerForGame(userId, gameId);
 
         result.Should().BeFalse();
     }
@@ -92,7 +92,7 @@ public class GameAuthorizationServiceTests
         var gamePerspective = CreateGamePerspective(gameId, [new ValueTuple<string, UserType>(userId, UserType.Player)]);
         MockResponse(gameId, userId, gamePerspective);
 
-        var result = Sut.IsStoryTellerForGame(userId, gameId);
+        var result = _sut.IsStoryTellerForGame(userId, gameId);
 
         result.Should().BeFalse();
     }
@@ -105,7 +105,7 @@ public class GameAuthorizationServiceTests
         var gamePerspective = CreateGamePerspective(gameId, [new ValueTuple<string, UserType>(userId, UserType.StoryTeller)]);
         MockResponse(gameId, userId, gamePerspective);
 
-        var result = Sut.IsStoryTellerForGame(userId, gameId);
+        var result = _sut.IsStoryTellerForGame(userId, gameId);
 
         result.Should().BeTrue();
     }

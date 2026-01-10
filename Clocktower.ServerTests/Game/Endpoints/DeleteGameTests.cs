@@ -6,12 +6,12 @@ namespace Clocktower.ServerTests.Game.Endpoints;
 [TestClass]
 public class DeleteGameTests
 {
-    private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
+    private Mock<IGameService> _mockGameService = null!;
     private const string ResponseMessage = "Response";
 
     private void MockResponse(bool success)
     {
-        _mockGamePerspectiveService.Setup(o =>
+        _mockGameService.Setup(o =>
                 o.DeleteGame(It.IsAny<string>()))
             .Returns((success, ResponseMessage));
     }
@@ -19,7 +19,7 @@ public class DeleteGameTests
     [TestInitialize]
     public void Setup()
     {
-        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
+        _mockGameService = new Mock<IGameService>();
     }
 
     [TestMethod]
@@ -41,9 +41,9 @@ public class DeleteGameTests
         var gameId = CommonMethods.GetRandomString();
         MockResponse(false);
 
-        var result = DeleteGame.Handle(gameId, _mockGamePerspectiveService.Object);
+        var result = DeleteGame.Handle(gameId, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.DeleteGame(gameId.Trim()), Times.Once);
+        _mockGameService.Verify(o => o.DeleteGame(gameId.Trim()), Times.Once);
 
         var response = result.Result.Should().BeOfType<NotFound<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
@@ -57,9 +57,9 @@ public class DeleteGameTests
         var gameId = CommonMethods.GetRandomString();
         MockResponse(true);
 
-        var result = DeleteGame.Handle(gameId, _mockGamePerspectiveService.Object);
+        var result = DeleteGame.Handle(gameId, _mockGameService.Object);
 
-        _mockGamePerspectiveService.Verify(o => o.DeleteGame(gameId.Trim()), Times.Once);
+        _mockGameService.Verify(o => o.DeleteGame(gameId.Trim()), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);

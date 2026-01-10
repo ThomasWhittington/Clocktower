@@ -1,6 +1,6 @@
 using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data.Wrappers;
-using Clocktower.Server.Socket;
+using Clocktower.Server.Socket.Services;
 using Discord;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -10,8 +10,8 @@ namespace Clocktower.Server.Discord.Town.Services;
 [UsedImplicitly]
 public class DiscordTownService(
     IDiscordBot bot,
-    INotificationService notificationService,
-    IGamePerspectiveStore gamePerspectiveStore,
+    IGameBroadcastService gameBroadcastService,
+    IGamePerspectiveService gamePerspectiveService,
     IDiscordTownManager discordTownManager,
     IJwtWriter jwtWriter,
     IMemoryCache cache,
@@ -129,7 +129,7 @@ public class DiscordTownService(
     {
         try
         {
-            var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+            var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
             if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
             var guild = bot.GetGuild(gamePerspective.GuildId);
             if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
@@ -138,7 +138,7 @@ public class DiscordTownService(
 
             var result = await UpdateUserType(gameId, user, guild, userType);
 
-            await notificationService.BroadcastDiscordTownUpdate(gameId);
+            await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
             return result.success ? Result.Ok($"({gameId}) {user.DisplayName} set to {userType}") : Result.Fail<string>(ErrorKind.Unexpected, "set-user-type.unexpected", $"Failed to set userType for user '{userId}' in game '{gameId}' to '{userType}'. {result.message}");
         }
         catch (Exception e)
@@ -149,7 +149,7 @@ public class DiscordTownService(
 
     public async Task<Result<string>> InviteAll(string gameId, bool sendInvite)
     {
-        var perspectives = gamePerspectiveStore.GetAllPerspectivesForGame(gameId).ToArray();
+        var perspectives = gamePerspectiveService.GetAllPerspectivesForGame(gameId).ToArray();
 
         var failures = new List<string>();
         var successCount = 0;
@@ -201,8 +201,8 @@ public class DiscordTownService(
 
             discordTownManager.SetDiscordTown(guildId, discordTown);
 
-            var gameId = gamePerspectiveStore.GetGuildGameIds(guildId).FirstOrDefault();
-            if (gameId is not null) await notificationService.BroadcastDiscordTownUpdate(gameId);
+            var gameId = gamePerspectiveService.GetGuildGameIds(guildId).FirstOrDefault();
+            if (gameId is not null) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
             return (true, discordTown, $"Discord town {discordTown.UserCount}");
         }
         catch (Exception ex)
@@ -213,7 +213,7 @@ public class DiscordTownService(
 
     public async Task<(bool success, DiscordTownDto? discordTown, string message)> GetDiscordTownDto(string gameId)
     {
-        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
         if (gamePerspective is null) return (false, null, $"Game not found for id: {gameId}");
 
         var (success, discordTown, message) = await GetDiscordTown(gamePerspective.GuildId);
@@ -230,12 +230,12 @@ public class DiscordTownService(
     {
         if (cache.TryGetValue($"join_data_{key}", out var joinData) && joinData is JoinData response)
         {
-            gamePerspectiveStore.UpdatePublicUser(response.GameId, response.User.Id, new GameUserUpdate
+            gamePerspectiveService.UpdatePublicUser(response.GameId, response.User.Id, new PublicGameUserUpdate
             {
                 IsPlaying = true
             });
             cache.Remove($"join_data_{key}");
-            await notificationService.BroadcastDiscordTownUpdate(response.GameId);
+            await gameBroadcastService.BroadcastDiscordTownUpdate(response.GameId);
             return response;
         }
 
@@ -244,14 +244,14 @@ public class DiscordTownService(
 
     public async Task PingUser(string userId)
     {
-        await notificationService.PingUser(userId, "Ping!");
+        await gameBroadcastService.PingUser(userId, "Ping!");
     }
 
     public async Task<(InviteUserOutcome outcome, string message)> InviteUser(string gameId, string userId, bool sendInvite)
     {
         try
         {
-            var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+            var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
             if (gamePerspective is null) return (InviteUserOutcome.GameDoesNotExistError, $"Couldn't find game with id: {gameId}");
             var guild = bot.GetGuild(gamePerspective.GuildId);
             if (guild is null) return (InviteUserOutcome.InvalidGuildError, "GamePerspective contained a guildId that could not be found");
@@ -274,8 +274,8 @@ public class DiscordTownService(
 
             if (sendInvite) await dmChannel.SendMessageAsync($"[Join here]({url})");
 
-            gamePerspectiveStore.AddUserToGame(gameId, thisGameUser);
-            await notificationService.BroadcastDiscordTownUpdate(gameId);
+            gamePerspectiveService.AddUserToGame(gameId, thisGameUser);
+            await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
             return (InviteUserOutcome.InviteSent, "Sent message to user");
         }
         catch (Exception)
@@ -306,7 +306,7 @@ public class DiscordTownService(
         foreach (var role in roleMap.Values.Where(role => role != targetRole && user.DoesUserHaveRole(role.Id))) await user.RemoveRoleAsync(role);
         if (!user.DoesUserHaveRole(targetRole.Id)) await user.AddRoleAsync(targetRole);
 
-        gamePerspectiveStore.UpdatePublicUser(gameId, user.Id, new GameUserUpdate
+        gamePerspectiveService.UpdatePublicUser(gameId, user.Id, new PublicGameUserUpdate
         {
             UserType = userType
         });

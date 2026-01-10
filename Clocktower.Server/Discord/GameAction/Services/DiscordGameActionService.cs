@@ -5,7 +5,7 @@ namespace Clocktower.Server.Discord.GameAction.Services;
 
 public class DiscordGameActionService(
     IDiscordBot bot,
-    IGamePerspectiveStore gamePerspectiveStore,
+    IGamePerspectiveService gamePerspectiveService,
     IDiscordTownManager discordTownManager,
     IDiscordConstantsService discordConstantsService,
     IUserService userService
@@ -84,7 +84,7 @@ public class DiscordGameActionService(
 
     private (Result<string> status, (IDiscordGuild discordGuild, GamePerspective gamePerspective) data) ValidateFromGameId(string gameId)
     {
-        var gamePerspective = gamePerspectiveStore.GetFirstPerspective(gameId);
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
         if (gamePerspective is null) return (Result.Fail<string>(Errors.GameNotFound(gameId)), default);
         var guild = bot.GetGuild(gamePerspective.GuildId);
         if (guild is null) return (Result.Fail<string>(Errors.InvalidGuildId()), default);

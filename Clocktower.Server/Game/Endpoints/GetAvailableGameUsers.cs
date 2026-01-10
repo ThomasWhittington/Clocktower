@@ -1,6 +1,4 @@
-﻿using Clocktower.Server.Data.Dto;
-
-namespace Clocktower.Server.Game.Endpoints;
+﻿namespace Clocktower.Server.Game.Endpoints;
 
 [UsedImplicitly]
 public class GetAvailableGameUsers : IEndpoint
@@ -17,9 +15,9 @@ public class GetAvailableGameUsers : IEndpoint
 
     internal static Results<Ok<IEnumerable<UserDto>>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>> Handle(
         [AsParameters] GameIdRequest request,
-        [FromServices] IGamePerspectiveService gamePerspectiveService)
+        [FromServices] IGameService gameService)
     {
-        var result = gamePerspectiveService.GetAvailableGameUsers(request.GameId);
+        var result = gameService.GetAvailableGameUsers(request.GameId);
         return result.ToHttpResult();
     }
 }

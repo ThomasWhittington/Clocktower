@@ -14,9 +14,9 @@ public class SwapSeatingPositions : IEndpoint
 
     internal static async Task<Results<Ok<string>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle(
         [AsParameters] Request request,
-        [FromServices] IGamePerspectiveService gamePerspectiveService)
+        [FromServices] IGameService gameService)
     {
-        var result = await gamePerspectiveService.SwapSeatingPositions(request.GameId, request.UserId1, request.UserId2);
+        var result = await gameService.SwapSeatingPositions(request.GameId, request.UserId1, request.UserId2);
         return result.ToHttpResult();
     }
 

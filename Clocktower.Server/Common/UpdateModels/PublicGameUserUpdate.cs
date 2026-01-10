@@ -1,6 +1,6 @@
 namespace Clocktower.Server.Common.UpdateModels;
 
-public record GameUserUpdate
+public record PublicGameUserUpdate
 {
     public UserType? UserType { get; init; }
     public bool? IsPlaying { get; init; }

@@ -2,21 +2,15 @@
 
 public interface IGamePerspectiveStore
 {
-    bool GameExists(string gameId);
-    void Clear();
-    GamePerspective? Get(string gameId, string userId);
-    bool Set(GamePerspective perspective);
-    bool RemovePerspective(string gameId, string userId);
-    bool RemoveGame(string gameId);
-    IEnumerable<string> GetGuildGameIds(string guildId);
-    IEnumerable<GamePerspective> GetAllPerspectivesForGame(string gameId);
-    GamePerspective? GetFirstPerspective(string gameId);
-    IEnumerable<GamePerspective> GetUserGames(string userId);
+    const string OmniscientKey = "omniscient";
+
+
     IEnumerable<GamePerspective> GetAll();
-    void AddUserToGame(string gameId, GameUser gameUser);
-    void RemoveUserFromGame(string gameId, string userId);
-    void SetTime(string gameId, GameTime gameTime);
-    bool UpdatePublicUser(string gameId, string affectedUserId, GameUserUpdate update);
-    int GetNextAvailableSeatingPosition(string gameId);
-    void SetUserRole(string gameId, string userId, Role role);
+    GamePerspective? Get(string gameId, string userId);
+    bool Add(string gameId, string perspectiveKey, GamePerspective perspective);
+    bool Remove(string gameId, string perspectiveKey);
+    void TryUpdate(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction);
+    IEnumerable<GamePerspective> GetAllPerspectivesForGame(string gameId);
+    void UpdateAllPerspectives(string gameId, Func<GamePerspective, GamePerspective> updateFunction);
+    void UpdateUserInOwnAndOmniscientPerspectives(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction);
 }

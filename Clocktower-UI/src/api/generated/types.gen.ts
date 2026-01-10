@@ -929,31 +929,6 @@ export type GetPlayerGamesApiResponses = {
 
 export type GetPlayerGamesApiResponse = GetPlayerGamesApiResponses[keyof GetPlayerGamesApiResponses];
 
-export type LoadDummyGamesApiData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/games/load';
-};
-
-export type LoadDummyGamesApiErrors = {
-    /**
-     * Bad Request
-     */
-    400: string;
-};
-
-export type LoadDummyGamesApiError = LoadDummyGamesApiErrors[keyof LoadDummyGamesApiErrors];
-
-export type LoadDummyGamesApiResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type LoadDummyGamesApiResponse = LoadDummyGamesApiResponses[keyof LoadDummyGamesApiResponses];
-
 export type RandomiseSeatingPositionsApiData = {
     body?: never;
     path: {

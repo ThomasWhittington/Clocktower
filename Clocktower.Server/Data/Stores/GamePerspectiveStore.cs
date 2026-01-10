@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Clocktower.Server.Data.Stores;
 
@@ -7,205 +6,45 @@ public class GamePerspectiveStore : IGamePerspectiveStore
 {
     private readonly ConcurrentDictionary<(string, string), GamePerspective> _store = new();
 
-    public bool GameExists(string gameId) => _store.Any(o => o.Key.Item1 == gameId);
+    public IEnumerable<GamePerspective> GetAll() => _store.Values;
 
-    public void Clear() => _store.Clear();
+    public GamePerspective? Get(string gameId, string userId)
+        => _store.TryGetValue((gameId, userId), out var p) ? p : null;
 
-    public GamePerspective? Get(string gameId, string userId) =>
-        _store.TryGetValue((gameId, userId), out var state) ? state : null;
+    public bool Add(string gameId, string perspectiveKey, GamePerspective perspective)
+        => _store.TryAdd((gameId, perspectiveKey), perspective);
 
-    public bool Set(GamePerspective perspective) => _store.TryAdd((perspective.Id, perspective.UserId), perspective);
+    public bool Remove(string gameId, string perspectiveKey)
+        => _store.TryRemove((gameId, perspectiveKey), out _);
 
-    public bool RemovePerspective(string gameId, string userId) => _store.TryRemove((gameId, userId), out _);
-
-    public bool RemoveGame(string gameId)
-    {
-        var keysToRemove = _store.Keys.Where(key => key.Item1 == gameId).ToList();
-        foreach (var key in keysToRemove)
-        {
-            _store.TryRemove(key, out _);
-        }
-
-        return keysToRemove.Count > 0;
-    }
-
-    public IEnumerable<string> GetGuildGameIds(string guildId)
-    {
-        return _store.Where(g => g.Value.GuildId == guildId)
-            .DistinctBy(g => g.Key.Item1)
-            .Select(g => g.Key.Item1);
-    }
 
     public IEnumerable<GamePerspective> GetAllPerspectivesForGame(string gameId)
+        => _store.Where(kvp => kvp.Key.Item1 == gameId).Select(kvp => kvp.Value);
+
+
+    public void UpdateAllPerspectives(string gameId, Func<GamePerspective, GamePerspective> updateFunction)
     {
-        return _store.Where(kvp => kvp.Key.Item1 == gameId).Select(kvp => kvp.Value);
-    }
-
-    public IEnumerable<GamePerspective> GetUserGames(string userId)
-    {
-        return _store.Where(kvp => kvp.Key.Item2 == userId).Select(kvp => kvp.Value);
-    }
-
-
-    public IEnumerable<GamePerspective> GetAll() => _store.Values;
-    public GamePerspective? GetFirstPerspective(string gameId) => _store.FirstOrDefault(kvp => kvp.Key.Item1 == gameId).Value;
-
-    public void AddUserToGame(string gameId, GameUser gameUser)
-    {
-        var existingPerspective = GetFirstPerspective(gameId);
-        if (existingPerspective is null) return;
-
-        var newUserPerspective = existingPerspective with
-        {
-            UserId = gameUser.Id,
-            Users = existingPerspective.Users.Select(ToPublicUser).Append(gameUser).ToList()
-        };
-        _store.TryAdd((gameId, gameUser.Id), newUserPerspective);
-
-        if (existingPerspective.Users.All(o => o.Id != gameUser.Id))
-        {
-            var publicNewUser = ToPublicUser(gameUser);
-            UpdateAllPerspectives(gameId, state =>
-            {
-                var userToAdd = state.UserId == gameUser.Id ? gameUser : publicNewUser;
-                if (state.Users.Any(u => u.Id == gameUser.Id)) return state;
-                return state with
-                {
-                    Users = [.. state.Users, userToAdd]
-                };
-            });
-        }
-    }
-
-    public void RemoveUserFromGame(string gameId, string userId)
-    {
-        RemovePerspective(gameId, userId);
-
-        UpdateAllPerspectives(gameId, state => state with
-        {
-            Users = state.Users.Where(u => u.Id != userId).ToList()
-        });
-
-        var perspective = GetFirstPerspective(gameId);
-        if (perspective is null) return;
-
-        var sortedUsers = perspective.Players
-            .OrderBy(u => u.SeatingPosition)
-            .ToList();
-
-        UpdateAllPerspectives(gameId, state =>
-        {
-            var updatedUsers = state.Users.Select(user =>
-            {
-                var newPosition = sortedUsers.FindIndex(u => u.Id == user.Id);
-                return newPosition >= 0 ? user with { SeatingPosition = newPosition } : user;
-            }).ToList();
-
-            return state with { Users = updatedUsers };
-        });
-    }
-
-    public void SetTime(string gameId, GameTime gameTime)
-    {
-        UpdateAllPerspectives(gameId, state => state with { GameTime = gameTime });
-    }
-
-    public bool UpdatePublicUser(string gameId, string affectedUserId, GameUserUpdate update)
-    {
-        bool updated = false;
-
-        UpdateAllPerspectives(gameId, state =>
-        {
-            var user = state.Users.FirstOrDefault(u => u.Id == affectedUserId);
-            if (user is null || !HasChanges(user, update)) return state;
-
-            updated = true;
-
-            var updatedUser = user with
-            {
-                UserType = update.UserType ?? user.UserType,
-                IsPlaying = update.IsPlaying ?? user.IsPlaying,
-                SeatingPosition = update.SeatingPosition ?? user.SeatingPosition,
-                IsDead = update.IsDead ?? user.IsDead,
-                IsMarked = update.IsMarked ?? user.IsMarked,
-                HasVoteToken = update.HasVoteToken ?? user.HasVoteToken
-            };
-
-            return state with { Users = state.Users.Select(u => u.Id == affectedUserId ? updatedUser : u).ToList() };
-        });
-
-        return updated;
-    }
-
-    public int GetNextAvailableSeatingPosition(string gameId)
-    {
-        var perspective = GetFirstPerspective(gameId);
-        if (perspective is null) return UserDto.NoSeatingPosition;
-        var currentPlayers = perspective.Players.ToArray();
-        if (!currentPlayers.Any()) return 0;
-
-        var maxPosition = currentPlayers.Max(u => u.SeatingPosition);
-        return maxPosition + 1;
-    }
-
-    public void SetUserRole(string gameId, string userId, Role role)
-    {
-        UpdateAllPerspectives(gameId, state =>
-        {
-            if (!ShouldUpdateRoleForPerspective(state, userId)) return state;
-
-            return state with
-            {
-                Users = state.Users.Select(user => user.Id == userId ? user with { Role = role } : user).ToList()
-            };
-        });
-    }
-
-
-    private void UpdateAllPerspectives(string gameId, Func<GamePerspective, GamePerspective> updateFunction)
-    {
-        var perspectiveIds = _store.Keys.Where(key =>
-                key is var (gId, _) && gId == gameId)
-            .Select(o => o.Item2).ToList();
+        var perspectiveIds = _store.Keys.Where(key => key.Item1 == gameId).Select(key => key.Item2).ToList();
         foreach (var userId in perspectiveIds)
         {
             TryUpdate(gameId, userId, updateFunction);
         }
     }
 
-    [ExcludeFromCodeCoverage(Justification = "This just runs a delegate, the value not found issue is covered in the calling functions")]
-    private void TryUpdate(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction)
+    public void UpdateUserInOwnAndOmniscientPerspectives(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction)
     {
-        _store.AddOrUpdate((gameId, userId),
-            addValueFactory: _ => throw new InvalidOperationException("Key should exist"),
-            updateValueFactory: (_, existing) => updateFunction(existing)
-        );
+        TryUpdate(gameId, userId, updateFunction);
+        TryUpdate(gameId, IGamePerspectiveStore.OmniscientKey, updateFunction);
     }
 
-    private static bool ShouldUpdateRoleForPerspective(GamePerspective perspective, string userId)
+    public void TryUpdate(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction)
     {
-        if (perspective.UserId == userId) return true;
-
-        var perspectiveOwner = perspective.Users.FirstOrDefault(u => u.Id == perspective.UserId);
-        return perspectiveOwner?.UserType is UserType.StoryTeller or UserType.Spectator;
-    }
-
-    private GameUser ToPublicUser(GameUser user) =>
-        new(user.Id)
+        var key = (gameId, userId);
+        while (true)
         {
-            UserType = user.UserType,
-            IsPlaying = user.IsPlaying,
-            SeatingPosition = user.SeatingPosition,
-            IsDead = user.IsDead,
-            IsMarked = user.IsMarked,
-            HasVoteToken = user.HasVoteToken
-        };
-
-    private static bool HasChanges(GameUser user, GameUserUpdate update) =>
-        (update.UserType != null && user.UserType != update.UserType) ||
-        (update.IsPlaying != null && user.IsPlaying != update.IsPlaying) ||
-        (update.SeatingPosition != null && user.SeatingPosition != update.SeatingPosition) ||
-        (update.HasVoteToken != null && user.HasVoteToken != update.HasVoteToken) ||
-        (update.IsDead != null && user.IsDead != update.IsDead) ||
-        (update.IsMarked != null && user.IsMarked != update.IsMarked);
+            if (!_store.TryGetValue(key, out var existing)) return;
+            var updated = updateFunction(existing);
+            if (_store.TryUpdate(key, updated, existing)) return;
+        }
+    }
 }
