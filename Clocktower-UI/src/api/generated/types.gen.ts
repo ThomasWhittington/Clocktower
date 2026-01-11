@@ -129,6 +129,18 @@ export type ClocktowerServerDataTypesRoleRole = {
     description?: string | null;
     type?: ClocktowerServerDataTypesEnumRoleType;
     edition?: ClocktowerServerDataTypesEnumEdition;
+    metadata?: ClocktowerServerDataTypesRoleRoleMetadata;
+    readonly id?: string | null;
+};
+
+export type ClocktowerServerDataTypesRoleRoleMetadata = {
+    firstNight?: number;
+    firstNightReminder?: string | null;
+    otherNight?: number;
+    otherNightReminder?: string | null;
+    setup?: boolean;
+    reminders?: Array<string> | null;
+    remindersGlobal?: Array<string> | null;
 };
 
 export type ClocktowerServerDataUserAuthData = {
@@ -186,20 +198,82 @@ export type MicrosoftAspNetCoreHttpHttpValidationProblemDetails = {
     } | null | undefined;
 };
 
+export type ClocktowerServerDataDtoChannelOccupantsDtoWritable = {
+    channel?: ClocktowerServerDataMiniChannel;
+    occupants?: Array<ClocktowerServerDataDtoUserDtoWritable> | null;
+};
+
 export type ClocktowerServerDataDtoDiscordTownDtoWritable = {
     gameId?: string | null;
-    channelCategories?: Array<ClocktowerServerDataDtoMiniCategoryDto> | null;
-    gameUsers?: Array<ClocktowerServerDataDtoUserDto> | null;
+    channelCategories?: Array<ClocktowerServerDataDtoMiniCategoryDtoWritable> | null;
+    gameUsers?: Array<ClocktowerServerDataDtoUserDtoWritable> | null;
+};
+
+export type ClocktowerServerDataDtoMiniCategoryDtoWritable = {
+    id?: string | null;
+    name?: string | null;
+    channels?: Array<ClocktowerServerDataDtoChannelOccupantsDtoWritable> | null;
+};
+
+export type ClocktowerServerDataDtoUserDtoWritable = {
+    id?: string | null;
+    name?: string | null;
+    avatarUrl?: string | null;
+    voiceState?: ClocktowerServerDataVoiceState;
+    isPresent?: boolean;
+    isPlaying?: boolean;
+    userType?: ClocktowerServerDataTypesEnumUserType;
+    seatingPosition?: number;
+    hasVoteToken?: boolean;
+    isDead?: boolean;
+    isMarked?: boolean;
+    role?: ClocktowerServerDataTypesRoleRoleWritable;
 };
 
 export type ClocktowerServerDataGamePerspectiveWritable = {
     id?: string | null;
     userId?: string | null;
     guildId?: string | null;
-    createdBy?: ClocktowerServerDataGameUser;
+    createdBy?: ClocktowerServerDataGameUserWritable;
     createdDate?: Date;
-    users?: Array<ClocktowerServerDataGameUser> | null;
+    users?: Array<ClocktowerServerDataGameUserWritable> | null;
     gameTime?: ClocktowerServerDataTypesEnumGameTime;
+};
+
+export type ClocktowerServerDataGameUserWritable = {
+    id?: string | null;
+    isPlaying?: boolean;
+    userType?: ClocktowerServerDataTypesEnumUserType;
+    seatingPosition?: number;
+    hasVoteToken?: boolean;
+    isDead?: boolean;
+    isMarked?: boolean;
+    role?: ClocktowerServerDataTypesRoleRoleWritable;
+};
+
+export type ClocktowerServerDataMiniGamePerspectiveWritable = {
+    gameId?: string | null;
+    createdBy?: ClocktowerServerDataGameUserWritable;
+    createdDate?: Date;
+};
+
+export type ClocktowerServerDataTypesJoinDataWritable = {
+    guildId?: string | null;
+    user?: ClocktowerServerDataGameUserWritable;
+    gameId?: string | null;
+    jwt?: string | null;
+};
+
+export type ClocktowerServerDataTypesRoleRoleWritable = {
+    name?: string | null;
+    description?: string | null;
+    type?: ClocktowerServerDataTypesEnumRoleType;
+    edition?: ClocktowerServerDataTypesEnumEdition;
+    metadata?: ClocktowerServerDataTypesRoleRoleMetadata;
+};
+
+export type ClocktowerServerRolesEndpointsGetRolesResponseWritable = {
+    roles?: Array<ClocktowerServerDataTypesRoleRoleWritable> | null;
 };
 
 export type GetAuthTokenApiData = {

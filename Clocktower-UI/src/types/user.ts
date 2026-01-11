@@ -1,24 +1,39 @@
 ﻿import type {ClocktowerServerDataDtoUserDto} from "@/api";
 import {mapToVoiceState, type VoiceState} from "@/types/voiceState.ts";
-import {mapToRole, type Role, UserType} from "@/types";
+import {mapToRole, Role, UserType} from "@/types";
 
-export type User = {
-    id: string;
-    name: string;
-    avatarUrl: string | undefined;
-    isPresent: boolean,
-    voiceState: VoiceState | undefined;
-    isPlaying: boolean;
-    userType: UserType;
-    seatingPosition: number;
-    hasVoteToken: boolean;
-    isDead: boolean;
-    isMarked: boolean;
-    role: Role | undefined;
-};
+export class User {
+    readonly id: string;
+    readonly name: string;
+    readonly avatarUrl: string | undefined;
+    readonly isPresent: boolean;
+    readonly voiceState: VoiceState | undefined;
+    readonly isPlaying: boolean;
+    readonly userType: UserType;
+    readonly seatingPosition: number;
+    readonly hasVoteToken: boolean;
+    readonly isDead: boolean;
+    readonly isMarked: boolean;
+    readonly role: Role | undefined;
+
+    constructor(data: Partial<User>) {
+        this.id = data.id ?? '';
+        this.name = data.name ?? '';
+        this.avatarUrl = data.avatarUrl;
+        this.isPresent = data.isPresent ?? false;
+        this.voiceState = data.voiceState;
+        this.isPlaying = data.isPlaying ?? false;
+        this.userType = data.userType ?? UserType.Unknown;
+        this.seatingPosition = data.seatingPosition ?? -1;
+        this.hasVoteToken = data.hasVoteToken ?? false;
+        this.isDead = data.isDead ?? false;
+        this.isMarked = data.isMarked ?? false;
+        this.role = data.role instanceof Role ? data.role : (data.role ? mapToRole(data.role as any) : undefined);
+    }
+}
 
 export function mapToUser(userDto: ClocktowerServerDataDtoUserDto): User {
-    return {
+    return new User({
         id: userDto.id!,
         name: userDto.name!,
         avatarUrl: userDto.avatarUrl ?? undefined,
@@ -31,5 +46,5 @@ export function mapToUser(userDto: ClocktowerServerDataDtoUserDto): User {
         isDead: userDto.isDead ?? false,
         isMarked: userDto.isMarked ?? false,
         role: userDto.role ? mapToRole(userDto.role) : undefined
-    };
+    });
 }

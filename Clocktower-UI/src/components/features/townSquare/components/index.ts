@@ -4,3 +4,4 @@ export {TownSquareControls} from './TownSquareControls';
 export {PlayerActionMenu} from './PlayerActionMenu';
 export {ActionBanner} from './ActionBanner';
 export {AvatarOverlays} from './AvatarOverlays';
+export {FlippableAvatar} from './FlippableAvatar';
