@@ -37,7 +37,7 @@ public class RolesServiceTests
     [DataRow(Edition.TroubleBrewing)]
     [DataRow(Edition.SectsAndViolets)]
     [DataRow(Edition.BadMoonRising)]
-    [DataRow(Edition.Experimental)]
+    [DataRow(Edition.Carousel)]
     public void GetRoles_ReturnsCorrect_WhenEditionFiltered(Edition filterEdition)
     {
         RoleType? filterRoleType = null;
@@ -53,18 +53,20 @@ public class RolesServiceTests
     [DynamicData(nameof(EditionRoleTypeTestData))]
     public void GetRoles_ReturnsCorrect_WhenRoleTypeAndEditionFiltered(Edition filterEdition, RoleType filterRoleType)
     {
-        var expected = _dummyRoles.Where(o => o.Edition == filterEdition && o.Type == filterRoleType);
+        var expected = _dummyRoles.Where(o => o.Edition == filterEdition && o.Type == filterRoleType).ToArray();
 
-        var result = Sut.GetRoles(filterEdition, filterRoleType, _dummyRoles);
+        var result = Sut.GetRoles(filterEdition, filterRoleType, _dummyRoles).ToArray();
 
+        result[0].Id.Should().Be(new string(result[0].Name.Where(c => !char.IsPunctuation(c) && !char.IsWhiteSpace(c)).ToArray()).ToLower());
         result.Should().BeEquivalentTo(expected);
     }
 
     private static IEnumerable<object[]> EditionRoleTypeTestData()
     {
-        return from
-                edition in Enum.GetValues<Edition>()
+        return from edition in Enum.GetValues<Edition>()
             from roleType in Enum.GetValues<RoleType>()
+            where edition != Edition.Unknown
+            where roleType != RoleType.Unknown
             select new object[] { edition, roleType };
     }
 }

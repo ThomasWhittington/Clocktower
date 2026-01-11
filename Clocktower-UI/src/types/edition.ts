@@ -3,5 +3,5 @@
     TroubleBrewing = 1,
     SectsAndViolets = 2,
     BadMoonRising = 3,
-    Experimental = 4
+    Carousel = 4
 }

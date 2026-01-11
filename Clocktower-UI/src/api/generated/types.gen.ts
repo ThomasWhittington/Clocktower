@@ -109,7 +109,7 @@ export type ClocktowerServerDataTownUser = {
     isPresent?: boolean;
 };
 
-export type ClocktowerServerDataTypesEnumEdition = 'Unknown' | 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Experimental';
+export type ClocktowerServerDataTypesEnumEdition = 'Unknown' | 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Carousel';
 
 export type ClocktowerServerDataTypesEnumGameTime = 'Unknown' | 'Day' | 'Evening' | 'Night';
 
@@ -129,8 +129,8 @@ export type ClocktowerServerDataTypesRoleRole = {
     description?: string | null;
     type?: ClocktowerServerDataTypesEnumRoleType;
     edition?: ClocktowerServerDataTypesEnumEdition;
-    metadata?: ClocktowerServerDataTypesRoleRoleMetadata;
     readonly id?: string | null;
+    metadata?: ClocktowerServerDataTypesRoleRoleMetadata;
 };
 
 export type ClocktowerServerDataTypesRoleRoleMetadata = {
