@@ -145,4 +145,27 @@
         @apply left-0 pointer-events-none;
         transform: translate(-10%, 10%);
     }
+
+    .users-container {
+        max-height: -webkit-fill-available;
+        overflow-y: auto;
+    }
+
+    .users-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .users-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .users-container::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+    }
+
+    .users-container::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+
 }

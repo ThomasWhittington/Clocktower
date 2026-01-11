@@ -1,10 +1,10 @@
 ﻿import {useState} from "react";
 import {Spinner} from '@/components/ui';
-
-import {discordService, gamesService} from "@/services";
+import {gamesService} from "@/services";
 import type {GamePerspective} from "@/types";
 import {useAppStore} from "@/store";
 import {GameList} from "@/components/features/gameManager/components";
+import {BottomHud} from "@/components/features/gameWindow/components";
 
 function GameManager() {
     const [isLoading, setIsLoading] = useState(false);
@@ -16,6 +16,7 @@ function GameManager() {
     const gameId = useAppStore((state) => state.gameId);
     const currentUser = useAppStore((state) => state.currentUser);
     const setGameId = useAppStore((state) => state.setGameId);
+    const setGuildId = useAppStore((state) => state.setGuildId);
 
 
     const clearError = () => {
@@ -46,26 +47,8 @@ function GameManager() {
         gamesService.startGame(text, guildId, currentUser?.id!).then(data => {
             setGameId(data?.id ?? null);
             getGames();
-        })
-            .catch((err) => handleError(err))
-            .finally(() => setIsLoading(false));
-    }
-
-    const inviteUser = async () => {
-        if (!gameId) return;
-        clearError();
-        setIsLoading(true);
-        await discordService.inviteUser(gameId, text).then(_ => {
-        })
-            .catch((err) => handleError(err))
-            .finally(() => setIsLoading(false));
-    }
-
-    const pingUser = async () => {
-        if (!gameId) return;
-        clearError();
-        setIsLoading(true);
-        await discordService.pingUser(text).then(_ => {
+            setGuildId(guildId);
+            globalThis.location.href = '/game';
         })
             .catch((err) => handleError(err))
             .finally(() => setIsLoading(false));
@@ -95,8 +78,6 @@ function GameManager() {
                             </div>
                         )}
 
-                        <h1>Current Game: {gameId}</h1>
-
                         <button onClick={getGames} className="btn-primary">
                             Get games
                         </button>
@@ -106,21 +87,12 @@ function GameManager() {
                         <button onClick={startGame} className="btn-primary">
                             Start game
                         </button>
-                        {gameId &&
-                            <>
-                                <button onClick={inviteUser} className="btn-primary">
-                                    Invite User
-                                </button>
 
-                                <button onClick={pingUser} className="btn-secondary">
-                                    Ping User
-                                </button>
-                            </>
-                        }
                         <GameList games={games}/>
                     </>
                 )
             }
+            <BottomHud gameId={gameId} storyTellers={[]}/>
         </>
     );
 }

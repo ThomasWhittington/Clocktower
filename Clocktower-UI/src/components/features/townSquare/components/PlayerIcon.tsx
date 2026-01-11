@@ -23,7 +23,6 @@ export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, glow
             {isTopHalf &&
                 <PlayerNameLabel player={player} onClick={onNameClick}>{children}</PlayerNameLabel>
             }
-            {player.role && <div className="role-badge">{player.role.name}</div>}
             <div className="avatar-container" style={glowColorStyle}>
                 <FlippableAvatar player={player} size={size} showToken={showToken}/>
                 {avatarOverlay}
