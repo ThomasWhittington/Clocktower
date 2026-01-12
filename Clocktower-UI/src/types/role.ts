@@ -16,7 +16,6 @@ export class Role {
     readonly remindersGlobal: string[];
 
     constructor(data: Partial<Role>) {
-        console.log(data)
         this.id = data.id ?? '';
         this.name = data.name ?? '';
         this.description = data.description ?? '';
@@ -39,9 +38,9 @@ export function mapToRole(roleDto: ClocktowerServerDataTypesRoleRole): Role {
         description: roleDto.description ?? '',
         type: RoleType[roleDto.type as keyof typeof RoleType],
         edition: Edition[roleDto.edition as keyof typeof Edition],
-        firstNight: roleDto.metadata?.firstNight ?? 0,
+        firstNight: roleDto.metadata?.firstNight,
         firstNightReminder: roleDto.metadata?.firstNightReminder ?? undefined,
-        otherNight: roleDto.metadata?.otherNight ?? 0,
+        otherNight: roleDto.metadata?.otherNight,
         otherNightReminder: roleDto.metadata?.otherNightReminder ?? undefined,
         setup: roleDto.metadata?.setup ?? false,
         reminders: roleDto.metadata?.reminders ?? undefined,

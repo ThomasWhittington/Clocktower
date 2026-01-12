@@ -57,6 +57,7 @@ public class RolesServiceTests
 
         var result = Sut.GetRoles(filterEdition, filterRoleType, _dummyRoles).ToArray();
 
+        result.Should().NotBeEmpty("filtered result should contain at least one role");
         result[0].Id.Should().Be(new string(result[0].Name.Where(c => !char.IsPunctuation(c) && !char.IsWhiteSpace(c)).ToArray()).ToLower());
         result.Should().BeEquivalentTo(expected);
     }

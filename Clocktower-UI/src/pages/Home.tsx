@@ -4,8 +4,10 @@ import {GameManager} from "@/components/features";
 import {GuildsList} from "@/components/ui";
 import {useGuildsWithUser} from "@/pages/hooks";
 import type {MiniGuild} from "@/types";
+import {useNavigate} from "react-router-dom";
 
 function Home() {
+    const navigate = useNavigate();
     const {loggedIn, setGuildId} = useAppStore();
     const {
         guilds,
@@ -15,7 +17,7 @@ function Home() {
 
     const handleGuildClick = (guild: MiniGuild) => {
         setGuildId(guild.id);
-        globalThis.location.href = '/game';
+        navigate('/game');
     };
 
     return (
