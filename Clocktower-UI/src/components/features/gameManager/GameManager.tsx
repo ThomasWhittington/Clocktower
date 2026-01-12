@@ -50,8 +50,12 @@ function GameManager() {
         clearError();
         setIsLoading(true);
         gamesService.startGame(text, guildId, currentUser.id).then(data => {
-            setGameId(data?.id ?? null);
-            navigate('/game');
+            if (data?.id) {
+                setGameId(data.id);
+                navigate('/game');
+            } else {
+                handleError({message: 'Failed to start game: No game ID returned'});
+            }
         })
             .catch((err) => handleError(err))
             .finally(() => setIsLoading(false));

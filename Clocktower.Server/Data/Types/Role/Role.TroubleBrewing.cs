@@ -25,7 +25,7 @@ public partial record Role
 
     public static Role FortuneTeller() => TroubleBrewingTownsfolk("Fortune Teller", "Each night, choose 2 players: you learn if either is a Demon. There is a good player that registers as a Demon to you.")
         .EachNight(38, 54, "The Fortune Teller chooses two players. Show YES or NO for whether either is a Demon or the Red Herring.")
-        .WithReminder("Red herring");
+        .WithReminder("Red Herring");
 
     public static Role Investigator() => TroubleBrewingTownsfolk("Investigator", "You start knowing that 1 of 2 players is a particular Minion.")
         .FirstNight(35, "Show the investigator a Minion character and 2 players. One of the players is the Minion.")
@@ -65,7 +65,7 @@ public partial record Role
         .WithReminder("Master");
 
     public static Role Drunk() => TroubleBrewingOutsider("Drunk", "You do not know you are the Drunk. You think you are a Townsfolk, but you are not.")
-        .WithGlobalReminder("Is The Drunk")
+        .WithGlobalReminder("Is the Drunk")
         .AffectsSetup();
 
     public static Role Recluse() => TroubleBrewingOutsider("Recluse", "You might register as evil & as a Minion or Demon, even if dead.");
