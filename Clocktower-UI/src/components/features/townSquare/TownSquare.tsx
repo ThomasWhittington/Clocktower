@@ -5,13 +5,14 @@ import {useDiscordTown, useUser} from "@/components/features/discordTownPanel/ho
 import {useElementSize} from "@/hooks";
 import {Spinner} from "@/components/ui";
 import {useAppStore} from "@/store";
+import {useState} from "react";
 
 export default function TownSquare() {
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
     const {discordTown, isLoading, error} = useDiscordTown();
     const {currentUser, gameId} = useAppStore();
     const {thisUser} = useUser(currentUser?.id);
-
+    const [showToken, setShowToken] = useState<boolean>(true);
     const {
         activeMenuPlayerId,
         swappingPlayer,
@@ -25,7 +26,7 @@ export default function TownSquare() {
     const {positions, size} = useCircleLayout({
         count: discordTown?.players?.length ?? 0,
         containerWidth: parentSize.width,
-        containerHeight: parentSize.height,
+        containerHeight: parentSize.height
     });
 
     const actionContext: PlayerActionContext = {
@@ -40,6 +41,10 @@ export default function TownSquare() {
             {swappingPlayer && (
                 <ActionBanner onCancel={cancelSwap} message={<div>Swapping <span>{swappingPlayer.name}</span>...</div>}/>
             )}
+
+            <button className="btn-primary" onClick={() => setShowToken(!showToken)}>
+                {showToken ? 'Hide tokens' : 'Show tokens'}
+            </button>
             {discordTown?.players?.map((player, index) => {
                 const pos = positions[index];
                 if (!pos) return null;
@@ -60,6 +65,7 @@ export default function TownSquare() {
                         size={size}
                         player={player}
                         glowColor={glowColor}
+                        showToken={showToken}
                         onNameClick={(e) => toggleMenu(player.id, e)}
                         avatarOverlay={isSwappingTarget && (
                             <button className="clickable-portrait" onClick={() => confirmSwap(player)}>

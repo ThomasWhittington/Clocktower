@@ -9,7 +9,7 @@ export function PlayerNameLabel({player, onClick, children}: Readonly<{
     return (
         <div className="player-name-container">
             <button onClick={onClick}>
-                <span className="flex items-center justify-center gap-1">
+                <span>
                     {player.name}
                 </span>
             </button>

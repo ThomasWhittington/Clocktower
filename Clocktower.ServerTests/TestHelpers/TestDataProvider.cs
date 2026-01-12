@@ -45,11 +45,11 @@ public static class TestDataProvider
             new Role("bmr-m", "bad_moon_rising-minion", RoleType.Minion, Edition.BadMoonRising),
             new Role("bmr-d", "bad_moon_rising-demon", RoleType.Demon, Edition.BadMoonRising),
             new Role("bmr-t", "bad_moon_rising-traveller", RoleType.Traveller, Edition.BadMoonRising),
-            new Role("exp-tf", "experimental-townsfolk", RoleType.Townsfolk, Edition.Experimental),
-            new Role("exp-o", "experimental-outsider", RoleType.Outsider, Edition.Experimental),
-            new Role("exp-m", "experimental-minion", RoleType.Minion, Edition.Experimental),
-            new Role("exp-d", "experimental-demon", RoleType.Demon, Edition.Experimental),
-            new Role("exp-t", "experimental-traveller", RoleType.Traveller, Edition.Experimental)
+            new Role("car-tf", "carousel-townsfolk", RoleType.Townsfolk, Edition.Carousel),
+            new Role("car-o", "carousel-outsider", RoleType.Outsider, Edition.Carousel),
+            new Role("car-m", "carousel-minion", RoleType.Minion, Edition.Carousel),
+            new Role("car-d", "carousel-demon", RoleType.Demon, Edition.Carousel),
+            new Role("car-t", "carousel-traveller", RoleType.Traveller, Edition.Carousel)
         ];
     }
 }

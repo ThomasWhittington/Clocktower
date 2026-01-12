@@ -14,7 +14,7 @@ export function useCircleLayout({count, containerWidth, containerHeight, itemSiz
             size: 0
         };
 
-        const dynamicSize = itemSize ?? Math.min(containerWidth, containerHeight) / 10;
+        const dynamicSize = itemSize ?? Math.min(containerWidth, containerHeight) / 8;
 
         const radius = Math.min(containerWidth, containerHeight) / 2 - dynamicSize;
 

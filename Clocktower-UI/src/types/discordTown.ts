@@ -1,5 +1,5 @@
 ﻿import {type MiniCategory} from "./miniCategory.ts";
-import {type User, UserType} from "@/types";
+import {User, UserType} from "@/types";
 
 export class DiscordTown {
     readonly gameId: string;
@@ -9,8 +9,8 @@ export class DiscordTown {
 
     constructor(data: Partial<DiscordTown>) {
         this.gameId = data.gameId ?? '';
-        this.townUsers = data.townUsers ?? [];
-        this.gameUsers = data.gameUsers ?? [];
+        this.townUsers = (data.townUsers ?? []).map(user => new User(user));
+        this.gameUsers = (data.gameUsers ?? []).map(user => new User(user));
         this.channelCategories = data.channelCategories ?? [];
     }
 
