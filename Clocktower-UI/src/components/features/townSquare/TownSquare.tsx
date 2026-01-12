@@ -42,7 +42,9 @@ export default function TownSquare() {
                 <ActionBanner onCancel={cancelSwap} message={<div>Swapping <span>{swappingPlayer.name}</span>...</div>}/>
             )}
 
-            <button className="btn-primary" onClick={() => setShowToken(!showToken)}>Toggle tokens</button>
+            <button className="btn-primary" onClick={() => setShowToken(!showToken)}>
+                {showToken ? 'Hide tokens' : 'Show tokens'}
+            </button>
             {discordTown?.players?.map((player, index) => {
                 const pos = positions[index];
                 if (!pos) return null;

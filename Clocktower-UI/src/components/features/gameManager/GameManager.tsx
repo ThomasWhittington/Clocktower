@@ -5,8 +5,10 @@ import type {GamePerspective} from "@/types";
 import {useAppStore} from "@/store";
 import {GameList} from "@/components/features/gameManager/components";
 import {BottomHud} from "@/components/features/gameWindow/components";
+import {useNavigate} from "react-router-dom";
 
 function GameManager() {
+    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
     const [games, setGames] = useState<GamePerspective[]>([]);
     const [text, setText] = useState('');
@@ -16,7 +18,6 @@ function GameManager() {
     const gameId = useAppStore((state) => state.gameId);
     const currentUser = useAppStore((state) => state.currentUser);
     const setGameId = useAppStore((state) => state.setGameId);
-    const setGuildId = useAppStore((state) => state.setGuildId);
 
 
     const clearError = () => {
@@ -46,9 +47,7 @@ function GameManager() {
         setIsLoading(true);
         gamesService.startGame(text, guildId, currentUser?.id!).then(data => {
             setGameId(data?.id ?? null);
-            getGames();
-            setGuildId(guildId);
-            globalThis.location.href = '/game';
+            navigate('/game');
         })
             .catch((err) => handleError(err))
             .finally(() => setIsLoading(false));

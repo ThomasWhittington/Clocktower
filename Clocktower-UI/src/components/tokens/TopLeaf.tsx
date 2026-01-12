@@ -14,8 +14,7 @@ export const TopLeaf = ({leafCount}: { leafCount: number }) => {
         5: leaf5,
     };
 
-        return (
-            <span className="leaf" style={{backgroundImage: `url(${leafMap[leafCount]})`}}/>
-        )
-    }
-;
+    return (
+        <span className="leaf" style={{backgroundImage: `url(${leafMap[leafCount]})`}}/>
+    )
+};

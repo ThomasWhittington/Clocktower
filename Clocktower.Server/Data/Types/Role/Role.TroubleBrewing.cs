@@ -93,7 +93,7 @@ public partial record Role
 
     public static Role Scapegoat() => TroubleBrewingTraveller("Scapegoat", "If a player of your alignment is executed, you might be executed instead.");
     public static Role Gunslinger() => TroubleBrewingTraveller("Gunslinger", "Each day, after the 1st vote has been tallied, you may choose a player that voted: they die.");
-    public static Role Beggar() => TroubleBrewingTraveller("Beggar", "You must use a vote token to vote. If a dead player gives you theirs, you lean their alignment. You are sober and healthy.");
+    public static Role Beggar() => TroubleBrewingTraveller("Beggar", "You must use a vote token to vote. If a dead player gives you theirs, you learn their alignment. You are sober and healthy.");
 
     public static Role Bureaucrat() => TroubleBrewingTraveller("Bureaucrat", "Each night, choose a player (not yourself): tomorrow, their vote counts as 3 votes.")
         .EachNight(1, 1, "The Bureaucrat picks a player (not themselves). Mark that player with the '3 Votes' reminder.")
