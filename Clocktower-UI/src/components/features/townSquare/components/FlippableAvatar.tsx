@@ -8,7 +8,7 @@ const flipAnimation = {
     animate: {rotateY: 0, opacity: 1},
     exit: {rotateY: 90, opacity: 0},
     transition: {duration: 0.3, ease: "easeInOut" as const},
-    style: {willChange: "transform, opacity"},
+    style: {willChange: "transform, opacity", perspective: 1000}
 };
 
 export function FlippableAvatar({player, size, showToken}: Readonly<{ player: User; size: number; showToken: boolean; }>) {

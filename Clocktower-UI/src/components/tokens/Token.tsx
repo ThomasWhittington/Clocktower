@@ -1,11 +1,6 @@
 ﻿import {User} from "@/types";
 import aliveTokenBase from '#/tokenParts/base/aliveToken.png';
-import {TokenRoleIcon} from "@/components/tokens/TokenRoleIcon.tsx";
-import {OrangeLeaf} from "@/components/tokens/OrangeLeaf.tsx";
-import {LeftLeaf} from "@/components/tokens/LeftLeaf.tsx";
-import {RightLeaf} from "@/components/tokens/RightLeaf.tsx";
-import {TopLeaf} from "@/components/tokens/TopLeaf.tsx";
-import {RoleName} from "@/components/tokens/RoleName.tsx";
+import {LeftLeaf, OrangeLeaf, RightLeaf, RoleName, TokenRoleIcon, TopLeaf} from "./";
 
 export const Token = ({player, size = 40}: { player: User, size?: number }) => {
     const role = player.role;

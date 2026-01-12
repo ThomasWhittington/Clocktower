@@ -53,7 +53,6 @@ public partial record Role
         .OtherNight(55, "If a player was EXECUTED today: Show that player's character token.")
         .WithReminder("Died Today");
 
-
     public static Role Virgin() => TroubleBrewingTownsfolk("Virgin", "The 1st time you are nominated, if the nominator is a Townsfolk, they are EXECUTED immediately.")
         .WithReminder("No Ability");
 

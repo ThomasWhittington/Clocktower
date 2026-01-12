@@ -43,9 +43,13 @@ function GameManager() {
     }
 
     const startGame = async () => {
+        if (!currentUser?.id) {
+            handleError({message: 'User not authenticated'});
+            return;
+        }
         clearError();
         setIsLoading(true);
-        gamesService.startGame(text, guildId, currentUser?.id!).then(data => {
+        gamesService.startGame(text, guildId, currentUser.id).then(data => {
             setGameId(data?.id ?? null);
             navigate('/game');
         })

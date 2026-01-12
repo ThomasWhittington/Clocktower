@@ -151,9 +151,7 @@
     }
 
     .users-container {
-        max-height: 100%;
-        max-height: -webkit-fill-available;
-        overflow-y: auto;
+        @apply max-h-full overflow-y-auto;
         scrollbar-width: thin;
         scrollbar-color: #ccc transparent;
     }
