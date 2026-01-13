@@ -1,6 +1,6 @@
 ﻿import {TownSquare} from "@/components/features";
 import {useAppStore} from "@/store";
-import {BottomHud, CenterHud, RightHud, ScriptManagerPanel, StoryTellerHud, TopHud, UserManagerPanel} from "@/components/features/gameWindow/components";
+import {BottomHud, CenterHud, NightOrderPanel, RightHud, RoleListPanel, ScriptManagerPanel, StoryTellerHud, TopHud, UserManagerPanel} from "@/components/features/gameWindow/components";
 import {UserUtils} from "@/utils";
 import {useDiscordTown, useUser} from "@/components/features/discordTownPanel/hooks";
 import {useKeyboardShortcut, useServerHub} from "@/hooks";
@@ -38,6 +38,8 @@ export default function GameWindow() {
 
             <UserManagerPanel isOpen={isPanelOpen('user')} onClose={closePanel}/>
             <ScriptManagerPanel isOpen={isPanelOpen('script')} onClose={closePanel}/>
+            <RoleListPanel isOpen={isPanelOpen('role')} onClose={closePanel}/>
+            <NightOrderPanel isOpen={isPanelOpen('night')} onClose={closePanel}/>
 
             {UserUtils.isStoryTeller(thisUser) &&
                 <StoryTellerHud
