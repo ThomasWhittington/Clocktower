@@ -1,5 +1,5 @@
-﻿import {type GamePerspective, GameTime, mapToGamePerspective, mapToUser, type User,} from "@/types";
-import {addUserToGameApi, type ClocktowerServerDataTypesEnumGameTime, getAvailableGameUsersApi, getGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, setPlayerHasVoteTokenApi, setPlayerIsDeadApi, setTimeApi, startGameApi, swapSeatingPositionsApi} from "@/api";
+﻿import {type GamePerspective, GameTime, mapToGamePerspective, mapToUser, ScriptSelect, type User,} from "@/types";
+import {addUserToGameApi, type ClocktowerServerDataTypesEnumGameTime, type ClocktowerServerDataTypesEnumScriptSelect, getAvailableGameUsersApi, getGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, setPlayerHasVoteTokenApi, setPlayerIsDeadApi, setScriptApi, setTimeApi, startGameApi, swapSeatingPositionsApi} from "@/api";
 import {apiClient} from "@/api/api-client.ts";
 
 async function getGames(): Promise<GamePerspective[]> {
@@ -196,6 +196,26 @@ async function setTime(gameId: string, gameTime: GameTime) {
     }
 }
 
+async function setScript(gameId: string, scriptSelect: ScriptSelect, json?: string) {
+    const {
+        error
+    } = await setScriptApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+        },
+        query: {
+            ScriptSelect: scriptSelectToString(scriptSelect),
+            Json: json
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set the game script:', error);
+        throw new Error(getMessage(error));
+    }
+}
+
 const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGameTime => {
     switch (gameTime) {
         case GameTime.Day:
@@ -208,6 +228,23 @@ const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGame
             throw new Error(`Unknown GameTime value: ${gameTime}`);
     }
 };
+
+const scriptSelectToString = (scriptSelect: ScriptSelect): ClocktowerServerDataTypesEnumScriptSelect => {
+    switch (scriptSelect) {
+        case ScriptSelect.Unknown:
+            return "Unknown";
+        case ScriptSelect.TroubleBrewing:
+            return "TroubleBrewing";
+        case ScriptSelect.SectsAndViolets:
+            return "SectsAndViolets";
+        case ScriptSelect.BadMoonRising:
+            return "BadMoonRising";
+        case ScriptSelect.Custom:
+            return "Custom";
+        default:
+            throw new Error(`Unknown ScriptSelect value: ${scriptSelect}`);
+    }
+}
 const getMessage = (err: unknown): string => {
     const error = typeof err === "object" && err && typeof (err as any).message === "string" ? (err as any).message : "Unknown error";
     return err instanceof Error ? err.message : error;
@@ -222,5 +259,6 @@ export const gamesService = {
     swapSeatingPositions,
     setPlayerIsDead,
     setPlayerHasVoteToken,
-    setTime
+    setTime,
+    setScript
 }

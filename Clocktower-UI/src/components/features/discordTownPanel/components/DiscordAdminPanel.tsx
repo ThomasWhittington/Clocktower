@@ -2,7 +2,7 @@
 import {useDiscordActions,} from "@/components/features/discordTownPanel/hooks";
 import {useTimerActions} from "@/hooks/useTimerActions.ts";
 import {useMemo, useState} from "react";
-import {TimeOfDaySwitch} from "@/components/features/discordTownPanel/components/TimeOfDaySwitch.tsx";
+import {ScriptSelector, TimeOfDaySwitch} from "@/components/features/discordTownPanel/components";
 
 function DiscordAdminPanel() {
     const {
@@ -66,6 +66,7 @@ function DiscordAdminPanel() {
                             ❌
                         </button>
                         <TimeOfDaySwitch/>
+                        <ScriptSelector/>
                     </>
                 }
             </div>
