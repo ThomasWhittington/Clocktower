@@ -1,7 +1,7 @@
 ﻿import {type ChangeEvent, useRef} from 'react';
 
 interface UseFileUploadOptions {
-    onFileLoad: (content: string) => void;
+    onFileLoad: (content: string) => Promise<void>;
 }
 
 export const useFileUpload = ({onFileLoad}: UseFileUploadOptions) => {

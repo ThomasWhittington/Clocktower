@@ -26,6 +26,19 @@
         }
     }
 
+
+    .script-manager {
+        @apply flex flex-col;
+
+        & .panel-body {
+            @apply items-center justify-center;
+
+            > .script-selector {
+                @apply flex flex-col items-center gap-2;
+            }
+        }
+    }
+
     .user-row {
         @apply flex items-center justify-between gap-2;
     }

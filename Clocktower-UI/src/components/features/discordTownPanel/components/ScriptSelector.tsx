@@ -7,7 +7,7 @@ export const ScriptSelector = () => {
         onFileLoad: (content) => setScript(ScriptSelect.Custom, content)
     });
     return (
-        <>
+        <div className="script-selector">
             <button onClick={() => setScript(ScriptSelect.TroubleBrewing)} className="btn-outline">
                 Trouble Brewing
             </button>
@@ -22,7 +22,7 @@ export const ScriptSelector = () => {
             </button>
             <input ref={fileInputRef} type="file" accept=".json" onChange={handleFileUpload} style={{display: 'none'}}/>
 
-        </>
+        </div>
     );
 }
 
