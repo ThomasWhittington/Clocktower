@@ -9,6 +9,23 @@ interface UseKeyboardShortcutOptions {
     enabled?: boolean;
 }
 
+const isEditableElement = (target: HTMLElement | null): boolean => {
+    return target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.contentEditable === 'true';
+};
+const isKeyMatch = (
+    event: KeyboardEvent,
+    key: string,
+    ctrlKey: boolean,
+    shiftKey: boolean,
+    altKey: boolean
+): boolean => {
+    return event.key.toLowerCase() === key.toLowerCase() &&
+        event.ctrlKey === ctrlKey &&
+        event.shiftKey === shiftKey &&
+        event.altKey === altKey;
+};
 export const useKeyboardShortcut = ({
                                         key,
                                         onKeyPress,
@@ -20,21 +37,17 @@ export const useKeyboardShortcut = ({
     useEffect(() => {
         if (!enabled) return;
         const handleKeyDown = (event: KeyboardEvent) => {
-            if (
-                event.key.toLowerCase() === key.toLowerCase() &&
-                event.ctrlKey === ctrlKey &&
-                event.shiftKey === shiftKey &&
-                event.altKey === altKey
-            ) {
+            if (isEditableElement(event.target as HTMLElement)) {
+                return;
+            }
+
+            if (isKeyMatch(event, key, ctrlKey, shiftKey, altKey)) {
                 event.preventDefault();
                 onKeyPress();
-                if (document.activeElement instanceof HTMLElement) {
-                    document.activeElement.blur();
-                }
             }
         };
 
         globalThis.addEventListener('keydown', handleKeyDown);
         return () => globalThis.removeEventListener('keydown', handleKeyDown);
-    }, [key, onKeyPress, ctrlKey, shiftKey, altKey]);
+    }, [key, onKeyPress, ctrlKey, shiftKey, altKey, enabled]);
 };
