@@ -729,6 +729,43 @@ public class GamePerspectiveServiceTests
 
     #endregion
 
+    #region SetScript
+
+    [TestMethod]
+    public void SetScript_UpdatesScriptForAllPerspectives()
+    {
+        var script = new Script("Name", "Author", []);
+        var storyTeller = new GameUser(UserId1) { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId2) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyTeller);
+        _sut.AddUserToGame(GameId1, player1);
+
+        _sut.SetScript(GameId1, script);
+
+        var stPerspective = _sut.GetPerspective(GameId1, UserId1);
+        stPerspective!.Script.Should().Be(script);
+
+        var playerPerspective = _sut.GetPerspective(GameId1, UserId2);
+        playerPerspective!.Script.Should().Be(script);
+    }
+
+    [TestMethod]
+    public void SetScript_DoesNotAffectOtherGames()
+    {
+        var script = new Script("Name", "Author", []);
+        var user1 = new GameUser(UserId1) { UserType = UserType.Player };
+        var user2 = new GameUser(UserId2) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, user1);
+        _sut.InitializeGame(GameId2, GuildId, user2);
+
+        _sut.SetScript(GameId1, script);
+
+        var game2Perspective = _sut.GetPerspective(GameId2, UserId2);
+        game2Perspective!.Script.Should().NotBe(script);
+    }
+
+    #endregion
+
     #region GetAll
 
     [TestMethod]

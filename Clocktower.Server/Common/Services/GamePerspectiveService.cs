@@ -182,6 +182,11 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         store.UpdateAllPerspectives(gameId, state => state with { GameTime = gameTime });
     }
 
+    public void SetScript(string gameId, Script script)
+    {
+        store.UpdateAllPerspectives(gameId, state => state with { Script = script });
+    }
+
     private static bool IsOmniscient(UserType? userType)
     {
         if (userType is null) return false;

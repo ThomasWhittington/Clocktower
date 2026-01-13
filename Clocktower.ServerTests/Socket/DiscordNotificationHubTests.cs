@@ -45,7 +45,8 @@ public class DiscordNotificationHubTests
                 Status = TimerStatus.Running,
                 ServerNowUtc = DateTime.UtcNow,
                 EndUtc = DateTime.UtcNow.AddSeconds(30)
-            }
+            },
+            Script = new Script("Name", "Author", [])
         };
         return result;
     }

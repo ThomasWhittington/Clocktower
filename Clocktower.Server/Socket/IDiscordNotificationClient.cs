@@ -1,6 +1,4 @@
-﻿using Clocktower.Server.Data.Dto;
-
-namespace Clocktower.Server.Socket;
+﻿namespace Clocktower.Server.Socket;
 
 public interface IDiscordNotificationClient
 {
@@ -9,4 +7,5 @@ public interface IDiscordNotificationClient
     Task TownTimeChanged(string gameId, int gameTime);
     Task PingUser(string message);
     Task TimerUpdated(TimerState timer);
+    Task ScriptUpdated(string gameId, Script? script);
 }

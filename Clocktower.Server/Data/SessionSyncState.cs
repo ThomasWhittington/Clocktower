@@ -1,6 +1,4 @@
-﻿using Clocktower.Server.Data.Dto;
-
-namespace Clocktower.Server.Data;
+﻿namespace Clocktower.Server.Data;
 
 public class SessionSyncState
 {
@@ -8,4 +6,5 @@ public class SessionSyncState
     public required string Jwt { get; init; }
     public required DiscordTownDto? DiscordTown { get; init; }
     public required TimerState Timer { get; init; }
+    public required Script? Script { get; init; }
 }

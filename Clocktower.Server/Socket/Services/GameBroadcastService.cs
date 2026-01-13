@@ -20,6 +20,9 @@ public class GameBroadcastService(
     public Task BroadcastTimeUpdate(string gameId, GameTime gameTime)
         => notificationService.SendTownTimeToGroup(gameId, gameTime);
 
+    public Task BroadcastScriptUpdate(string gameId, Script script)
+        => notificationService.SendScriptToGroup(gameId, script);
+
     public Task BroadcastUserVoiceStateChanged(string gameId, string userId, bool inVoice, VoiceState voiceState)
         => notificationService.SendUserVoiceStateToGroup(gameId, userId, inVoice, voiceState);
 

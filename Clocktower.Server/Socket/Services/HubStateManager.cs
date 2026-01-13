@@ -16,10 +16,13 @@ public class HubStateManager(IGamePerspectiveService gamePerspectiveService, IDi
 
         var timer = timerCoordinator.Get(gameId);
 
+        var jwtToken = jwtWriter.GetJwtToken(gameUser);
+
         var currentState = new SessionSyncState
         {
             GameTime = currentPerspective.GameTime,
-            Jwt = jwtWriter.GetJwtToken(gameUser),
+            Script = currentPerspective.Script,
+            Jwt = jwtToken,
             DiscordTown = discordTown,
             Timer = timer
         };

@@ -124,4 +124,17 @@ public class NotificationServiceTests
         _mockClients.Verify(c => c.Group("game:test-game-789"), Times.Once);
         _mockClientProxy1.Verify(cp => cp.TownTimeChanged(gameId, (int)gameTime), Times.Once);
     }
+
+    [TestMethod]
+    public async Task SendTownScriptToGroup_WithGameId_CallsCorrectGroup()
+    {
+        const string gameId = "test-game-789";
+        var script = new Script("Name", "Author", []);
+        _mockClients.Setup(c => c.Group("game:test-game-789")).Returns(_mockClientProxy1.Object);
+
+        await _sut.SendScriptToGroup(gameId, script);
+
+        _mockClients.Verify(c => c.Group("game:test-game-789"), Times.Once);
+        _mockClientProxy1.Verify(cp => cp.ScriptUpdated(gameId, script), Times.Once);
+    }
 }

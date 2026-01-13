@@ -72,6 +72,7 @@ export type ClocktowerServerDataGamePerspective = {
     readonly storyTellers?: Array<ClocktowerServerDataGameUser> | null;
     readonly spectators?: Array<ClocktowerServerDataGameUser> | null;
     gameTime?: ClocktowerServerDataTypesEnumGameTime;
+    script?: ClocktowerServerDataScript;
 };
 
 export type ClocktowerServerDataGameUser = {
@@ -101,6 +102,12 @@ export type ClocktowerServerDataMiniGuild = {
     name?: string | null;
 };
 
+export type ClocktowerServerDataScript = {
+    name?: string | null;
+    author?: string | null;
+    roles?: Array<ClocktowerServerDataTypesRoleRole> | null;
+};
+
 export type ClocktowerServerDataTownUser = {
     id?: string | null;
     name?: string | null;
@@ -114,6 +121,8 @@ export type ClocktowerServerDataTypesEnumEdition = 'Unknown' | 'TroubleBrewing' 
 export type ClocktowerServerDataTypesEnumGameTime = 'Unknown' | 'Day' | 'Evening' | 'Night';
 
 export type ClocktowerServerDataTypesEnumRoleType = 'Unknown' | 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
+
+export type ClocktowerServerDataTypesEnumScriptSelect = 'Unknown' | 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Custom';
 
 export type ClocktowerServerDataTypesEnumUserType = 'Unknown' | 'Player' | 'StoryTeller' | 'Spectator';
 
@@ -238,6 +247,7 @@ export type ClocktowerServerDataGamePerspectiveWritable = {
     createdDate?: Date;
     users?: Array<ClocktowerServerDataGameUserWritable> | null;
     gameTime?: ClocktowerServerDataTypesEnumGameTime;
+    script?: ClocktowerServerDataScriptWritable;
 };
 
 export type ClocktowerServerDataGameUserWritable = {
@@ -255,6 +265,12 @@ export type ClocktowerServerDataMiniGamePerspectiveWritable = {
     gameId?: string | null;
     createdBy?: ClocktowerServerDataGameUserWritable;
     createdDate?: Date;
+};
+
+export type ClocktowerServerDataScriptWritable = {
+    name?: string | null;
+    author?: string | null;
+    roles?: Array<ClocktowerServerDataTypesRoleRoleWritable> | null;
 };
 
 export type ClocktowerServerDataTypesJoinDataWritable = {
@@ -1132,6 +1148,40 @@ export type SetPlayerIsDeadApiResponses = {
 
 export type SetPlayerIsDeadApiResponse = SetPlayerIsDeadApiResponses[keyof SetPlayerIsDeadApiResponses];
 
+export type SetScriptApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query: {
+        ScriptSelect: ClocktowerServerDataTypesEnumScriptSelect;
+        Json?: string;
+    };
+    url: '/api/games/{gameId}/script';
+};
+
+export type SetScriptApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetScriptApiError = SetScriptApiErrors[keyof SetScriptApiErrors];
+
+export type SetScriptApiResponses = {
+    /**
+     * OK
+     */
+    200: ClocktowerServerDataScript;
+};
+
+export type SetScriptApiResponse = SetScriptApiResponses[keyof SetScriptApiResponses];
+
 export type SetTimeApiData = {
     body?: never;
     path: {
@@ -1147,7 +1197,7 @@ export type SetTimeApiErrors = {
     /**
      * Bad Request
      */
-    400: string;
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
 };
 
 export type SetTimeApiError = SetTimeApiErrors[keyof SetTimeApiErrors];

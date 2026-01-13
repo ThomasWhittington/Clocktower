@@ -1,7 +1,7 @@
 ﻿import {useEffect, useRef, useState} from 'react';
 import * as signalR from '@microsoft/signalr';
 import {HubConnectionState} from '@microsoft/signalr';
-import {DiscordTown, GameTime, type SessionSyncState, type TimerState, type VoiceState} from '@/types';
+import {DiscordTown, GameTime, Script, type SessionSyncState, type TimerState, type VoiceState} from '@/types';
 import {useAppStore} from "@/store";
 
 type UserPresenceStates = Record<string, boolean>;
@@ -14,6 +14,7 @@ type HubState = {
     connectionState: signalR.HubConnectionState;
     gameTime: GameTime;
     timer?: TimerState;
+    script?: Script;
 };
 
 let globalConnection: signalR.HubConnection | null = null;
@@ -22,7 +23,8 @@ let globalState: HubState = {
     userVoiceStates: {},
     connectionState: signalR.HubConnectionState.Disconnected,
     gameTime: GameTime.Night,
-    timer: undefined
+    timer: undefined,
+    script: undefined
 };
 const globalListeners = new Set<(state: HubState) => void>();
 
@@ -53,7 +55,8 @@ const handleJoinSnapshot = async (snapshot: SessionSyncState, isReconnecting: bo
     setState({
         gameTime: snapshot.gameTime,
         discordTown: snapshot.discordTown ? new DiscordTown(snapshot.discordTown) : undefined,
-        timer: snapshot.timer
+        timer: snapshot.timer,
+        script: snapshot.script
     });
 
     const currentJwt = useAppStore.getState().jwt;
@@ -109,6 +112,12 @@ const createConnection = async () => {
         if (timer.gameId !== joinedGameId) return;
         console.log(`⏱️ Received TimerUpdated for game ${timer.gameId}:`, timer);
         setState({timer});
+    });
+    globalConnection.on('ScriptUpdated', (gameId: string, script: Script) => {
+        const {joinedGameId} = useAppStore.getState();
+        if (gameId !== joinedGameId) return;
+        console.log(`📜 Received ScriptUpdated for game ${gameId}:`, script);
+        setState({script: new Script(script)});
     });
 
     globalConnection.on('PingUser', (message: string) => {
@@ -238,6 +247,7 @@ export const joinGameGroup = async (gameId: string, isReconnecting: boolean = fa
         const previousState = {
             discordTown: globalState.discordTown,
             timer: globalState.timer,
+            script: globalState.script,
             userPresenceStates: globalState.userPresenceStates,
             userVoiceStates: globalState.userVoiceStates
         };
@@ -248,6 +258,7 @@ export const joinGameGroup = async (gameId: string, isReconnecting: boolean = fa
             setState({
                 discordTown: undefined,
                 timer: undefined,
+                script: undefined,
                 userPresenceStates: {},
                 userVoiceStates: {}
             });
