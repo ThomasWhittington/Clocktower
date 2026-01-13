@@ -1,5 +1,5 @@
-﻿import {type GamePerspective, mapToGamePerspective, mapToUser, type User,} from "@/types";
-import {addUserToGameApi, getAvailableGameUsersApi, getGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, setPlayerHasVoteTokenApi, setPlayerIsDeadApi, startGameApi, swapSeatingPositionsApi} from "@/api";
+﻿import {type GamePerspective, GameTime, mapToGamePerspective, mapToUser, type User,} from "@/types";
+import {addUserToGameApi, type ClocktowerServerDataTypesEnumGameTime, getAvailableGameUsersApi, getGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, setPlayerHasVoteTokenApi, setPlayerIsDeadApi, setTimeApi, startGameApi, swapSeatingPositionsApi} from "@/api";
 import {apiClient} from "@/api/api-client.ts";
 
 async function getGames(): Promise<GamePerspective[]> {
@@ -50,7 +50,7 @@ async function getAvailableGameUsers(gameId: string): Promise<User[]> {
 
     if (error) {
         console.error('Failed to get available users:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     return data?.map(mapToUser) ?? [];
@@ -70,7 +70,7 @@ async function addUserToGame(gameId: string, userId: string): Promise<string> {
 
     if (error) {
         console.error('Failed to add user:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
     return data ?? '';
 }
@@ -89,7 +89,7 @@ async function removeUserFromGame(gameId: string, userId: string): Promise<strin
 
     if (error) {
         console.error('Failed to remove user:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     return data ?? '';
@@ -108,7 +108,7 @@ async function randomiseSeatingPositions(gameId: string): Promise<string[]> {
 
     if (error) {
         console.error('Failed to randomise seating positions:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     return data ?? [];
@@ -129,7 +129,7 @@ async function swapSeatingPositions(gameId: string, userId1: string, userId2: st
 
     if (error) {
         console.error('Failed to swap player seats:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     return data ?? '';
@@ -150,7 +150,7 @@ async function setPlayerIsDead(gameId: string, userId: string, isDead: boolean):
 
     if (error) {
         console.error('Failed to set player dead state:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     return data ?? '';
@@ -171,12 +171,47 @@ async function setPlayerHasVoteToken(gameId: string, userId: string, hasVoteToke
 
     if (error) {
         console.error('Failed to set player has vote token state:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     return data ?? '';
 }
 
+async function setTime(gameId: string, gameTime: GameTime) {
+    const {
+        error
+    } = await setTimeApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+        },
+        query: {
+            GameTime: gameTimeToString(gameTime)
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set the game time:', error);
+        throw new Error(getMessage(error));
+    }
+}
+
+const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGameTime => {
+    switch (gameTime) {
+        case GameTime.Day:
+            return 'Day';
+        case GameTime.Evening:
+            return 'Evening';
+        case GameTime.Night:
+            return 'Night';
+        default:
+            throw new Error(`Unknown GameTime value: ${gameTime}`);
+    }
+};
+const getMessage = (err: unknown): string => {
+    const error = typeof err === "object" && err && typeof (err as any).message === "string" ? (err as any).message : "Unknown error";
+    return err instanceof Error ? err.message : error;
+};
 export const gamesService = {
     getGames,
     startGame,
@@ -186,5 +221,6 @@ export const gamesService = {
     randomiseSeatingPositions,
     swapSeatingPositions,
     setPlayerIsDead,
-    setPlayerHasVoteToken
+    setPlayerHasVoteToken,
+    setTime
 }

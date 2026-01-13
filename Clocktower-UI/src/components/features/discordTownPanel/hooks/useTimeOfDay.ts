@@ -1,4 +1,4 @@
-﻿import {discordService} from "@/services";
+﻿import {gamesService} from "@/services";
 import {GameTime} from "@/types";
 import {useAppStore} from "@/store";
 import {useCallback} from "react";
@@ -9,7 +9,7 @@ export const useTimeOfDay = () => {
     return useCallback(
         async (gameTime: GameTime) => {
             if (!gameId) return;
-            await discordService.setTime(gameId, gameTime);
+            await gamesService.setTime(gameId, gameTime);
         },
         [gameId],
     );

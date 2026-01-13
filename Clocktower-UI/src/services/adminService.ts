@@ -1,11 +1,5 @@
-﻿import {
-    cancelTimerApi,
-    healthApi,
-    startOrEditTimerApi
-} from "@/api";
-import {
-    apiClient
-} from "@/api/api-client.ts";
+﻿import {cancelTimerApi, healthApi, startOrEditTimerApi} from "@/api";
+import {apiClient} from "@/api/api-client.ts";
 
 async function health() {
     const {
@@ -66,10 +60,10 @@ async function cancelTimer(gameId: string) {
     return data;
 }
 
-const getMessage = (err: unknown): string =>
-    err instanceof Error ? err.message
-        : typeof err === "object" && err && typeof (err as any).message === "string" ? (err as any).message
-            : "Unknown error";
+const getMessage = (err: unknown): string => {
+    const error = typeof err === "object" && err && typeof (err as any).message === "string" ? (err as any).message : "Unknown error";
+    return err instanceof Error ? err.message : error;
+};
 
 export const adminService = {
     health,
