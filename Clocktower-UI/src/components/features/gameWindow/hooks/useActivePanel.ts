@@ -1,6 +1,6 @@
 ﻿import {useCallback, useState} from 'react';
 
-type PanelType = "script" | "user";
+type PanelType = "script" | "user" | "role" | "night";
 
 interface UseActivePanelReturn {
     activePanel: PanelType | null;

@@ -22,7 +22,7 @@
     }
 
     .panel-content {
-        @apply w-full h-full p-8 pl-25 shadow-2xl flex flex-col;
+        @apply w-full h-full p-8 px-25 shadow-2xl flex flex-col;
     }
 
     .panel-header {

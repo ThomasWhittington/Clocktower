@@ -4,7 +4,27 @@
     }
 
     .controls-storyteller {
-        @apply absolute left-0 top-0 h-screen w-20 z-50;
+        @apply absolute left-0 top-0 h-screen z-50  flex flex-col items-center;
+    }
+
+    .controls-right {
+        @apply absolute right-0 top-2 h-screen z-50 flex flex-col items-center;
+
+        .help-menu {
+            @apply absolute right-0 mr-2 py-2 w-40 bg-discord rounded-lg shadow-lg z-50;
+
+            > h2 {
+                @apply text-lg font-bold text-center w-full;
+            }
+
+            > button {
+                @apply w-full px-4 py-2 text-white hover:bg-gray-700 rounded-t-lg transition-colors text-left flex justify-between items-center;
+
+                span:last-child {
+                    @apply text-gray-400;
+                }
+            }
+        }
     }
 
     .controls-center {
@@ -12,7 +32,7 @@
     }
 
     .controls-top {
-        @apply absolute top-8 left-1/2 -translate-x-1/2 pointer-events-none;
+        @apply absolute top-2 left-20 pointer-events-none;
     }
 
     .controls-bottom {
@@ -23,6 +43,10 @@
         @apply bg-black/50 backdrop-blur-sm p-3 rounded-lg pointer-events-auto select-none text-sm;
     }
 
+    .script-label {
+        @apply bg-black/50 backdrop-blur-sm p-3 rounded-lg pointer-events-auto select-none text-sm;
+    }
+
     .story-teller-label {
         @apply gap-1 items-center text-sm inline-block ml-1 select-none text-gray-400;
 
@@ -30,5 +54,4 @@
             @apply inline-block w-4 h-4;
         }
     }
-
 } 

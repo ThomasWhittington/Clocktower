@@ -1,15 +1,16 @@
 ﻿import {TownSquare} from "@/components/features";
 import {useAppStore} from "@/store";
-import {BottomHud, CenterHud, ScriptManagerPanel, StoryTellerHud, TopHud, UserManagerPanel} from "@/components/features/gameWindow/components";
+import {BottomHud, CenterHud, RightHud, ScriptManagerPanel, StoryTellerHud, TopHud, UserManagerPanel} from "@/components/features/gameWindow/components";
 import {UserUtils} from "@/utils";
 import {useDiscordTown, useUser} from "@/components/features/discordTownPanel/hooks";
-import {useKeyboardShortcut} from "@/hooks";
+import {useKeyboardShortcut, useServerHub} from "@/hooks";
 import {useActivePanel} from "@/components/features/gameWindow/hooks";
 
 export default function GameWindow() {
     const {gameId, currentUser} = useAppStore();
     const {thisUser} = useUser(currentUser?.id);
     const {discordTown} = useDiscordTown();
+    const {script} = useServerHub();
     const {togglePanel, isPanelOpen, closePanel} = useActivePanel();
 
     useKeyboardShortcut({
@@ -22,18 +23,21 @@ export default function GameWindow() {
         onKeyPress: () => togglePanel('script'),
         enabled: UserUtils.isStoryTeller(thisUser)
     });
+    useKeyboardShortcut({
+        key: 'r',
+        onKeyPress: () => togglePanel('role')
+    });
+    useKeyboardShortcut({
+        key: 'n',
+        onKeyPress: () => togglePanel('night')
+    });
+
     return (
         <div className="game-window-controls">
             <TownSquare/>
 
-            <UserManagerPanel
-                isOpen={isPanelOpen('user')}
-                onClose={closePanel}
-            />
-            <ScriptManagerPanel
-                isOpen={isPanelOpen('script')}
-                onClose={closePanel}
-            />
+            <UserManagerPanel isOpen={isPanelOpen('user')} onClose={closePanel}/>
+            <ScriptManagerPanel isOpen={isPanelOpen('script')} onClose={closePanel}/>
 
             {UserUtils.isStoryTeller(thisUser) &&
                 <StoryTellerHud
@@ -44,7 +48,11 @@ export default function GameWindow() {
                 />
             }
             <CenterHud/>
-            <TopHud/>
+            <TopHud scriptName={script?.name}/>
+            <RightHud
+                onRoleListClick={() => togglePanel('role')}
+                onNightOrderClick={() => togglePanel('night')}
+            />
             <BottomHud gameId={gameId} storyTellers={discordTown?.storyTellers ?? []}/>
         </div>
     );

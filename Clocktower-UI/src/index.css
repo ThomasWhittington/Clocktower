@@ -13,19 +13,19 @@
 }
 
 .btn-primary {
-    @apply bg-discord-primary hover:bg-discord-primary/70 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-transparent cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
+    @apply bg-discord-primary hover:bg-discord-primary/70 text-white font-medium px-2 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-transparent cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .btn-secondary {
-    @apply bg-discord-secondary hover:enabled:bg-discord-secondary/70 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-transparent cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
+    @apply bg-discord-secondary hover:enabled:bg-discord-secondary/70 text-white font-medium px-2 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-transparent cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .btn-danger {
-    @apply bg-discord-warning hover:bg-discord-warning/70 text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-transparent cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
+    @apply bg-discord-warning hover:bg-discord-warning/70 text-white font-medium px-2 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-transparent cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .btn-outline {
-    @apply bg-transparent hover:bg-discord-primary text-discord-primary hover:enabled:text-white font-medium px-4 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-discord-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
+    @apply bg-transparent hover:bg-discord-primary text-discord-primary hover:enabled:text-white font-medium px-2 py-2 m-2 rounded-lg transition-colors duration-200 border-2 border-discord-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-20 select-none;
 }
 
 .loading {
