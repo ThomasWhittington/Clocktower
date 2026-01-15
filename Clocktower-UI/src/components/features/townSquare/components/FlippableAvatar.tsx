@@ -16,7 +16,7 @@ export function FlippableAvatar({player, size, showToken}: Readonly<{ player: Us
         <AnimatePresence mode="wait">
             {showToken ? (
                 <motion.div key="token" {...flipAnimation}>
-                    <Token player={player} size={size}/>
+                    <Token role={player.role} size={size} isDead={player.isDead}/>
                 </motion.div>
             ) : (
                 <motion.div key="avatar" {...flipAnimation}>

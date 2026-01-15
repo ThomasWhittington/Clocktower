@@ -2,7 +2,7 @@
 
 export const RoleName = ({roleName}: { roleName: string }) => {
     const curveId = useId();
-    const fontSize = (roleName && roleName.length > 10 ? "90%" : "110%");
+    const fontSize = (roleName && roleName.length > 10 ? "80%" : "100%");
     return (
         <svg viewBox="0 0 150 150" className="token-role-name">
             <path
