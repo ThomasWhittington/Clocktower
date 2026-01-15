@@ -112,9 +112,6 @@ const clocktowerServerDataTypesRoleRoleSchemaResponseTransformer = (data: any) =
     if (data.edition) {
         data.edition = clocktowerServerDataTypesEnumEditionSchemaResponseTransformer(data.edition);
     }
-    if (data.metadata) {
-        data.metadata = clocktowerServerDataTypesRoleRoleMetadataSchemaResponseTransformer(data.metadata);
-    }
     return data;
 };
 

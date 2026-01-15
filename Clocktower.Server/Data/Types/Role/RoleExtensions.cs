@@ -6,7 +6,7 @@ public static class RoleExtensions
     {
         public Role FirstNight(int order, string reminder)
         {
-            role.Metadata = role.Metadata with
+            role = role with
             {
                 FirstNight = order,
                 FirstNightReminder = reminder
@@ -16,7 +16,7 @@ public static class RoleExtensions
 
         public Role OtherNight(int order, string reminder)
         {
-            role.Metadata = role.Metadata with
+            role = role with
             {
                 OtherNight = order,
                 OtherNightReminder = reminder
@@ -26,7 +26,7 @@ public static class RoleExtensions
 
         public Role EachNight(int firstOrder, int otherOther, string reminder)
         {
-            role.Metadata = role.Metadata with
+            role = role with
             {
                 FirstNight = firstOrder,
                 FirstNightReminder = reminder,
@@ -38,7 +38,7 @@ public static class RoleExtensions
 
         public Role WithReminders(string[] reminders)
         {
-            role.Metadata = role.Metadata with
+            role = role with
             {
                 Reminders = reminders
             };
@@ -47,7 +47,7 @@ public static class RoleExtensions
 
         public Role WithReminder(string reminder)
         {
-            role.Metadata = role.Metadata with
+            role = role with
             {
                 Reminders = [reminder]
             };
@@ -56,7 +56,7 @@ public static class RoleExtensions
 
         public Role WithGlobalReminder(string reminder)
         {
-            role.Metadata = role.Metadata with
+            role = role with
             {
                 RemindersGlobal = [reminder]
             };
@@ -65,7 +65,7 @@ public static class RoleExtensions
 
         public Role AffectsSetup()
         {
-            role.Metadata = role.Metadata with
+            role = role with
             {
                 Setup = true
             };

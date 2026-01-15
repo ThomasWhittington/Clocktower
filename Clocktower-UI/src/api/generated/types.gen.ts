@@ -139,10 +139,6 @@ export type ClocktowerServerDataTypesRoleRole = {
     type?: ClocktowerServerDataTypesEnumRoleType;
     edition?: ClocktowerServerDataTypesEnumEdition;
     readonly id?: string | null;
-    metadata?: ClocktowerServerDataTypesRoleRoleMetadata;
-};
-
-export type ClocktowerServerDataTypesRoleRoleMetadata = {
     firstNight?: number;
     firstNightReminder?: string | null;
     otherNight?: number;
@@ -285,7 +281,13 @@ export type ClocktowerServerDataTypesRoleRoleWritable = {
     description?: string | null;
     type?: ClocktowerServerDataTypesEnumRoleType;
     edition?: ClocktowerServerDataTypesEnumEdition;
-    metadata?: ClocktowerServerDataTypesRoleRoleMetadata;
+    firstNight?: number;
+    firstNightReminder?: string | null;
+    otherNight?: number;
+    otherNightReminder?: string | null;
+    setup?: boolean;
+    reminders?: Array<string> | null;
+    remindersGlobal?: Array<string> | null;
 };
 
 export type ClocktowerServerRolesEndpointsGetRolesResponseWritable = {

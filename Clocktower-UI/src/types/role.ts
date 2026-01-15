@@ -38,12 +38,12 @@ export function mapToRole(roleDto: ClocktowerServerDataTypesRoleRole): Role {
         description: roleDto.description ?? '',
         type: RoleType[roleDto.type as keyof typeof RoleType],
         edition: Edition[roleDto.edition as keyof typeof Edition],
-        firstNight: roleDto.metadata?.firstNight,
-        firstNightReminder: roleDto.metadata?.firstNightReminder ?? undefined,
-        otherNight: roleDto.metadata?.otherNight,
-        otherNightReminder: roleDto.metadata?.otherNightReminder ?? undefined,
-        setup: roleDto.metadata?.setup ?? false,
-        reminders: roleDto.metadata?.reminders ?? undefined,
-        remindersGlobal: roleDto.metadata?.remindersGlobal ?? undefined
+        firstNight: roleDto.firstNight,
+        firstNightReminder: roleDto.firstNightReminder ?? undefined,
+        otherNight: roleDto.otherNight,
+        otherNightReminder: roleDto.otherNightReminder ?? undefined,
+        setup: roleDto.setup ?? false,
+        reminders: roleDto.reminders ?? undefined,
+        remindersGlobal: roleDto.remindersGlobal ?? undefined
     });
 }
