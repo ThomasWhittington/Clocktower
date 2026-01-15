@@ -11,7 +11,7 @@
         @apply absolute right-0 top-2 h-screen z-50 flex flex-col items-center;
 
         .help-menu {
-            @apply absolute right-0 mr-2 py-2 w-40 bg-discord rounded-lg shadow-lg z-50;
+            @apply absolute right-0 mr-2 py-2 w-40 bg-discord rounded-lg shadow-lg z-50 select-none;
 
             > h2 {
                 @apply text-lg font-bold text-center w-full;
