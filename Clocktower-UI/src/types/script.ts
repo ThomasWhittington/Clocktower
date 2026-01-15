@@ -1,4 +1,5 @@
 ﻿import {Role} from "@/types/role.ts";
+import {RoleType} from "@/types/roleType.ts";
 
 export class Script {
 
@@ -11,5 +12,27 @@ export class Script {
         this.author = data.author ?? '';
         this.roles = (data.roles ?? []).map(role => new Role(role));
     }
+
+    get townsfolk(): Role[] {
+        return this.roles.filter(r => r.type === RoleType.Townsfolk);
+    }
+
+    get outsiders(): Role[] {
+        return this.roles.filter(r => r.type === RoleType.Outsider);
+    }
+
+    get minions(): Role[] {
+        return this.roles.filter(r => r.type === RoleType.Minion);
+    }
+
+    get demons(): Role[] {
+        return this.roles.filter(r => r.type === RoleType.Demon);
+    }
+
+    get travellers(): Role[] {
+        return this.roles.filter(r => r.type === RoleType.Traveller);
+    }
+
+
 }
 
