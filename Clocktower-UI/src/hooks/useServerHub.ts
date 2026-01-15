@@ -56,7 +56,7 @@ const handleJoinSnapshot = async (snapshot: SessionSyncState, isReconnecting: bo
         gameTime: snapshot.gameTime,
         discordTown: snapshot.discordTown ? new DiscordTown(snapshot.discordTown) : undefined,
         timer: snapshot.timer,
-        script: snapshot.script
+        script: snapshot.script ? new Script(snapshot.script) : undefined
     });
 
     const currentJwt = useAppStore.getState().jwt;
