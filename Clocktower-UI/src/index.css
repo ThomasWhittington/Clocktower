@@ -5,6 +5,8 @@
     @apply font-sans leading-normal font-normal;
     @apply scheme-dark bg-[#242424];
     @apply antialiased;
+
+    font-size: 1.2rem;
 }
 
 .unstyled-button {
@@ -52,5 +54,12 @@
     --color-discord-warning: #c6383d;
     --color-discord-icon: #76777e;
     --color-forestgreen: #4d8e53;
+
+    --color-fabled: #ffe91f;
+    --color-townsfolk: #1f65ff;
+    --color-outsider: #46d5ff;
+    --color-minion: #ff6900;
+    --color-demon: #ce0100;
+    --color-traveler: #cc04ff;
 }
 
