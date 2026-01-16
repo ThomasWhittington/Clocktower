@@ -11,7 +11,7 @@ interface RoleListPanelProps {
 export const RoleListPanel = ({isOpen, onClose}: RoleListPanelProps) => {
         const {script} = useServerHub();
         const {discordTown} = useDiscordTown();
-        const players = discordTown?.gameUsers || [];
+    const players = discordTown?.players || [];
         return (
             <BasePanel title="Role List" isOpen={isOpen} onClose={onClose}>
                 <div className="role-list-container">

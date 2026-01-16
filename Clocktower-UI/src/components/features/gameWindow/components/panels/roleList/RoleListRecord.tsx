@@ -17,7 +17,7 @@ export const RoleListRecord = ({role, players}: RoleListRecordProps) => {
                     <span className="role-player">
                         {playersWithRole.map((player, index) =>
                             <small className={`${player.isDead ? 'dead' : ''}`} key={player.id}>
-                                {player.name + (playersWithRole.length > index + 1 ? "," : "")}
+                                {player.name + (playersWithRole.length > index + 1 ? ", " : "")}
                             </small>
                         )}
                     </span>

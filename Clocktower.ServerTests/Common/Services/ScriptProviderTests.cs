@@ -22,7 +22,7 @@ public class ScriptProviderTests
 
 
     [TestMethod]
-    public async Task GetScriptsAsync_ReturnsError_Custom_WhenJsonMissing()
+    public async Task GetScriptAsync_ReturnsError_Custom_WhenJsonMissing()
     {
         var result = await _sut.GetScriptAsync(ScriptSelect.Custom, null);
 
@@ -31,7 +31,7 @@ public class ScriptProviderTests
     }
 
     [TestMethod]
-    public async Task GetScriptsAsync_ReturnsError_Custom_WhenJsonInvalid()
+    public async Task GetScriptAsync_ReturnsError_Custom_WhenJsonInvalid()
     {
         var result = await _sut.GetScriptAsync(ScriptSelect.Custom, "abcde");
 
@@ -40,7 +40,7 @@ public class ScriptProviderTests
     }
 
     [TestMethod]
-    public async Task GetScriptsAsync_ReturnsError_Custom_WhenJsonEmpty()
+    public async Task GetScriptAsync_ReturnsError_Custom_WhenJsonEmpty()
     {
         var result = await _sut.GetScriptAsync(ScriptSelect.Custom, "[]");
 
@@ -49,7 +49,7 @@ public class ScriptProviderTests
     }
 
     [TestMethod]
-    public async Task GetScriptsAsync_ReturnsError_Custom_WhenMetaNotFound()
+    public async Task GetScriptAsync_ReturnsError_Custom_WhenMetaNotFound()
     {
         var result = await _sut.GetScriptAsync(ScriptSelect.Custom, "[\"role1\"]");
 
@@ -58,7 +58,7 @@ public class ScriptProviderTests
     }
 
     [TestMethod]
-    public async Task GetScriptsAsync_ReturnsError_Custom_WhenRoleNotFound()
+    public async Task GetScriptAsync_ReturnsError_Custom_WhenRoleNotFound()
     {
         var result = await _sut.GetScriptAsync(ScriptSelect.Custom,
             """
@@ -78,7 +78,7 @@ public class ScriptProviderTests
     }
 
     [TestMethod]
-    public async Task GetScriptsAsync_ReturnsOk_Custom_WhenScriptIsValid()
+    public async Task GetScriptAsync_ReturnsOk_Custom_WhenScriptIsValid()
     {
         var expected = new Script("NAME", "AUTHOR", [Role.Chef(), Role.Empath()]);
         var result = await _sut.GetScriptAsync(ScriptSelect.Custom,
@@ -100,7 +100,7 @@ public class ScriptProviderTests
     }
 
     [TestMethod]
-    public async Task GetScriptsAsync_ReturnsError_PreDefined_WhenFileDoesNotExist()
+    public async Task GetScriptAsync_ReturnsError_PreDefined_WhenFileDoesNotExist()
     {
         _mockFileSystem.Setup(o => o.File.Exists(It.IsAny<string>())).Returns(false);
 
@@ -111,7 +111,7 @@ public class ScriptProviderTests
     }
 
     [TestMethod]
-    public async Task GetScriptsAsync_ReturnsError_PreDefined_WhenReadFails()
+    public async Task GetScriptAsync_ReturnsError_PreDefined_WhenReadFails()
     {
         _mockFileSystem.Setup(o => o.File.Exists(It.IsAny<string>())).Returns(true);
         _mockFileSystem.Setup(o => o.File.ReadAllTextAsync(It.IsAny<string>())).ThrowsAsync(new Exception());
@@ -122,7 +122,7 @@ public class ScriptProviderTests
     }
 
     [TestMethod]
-    public async Task GetScriptsAsync_ReturnsOk_PreDefined_WhenScriptIsValid()
+    public async Task GetScriptAsync_ReturnsOk_PreDefined_WhenScriptIsValid()
     {
         var expected = new Script("NAME", "AUTHOR", [Role.Chef(), Role.Empath()]);
         _mockFileSystem.Setup(o => o.File.Exists(It.IsAny<string>())).Returns(true);
@@ -143,29 +143,5 @@ public class ScriptProviderTests
 
         result.Should().BeOfType<Result<Script>>();
         result.ShouldSucceedWithEquivalent(expected);
-    }
-
-    [TestMethod]
-    public async Task GetScriptsAsync_ReturnsOk_PreDefined_WithCache()
-    {
-        _mockFileSystem.Setup(o => o.File.Exists(It.IsAny<string>())).Returns(true);
-        _mockFileSystem.Setup(o => o.File.ReadAllTextAsync(It.IsAny<string>())).ReturnsAsync(
-            """
-            [
-                {
-                  "id": "_meta",
-                  "author": "AUTHOR",
-                  "name": "NAME"
-                },
-                "chef",
-                "empath"
-            ]
-            """
-        );
-        var result1 = await _sut.GetScriptAsync(ScriptSelect.TroubleBrewing, null);
-
-        var result2 = await _sut.GetScriptAsync(ScriptSelect.TroubleBrewing, null);
-
-        result1.Value.Should().BeEquivalentTo(result2.Value);
     }
 }

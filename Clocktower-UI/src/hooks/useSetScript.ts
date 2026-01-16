@@ -7,7 +7,10 @@ export const useSetScript = () => {
     const gameId = useAppStore(state => state.gameId);
     return useCallback(
         async (scriptSelect: ScriptSelect, json?: string) => {
-            if (!gameId) return;
+            if (!gameId) {
+                console.warn('useSetScript called without a gameId');
+                return;
+            }
             await gamesService.setScript(gameId, scriptSelect, json);
         },
         [gameId],
