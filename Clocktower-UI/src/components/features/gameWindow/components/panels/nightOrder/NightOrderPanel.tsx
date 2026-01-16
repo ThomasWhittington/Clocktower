@@ -11,8 +11,8 @@ interface NightOrderPanelProps {
 export const NightOrderPanel = ({isOpen, onClose}: NightOrderPanelProps) => {
     const {script} = useServerHub();
     const {discordTown} = useDiscordTown();
-    const players = discordTown?.gameUsers || [];
-    const firstNightOrder = script?.firstNightOrder ?? [];
+    const players = discordTown?.players || [];
+    const firstNightOrder = script?.getFirstNightOrder(players.length) ?? [];
     const otherNightOrder = script?.otherNightOrder ?? [];
     return (
         <BasePanel title="Night Order" isOpen={isOpen} onClose={onClose} className="night-order-panel">
