@@ -1,4 +1,7 @@
 ﻿import {BasePanel} from "@/components/ui";
+import {useServerHub} from "@/hooks";
+import {NightOrderList} from "./NightOrderList";
+import {useDiscordTown} from "@/components/features/discordTownPanel/hooks";
 
 interface NightOrderPanelProps {
     isOpen: boolean;
@@ -6,9 +9,15 @@ interface NightOrderPanelProps {
 }
 
 export const NightOrderPanel = ({isOpen, onClose}: NightOrderPanelProps) => {
+    const {script} = useServerHub();
+    const {discordTown} = useDiscordTown();
+    const players = discordTown?.gameUsers || [];
+    const firstNightOrder = script?.firstNightOrder ?? [];
+    const otherNightOrder = script?.otherNightOrder ?? [];
     return (
         <BasePanel title="Night Order" isOpen={isOpen} onClose={onClose} className="night-order-panel">
-            <h2>dummy</h2>
+            <NightOrderList night="first" roles={firstNightOrder} players={players}/>
+            <NightOrderList night="other" roles={otherNightOrder} players={players}/>
         </BasePanel>
     )
 };
