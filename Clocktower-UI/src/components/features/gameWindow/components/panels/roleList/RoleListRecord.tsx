@@ -1,4 +1,5 @@
 ﻿import {Role, User} from "@/types";
+import {TokenRoleIcon} from "@/components/tokens";
 
 interface RoleListRecordProps {
     role?: Role;
@@ -6,16 +7,20 @@ interface RoleListRecordProps {
 }
 
 export const RoleListRecord = ({role, players}: RoleListRecordProps) => {
-        const playerNames = players
-            .filter(player => player.role?.id === role?.id)
-            .map(p => p.name)
-            .join(', ');
+    if (!role) return;
+    const playersWithRole = players.filter(player => player.role?.id === role?.id);
 
         return (
             <li className="role-record townsfolk">
-                <span className="role-icon" style={{backgroundImage: `url(/tokenParts/roles/${role?.id}.png)`}}/>
+                <TokenRoleIcon role={role} className="role-icon"/>
                 <div className="role">
-                    <span className="role-player">{playerNames}</span>
+                    <span className="role-player">
+                        {playersWithRole.map((player, index) =>
+                            <small className={`${player.isDead ? 'dead' : ''}`} key={player.id}>
+                                {player.name + (playersWithRole.length > index + 1 ? "," : "")}
+                            </small>
+                        )}
+                    </span>
                     <span className="role-name">{role?.name}</span>
                     <span className="role-ability">{role?.description}</span>
                 </div>
