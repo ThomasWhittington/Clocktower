@@ -49,6 +49,10 @@
 
     .user-row-section {
         @apply flex items-center gap-2;
+
+        .role-icon {
+            @apply w-10 h-10 shrink-0 bg-cover bg-center;
+        }
     }
 
     .available-user {
