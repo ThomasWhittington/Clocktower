@@ -96,7 +96,7 @@ public class ScriptProviderTests
         );
 
         result.Should().BeOfType<Result<Script>>();
-        result.ShouldSucceedWithEq(expected);
+        result.ShouldSucceedWithEquivalent(expected);
     }
 
     [TestMethod]
@@ -111,7 +111,7 @@ public class ScriptProviderTests
     }
 
     [TestMethod]
-    public async Task GetScriptsAsync_ReturnsError_PreDefined_WhenJsonInvalid()
+    public async Task GetScriptsAsync_ReturnsError_PreDefined_WhenReadFails()
     {
         _mockFileSystem.Setup(o => o.File.Exists(It.IsAny<string>())).Returns(true);
         _mockFileSystem.Setup(o => o.File.ReadAllTextAsync(It.IsAny<string>())).ThrowsAsync(new Exception());
@@ -142,7 +142,7 @@ public class ScriptProviderTests
         var result = await _sut.GetScriptAsync(ScriptSelect.TroubleBrewing, null);
 
         result.Should().BeOfType<Result<Script>>();
-        result.ShouldSucceedWithEq(expected);
+        result.ShouldSucceedWithEquivalent(expected);
     }
 
     [TestMethod]

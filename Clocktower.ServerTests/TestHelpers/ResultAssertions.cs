@@ -21,7 +21,7 @@ public static class ResultAssertions
             result.IsSuccess.Should().BeTrue();
         }
 
-        public void ShouldSucceedWithEq(T expectedValue)
+        public void ShouldSucceedWithEquivalent(T expectedValue)
         {
             result.Error.Should().BeNull();
             result.Value.Should().BeEquivalentTo(expectedValue);

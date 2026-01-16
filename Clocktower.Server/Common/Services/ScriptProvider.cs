@@ -6,7 +6,6 @@ namespace Clocktower.Server.Common.Services;
 public class ScriptProvider(IFileSystem fileSystem) : IScriptProvider
 {
     private readonly string _scriptsPath = Path.Combine(AppContext.BaseDirectory, "Data", "Scripts");
-    private readonly Dictionary<ScriptSelect, Script> _cachedPredefinedScripts = new();
     private const string InvalidScriptCode = "script.invalid";
 
     public async Task<Result<Script>> GetScriptAsync(ScriptSelect scriptSelect, string? json)
@@ -28,16 +27,12 @@ public class ScriptProvider(IFileSystem fileSystem) : IScriptProvider
     {
         try
         {
-            if (_cachedPredefinedScripts.TryGetValue(scriptSelect, out var cached)) return Result.Ok(cached);
-
             var filePath = Path.Combine(_scriptsPath, $"{scriptSelect}.json");
             if (!fileSystem.File.Exists(filePath))
                 return Result.Fail<Script>(ErrorKind.NotFound, "script.not_found", $"Script file not found: {scriptSelect}");
 
             var json = await fileSystem.File.ReadAllTextAsync(filePath);
             var result = DeserializeAndValidateScript(json, scriptSelect.ToString());
-
-            if (result is { IsSuccess: true, Value: not null }) _cachedPredefinedScripts[scriptSelect] = result.Value;
 
             return result;
         }

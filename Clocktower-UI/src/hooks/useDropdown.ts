@@ -20,7 +20,7 @@ export const useDropdown = () => {
         };
     }, [isOpen]);
 
-    const toggle = () => setIsOpen(!isOpen);
+    const toggle = () => setIsOpen(prev => !prev);
     const close = () => setIsOpen(false);
 
     return {isOpen, toggle, close, dropdownRef};

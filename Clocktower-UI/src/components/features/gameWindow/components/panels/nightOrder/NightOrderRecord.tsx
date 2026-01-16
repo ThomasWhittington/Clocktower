@@ -8,7 +8,7 @@ interface NightOrderRecordProps {
 }
 
 export const NightOrderRecord = ({night, role, players}: NightOrderRecordProps) => {
-    if (!role) return;
+    if (!role) return null;
 
     const playersWithRole = role.id.startsWith("evil-")
         ? players.filter(player => player.role?.type === role.type)

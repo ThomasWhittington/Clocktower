@@ -1,4 +1,4 @@
-﻿import {useEffect} from 'react';
+﻿import {useEffect, useRef} from 'react';
 
 interface UseKeyboardShortcutOptions {
     key: string;
@@ -34,6 +34,8 @@ export const useKeyboardShortcut = ({
                                         altKey = false,
                                         enabled = true
                                     }: UseKeyboardShortcutOptions) => {
+    const onKeyPressRef = useRef(onKeyPress);
+    onKeyPressRef.current = onKeyPress;
     useEffect(() => {
         if (!enabled) return;
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -43,11 +45,11 @@ export const useKeyboardShortcut = ({
 
             if (isKeyMatch(event, key, ctrlKey, shiftKey, altKey)) {
                 event.preventDefault();
-                onKeyPress();
+                onKeyPressRef.current();
             }
         };
 
         globalThis.addEventListener('keydown', handleKeyDown);
         return () => globalThis.removeEventListener('keydown', handleKeyDown);
-    }, [key, onKeyPress, ctrlKey, shiftKey, altKey, enabled]);
+    }, [key, ctrlKey, shiftKey, altKey, enabled]);
 };

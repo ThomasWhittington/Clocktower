@@ -13,7 +13,7 @@ export default function TownSquare() {
     const {currentUser, gameId} = useAppStore();
     const {thisUser} = useUser(currentUser?.id);
     const [showToken, setShowToken] = useState<boolean>(true);
-    useKeyboardShortcut({key: 'g', onKeyPress: () => setShowToken(!showToken)});
+    useKeyboardShortcut({key: 'g', onKeyPress: () => setShowToken(prev => !prev)});
 
     const {
         activeMenuPlayerId,

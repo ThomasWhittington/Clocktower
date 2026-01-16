@@ -45,7 +45,7 @@ public class SetScript : IEndpoint
             if (string.IsNullOrWhiteSpace(json)) return false;
             try
             {
-                JsonDocument.Parse(json);
+                using var _ = JsonDocument.Parse(json);
                 return true;
             }
             catch

@@ -7,7 +7,7 @@ interface RoleListRecordProps {
 }
 
 export const RoleListRecord = ({role, players}: RoleListRecordProps) => {
-    if (!role) return;
+    if (!role) return null;
     const playersWithRole = players.filter(player => player.role?.id === role?.id);
 
         return (
