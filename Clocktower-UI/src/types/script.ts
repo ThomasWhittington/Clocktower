@@ -33,6 +33,15 @@ export class Script {
         return this.roles.filter(r => r.type === RoleType.Traveller);
     }
 
+    get firstNightOrder(): Role[] {
+        return this.roles?.filter(r => r.firstNight !== 0 && r.type !== RoleType.Traveller)
+            .sort((a, b) => a.firstNight - b.firstNight);
+    }
+
+    get otherNightOrder(): Role[] {
+        return this.roles?.filter(r => r.otherNight !== 0 && r.type !== RoleType.Traveller)
+            .sort((a, b) => a.otherNight - b.otherNight);
+    }
 
 }
 
