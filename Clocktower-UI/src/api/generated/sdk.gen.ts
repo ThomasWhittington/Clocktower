@@ -98,6 +98,9 @@ import type {
     SetPlayerIsDeadApiData,
     SetPlayerIsDeadApiErrors,
     SetPlayerIsDeadApiResponses,
+    SetScriptApiData,
+    SetScriptApiErrors,
+    SetScriptApiResponses,
     SetTimeApiData,
     SetTimeApiErrors,
     SetTimeApiResponses,
@@ -727,6 +730,24 @@ export const setPlayerIsDeadApi = <ThrowOnError extends boolean = false>(options
             }
         ],
         url: '/api/games/{gameId}/set-player-is-dead/{userId}/{isDead}',
+        ...options
+    });
+};
+
+/**
+ * Sets the script of the game
+ *
+ * Sets the script of the game. Setting to custom requires a custom script file to be uploaded
+ */
+export const setScriptApi = <ThrowOnError extends boolean = false>(options: Options<SetScriptApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetScriptApiResponses, SetScriptApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/script',
         ...options
     });
 };

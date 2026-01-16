@@ -20,8 +20,6 @@ export const BasePanel = ({isOpen, onClose, title, className, children}: BasePan
         document.body.style.overflow = 'hidden';
         document.addEventListener('keydown', handleEscape);
 
-        panelRef.current?.focus();
-
         return () => {
             document.body.style.overflow = '';
             document.removeEventListener('keydown', handleEscape);

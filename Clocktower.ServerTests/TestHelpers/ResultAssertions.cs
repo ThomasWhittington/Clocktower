@@ -20,6 +20,13 @@ public static class ResultAssertions
             result.Value.Should().Be(expectedValue);
             result.IsSuccess.Should().BeTrue();
         }
+
+        public void ShouldSucceedWithEquivalent(T expectedValue)
+        {
+            result.Error.Should().BeNull();
+            result.Value.Should().BeEquivalentTo(expectedValue);
+            result.IsSuccess.Should().BeTrue();
+        }
     }
 
     extension<T>(ErrorResponse? error)

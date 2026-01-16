@@ -2,7 +2,7 @@
 
 @layer components {
     .btn-close {
-        @apply text-gray-400 hover:text-white text-2xl;
+        @apply text-gray-400 hover:text-white text-2xl select-none;
     }
 
     .btn-icon {
@@ -22,7 +22,7 @@
     }
 
     .panel-content {
-        @apply w-full h-full p-8 pl-25 shadow-2xl flex flex-col;
+        @apply w-full h-full p-8 px-25 shadow-2xl flex flex-col;
     }
 
     .panel-header {
@@ -34,7 +34,7 @@
     }
 
     .panel-title {
-        @apply text-3xl font-bold text-white;
+        @apply text-3xl font-bold text-white select-none;
     }
 
     .user-avatar {

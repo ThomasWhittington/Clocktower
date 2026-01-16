@@ -7,4 +7,5 @@ public record GamePerspective(string Id, string UserId, string GuildId, GameUser
     public IEnumerable<GameUser> StoryTellers => Users.Where(o => o.UserType == UserType.StoryTeller);
     public IEnumerable<GameUser> Spectators => Users.Where(o => o.UserType == UserType.Spectator);
     public GameTime GameTime { get; init; }
+    public Script? Script { get; init; }
 }

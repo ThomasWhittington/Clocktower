@@ -21,23 +21,27 @@ public class GameServiceTests
     private Mock<IDiscordBot> _mockBot = null!;
     private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
     private Mock<IGameBroadcastService> _mockGameBroadcastService = null!;
+
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
+    private Mock<IScriptProvider> _mockScriptProvider = null!;
 
     private IGameService _sut = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _mockBot = new Mock<IDiscordBot>();
-        _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
-        _mockGameBroadcastService = new Mock<IGameBroadcastService>();
+        _mockBot = StrictMockFactory.Create<IDiscordBot>();
+        _mockGamePerspectiveService = StrictMockFactory.Create<IGamePerspectiveService>();
+        _mockGameBroadcastService = StrictMockFactory.Create<IGameBroadcastService>();
         _mockDiscordTownManager = StrictMockFactory.Create<IDiscordTownManager>();
+        _mockScriptProvider = StrictMockFactory.Create<IScriptProvider>();
 
         _sut = new GameService(
             _mockBot.Object,
             _mockGamePerspectiveService.Object,
             _mockDiscordTownManager.Object,
-            _mockGameBroadcastService.Object
+            _mockGameBroadcastService.Object,
+            _mockScriptProvider.Object
         );
     }
 
@@ -256,13 +260,15 @@ public class GameServiceTests
     {
         const string gameId = "game-id";
         _mockGamePerspectiveService.Setup(o => o.GameExists(gameId)).Returns(true);
+        _mockGamePerspectiveService.Setup(o => o.SetTime(gameId, gameTime));
+        _mockGameBroadcastService.Setup(o => o.BroadcastTimeUpdate(gameId, gameTime)).Returns(Task.CompletedTask);
 
         var result = await _sut.SetTime(gameId, gameTime);
 
+        result.message.Should().Be($"Time set to {gameTime}");
+        result.success.Should().BeTrue();
         _mockGamePerspectiveService.Verify(o => o.SetTime(gameId, gameTime), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastTimeUpdate(gameId, gameTime), Times.Once);
-        result.success.Should().BeTrue();
-        result.message.Should().Be($"Time set to {gameTime}");
     }
 
     [TestMethod]
@@ -386,10 +392,13 @@ public class GameServiceTests
 
         _mockDiscordTownManager.Setup(o => o.UpdateUserIdentity(townUser));
 
-
         _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? perspective : null);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guildMock.Object : null);
         guildMock.Setup(o => o.GetUser(UserId)).Returns(hasUser ? userMock.Object : null);
+
+        _mockGamePerspectiveService.Setup(o => o.GetNextAvailableSeatingPosition(GameId)).Returns(1);
+        _mockGamePerspectiveService.Setup(o => o.AddUserToGame(GameId, It.IsAny<GameUser>())).Returns(true);
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
     }
 
     [TestMethod]
@@ -432,7 +441,8 @@ public class GameServiceTests
         _mockDiscordTownManager.Verify(o => o.UpdateUserIdentity(It.Is<TownUser>(townUser => townUser.Id == UserId)));
         _mockGamePerspectiveService.Verify(o => o.AddUserToGame(GameId, It.Is<GameUser>(gameUser =>
             gameUser.Id == UserId &&
-            gameUser.UserType == UserType.Player
+            gameUser.UserType == UserType.Player &&
+            gameUser.SeatingPosition == 1
         )));
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
         result.ShouldSucceedWith<string>($"{DisplayName} added to game: {GameId}");
@@ -456,6 +466,9 @@ public class GameServiceTests
         _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? perspective : null);
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guildMock.Object : null);
         guildMock.Setup(o => o.GetUser(UserId)).Returns(hasUser ? userMock.Object : null);
+
+        _mockGamePerspectiveService.Setup(o => o.RemoveUserFromGame(GameId, UserId));
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
     }
 
     [TestMethod]
@@ -527,6 +540,8 @@ public class GameServiceTests
         };
         var perspective = CommonMethods.GetGamePerspective(GameId) with { Users = players.ToList() };
         _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(perspective);
+        _mockGamePerspectiveService.Setup(o => o.UpdatePublicUser(GameId, It.IsAny<string>(), It.IsAny<PublicGameUserUpdate>())).Returns(true);
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
 
         var result = await _sut.RandomiseSeatingPositions(GameId);
 
@@ -589,6 +604,8 @@ public class GameServiceTests
         var perspective = CommonMethods.GetGamePerspective(GameId) with { Users = [u1, u2] };
 
         _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(perspective);
+        _mockGamePerspectiveService.Setup(o => o.UpdatePublicUser(GameId, It.IsAny<string>(), It.IsAny<PublicGameUserUpdate>())).Returns(true);
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
 
         var result = await _sut.SwapSeatingPositions(GameId, UserId + 1, UserId + 2);
 
@@ -756,6 +773,81 @@ public class GameServiceTests
         result.ShouldSucceedWith($"{DisplayName} is already {expectedDeadStatus}");
         _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new PublicGameUserUpdate { IsDead = isDead, HasVoteToken = true }), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+    }
+
+    #endregion
+
+    #region SetScript
+
+    private Script? Setup_SetScript(bool gameExists = true, bool getScriptSuccess = true, bool scriptExists = true)
+    {
+        _mockGamePerspectiveService.Setup(o => o.GameExists(GameId)).Returns(gameExists);
+
+        var script = scriptExists ? new Script("Name", "Author", []) : null;
+        var result = getScriptSuccess ? Result.Ok(script!) : Result.Fail<Script>(ErrorKind.Invalid, "code", "message");
+        _mockScriptProvider.Setup(o => o.GetScriptAsync(It.IsAny<ScriptSelect>(), It.IsAny<string>())).ReturnsAsync(result);
+
+        if (getScriptSuccess && scriptExists)
+        {
+            _mockGamePerspectiveService.Setup(o => o.SetScript(GameId, script!));
+            _mockGameBroadcastService.Setup(o => o.BroadcastScriptUpdate(GameId, script!)).Returns(Task.CompletedTask);
+        }
+
+        return script;
+    }
+
+    [TestMethod]
+    public async Task SetScript_ReturnsError_WhenGameMissing()
+    {
+        const ScriptSelect script = ScriptSelect.SectsAndViolets;
+        const string json = "{}";
+
+        Setup_SetScript(gameExists: false);
+
+        var result = await _sut.SetScript(GameId, script, json);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetScript_ReturnsError_WhenScriptFails()
+    {
+        const ScriptSelect script = ScriptSelect.SectsAndViolets;
+        const string json = "{}";
+
+        Setup_SetScript(getScriptSuccess: false);
+
+        var result = await _sut.SetScript(GameId, script, json);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "code");
+    }
+
+    [TestMethod]
+    public async Task SetScript_ReturnsError_WhenScriptNull()
+    {
+        const ScriptSelect script = ScriptSelect.SectsAndViolets;
+        const string json = "{}";
+
+        Setup_SetScript(scriptExists: false);
+
+        var result = await _sut.SetScript(GameId, script, json);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "script.empty");
+    }
+
+    [TestMethod]
+    public async Task SetScript_ReturnsOk_WhenScriptExists()
+    {
+        const ScriptSelect script = ScriptSelect.SectsAndViolets;
+        const string json = "{}";
+
+        var expected = Setup_SetScript();
+
+        var result = await _sut.SetScript(GameId, script, json);
+
+        result.ShouldSucceedWith(expected!);
+        _mockGamePerspectiveService.Verify(o => o.SetScript(GameId, expected!));
+        _mockGameBroadcastService.Verify(o => o.BroadcastScriptUpdate(GameId, expected!));
     }
 
     #endregion

@@ -2,7 +2,7 @@
 
 @layer components {
     .user-manager {
-        @apply flex-1 flex gap-4;
+        @apply flex-1 flex gap-4 select-none;
 
         & .column {
             @apply p-4;
@@ -26,12 +26,33 @@
         }
     }
 
+
+    .script-manager {
+        @apply flex flex-col;
+
+        & .panel-body {
+            @apply items-center justify-center;
+
+            > .script-selector {
+                @apply flex flex-col items-center gap-2;
+            }
+        }
+    }
+
+    .user-list {
+        @apply max-h-full overflow-y-auto;
+    }
+
     .user-row {
         @apply flex items-center justify-between gap-2;
     }
 
     .user-row-section {
         @apply flex items-center gap-2;
+
+        .role-icon {
+            @apply w-10 h-10 shrink-0 bg-cover bg-center;
+        }
     }
 
     .available-user {
@@ -40,5 +61,200 @@
 
     .user-type-change {
         @apply flex items-center;
+    }
+
+    .night-order-container {
+        @apply flex-1 flex gap-4 select-none rounded-2xl bg-black/50;
+        
+        & .night-order-list {
+            @apply p-4 max-h-full overflow-y-auto;
+
+            h2 {
+                @apply font-bold text-xl text-center relative pb-2 border-b-3 border-white/40;
+            }
+        }
+
+        & .night-order-record {
+            @apply flex items-center gap-2 py-1 relative;
+
+            .role-icon {
+                @apply w-16 h-16 shrink-0 bg-cover bg-center;
+            }
+
+            .role-name {
+                @apply flex-1 px-2 py-1 text-xl flex flex-col;
+
+                &.no-players {
+                    @apply opacity-40;
+                }
+            }
+
+            .role-player {
+                @apply text-gray-500 text-[80%] block;
+
+                > .dead {
+                    @apply line-through;
+                }
+            }
+
+            .role-ability {
+                @apply hidden absolute z-10 bg-gray-900 text-white p-3 rounded-lg shadow-lg max-w-xs text-sm text-left;
+                top: 80%;
+                left: 50%;
+                transform: translateX(-50%);
+                margin-top: 0.5rem;
+            }
+
+            &:hover .role-ability {
+                @apply block;
+            }
+        }
+
+        & .first {
+            @apply flex-1 text-right;
+
+            .role-player {
+                @apply text-right;
+            }
+
+            .townsfolk .role-name {
+                @apply bg-linear-to-r from-townsfolk/50 to-transparent;
+            }
+
+            .outsider .role-name {
+                @apply bg-linear-to-r from-outsider/50 to-transparent;
+            }
+
+            .minion .role-name {
+                @apply bg-linear-to-r from-minion/50 to-transparent;
+            }
+
+            .demon .role-name {
+                @apply bg-linear-to-r from-demon/50 to-transparent;
+            }
+        }
+
+        & .other {
+            @apply flex-1;
+
+            .role-player {
+                @apply text-left;
+            }
+
+            .townsfolk .role-name {
+                @apply bg-linear-to-l from-townsfolk/50 to-transparent;
+            }
+
+            .outsider .role-name {
+                @apply bg-linear-to-l from-outsider/50 to-transparent;
+            }
+
+            .minion .role-name {
+                @apply bg-linear-to-l from-minion/50 to-transparent;
+            }
+
+            .demon .role-name {
+                @apply bg-linear-to-l from-demon/50 to-transparent;
+            }
+        }
+    }
+
+    .role-list-container {
+        @apply flex-1 overflow-y-auto flex flex-col rounded-2xl bg-black/50;
+
+        .townsfolk {
+            .role-name {
+                @apply text-townsfolk;
+            }
+
+            .role-aside {
+                @apply bg-linear-to-r from-transparent to-townsfolk;
+            }
+        }
+
+        .outsider {
+            .role-name {
+                @apply text-outsider;
+            }
+
+            .role-aside {
+                @apply bg-linear-to-r from-transparent to-outsider;
+            }
+        }
+
+        .minion {
+            .role-name {
+                @apply text-minion;
+            }
+
+            .role-aside {
+                @apply bg-linear-to-r from-transparent to-minion;
+            }
+        }
+
+        .demon {
+            .role-name {
+                @apply text-demon;
+            }
+
+            .role-aside {
+                @apply bg-linear-to-r from-transparent to-demon;
+            }
+        }
+    }
+}
+
+
+.role-list {
+    @apply flex flex-wrap gap-4 select-none p-4;
+
+    .role-record {
+        @apply flex items-center w-[420px];
+
+        .role-icon {
+            @apply w-[8vh] bg-cover shrink-0 bg-position-[center_top_-5px];
+
+            &:after {
+                content: " ";
+                @apply block pt-[75%];
+            }
+        }
+
+        .role {
+            @apply leading-[0.8];
+        }
+
+        .role-name {
+            @apply block font-bold text-[95%];
+        }
+
+        .role-player {
+            @apply text-gray-500 float-right text-[80%];
+
+            > .dead {
+                @apply line-through;
+            }
+        }
+
+        .role-ability {
+            @apply text-[70%];
+        }
+    }
+}
+
+.role-aside {
+    @apply w-[30px] flex grow-0 shrink-0 items-center justify-center content-center overflow-hidden self-stretch shadow-[0_0_4px_black] select-none;
+
+    > h4 {
+        @apply uppercase text-center rotate-90 text-[80%] origin-center;
+    }
+}
+
+.team {
+    @apply flex self-start relative flex-1;
+
+    &:not(:last-child):after {
+        content: " ";
+        @apply block w-1/4 h-px absolute left-0 bottom-0 bg-linear-to-r from-[#ffffffaa] to-transparent;
     }
 }

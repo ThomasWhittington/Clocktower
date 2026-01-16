@@ -79,6 +79,7 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IDiscordConstantsService, DiscordConstantsService>();
             builder.Services.AddSingleton<IGamePerspectiveService, GamePerspectiveService>();
 
+            builder.Services.AddScoped<IScriptProvider, ScriptProvider>();
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IDiscordAuthService, DiscordAuthService>();
             builder.Services.AddScoped<IGameService, GameService>();

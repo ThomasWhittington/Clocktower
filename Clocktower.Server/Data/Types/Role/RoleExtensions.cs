@@ -6,70 +6,63 @@ public static class RoleExtensions
     {
         public Role FirstNight(int order, string reminder)
         {
-            role.Metadata = role.Metadata with
+            return role with
             {
                 FirstNight = order,
                 FirstNightReminder = reminder
             };
-            return role;
         }
 
         public Role OtherNight(int order, string reminder)
         {
-            role.Metadata = role.Metadata with
+            return role with
             {
                 OtherNight = order,
                 OtherNightReminder = reminder
             };
-            return role;
         }
 
         public Role EachNight(int firstOrder, int otherOther, string reminder)
         {
-            role.Metadata = role.Metadata with
+            return role with
             {
                 FirstNight = firstOrder,
                 FirstNightReminder = reminder,
                 OtherNight = otherOther,
                 OtherNightReminder = reminder
             };
-            return role;
         }
 
         public Role WithReminders(string[] reminders)
         {
-            role.Metadata = role.Metadata with
+            return role with
             {
                 Reminders = reminders
             };
-            return role;
         }
 
         public Role WithReminder(string reminder)
         {
-            role.Metadata = role.Metadata with
+            return role with
             {
                 Reminders = [reminder]
             };
-            return role;
         }
 
         public Role WithGlobalReminder(string reminder)
         {
-            role.Metadata = role.Metadata with
+            return role with
             {
                 RemindersGlobal = [reminder]
             };
-            return role;
         }
 
         public Role AffectsSetup()
         {
-            role.Metadata = role.Metadata with
+            return role with
             {
                 Setup = true
             };
-            return role;
         }
     }
 }

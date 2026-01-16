@@ -92,7 +92,7 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
 
             var updatedUser = user with
             {
-                Role = update.Role ?? user.Role
+                Role = update.RemoveRole ? null : update.Role ?? user.Role
             };
 
             return state with { Users = state.Users.Select(u => u.Id == userId ? updatedUser : u).ToList() };
@@ -182,6 +182,11 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         store.UpdateAllPerspectives(gameId, state => state with { GameTime = gameTime });
     }
 
+    public void SetScript(string gameId, Script script)
+    {
+        store.UpdateAllPerspectives(gameId, state => state with { Script = script });
+    }
+
     private static bool IsOmniscient(UserType? userType)
     {
         if (userType is null) return false;
@@ -197,7 +202,7 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         (update.IsMarked != null && user.IsMarked != update.IsMarked);
 
     private static bool UserHasPrivateChanges(GameUser user, PrivateGameUserUpdate update) =>
-        update.Role != null && user.Role != update.Role;
+        (update.RemoveRole && user.Role != null) || (update.Role != null && user.Role != update.Role);
 
     private void HandleUserTypeTransition(string gameId, string userId, UserType newUserType)
     {

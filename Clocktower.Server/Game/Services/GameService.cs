@@ -3,7 +3,7 @@ using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiveService, IDiscordTownManager discordTownManager, IGameBroadcastService gameBroadcastService) : IGameService
+public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiveService, IDiscordTownManager discordTownManager, IGameBroadcastService gameBroadcastService, IScriptProvider scriptProvider) : IGameService
 {
     public IEnumerable<GamePerspective> GetGames() => gamePerspectiveService.GetAll();
 
@@ -65,6 +65,21 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         {
             return (false, ex.Message);
         }
+    }
+
+    public async Task<Result<Script>> SetScript(string gameId, ScriptSelect scriptSelect, string? json)
+    {
+        var gamePerspective = gamePerspectiveService.GameExists(gameId);
+        if (!gamePerspective) return Result.Fail<Script>(Errors.GameNotFound(gameId));
+
+        var scriptResult = await scriptProvider.GetScriptAsync(scriptSelect, json);
+        if (scriptResult is { IsSuccess: false }) return scriptResult;
+        var script = scriptResult.Value;
+        if (script is null) return Result.Fail<Script>(ErrorKind.Invalid, "script.empty", "Script is empty or invalid");
+
+        gamePerspectiveService.SetScript(gameId, script);
+        await gameBroadcastService.BroadcastScriptUpdate(gameId, script);
+        return Result.Ok(script);
     }
 
     public Result<IEnumerable<UserDto>> GetAvailableGameUsers(string gameId)

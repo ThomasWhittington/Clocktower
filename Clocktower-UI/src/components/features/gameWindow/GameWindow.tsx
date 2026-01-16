@@ -1,32 +1,60 @@
 ﻿import {TownSquare} from "@/components/features";
 import {useAppStore} from "@/store";
-import {useState} from "react";
-import {BottomHud, CenterHud, StoryTellerHud, TopHud, UserManagerPanel} from "@/components/features/gameWindow/components";
+import {BottomHud, CenterHud, NightOrderPanel, RightHud, RoleListPanel, ScriptManagerPanel, StoryTellerHud, TopHud, UserManagerPanel} from "@/components/features/gameWindow/components";
 import {UserUtils} from "@/utils";
 import {useDiscordTown, useUser} from "@/components/features/discordTownPanel/hooks";
+import {useKeyboardShortcut, useServerHub} from "@/hooks";
+import {useActivePanel} from "@/components/features/gameWindow/hooks";
 
 export default function GameWindow() {
     const {gameId, currentUser} = useAppStore();
-    const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const {thisUser} = useUser(currentUser?.id);
     const {discordTown} = useDiscordTown();
+    const {script} = useServerHub();
+    const {togglePanel, isPanelOpen, closePanel} = useActivePanel();
+
+    useKeyboardShortcut({
+        key: 'u',
+        onKeyPress: () => togglePanel('user'),
+        enabled: UserUtils.isStoryTeller(thisUser)
+    });
+    useKeyboardShortcut({
+        key: 's',
+        onKeyPress: () => togglePanel('script'),
+        enabled: UserUtils.isStoryTeller(thisUser)
+    });
+    useKeyboardShortcut({
+        key: 'r',
+        onKeyPress: () => togglePanel('role')
+    });
+    useKeyboardShortcut({
+        key: 'n',
+        onKeyPress: () => togglePanel('night')
+    });
+
     return (
         <div className="game-window-controls">
             <TownSquare/>
 
-            <UserManagerPanel
-                isOpen={isInviteModalOpen}
-                onClose={() => setIsInviteModalOpen(false)}
-            />
+            <UserManagerPanel isOpen={isPanelOpen('user')} onClose={closePanel}/>
+            <ScriptManagerPanel isOpen={isPanelOpen('script')} onClose={closePanel}/>
+            <RoleListPanel isOpen={isPanelOpen('role')} onClose={closePanel}/>
+            <NightOrderPanel isOpen={isPanelOpen('night')} onClose={closePanel}/>
 
             {UserUtils.isStoryTeller(thisUser) &&
                 <StoryTellerHud
-                    inviteIsOpen={isInviteModalOpen}
-                    onInviteClick={() => setIsInviteModalOpen(prev => !prev)}
+                    inviteIsOpen={isPanelOpen('user')}
+                    onInviteClick={() => togglePanel('user')}
+                    scriptIsOpen={isPanelOpen('script')}
+                    onScriptClick={() => togglePanel('script')}
                 />
             }
             <CenterHud/>
-            <TopHud/>
+            <TopHud scriptName={script?.name}/>
+            <RightHud
+                onRoleListClick={() => togglePanel('role')}
+                onNightOrderClick={() => togglePanel('night')}
+            />
             <BottomHud gameId={gameId} storyTellers={discordTown?.storyTellers ?? []}/>
         </div>
     );

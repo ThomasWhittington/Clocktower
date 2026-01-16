@@ -2,7 +2,7 @@
 import {ActionBanner, PlayerActionMenu, PlayerIcon} from "@/components/features/townSquare/components";
 import {getPlayerGlowColor, useCircleLayout, useTownSquareActions} from "@/components/features/townSquare/hooks";
 import {useDiscordTown, useUser} from "@/components/features/discordTownPanel/hooks";
-import {useElementSize} from "@/hooks";
+import {useElementSize, useKeyboardShortcut} from "@/hooks";
 import {Spinner} from "@/components/ui";
 import {useAppStore} from "@/store";
 import {useState} from "react";
@@ -13,6 +13,8 @@ export default function TownSquare() {
     const {currentUser, gameId} = useAppStore();
     const {thisUser} = useUser(currentUser?.id);
     const [showToken, setShowToken] = useState<boolean>(true);
+    useKeyboardShortcut({key: 'g', onKeyPress: () => setShowToken(prev => !prev)});
+
     const {
         activeMenuPlayerId,
         swappingPlayer,
@@ -42,9 +44,6 @@ export default function TownSquare() {
                 <ActionBanner onCancel={cancelSwap} message={<div>Swapping <span>{swappingPlayer.name}</span>...</div>}/>
             )}
 
-            <button className="btn-primary" onClick={() => setShowToken(!showToken)}>
-                {showToken ? 'Hide tokens' : 'Show tokens'}
-            </button>
             {discordTown?.players?.map((player, index) => {
                 const pos = positions[index];
                 if (!pos) return null;

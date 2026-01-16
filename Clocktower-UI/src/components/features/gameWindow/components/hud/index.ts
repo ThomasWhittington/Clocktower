@@ -2,3 +2,4 @@
 export * from './TopHud'
 export * from './CenterHud'
 export * from './BottomHud'
+export * from './RightHud'

@@ -310,6 +310,15 @@ public class DiscordTownService(
         {
             UserType = userType
         });
+
+        if (userType is UserType.StoryTeller or UserType.Spectator)
+        {
+            gamePerspectiveService.UpdatePrivateUser(gameId, user.Id, new PrivateGameUserUpdate
+            {
+                RemoveRole = true
+            });
+        }
+
         return (true, string.Empty);
     }
 

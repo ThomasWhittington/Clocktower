@@ -17,4 +17,5 @@ public interface IGamePerspectiveService
     IEnumerable<GamePerspective> GetUserGames(string userId);
     IEnumerable<string> GetGuildGameIds(string guildId);
     void SetTime(string gameId, GameTime gameTime);
+    void SetScript(string gameId, Script script);
 }

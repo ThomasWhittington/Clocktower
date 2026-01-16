@@ -5,6 +5,7 @@ import {UserAvatar} from "@/components/ui/UserAvatar.tsx";
 import {UserTypeChange} from "./UserTypeChange";
 import {ArrowRightCircle, OpenLetter, RemoveIcon} from "@/components/ui/icons";
 import {UserUtils} from "@/utils";
+import {TokenRoleIcon} from "@/components/tokens";
 
 export const UserRow = ({user}: { user: User }) => {
     const {isLoading, canRun, inviteUser, removeUser} = useUserControls();
@@ -23,6 +24,7 @@ export const UserRow = ({user}: { user: User }) => {
                 <p>{user.name}</p>
             </div>
             <div className="user-row-section">
+                {user?.role && <TokenRoleIcon role={user.role} className="role-icon"/>}
                 <UserTypeChange user={user}/>
                 <IconButton
                     className={UserUtils.isStoryTeller(user) ? "invisible" : "visible"}

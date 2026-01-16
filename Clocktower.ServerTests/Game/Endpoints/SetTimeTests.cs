@@ -24,6 +24,7 @@ public class SetTimeTests
 
         builder.GetEndpoint("/{gameId}/time")
             .ShouldHaveMethod(HttpMethod.Post)
+            .ShouldHaveStorytellerAuthorization()
             .ShouldHaveOperationId("setTimeApi")
             .ShouldHaveSummary("Sets the time of the town")
             .ShouldHaveDescription("Sets the game perspective of the town based on the day time");

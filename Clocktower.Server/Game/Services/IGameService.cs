@@ -8,6 +8,7 @@ public interface IGameService
     IEnumerable<GamePerspective> GetGames();
     IEnumerable<MiniGamePerspective> GetPlayerGames(string userId);
     Task<(bool success, string message)> SetTime(string gameId, GameTime gameTime);
+    Task<Result<Script>> SetScript(string gameId, ScriptSelect scriptSelect, string? json);
     Result<IEnumerable<UserDto>> GetAvailableGameUsers(string gameId);
     Task<Result<string>> AddUserToGame(string gameId, string userId);
     Task<Result<string>> RemoveUserFromGame(string gameId, string userId);

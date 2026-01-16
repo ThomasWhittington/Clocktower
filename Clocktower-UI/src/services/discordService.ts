@@ -1,5 +1,5 @@
-﻿import {type ClocktowerServerDataTypesEnumGameTime, type ClocktowerServerDataTypesEnumUserType, getAuthDataApi, getGuildsWithUserApi, getJoinDataApi, inviteAllApi, inviteUserApi, moveUserToChannelApi, pingUserApi, sendToCottagesApi, sendToTownSquareApi, setTimeApi, setUserTypeApi} from '@/api';
-import {GameTime, mapToMiniGuild, type MiniGuild, UserType} from "@/types";
+﻿import {type ClocktowerServerDataTypesEnumUserType, getAuthDataApi, getGuildsWithUserApi, getJoinDataApi, inviteAllApi, inviteUserApi, moveUserToChannelApi, sendToCottagesApi, sendToTownSquareApi, setUserTypeApi} from '@/api';
+import {mapToMiniGuild, type MiniGuild, UserType} from "@/types";
 import {apiClient} from "@/api/api-client.ts";
 
 async function moveUserToChannel(guildId: string, userId: string, channelId: string): Promise<string> {
@@ -16,7 +16,7 @@ async function moveUserToChannel(guildId: string, userId: string, channelId: str
     });
     if (error) {
         console.error('Failed to move user to channel:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
 
@@ -45,7 +45,7 @@ async function getGuildsWithUser(userId: string): Promise<MiniGuild[]> {
 
     if (error) {
         console.error('Failed to get guilds:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     if (data) {
@@ -67,7 +67,7 @@ async function inviteUser(gameId: string, userId: string): Promise<boolean> {
 
     if (error) {
         console.error('Failed to invite user:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     return true;
@@ -85,7 +85,7 @@ async function inviteAll(gameId: string): Promise<boolean> {
 
     if (error) {
         console.error('Failed to invite all:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     return true;
@@ -98,25 +98,6 @@ async function getJoinData(key: string) {
             key: key
         }
     });
-}
-
-async function setTime(gameId: string, gameTime: GameTime) {
-    const {
-        error
-    } = await setTimeApi({
-        client: apiClient,
-        path: {
-            gameId: gameId,
-        },
-        query: {
-            GameTime: gameTimeToString(gameTime)
-        }
-    });
-
-    if (error) {
-        console.error('Failed to set the game time:', error);
-        throw new Error(error.toString());
-    }
 }
 
 async function sendToCottages(gameId: string) {
@@ -178,45 +159,19 @@ async function sendToTownSquare(gameId: string) {
     return data;
 }
 
-async function pingUser(userId: string): Promise<boolean> {
-    const {
-        error
-    } = await pingUserApi({
-        client: apiClient,
-        path: {
-            userId: userId
-        }
-    });
-
-    if (error) {
-        console.error('Failed to ping user:', error);
-        throw new Error(error.toString());
+const getMessage = (err: unknown): string => {
+    if (typeof err === "string") return err;
+    if (err instanceof Error) return err.message;
+    if (typeof err === "object" && err && typeof (err as any).message === "string") {
+        return (err as any).message;
     }
-
-    return true;
-}
-
-const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGameTime => {
-    switch (gameTime) {
-        case GameTime.Day:
-            return 'Day';
-        case GameTime.Evening:
-            return 'Evening';
-        case GameTime.Night:
-            return 'Night';
-        default:
-            throw new Error(`Unknown GameTime value: ${gameTime}`);
-    }
+    return "Unknown error";
 };
-
-const getMessage = (err: unknown): string =>
-    err instanceof Error ? err.message
-        : typeof err === "object" && err && typeof (err as any).message === "string" ? (err as any).message
-            : "Unknown error";
 
 function mapUserType(type: UserType): ClocktowerServerDataTypesEnumUserType {
     return type as unknown as ClocktowerServerDataTypesEnumUserType;
 }
+
 export const discordService = {
     getGuildsWithUser,
     moveUserToChannel,
@@ -224,8 +179,6 @@ export const discordService = {
     inviteUser,
     inviteAll,
     getJoinData,
-    setTime,
-    pingUser,
     sendToCottages,
     sendToTownSquare,
     setUserType
