@@ -8,7 +8,7 @@ export const Token = memo(({role, size = 40, isDead}: { role?: Role, size?: numb
 
     return (
         <div className={`token${isDead ? ' token-is-dead' : ''}`} style={{backgroundImage: `url(${aliveTokenBase})`, width: size, height: size}}>
-            {role && <TokenRoleIcon role={role}/>}
+            {role && <TokenRoleIcon role={role} className="token-icon"/>}
             {(Boolean(role?.firstNight) || role?.firstNightReminder) && <LeftLeaf/>}
             {(Boolean(role?.otherNight) || role?.otherNightReminder) && <RightLeaf/>}
             {reminderLeaves > 0 && <TopLeaf leafCount={reminderLeaves}/>}
