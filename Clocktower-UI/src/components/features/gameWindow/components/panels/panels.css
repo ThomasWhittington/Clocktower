@@ -63,11 +63,11 @@
         @apply flex items-center;
     }
 
-    .night-order-panel {
-        @apply flex-1 flex gap-4 select-none;
-
+    .night-order-container {
+        @apply flex-1 flex gap-4 select-none rounded-2xl bg-black/50;
+        
         & .night-order-list {
-            @apply p-4;
+            @apply p-4 max-h-full overflow-y-auto;
 
             h2 {
                 @apply font-bold text-xl text-center relative pb-2 border-b-3 border-white/40;

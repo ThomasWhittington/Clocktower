@@ -18,7 +18,7 @@ export const RoleListPanel = ({isOpen, onClose}: RoleListPanelProps) => {
                     <div className="team townsfolk">
                         <aside className="role-aside"><h4>Townsfolk</h4></aside>
                         <ul className="role-list">
-                            {script?.townsfolk.map((role) => (
+                            {(script?.townsfolk ?? []).map((role) => (
                                 <RoleListRecord key={role.id} role={role} players={players}/>
                             ))}
                         </ul>
@@ -27,7 +27,7 @@ export const RoleListPanel = ({isOpen, onClose}: RoleListPanelProps) => {
                     <div className="team outsider">
                         <aside className="role-aside"><h4>Outsider</h4></aside>
                         <ul className="role-list">
-                            {script?.outsiders.map((role) => (
+                            {(script?.outsiders ?? []).map((role) => (
                                 <RoleListRecord key={role.id} role={role} players={players}/>
                             ))}
                         </ul>
@@ -36,7 +36,7 @@ export const RoleListPanel = ({isOpen, onClose}: RoleListPanelProps) => {
                     <div className="team minion">
                         <aside className="role-aside"><h4>Minion</h4></aside>
                         <ul className="role-list">
-                            {script?.minions.map((role) => (
+                            {(script?.minions ?? []).map((role) => (
                                 <RoleListRecord key={role.id} role={role} players={players}/>
                             ))}
                         </ul>
@@ -45,7 +45,7 @@ export const RoleListPanel = ({isOpen, onClose}: RoleListPanelProps) => {
                     <div className="team demon">
                         <aside className="role-aside"><h4>Demon</h4></aside>
                         <ul className="role-list">
-                            {script?.demons.map((role) => (
+                            {(script?.demons ?? []).map((role) => (
                                 <RoleListRecord key={role.id} role={role} players={players}/>
                             ))}
                         </ul>

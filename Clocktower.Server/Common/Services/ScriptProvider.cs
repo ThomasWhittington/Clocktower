@@ -56,13 +56,12 @@ public class ScriptProvider(IFileSystem fileSystem) : IScriptProvider
             if (scriptArray == null || scriptArray.Length == 0)
                 return Result.Fail<Script>(ErrorKind.Invalid, InvalidScriptCode, $"{scriptName} script array is empty");
 
-            var metaElement = scriptArray.FirstOrDefault(e =>
-                e.ValueKind == JsonValueKind.Object &&
-                e.TryGetProperty("id", out var idProp) &&
-                idProp.GetString() == "_meta");
+            var metaElement = scriptArray[0];
 
-            if (metaElement.ValueKind == JsonValueKind.Undefined)
-                return Result.Fail<Script>(ErrorKind.Invalid, InvalidScriptCode, $"{scriptName} script missing metadata element with id '_meta'");
+            if (metaElement.ValueKind != JsonValueKind.Object ||
+                !metaElement.TryGetProperty("id", out var idProp) ||
+                idProp.GetString() != "_meta")
+                return Result.Fail<Script>(ErrorKind.Invalid, InvalidScriptCode, $"{scriptName} script missing metadata element with id '_meta' as the first entry");
 
             var metaName = metaElement.GetProperty("name").GetString() ?? "";
             var metaAuthor = metaElement.GetProperty("author").GetString() ?? "";

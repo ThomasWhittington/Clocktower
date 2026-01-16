@@ -160,8 +160,12 @@ async function sendToTownSquare(gameId: string) {
 }
 
 const getMessage = (err: unknown): string => {
-    const error = typeof err === "object" && err && typeof (err as any).message === "string" ? (err as any).message : "Unknown error";
-    return err instanceof Error ? err.message : error;
+    if (typeof err === "string") return err;
+    if (err instanceof Error) return err.message;
+    if (typeof err === "object" && err && typeof (err as any).message === "string") {
+        return (err as any).message;
+    }
+    return "Unknown error";
 };
 
 function mapUserType(type: UserType): ClocktowerServerDataTypesEnumUserType {

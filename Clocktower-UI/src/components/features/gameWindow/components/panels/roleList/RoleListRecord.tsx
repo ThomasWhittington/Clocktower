@@ -11,7 +11,7 @@ export const RoleListRecord = ({role, players}: RoleListRecordProps) => {
     const playersWithRole = players.filter(player => player.role?.id === role?.id);
 
         return (
-            <li className="role-record townsfolk">
+            <li className="role-record">
                 <TokenRoleIcon role={role} className="role-icon"/>
                 <div className="role">
                     <span className="role-player">

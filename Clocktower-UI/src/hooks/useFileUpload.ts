@@ -18,13 +18,13 @@ export const useFileUpload = ({onFileLoad}: UseFileUploadOptions) => {
         try {
             const content = await file.text();
             JSON.parse(content);
-            onFileLoad(content);
+            await onFileLoad(content);
         } catch (error) {
             console.error('Failed to parse JSON file:', error);
             alert('Invalid JSON file. Please upload a valid JSON file.');
+        } finally {
+            event.target.value = '';
         }
-
-        event.target.value = '';
     };
 
     return {

@@ -25,14 +25,14 @@ export const RightHud = ({
                 {isOpen && (
                     <div className="help-menu">
                         <h2>Help</h2>
-                        <button onClick={() => {
+                        <button type="button" onClick={() => {
                             onRoleListClick();
                             close();
                         }}>
                             <span>Role List</span>
                             <span>[R]</span>
                         </button>
-                        <button onClick={() => {
+                        <button type="button" onClick={() => {
                             onNightOrderClick();
                             close();
                         }}>

@@ -15,9 +15,11 @@ export const NightOrderPanel = ({isOpen, onClose}: NightOrderPanelProps) => {
     const firstNightOrder = script?.getFirstNightOrder(players.length) ?? [];
     const otherNightOrder = script?.otherNightOrder ?? [];
     return (
-        <BasePanel title="Night Order" isOpen={isOpen} onClose={onClose} className="night-order-panel">
-            <NightOrderList night="first" roles={firstNightOrder} players={players}/>
-            <NightOrderList night="other" roles={otherNightOrder} players={players}/>
+        <BasePanel title="Night Order" isOpen={isOpen} onClose={onClose}>
+            <div className="night-order-container">
+                <NightOrderList night="first" roles={firstNightOrder} players={players}/>
+                <NightOrderList night="other" roles={otherNightOrder} players={players}/>
+            </div>
         </BasePanel>
     )
 };
