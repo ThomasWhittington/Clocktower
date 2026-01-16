@@ -18,4 +18,6 @@ public interface IGamePerspectiveService
     IEnumerable<string> GetGuildGameIds(string guildId);
     void SetTime(string gameId, GameTime gameTime);
     void SetScript(string gameId, Script script);
+    bool UpdateDraftRole(string gameId, string userId, Role? draftRole);
+    void CommitDraftRoles(string gameId);
 }

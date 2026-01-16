@@ -14,3 +14,4 @@ export {default as VoteToken} from "#/icons/voteToken.svg?react";
 export {default as Shroud} from "#/icons/shroud.svg?react";
 export {default as ScriptIcon} from "#/icons/script.svg?react";
 export {default as HelpIcon} from "#/icons/help.svg?react";
+export {default as DraftIcon} from "#/icons/draft.svg?react";

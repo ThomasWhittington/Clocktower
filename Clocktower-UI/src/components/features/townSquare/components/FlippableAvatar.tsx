@@ -11,12 +11,12 @@ const flipAnimation = {
     style: {willChange: "transform, opacity", perspective: 1000}
 };
 
-export function FlippableAvatar({player, size, showToken}: Readonly<{ player: User; size: number; showToken: boolean; }>) {
+export function FlippableAvatar({player, size, showToken, showDraftRoles}: Readonly<{ player: User; size: number; showToken: boolean; showDraftRoles: boolean; }>) {
     return (
         <AnimatePresence mode="wait">
             {showToken ? (
                 <motion.div key="token" {...flipAnimation}>
-                    <Token role={player.role} size={size} isDead={player.isDead}/>
+                    <Token role={showDraftRoles ? player.draftRole : player.role} size={size} isDead={player.isDead}/>
                 </motion.div>
             ) : (
                 <motion.div key="avatar" {...flipAnimation}>

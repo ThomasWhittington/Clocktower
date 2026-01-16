@@ -22,7 +22,8 @@ public class UserDtoTests
         HasVoteToken = true,
         IsDead = true,
         IsMarked = true,
-        Role = Role.Empath()
+        Role = Role.Empath(),
+        DraftRole = Role.Baron()
     };
 
     [TestMethod]
@@ -42,6 +43,7 @@ public class UserDtoTests
         result.IsDead.Should().BeFalse();
         result.IsMarked.Should().BeFalse();
         result.Role.Should().BeNull();
+        result.DraftRole.Should().BeNull();
     }
 
     [TestMethod]
@@ -61,6 +63,7 @@ public class UserDtoTests
         result.IsDead.Should().Be(_gameUser.IsDead);
         result.IsMarked.Should().Be(_gameUser.IsMarked);
         result.Role.Should().Be(_gameUser.Role);
+        result.DraftRole.Should().Be(_gameUser.DraftRole);
     }
 
     [TestMethod]
@@ -80,6 +83,7 @@ public class UserDtoTests
         result.IsDead.Should().Be(_gameUser.IsDead);
         result.IsMarked.Should().Be(_gameUser.IsMarked);
         result.Role.Should().Be(_gameUser.Role);
+        result.DraftRole.Should().Be(_gameUser.DraftRole);
     }
 
     [TestMethod]
@@ -99,5 +103,6 @@ public class UserDtoTests
         result.IsDead.Should().Be(_gameUser.IsDead);
         result.IsMarked.Should().Be(_gameUser.IsMarked);
         result.Role.Should().Be(_gameUser.Role);
+        result.DraftRole.Should().Be(_gameUser.DraftRole);
     }
 }

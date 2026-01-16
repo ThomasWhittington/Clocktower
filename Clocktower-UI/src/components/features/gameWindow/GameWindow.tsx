@@ -5,12 +5,14 @@ import {UserUtils} from "@/utils";
 import {useDiscordTown, useUser} from "@/components/features/discordTownPanel/hooks";
 import {useKeyboardShortcut, useServerHub} from "@/hooks";
 import {useActivePanel} from "@/components/features/gameWindow/hooks";
+import {useState} from "react";
 
 export default function GameWindow() {
     const {gameId, currentUser} = useAppStore();
     const {thisUser} = useUser(currentUser?.id);
     const {discordTown} = useDiscordTown();
     const {script} = useServerHub();
+    const [showDraftRoles, setShowDraftRoles] = useState(false);
     const {togglePanel, isPanelOpen, closePanel} = useActivePanel();
 
     useKeyboardShortcut({
@@ -31,10 +33,15 @@ export default function GameWindow() {
         key: 'n',
         onKeyPress: () => togglePanel('night')
     });
+    useKeyboardShortcut({
+        key: 'd',
+        onKeyPress: () => setShowDraftRoles(prev => !prev),
+        enabled: UserUtils.isStoryTeller(thisUser)
+    });
 
     return (
         <div className="game-window-controls">
-            <TownSquare/>
+            <TownSquare showDraftRoles={showDraftRoles}/>
 
             <UserManagerPanel isOpen={isPanelOpen('user')} onClose={closePanel}/>
             <ScriptManagerPanel isOpen={isPanelOpen('script')} onClose={closePanel}/>
@@ -47,6 +54,8 @@ export default function GameWindow() {
                     onInviteClick={() => togglePanel('user')}
                     scriptIsOpen={isPanelOpen('script')}
                     onScriptClick={() => togglePanel('script')}
+                    showDraftRoles={showDraftRoles}
+                    onDraftToggle={() => setShowDraftRoles(prev => !prev)}
                 />
             }
             <CenterHud/>

@@ -1,11 +1,13 @@
 ﻿import {IconButton} from "@/components/ui";
-import {AddUserIcon, ScriptIcon} from "@/components/ui/icons";
+import {AddUserIcon, DraftIcon, ScriptIcon} from "@/components/ui/icons";
 
 interface StoryTellerHudProps {
     inviteIsOpen: boolean;
     onInviteClick: () => void;
     scriptIsOpen: boolean;
     onScriptClick: () => void;
+    showDraftRoles: boolean;
+    onDraftToggle: () => void;
 }
 
 export const StoryTellerHud = (
@@ -13,7 +15,9 @@ export const StoryTellerHud = (
         inviteIsOpen,
         onInviteClick,
         scriptIsOpen,
-        onScriptClick
+        onScriptClick,
+        showDraftRoles,
+        onDraftToggle
     }: StoryTellerHudProps) => {
     return (
         <div className="controls-storyteller">
@@ -26,6 +30,12 @@ export const StoryTellerHud = (
                 icon={<ScriptIcon/>}
                 isActive={scriptIsOpen}
                 onClick={onScriptClick}
+            />
+            <IconButton
+                icon={<DraftIcon/>}
+                isActive={showDraftRoles}
+                isActiveVariant="danger"
+                onClick={onDraftToggle}
             />
         </div>
     );

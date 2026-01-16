@@ -102,6 +102,9 @@ const clocktowerServerDataDtoUserDtoSchemaResponseTransformer = (data: any) => {
     if (data.role) {
         data.role = clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(data.role);
     }
+    if (data.draftRole) {
+        data.draftRole = clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(data.draftRole);
+    }
     return data;
 };
 
@@ -133,6 +136,9 @@ const clocktowerServerDataGameUserSchemaResponseTransformer = (data: any) => {
     }
     if (data.role) {
         data.role = clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(data.role);
+    }
+    if (data.draftRole) {
+        data.draftRole = clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(data.draftRole);
     }
     return data;
 };

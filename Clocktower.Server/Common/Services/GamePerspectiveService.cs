@@ -187,6 +187,45 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         store.UpdateAllPerspectives(gameId, state => state with { Script = script });
     }
 
+    public bool UpdateDraftRole(string gameId, string userId, Role? draftRole)
+    {
+        bool updated = false;
+
+        store.TryUpdate(gameId, IGamePerspectiveStore.OmniscientKey, state =>
+        {
+            var user = state.Users.FirstOrDefault(u => u.Id == userId);
+            if (user is null || user.DraftRole == draftRole) return state;
+
+            updated = true;
+
+            var updatedUser = user with { DraftRole = draftRole };
+
+            return state with { Users = state.Users.Select(u => u.Id == userId ? updatedUser : u).ToList() };
+        });
+
+        return updated;
+    }
+
+    public void CommitDraftRoles(string gameId)
+    {
+        var omniscient = store.Get(gameId, IGamePerspectiveStore.OmniscientKey);
+        if (omniscient is null) return;
+
+        var usersWithDrafts = omniscient.Users.Where(u => u.DraftRole != null).ToList();
+
+        foreach (var user in usersWithDrafts)
+        {
+            UpdatePrivateUser(gameId, user.Id, new PrivateGameUserUpdate { Role = user.DraftRole });
+        }
+
+        store.TryUpdate(gameId, IGamePerspectiveStore.OmniscientKey, state =>
+            state with
+            {
+                Users = state.Users.Select(u => u with { DraftRole = null }).ToList()
+            }
+        );
+    }
+
     private static bool IsOmniscient(UserType? userType)
     {
         if (userType is null) return false;
@@ -282,18 +321,11 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         {
             if (state.Users.Any(u => u.Id == gameUser.Id)) return state;
 
-            var userToAdd = ShouldReceiveFullUserData(state.UserId, gameUser.Id)
-                ? gameUser
-                : publicUser;
+            var redactedRole = state.UserId == gameUser.Id ? ToPersonalUser(gameUser) : publicUser;
+            var userToAdd = state.UserId == IGamePerspectiveStore.OmniscientKey ? gameUser : redactedRole;
 
             return state with { Users = [.. state.Users, userToAdd] };
         });
-    }
-
-
-    private static bool ShouldReceiveFullUserData(string perspectiveUserId, string targetUserId)
-    {
-        return perspectiveUserId == IGamePerspectiveStore.OmniscientKey || perspectiveUserId == targetUserId;
     }
 
     private static GameUser ToPublicUser(GameUser user) =>
@@ -306,4 +338,6 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
             IsMarked = user.IsMarked,
             HasVoteToken = user.HasVoteToken
         };
+
+    private static GameUser ToPersonalUser(GameUser user) => user with { DraftRole = null };
 }

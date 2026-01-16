@@ -7,7 +7,7 @@ import {Spinner} from "@/components/ui";
 import {useAppStore} from "@/store";
 import {useState} from "react";
 
-export default function TownSquare() {
+export default function TownSquare({showDraftRoles = false}: Readonly<{ showDraftRoles?: boolean }>) {
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
     const {discordTown, isLoading, error} = useDiscordTown();
     const {currentUser, gameId} = useAppStore();
@@ -43,6 +43,11 @@ export default function TownSquare() {
             {swappingPlayer && (
                 <ActionBanner onCancel={cancelSwap} message={<div>Swapping <span>{swappingPlayer.name}</span>...</div>}/>
             )}
+            {showDraftRoles && (
+                <div className="draft-mode-indicator">
+                    <span>📝 Draft Mode</span>
+                </div>
+            )}
 
             {discordTown?.players?.map((player, index) => {
                 const pos = positions[index];
@@ -65,6 +70,7 @@ export default function TownSquare() {
                         player={player}
                         glowColor={glowColor}
                         showToken={showToken}
+                        showDraftRoles={showDraftRoles}
                         onNameClick={(e) => toggleMenu(player.id, e)}
                         avatarOverlay={isSwappingTarget && (
                             <button className="clickable-portrait" onClick={() => confirmSwap(player)}>

@@ -59,6 +59,7 @@ export type ClocktowerServerDataDtoUserDto = {
     isDead?: boolean;
     isMarked?: boolean;
     role?: ClocktowerServerDataTypesRoleRole;
+    draftRole?: ClocktowerServerDataTypesRoleRole;
 };
 
 export type ClocktowerServerDataGamePerspective = {
@@ -84,6 +85,7 @@ export type ClocktowerServerDataGameUser = {
     isDead?: boolean;
     isMarked?: boolean;
     role?: ClocktowerServerDataTypesRoleRole;
+    draftRole?: ClocktowerServerDataTypesRoleRole;
 };
 
 export type ClocktowerServerDataMiniChannel = {
@@ -233,6 +235,7 @@ export type ClocktowerServerDataDtoUserDtoWritable = {
     isDead?: boolean;
     isMarked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
+    draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
 };
 
 export type ClocktowerServerDataGamePerspectiveWritable = {
@@ -255,6 +258,7 @@ export type ClocktowerServerDataGameUserWritable = {
     isDead?: boolean;
     isMarked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
+    draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
 };
 
 export type ClocktowerServerDataMiniGamePerspectiveWritable = {

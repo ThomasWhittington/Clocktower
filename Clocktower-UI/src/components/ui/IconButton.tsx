@@ -4,6 +4,7 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     icon: ReactNode | ReactNode[];
     text?: string;
     variant?: "primary" | "secondary" | "outline" | "danger";
+    isActiveVariant?: "primary" | "secondary" | "outline" | "danger";
     isActive?: boolean;
     isEnabled?: boolean;
 }
@@ -13,11 +14,14 @@ export const IconButton = ({
                                text,
                                variant = 'secondary',
                                isActive,
+                               isActiveVariant,
                                isEnabled = true,
                                className = "",
                                ...props
                            }: IconButtonProps) => {
-    let baseClass = isActive ? "btn-outline" : `btn-${variant}`;
+    const activeClass = isActiveVariant ? `btn-${isActiveVariant}` : "btn-outline";
+    let baseClass = isActive ? activeClass : `btn-${variant}`;
+
     return (
         <button
             disabled={!isEnabled}
