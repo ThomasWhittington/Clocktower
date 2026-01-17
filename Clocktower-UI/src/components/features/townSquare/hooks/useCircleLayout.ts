@@ -7,7 +7,7 @@ interface CircleLayoutOptions {
     itemSize?: number;
 }
 
-export function useCircleLayout({count, containerWidth, containerHeight, itemSize,}: CircleLayoutOptions) {
+export function useCircleLayout({count, containerWidth, containerHeight, itemSize}: CircleLayoutOptions) {
     return useMemo(() => {
         if (count <= 0 || containerWidth === 0 || containerHeight === 0) return {
             positions: [],

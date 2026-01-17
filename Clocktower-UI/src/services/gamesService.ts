@@ -1,6 +1,6 @@
 ﻿import {type GamePerspective, GameTime, mapToGamePerspective, mapToUser, ScriptSelect, type User,} from "@/types";
-import {addUserToGameApi, type ClocktowerServerDataTypesEnumGameTime, type ClocktowerServerDataTypesEnumScriptSelect, getAvailableGameUsersApi, getGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, setPlayerHasVoteTokenApi, setPlayerIsDeadApi, setScriptApi, setTimeApi, startGameApi, swapSeatingPositionsApi} from "@/api";
 import {apiClient} from "@/api/api-client.ts";
+import {addUserToGameApi, type ClocktowerServerDataTypesEnumGameTime, type ClocktowerServerDataTypesEnumScriptSelect, getAvailableGameUsersApi, getGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, setDraftRoleApi, setPlayerHasVoteTokenApi, setPlayerIsDeadApi, setRoleApi, setScriptApi, setTimeApi, startGameApi, swapSeatingPositionsApi} from "@/api";
 
 async function getGames(): Promise<GamePerspective[]> {
 
@@ -216,6 +216,42 @@ async function setScript(gameId: string, scriptSelect: ScriptSelect, json?: stri
     }
 }
 
+async function setRole(gameId: string, userId: string, roleId: string | undefined) {
+    const {
+        error
+    } = await setRoleApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId,
+            roleId: roleId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set role for user:', error);
+        throw new Error(getMessage(error));
+    }
+}
+
+async function setDraftRole(gameId: string, userId: string, roleId: string | undefined) {
+    const {
+        error
+    } = await setDraftRoleApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId,
+            roleId: roleId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set draft role for user:', error);
+        throw new Error(getMessage(error));
+    }
+}
+
 const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGameTime => {
     switch (gameTime) {
         case GameTime.Unknown:
@@ -267,5 +303,7 @@ export const gamesService = {
     setPlayerIsDead,
     setPlayerHasVoteToken,
     setTime,
-    setScript
+    setScript,
+    setRole,
+    setDraftRole
 }
