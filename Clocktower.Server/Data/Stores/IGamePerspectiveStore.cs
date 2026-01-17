@@ -13,4 +13,5 @@ public interface IGamePerspectiveStore
     IEnumerable<GamePerspective> GetAllPerspectivesForGame(string gameId);
     void UpdateAllPerspectives(string gameId, Func<GamePerspective, GamePerspective> updateFunction);
     void UpdateUserInOwnAndOmniscientPerspectives(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction);
+    void UpdateUserInOwnPerspective(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction);
 }

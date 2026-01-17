@@ -5,6 +5,8 @@ namespace Clocktower.Server.Game.Services;
 
 public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiveService, IDiscordTownManager discordTownManager, IGameBroadcastService gameBroadcastService, IScriptProvider scriptProvider) : IGameService
 {
+    private const string Now = "now";
+    private const string Already = "already";
     public IEnumerable<GamePerspective> GetGames() => gamePerspectiveService.GetAll();
 
     public IEnumerable<MiniGamePerspective> GetPlayerGames(string userId)
@@ -114,8 +116,6 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         gameUser.UserType = UserType.Player;
         gameUser.SeatingPosition = gamePerspectiveService.GetNextAvailableSeatingPosition(gameId);
 
-        gameUser.Role = Role.AllRoles[Random.Shared.Next(Role.AllRoles.Count)];
-
         gamePerspectiveService.AddUserToGame(gameId, gameUser);
 
         await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
@@ -201,7 +201,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         });
 
         if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
-        string updateOccurredString = updateOccurred ? "now" : "already";
+        string updateOccurredString = updateOccurred ? Now : Already;
         string expectedTokenStatus = isDead ? "dead" : "alive";
         return Result.Ok($"{user.DisplayName} is {updateOccurredString} {expectedTokenStatus}");
     }
@@ -221,8 +221,82 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         });
 
         if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
-        string updateOccurredString = updateOccurred ? "now" : "already";
+        string updateOccurredString = updateOccurred ? Now : Already;
         string expectedTokenStatus = hasVoteToken ? "has token" : "does not have token";
         return Result.Ok($"{user.DisplayName} {updateOccurredString} {expectedTokenStatus}");
+    }
+
+    public async Task<Result<string>> SetPerspectiveRole(string gameId, string userId, string targetUserId, string? roleId)
+    {
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var user = guild.GetUser(userId);
+        if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
+        var targetUser = guild.GetUser(targetUserId);
+        if (targetUser is null) return Result.Fail<string>(Errors.UserNotFound(targetUserId));
+        var role = Role.AllRoles.FirstOrDefault(o => o.Id == roleId);
+
+        var updateOccurred = gamePerspectiveService.SetRoleOnPerspective(gameId, userId, targetUserId, role);
+
+        if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+
+        string updateOccurredString = updateOccurred ? Now : Already;
+        string roleString = role == null ? "NONE" : role.Name;
+        return Result.Ok($"{targetUser.DisplayName} {updateOccurredString} has the perspective role: {roleString}");
+    }
+
+    public async Task<Result<string>> SetRole(string gameId, string targetUserId, string? roleId)
+    {
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var targetUser = guild.GetUser(targetUserId);
+        if (targetUser is null) return Result.Fail<string>(Errors.UserNotFound(targetUserId));
+        var role = Role.AllRoles.FirstOrDefault(o => o.Id == roleId);
+
+        var updateOccurred = gamePerspectiveService.UpdatePrivateUser(gameId, targetUserId, new PrivateGameUserUpdate
+        {
+            RemoveRole = role is null,
+            Role = role
+        });
+
+        if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+
+        string updateOccurredString = updateOccurred ? Now : Already;
+        string roleString = role == null ? "NONE" : role.Name;
+        return Result.Ok($"{targetUser.DisplayName} {updateOccurredString} has the role: {roleString}");
+    }
+
+    public async Task<Result<string>> SetDraftRole(string gameId, string targetUserId, string? roleId)
+    {
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var targetUser = guild.GetUser(targetUserId);
+        if (targetUser is null) return Result.Fail<string>(Errors.UserNotFound(targetUserId));
+        var role = Role.AllRoles.FirstOrDefault(o => o.Id == roleId);
+
+        var updateOccurred = gamePerspectiveService.UpdateDraftRole(gameId, targetUserId, role);
+
+        if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+
+        string updateOccurredString = updateOccurred ? Now : Already;
+        string roleString = role == null ? "NONE" : role.Name;
+        return Result.Ok($"{targetUser.DisplayName} {updateOccurredString} has the draft role: {roleString}");
+    }
+
+    public async Task<Result<string>> CommitDraftRoles(string gameId)
+    {
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+
+        gamePerspectiveService.CommitDraftRoles(gameId);
+
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+        return Result.Ok($"Draft roles committed for game {gameId}");
     }
 }

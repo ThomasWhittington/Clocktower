@@ -1,31 +1,36 @@
 ﻿import {BasePanel} from "@/components/ui";
-import {Role, type User} from "@/types";
-import {useElementSize, useServerHub} from "@/hooks";
+import {
+    Role,
+    type User
+} from "@/types";
+import {
+    useElementSize,
+    useServerHub
+} from "@/hooks";
 import {TokenGroup} from "@/components/features/gameWindow/components";
 import {Token} from "@/components/tokens";
-import {useSetRoles} from "@/components/features/gameWindow/hooks/useSetRoles.ts";
 import {useAppStore} from "@/store";
 
 interface TokenPanelProps {
     isOpen: boolean,
     onClose: () => void,
     player: User,
-    isDraftMode: boolean
+    isDraftMode: boolean,
+    setRole: (role: (Role | undefined), targetUserId: string) => Promise<void>
 }
 
-export const TokenPanel = ({isOpen, onClose, player, isDraftMode}: TokenPanelProps) => {
+export const TokenPanel = ({isOpen, onClose, player, isDraftMode, setRole}: TokenPanelProps) => {
     if (!player) return null;
     const currentUser = useAppStore((state) => state.currentUser);
     if (!currentUser) return null;
     const {script} = useServerHub();
-    const {setRole} = useSetRoles(currentUser.id, player.id);
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
 
     const playerRole = isDraftMode ? player.draftRole : player.role;
 
 
     const tokenClicked = async (role: Role | undefined) => {
-        await setRole(role, isDraftMode);
+        await setRole(role, player.id);
         onClose();
     }
 

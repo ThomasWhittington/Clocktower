@@ -11,7 +11,7 @@
     }
 
     .draft-mode-indicator {
-        @apply absolute bottom-5 left-1/2 translate-x-[-50%] py-3 px-6 bg-discord-warning rounded-lg z-1000 select-none shadow-[0_4px_12px_rgba(0,0,0,0.3)];
+        @apply absolute bottom-5 left-1/2 translate-x-[-50%] py-3 px-6 bg-discord-warning/50 font-bold rounded-lg z-1000 select-none shadow-[0_4px_12px_rgba(0,0,0,0.3)];
     }
 
     .action-banner-content {

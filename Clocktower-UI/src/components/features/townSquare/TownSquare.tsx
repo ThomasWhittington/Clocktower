@@ -1,8 +1,22 @@
 ﻿import type {PlayerActionContext} from "@/components/features/townSquare/config";
-import {ActionBanner, PlayerActionMenu, PlayerIcon} from "@/components/features/townSquare/components";
-import {getPlayerGlowColor, useCircleLayout, useTownSquareActions} from "@/components/features/townSquare/hooks";
-import {useDiscordTown, useUser} from "@/components/features/discordTownPanel/hooks";
-import {useElementSize, useKeyboardShortcut} from "@/hooks";
+import {
+    ActionBanner,
+    PlayerActionMenu,
+    PlayerIcon
+} from "@/components/features/townSquare/components";
+import {
+    getPlayerGlowColor,
+    useCircleLayout,
+    useTownSquareActions
+} from "@/components/features/townSquare/hooks";
+import {
+    useDiscordTown,
+    useUser
+} from "@/components/features/discordTownPanel/hooks";
+import {
+    useElementSize,
+    useKeyboardShortcut
+} from "@/hooks";
 import {Spinner} from "@/components/ui";
 import {useAppStore} from "@/store";
 import {useState} from "react";
@@ -12,9 +26,10 @@ import {User} from "@/types";
 interface TownSquareProps {
     showDraftRoles?: boolean;
     onTokenClick?: (player: User) => void;
+    onCommitDraftRoles?: () => void;
 }
 
-export default function TownSquare({showDraftRoles = false, onTokenClick}: Readonly<TownSquareProps>) {
+export default function TownSquare({showDraftRoles = false, onTokenClick, onCommitDraftRoles}: Readonly<TownSquareProps>) {
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
     const {discordTown, isLoading, error} = useDiscordTown();
     const {currentUser, gameId} = useAppStore();
@@ -53,6 +68,11 @@ export default function TownSquare({showDraftRoles = false, onTokenClick}: Reado
             {showDraftRoles && (
                 <div className="draft-mode-indicator">
                     <span>📝 Draft Mode</span>
+                    {onCommitDraftRoles && (
+                        <button onClick={onCommitDraftRoles} className="btn-danger">
+                            Send to Players
+                        </button>
+                    )}
                 </div>
             )}
 

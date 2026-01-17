@@ -37,6 +37,11 @@ public class GamePerspectiveStore : IGamePerspectiveStore
         TryUpdate(gameId, IGamePerspectiveStore.OmniscientKey, updateFunction);
     }
 
+    public void UpdateUserInOwnPerspective(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction)
+    {
+        TryUpdate(gameId, userId, updateFunction);
+    }
+
     public void TryUpdate(string gameId, string userId, Func<GamePerspective, GamePerspective> updateFunction)
     {
         var key = (gameId, userId);

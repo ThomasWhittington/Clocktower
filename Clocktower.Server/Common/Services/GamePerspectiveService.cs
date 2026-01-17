@@ -101,6 +101,26 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         return updated;
     }
 
+    public bool SetRoleOnPerspective(string gameId, string userId, string targetUserId, Role? role)
+    {
+        bool updated = false;
+        store.UpdateUserInOwnPerspective(gameId, userId, state =>
+        {
+            var user = state.Users.FirstOrDefault(o => o.Id == targetUserId);
+            if (user is null || (user.Role == null && role is null) || user.Role?.Id == role?.Id) return state;
+            updated = true;
+
+            var updatedUser = user with
+            {
+                Role = role
+            };
+
+            return state with { Users = state.Users.Select(u => u.Id == targetUserId ? updatedUser : u).ToList() };
+        });
+
+        return updated;
+    }
+
 
     public bool AddUserToGame(string gameId, GameUser gameUser)
     {
