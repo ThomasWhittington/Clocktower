@@ -1127,7 +1127,7 @@ export type SetDraftRoleApiData = {
         roleId?: string;
     };
     query?: never;
-    url: '/api/games/{gameId}/{userId}/set-draft-role/{targetUserId}/{roleId}';
+    url: '/api/games/{gameId}/set-draft-role/{targetUserId}/{roleId}';
 };
 
 export type SetDraftRoleApiErrors = {

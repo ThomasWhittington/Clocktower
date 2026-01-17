@@ -4,6 +4,7 @@ using Clocktower.Server.Data;
 using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types.Enum;
+using Clocktower.Server.Data.Types.Role;
 using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Game.Services;
 using Clocktower.Server.Socket.Services;
@@ -15,8 +16,10 @@ public class GameServiceTests
 {
     private const string GameId = "game-id";
     private const string UserId = "123";
+    private const string UserId2 = "456";
     private const string GuildId = "789";
     private const string DisplayName = "display name";
+    private const string DisplayName2 = "display name2";
 
     private Mock<IDiscordBot> _mockBot = null!;
     private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
@@ -846,8 +849,365 @@ public class GameServiceTests
         var result = await _sut.SetScript(GameId, script, json);
 
         result.ShouldSucceedWith(expected!);
-        _mockGamePerspectiveService.Verify(o => o.SetScript(GameId, expected!));
-        _mockGameBroadcastService.Verify(o => o.BroadcastScriptUpdate(GameId, expected!));
+        _mockGamePerspectiveService.Verify(o => o.SetScript(GameId, expected!), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastScriptUpdate(GameId, expected!), Times.Once);
+    }
+
+    #endregion
+
+    #region CommitDraftRoles
+
+    private void Setup_CommitDraftRoles(bool gameExists = true)
+    {
+        _mockGamePerspectiveService.Setup(o => o.GameExists(GameId)).Returns(gameExists);
+        _mockGamePerspectiveService.Setup(o => o.CommitDraftRoles(GameId));
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+    }
+
+    [TestMethod]
+    public async Task CommitDraftRoles_ReturnsError_WhenGameNotFound()
+    {
+        Setup_CommitDraftRoles(gameExists: false);
+
+        var result = await _sut.CommitDraftRoles(GameId);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task CommitDraftRoles_ReturnsOk()
+    {
+        Setup_CommitDraftRoles();
+
+        var result = await _sut.CommitDraftRoles(GameId);
+
+        result.ShouldSucceedWith<string>($"Draft roles committed for game {GameId}");
+
+        _mockGamePerspectiveService.Verify(o => o.CommitDraftRoles(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    #endregion
+
+    #region SetPerspectiveRole
+
+    private void Setup_SetPerspectiveRole(bool hasGame = true, bool hasGuild = true, bool hasUser = true, bool hasTargetUser = true, bool updated = true)
+    {
+        var guild = StrictMockFactory.Create<IDiscordGuild>();
+
+        var targetUser = StrictMockFactory.Create<IDiscordGuildUser>();
+        targetUser.Setup(o => o.DisplayName).Returns(DisplayName);
+        var user = StrictMockFactory.Create<IDiscordGuildUser>();
+        user.Setup(o => o.DisplayName).Returns(DisplayName2);
+
+        var perspective = new GamePerspective(GameId, UserId, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow);
+
+        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? perspective : null);
+
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guild.Object : null);
+
+        guild.Setup(o => o.GetUser(UserId)).Returns(hasTargetUser ? targetUser.Object : null);
+        guild.Setup(o => o.GetUser(UserId2)).Returns(hasUser ? user.Object : null);
+        _mockGamePerspectiveService.Setup(o => o.SetRoleOnPerspective(GameId, UserId2, UserId, It.IsAny<Role>())).Returns(updated);
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+    }
+
+    [TestMethod]
+    public async Task SetPerspectiveRole_ReturnsError_WhenGameNotFound()
+    {
+        Setup_SetPerspectiveRole(hasGame: false);
+
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger().Id);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetPerspectiveRole_ReturnsError_WhenGuildNotFound()
+    {
+        Setup_SetPerspectiveRole(hasGuild: false);
+
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger().Id);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
+    }
+
+    [TestMethod]
+    public async Task SetPerspectiveRole_ReturnsError_WhenUserNotFound()
+    {
+        Setup_SetPerspectiveRole(hasUser: false);
+
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger().Id);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetPerspectiveRole_ReturnsError_WhenTargetUserNotFound()
+    {
+        Setup_SetPerspectiveRole(hasTargetUser: false);
+
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger().Id);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetPerspectiveRole_ReturnsOk_RoleNotNull()
+    {
+        Setup_SetPerspectiveRole();
+
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger().Id);
+
+        result.ShouldSucceedWith<string>("display name now has the perspective role: Gunslinger");
+        _mockGamePerspectiveService.Verify(o => o.SetRoleOnPerspective(GameId, UserId2, UserId, Role.Gunslinger()), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task SetPerspectiveRole_ReturnsOk_RoleNull()
+    {
+        Setup_SetPerspectiveRole();
+
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, null);
+
+        result.ShouldSucceedWith<string>("display name now has the perspective role: NONE");
+        _mockGamePerspectiveService.Verify(o => o.SetRoleOnPerspective(GameId, UserId2, UserId, null), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task SetPerspectiveRole_ReturnsOk_RoleNull_NoChange()
+    {
+        Setup_SetPerspectiveRole(updated: false);
+
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, null);
+
+        result.ShouldSucceedWith<string>("display name already has the perspective role: NONE");
+        _mockGamePerspectiveService.Verify(o => o.SetRoleOnPerspective(GameId, UserId2, UserId, null), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task SetPerspectiveRole_ReturnsOk_RoleNotNull_NoChange()
+    {
+        Setup_SetPerspectiveRole(updated: false);
+
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger().Id);
+
+        result.ShouldSucceedWith<string>("display name already has the perspective role: Gunslinger");
+        _mockGamePerspectiveService.Verify(o => o.SetRoleOnPerspective(GameId, UserId2, UserId, Role.Gunslinger()), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+    }
+
+    #endregion
+
+    #region SetDraftRole
+
+    private void Setup_SetDraftRole(bool hasGame = true, bool hasGuild = true, bool hasTargetUser = true, bool updated = true)
+    {
+        var guild = StrictMockFactory.Create<IDiscordGuild>();
+        var targetUser = StrictMockFactory.Create<IDiscordGuildUser>();
+        targetUser.Setup(o => o.DisplayName).Returns(DisplayName);
+        var perspective = new GamePerspective(GameId, UserId, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow);
+
+        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? perspective : null);
+
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guild.Object : null);
+
+        guild.Setup(o => o.GetUser(UserId)).Returns(hasTargetUser ? targetUser.Object : null);
+        _mockGamePerspectiveService.Setup(o => o.UpdateDraftRole(GameId, UserId, It.IsAny<Role>())).Returns(updated);
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+    }
+
+    [TestMethod]
+    public async Task SetDraftRole_ReturnsError_WhenGameNotFound()
+    {
+        Setup_SetDraftRole(hasGame: false);
+
+        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger().Id);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetDraftRole_ReturnsError_WhenGuildNotFound()
+    {
+        Setup_SetDraftRole(hasGuild: false);
+
+        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger().Id);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
+    }
+
+    [TestMethod]
+    public async Task SetDraftRole_ReturnsError_WhenTargetUserNotFound()
+    {
+        Setup_SetDraftRole(hasTargetUser: false);
+
+        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger().Id);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetDraftRole_ReturnsOk_RoleNotNull()
+    {
+        Setup_SetDraftRole();
+
+        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger().Id);
+
+        result.ShouldSucceedWith<string>("display name now has the draft role: Gunslinger");
+        _mockGamePerspectiveService.Verify(o => o.UpdateDraftRole(GameId, UserId, Role.Gunslinger()), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task SetDraftRole_ReturnsOk_RoleNull()
+    {
+        Setup_SetDraftRole();
+
+        var result = await _sut.SetDraftRole(GameId, UserId, null);
+
+        result.ShouldSucceedWith<string>("display name now has the draft role: NONE");
+        _mockGamePerspectiveService.Verify(o => o.UpdateDraftRole(GameId, UserId, null), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task SetDraftRole_ReturnsOk_RoleNull_NoChange()
+    {
+        Setup_SetDraftRole(updated: false);
+
+        var result = await _sut.SetDraftRole(GameId, UserId, null);
+
+        result.ShouldSucceedWith<string>("display name already has the draft role: NONE");
+        _mockGamePerspectiveService.Verify(o => o.UpdateDraftRole(GameId, UserId, null), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task SetDraftRole_ReturnsOk_RoleNotNull_NoChange()
+    {
+        Setup_SetDraftRole(updated: false);
+
+        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger().Id);
+
+        result.ShouldSucceedWith<string>("display name already has the draft role: Gunslinger");
+        _mockGamePerspectiveService.Verify(o => o.UpdateDraftRole(GameId, UserId, Role.Gunslinger()), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+    }
+
+    #endregion
+
+    #region SetRole
+
+    private void Setup_SetRole(bool hasGame = true, bool hasGuild = true, bool hasTargetUser = true, bool updated = true)
+    {
+        var guild = StrictMockFactory.Create<IDiscordGuild>();
+        var targetUser = StrictMockFactory.Create<IDiscordGuildUser>();
+        targetUser.Setup(o => o.DisplayName).Returns(DisplayName);
+        var perspective = new GamePerspective(GameId, UserId, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow);
+
+        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? perspective : null);
+
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guild.Object : null);
+
+        guild.Setup(o => o.GetUser(UserId)).Returns(hasTargetUser ? targetUser.Object : null);
+
+
+        _mockGamePerspectiveService.Setup(o => o.UpdatePrivateUser(GameId, UserId, It.IsAny<PrivateGameUserUpdate>())).Returns(updated);
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+    }
+
+    [TestMethod]
+    public async Task SetRole_ReturnsError_WhenGameNotFound()
+    {
+        Setup_SetRole(hasGame: false);
+
+        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetRole_ReturnsError_WhenGuildNotFound()
+    {
+        Setup_SetRole(hasGuild: false);
+
+        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
+    }
+
+    [TestMethod]
+    public async Task SetRole_ReturnsError_WhenTargetUserNotFound()
+    {
+        Setup_SetRole(hasTargetUser: false);
+
+        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetRole_ReturnsOk_RoleNotNull()
+    {
+        Setup_SetRole();
+
+        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
+
+        result.ShouldSucceedWith<string>("display name now has the role: Gunslinger");
+        _mockGamePerspectiveService.Verify(o => o.UpdatePrivateUser(GameId, UserId, It.Is<PrivateGameUserUpdate>(u =>
+            u.Role == Role.Gunslinger() &&
+            !u.RemoveRole
+        )), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task SetRole_ReturnsOk_RoleNull()
+    {
+        Setup_SetRole();
+
+        var result = await _sut.SetRole(GameId, UserId, null);
+
+        result.ShouldSucceedWith<string>("display name now has the role: NONE");
+        _mockGamePerspectiveService.Verify(o => o.UpdatePrivateUser(GameId, UserId, It.Is<PrivateGameUserUpdate>(u =>
+            u.Role == null &&
+            u.RemoveRole
+        )), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task SetRole_ReturnsOk_RoleNull_NoChange()
+    {
+        Setup_SetRole(updated: false);
+
+        var result = await _sut.SetRole(GameId, UserId, null);
+
+        result.ShouldSucceedWith<string>("display name already has the role: NONE");
+        _mockGamePerspectiveService.Verify(o => o.UpdatePrivateUser(GameId, UserId, It.Is<PrivateGameUserUpdate>(u =>
+            u.Role == null &&
+            u.RemoveRole
+        )), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task SetRole_ReturnsOk_RoleNotNull_NoChange()
+    {
+        Setup_SetRole(updated: false);
+
+        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
+
+        result.ShouldSucceedWith<string>("display name already has the role: Gunslinger");
+        _mockGamePerspectiveService.Verify(o => o.UpdatePrivateUser(GameId, UserId, It.Is<PrivateGameUserUpdate>(u =>
+            u.Role == Role.Gunslinger() &&
+            !u.RemoveRole
+        )), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
     }
 
     #endregion

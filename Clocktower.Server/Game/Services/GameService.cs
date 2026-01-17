@@ -291,8 +291,8 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
 
     public async Task<Result<string>> CommitDraftRoles(string gameId)
     {
-        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
-        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var gameExists = gamePerspectiveService.GameExists(gameId);
+        if (!gameExists) return Result.Fail<string>(Errors.GameNotFound(gameId));
 
         gamePerspectiveService.CommitDraftRoles(gameId);
 

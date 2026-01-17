@@ -369,6 +369,79 @@ public class GamePerspectiveServiceTests
 
     #endregion
 
+    #region SetRoleOnPerspective
+
+    [TestMethod]
+    public void SetRoleOnPerspective_ReturnsFalse_WhenUserNotFound()
+    {
+        var storyTeller = new GameUser(UserId1) { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId2) { UserType = UserType.Player };
+        var player2 = new GameUser(UserId3) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyTeller);
+        _sut.AddUserToGame(GameId1, player1);
+        _sut.AddUserToGame(GameId1, player2);
+
+        var result = _sut.SetRoleOnPerspective(GameId1, UserId4, UserId2, Role.Gunslinger());
+
+        result.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void SetRoleOnPerspective_ReturnsFalse_WhenNoChangeRequired_Null()
+    {
+        var storyTeller = new GameUser(UserId1) { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId2) { UserType = UserType.Player };
+        var player2 = new GameUser(UserId3) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyTeller);
+        _sut.AddUserToGame(GameId1, player1);
+        _sut.AddUserToGame(GameId1, player2);
+
+        var result = _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, null);
+
+        result.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void SetRoleOnPerspective_ReturnsFalse_WhenNoChangeRequired_SameRole()
+    {
+        var storyTeller = new GameUser(UserId1) { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId2) { UserType = UserType.Player, Role = Role.Gunslinger() };
+        var player2 = new GameUser(UserId3) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyTeller);
+        _sut.AddUserToGame(GameId1, player1);
+        _sut.AddUserToGame(GameId1, player2);
+        _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, Role.Gunslinger());
+
+        var result = _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, Role.Gunslinger());
+
+        result.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void SetRoleOnPerspective_ReturnsTrue_WhenChangesMade()
+    {
+        var storyTeller = new GameUser(UserId1) { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId2) { UserType = UserType.Player, Role = Role.Gunslinger() };
+        var player2 = new GameUser(UserId3) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyTeller);
+        _sut.AddUserToGame(GameId1, player1);
+        _sut.AddUserToGame(GameId1, player2);
+        _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, Role.Gunslinger());
+
+        var result = _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, Role.Baron());
+
+        result.Should().BeTrue();
+
+        var stPerspective = _sut.GetPerspective(GameId1, UserId1);
+        stPerspective!.Users.First(u => u.Id == UserId1).Role.Should().BeNull();
+        var player1Perspective = _sut.GetPerspective(GameId1, UserId2);
+        player1Perspective!.Users.First(u => u.Id == UserId2).Role.Should().Be(Role.Gunslinger());
+        var player2Perspective = _sut.GetPerspective(GameId1, UserId3);
+        player2Perspective!.Users.First(u => u.Id == UserId2).Role.Should().Be(Role.Baron());
+    }
+
+    #endregion
+
     #region AddUserToGame
 
     [TestMethod]

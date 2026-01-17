@@ -422,4 +422,16 @@ public class GameBroadcastServiceTests
 
         _mockNotificationService.Verify(c => c.SendTownTimeToGroup(GameId, gameTime), Times.Once);
     }
+
+
+    [TestMethod]
+    public async Task BroadcastScriptUpdate_CallsNotificationService()
+    {
+        var script = new Script("Script", "Author", []);
+        _mockNotificationService.Setup(c => c.SendScriptToGroup(GameId, script)).Returns(Task.CompletedTask);
+
+        await _sut.BroadcastScriptUpdate(GameId, script);
+
+        _mockNotificationService.Verify(c => c.SendScriptToGroup(GameId, script), Times.Once);
+    }
 }

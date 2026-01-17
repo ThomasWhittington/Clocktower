@@ -745,7 +745,7 @@ export const setDraftRoleApi = <ThrowOnError extends boolean = false>(options: O
                 type: 'http'
             }
         ],
-        url: '/api/games/{gameId}/{userId}/set-draft-role/{targetUserId}/{roleId}',
+        url: '/api/games/{gameId}/set-draft-role/{targetUserId}/{roleId}',
         ...options
     });
 };
