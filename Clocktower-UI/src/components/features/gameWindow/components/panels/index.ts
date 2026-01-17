@@ -2,3 +2,4 @@
 export * from './scriptManager'
 export * from './roleList'
 export * from './nightOrder'
+export * from './token'

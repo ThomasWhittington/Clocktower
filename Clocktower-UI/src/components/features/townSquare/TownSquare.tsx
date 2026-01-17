@@ -6,8 +6,15 @@ import {useElementSize, useKeyboardShortcut} from "@/hooks";
 import {Spinner} from "@/components/ui";
 import {useAppStore} from "@/store";
 import {useState} from "react";
+import {User} from "@/types";
 
-export default function TownSquare({showDraftRoles = false}: Readonly<{ showDraftRoles?: boolean }>) {
+
+interface TownSquareProps {
+    showDraftRoles?: boolean;
+    onTokenClick?: (player: User) => void;
+}
+
+export default function TownSquare({showDraftRoles = false, onTokenClick}: Readonly<TownSquareProps>) {
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
     const {discordTown, isLoading, error} = useDiscordTown();
     const {currentUser, gameId} = useAppStore();
@@ -72,6 +79,7 @@ export default function TownSquare({showDraftRoles = false}: Readonly<{ showDraf
                         showToken={showToken}
                         showDraftRoles={showDraftRoles}
                         onNameClick={(e) => toggleMenu(player.id, e)}
+                        onTokenClick={onTokenClick}
                         avatarOverlay={isSwappingTarget && (
                             <button className="clickable-portrait" onClick={() => confirmSwap(player)}>
                                 <span className="portrait-icon">🔄</span>

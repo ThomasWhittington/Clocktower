@@ -3,18 +3,21 @@ import type {User} from "@/types";
 import {type CSSProperties, type MouseEvent, type ReactNode} from "react";
 import {type ColorKey, colors} from "@/theme";
 
-export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, glowColor, showToken, children, showDraftRoles}: Readonly<{
-    x: number,
-    y: number,
-    size: number,
-    player: User,
-    onNameClick: (e: MouseEvent) => void,
-    avatarOverlay?: ReactNode,
-    glowColor?: ColorKey,
-    showToken: boolean,
-    children?: ReactNode,
-    showDraftRoles: boolean
-}>) {
+interface PlayerIconProps {
+    x: number;
+    y: number;
+    size: number;
+    player: User;
+    onNameClick: (e: MouseEvent) => void;
+    avatarOverlay?: ReactNode;
+    glowColor?: ColorKey;
+    showToken: boolean;
+    children?: ReactNode;
+    showDraftRoles: boolean;
+    onTokenClick?: (player: User) => void;
+}
+
+export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, glowColor, showToken, children, showDraftRoles, onTokenClick}: Readonly<PlayerIconProps>) {
     const isTopHalf = y < 0;
     const playerIconStyle = {'--player-x': `${x}px`, '--player-y': `${y}px`} as CSSProperties;
     const glowColorStyle = glowColor ? {'--glow-color': colors[glowColor]} as CSSProperties : undefined;
@@ -25,7 +28,7 @@ export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, glow
                 <PlayerNameLabel player={player} onClick={onNameClick}>{children}</PlayerNameLabel>
             }
             <div className="avatar-container" style={glowColorStyle}>
-                <FlippableAvatar player={player} size={size} showToken={showToken} showDraftRoles={showDraftRoles}/>
+                <FlippableAvatar player={player} size={size} showToken={showToken} showDraftRoles={showDraftRoles} onTokenClick={onTokenClick}/>
                 {avatarOverlay}
                 <AvatarOverlays player={player}/>
             </div>

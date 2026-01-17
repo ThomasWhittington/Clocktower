@@ -1,11 +1,12 @@
 ﻿import {TownSquare} from "@/components/features";
 import {useAppStore} from "@/store";
-import {BottomHud, CenterHud, NightOrderPanel, RightHud, RoleListPanel, ScriptManagerPanel, StoryTellerHud, TopHud, UserManagerPanel} from "@/components/features/gameWindow/components";
+import {BottomHud, CenterHud, NightOrderPanel, RightHud, RoleListPanel, ScriptManagerPanel, StoryTellerHud, TokenPanel, TopHud, UserManagerPanel} from "@/components/features/gameWindow/components";
 import {UserUtils} from "@/utils";
 import {useDiscordTown, useUser} from "@/components/features/discordTownPanel/hooks";
 import {useKeyboardShortcut, useServerHub} from "@/hooks";
 import {useActivePanel} from "@/components/features/gameWindow/hooks";
 import {useState} from "react";
+import {User} from "@/types";
 
 export default function GameWindow() {
     const {gameId, currentUser} = useAppStore();
@@ -13,7 +14,7 @@ export default function GameWindow() {
     const {discordTown} = useDiscordTown();
     const {script} = useServerHub();
     const [showDraftRoles, setShowDraftRoles] = useState(false);
-    const {togglePanel, isPanelOpen, closePanel} = useActivePanel();
+    const {togglePanel, isPanelOpen, closePanel, openPanel, getPanelData} = useActivePanel();
 
     useKeyboardShortcut({
         key: 'u',
@@ -38,16 +39,25 @@ export default function GameWindow() {
         onKeyPress: () => setShowDraftRoles(prev => !prev),
         enabled: UserUtils.isStoryTeller(thisUser)
     });
+    const tokenData = getPanelData('token');
 
     return (
         <div className="game-window-controls">
-            <TownSquare showDraftRoles={showDraftRoles}/>
+            <TownSquare showDraftRoles={showDraftRoles} onTokenClick={(player: User) => {
+                openPanel('token', {player});
+            }}/>
 
             <UserManagerPanel isOpen={isPanelOpen('user')} onClose={closePanel}/>
             <ScriptManagerPanel isOpen={isPanelOpen('script')} onClose={closePanel}/>
             <RoleListPanel isOpen={isPanelOpen('role')} onClose={closePanel}/>
             <NightOrderPanel isOpen={isPanelOpen('night')} onClose={closePanel}/>
-
+            {tokenData && (
+                <TokenPanel
+                    isOpen={isPanelOpen('token')}
+                    onClose={closePanel}
+                    player={tokenData.player}
+                />
+            )}
             {UserUtils.isStoryTeller(thisUser) &&
                 <StoryTellerHud
                     inviteIsOpen={isPanelOpen('user')}
