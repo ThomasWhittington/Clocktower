@@ -4,6 +4,7 @@ import {useElementSize, useServerHub} from "@/hooks";
 import {TokenGroup} from "@/components/features/gameWindow/components";
 import {Token} from "@/components/tokens";
 import {useSetRoles} from "@/components/features/gameWindow/hooks/useSetRoles.ts";
+import {useAppStore} from "@/store";
 
 interface TokenPanelProps {
     isOpen: boolean,
@@ -14,8 +15,10 @@ interface TokenPanelProps {
 
 export const TokenPanel = ({isOpen, onClose, player, isDraftMode}: TokenPanelProps) => {
     if (!player) return null;
+    const currentUser = useAppStore((state) => state.currentUser);
+    if (!currentUser) return null;
     const {script} = useServerHub();
-    const {setRole} = useSetRoles(player);
+    const {setRole} = useSetRoles(currentUser.id, player.id);
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
 
     const playerRole = isDraftMode ? player.draftRole : player.role;

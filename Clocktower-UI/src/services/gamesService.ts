@@ -216,7 +216,7 @@ async function setScript(gameId: string, scriptSelect: ScriptSelect, json?: stri
     }
 }
 
-async function setRole(gameId: string, userId: string, roleId: string | undefined) {
+async function setRole(gameId: string, userId: string, targetUserId: string, roleId: string | undefined) {
     const {
         error
     } = await setRoleApi({
@@ -224,6 +224,7 @@ async function setRole(gameId: string, userId: string, roleId: string | undefine
         path: {
             gameId: gameId,
             userId: userId,
+            targetUserId: targetUserId,
             roleId: roleId
         }
     });
@@ -234,7 +235,7 @@ async function setRole(gameId: string, userId: string, roleId: string | undefine
     }
 }
 
-async function setDraftRole(gameId: string, userId: string, roleId: string | undefined) {
+async function setDraftRole(gameId: string, userId: string, targetUserId: string, roleId: string | undefined) {
     const {
         error
     } = await setDraftRoleApi({
@@ -242,6 +243,7 @@ async function setDraftRole(gameId: string, userId: string, roleId: string | und
         path: {
             gameId: gameId,
             userId: userId,
+            targetUserId: targetUserId,
             roleId: roleId
         }
     });

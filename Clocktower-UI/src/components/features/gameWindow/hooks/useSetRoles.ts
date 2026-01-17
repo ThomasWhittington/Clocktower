@@ -1,10 +1,10 @@
 ﻿import {useCallback} from "react";
-import {Role, type User} from "@/types";
+import {Role} from "@/types";
 import {useAction} from "@/hooks";
 import {useAppStore} from "@/store";
 import {gamesService} from "@/services";
 
-export function useSetRoles(player: User) {
+export function useSetRoles(currentUserId: string, targetUserId: string) {
     const {runAction} = useAction();
     const {gameId} = useAppStore();
 
@@ -12,12 +12,12 @@ export function useSetRoles(player: User) {
         if (!gameId) return;
         await runAction(async () => {
             if (isDraftMode) {
-                return await gamesService.setDraftRole(gameId, player.id, role?.id);
+                return await gamesService.setDraftRole(gameId, currentUserId, targetUserId, role?.id);
             } else {
-                return await gamesService.setRole(gameId, player.id, role?.id);
+                return await gamesService.setRole(gameId, currentUserId, targetUserId, role?.id);
             }
         });
-    }, [player.role, gameId, runAction]);
+    }, [gameId, runAction, currentUserId, targetUserId]);
 
     return {
         setRole
