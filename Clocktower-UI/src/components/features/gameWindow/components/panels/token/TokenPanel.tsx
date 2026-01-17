@@ -1,21 +1,54 @@
 ﻿import {BasePanel} from "@/components/ui";
-import type {User} from "@/types";
+import {Role, type User} from "@/types";
+import {useElementSize, useServerHub} from "@/hooks";
+import {TokenGroup} from "@/components/features/gameWindow/components";
+import {Token} from "@/components/tokens";
+import {useSetRoles} from "@/components/features/gameWindow/hooks/useSetRoles.ts";
 
 interface TokenPanelProps {
-    isOpen: boolean;
-    onClose: () => void;
-    player: User;
+    isOpen: boolean,
+    onClose: () => void,
+    player: User,
+    isDraftMode: boolean
 }
 
-export const TokenPanel = ({isOpen, onClose, player}: TokenPanelProps) => {
+export const TokenPanel = ({isOpen, onClose, player, isDraftMode}: TokenPanelProps) => {
     if (!player) return null;
+    const {script} = useServerHub();
+    const {setRole} = useSetRoles(player);
+    const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
 
+    const playerRole = isDraftMode ? player.draftRole : player.role;
+
+
+    const tokenClicked = async (role: Role | undefined) => {
+        await setRole(role, isDraftMode);
+        onClose();
+    }
+
+    const dynamicSize = Math.min(parentSize.width, parentSize.height) / 8;
     return (
-        <BasePanel title={`${player.name}'s Token`} isOpen={isOpen} onClose={onClose}>
-            <div>
-                <p>Player: {player.name}</p>
-                <p>Role: {player.role?.name}</p>
+        <BasePanel title={`Choose a new character for ${player.name}`} isOpen={isOpen} onClose={onClose}>
+            <div ref={containerRef} className="token-panel">
+                <TokenGroup name="Townsfolk" roles={script?.townsfolk} tokenSize={dynamicSize} currentRoleId={playerRole?.id} onClick={tokenClicked}/>
+
+                <div className="outsider-minion-demon-group">
+                    <TokenGroup name="Outsiders" roles={script?.outsiders} tokenSize={dynamicSize} currentRoleId={playerRole?.id} onClick={tokenClicked}/>
+                    <TokenGroup name="Minions" roles={script?.minions} tokenSize={dynamicSize} currentRoleId={playerRole?.id} onClick={tokenClicked}/>
+                    <TokenGroup name="Demons" roles={script?.demons} tokenSize={dynamicSize} currentRoleId={playerRole?.id} onClick={tokenClicked}/>
+                </div>
+
+                <div className="no-role-token">
+                    <Token
+                        size={dynamicSize * 1.5}
+                        key="no-role"
+                        customName="Remove Role"
+                        className={playerRole?.id === undefined ? 'current-role' : undefined}
+                        onClick={() => tokenClicked(undefined)}
+                    />
+                </div>
+                <TokenGroup name="Travellers" roles={script?.travellers} tokenSize={dynamicSize} currentRoleId={playerRole?.id} onClick={tokenClicked}/>
             </div>
         </BasePanel>
-    );
+    )
 };

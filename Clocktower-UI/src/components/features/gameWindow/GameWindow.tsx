@@ -13,7 +13,7 @@ export default function GameWindow() {
     const {thisUser} = useUser(currentUser?.id);
     const {discordTown} = useDiscordTown();
     const {script} = useServerHub();
-    const [showDraftRoles, setShowDraftRoles] = useState(false);
+    const [isDraftMode, setIsDraftMode] = useState(false);
     const {togglePanel, isPanelOpen, closePanel, openPanel, getPanelData} = useActivePanel();
 
     useKeyboardShortcut({
@@ -36,14 +36,14 @@ export default function GameWindow() {
     });
     useKeyboardShortcut({
         key: 'd',
-        onKeyPress: () => setShowDraftRoles(prev => !prev),
+        onKeyPress: () => setIsDraftMode(prev => !prev),
         enabled: UserUtils.isStoryTeller(thisUser)
     });
     const tokenData = getPanelData('token');
 
     return (
         <div className="game-window-controls">
-            <TownSquare showDraftRoles={showDraftRoles} onTokenClick={(player: User) => {
+            <TownSquare showDraftRoles={isDraftMode} onTokenClick={(player: User) => {
                 openPanel('token', {player});
             }}/>
 
@@ -56,6 +56,7 @@ export default function GameWindow() {
                     isOpen={isPanelOpen('token')}
                     onClose={closePanel}
                     player={tokenData.player}
+                    isDraftMode={isDraftMode}
                 />
             )}
             {UserUtils.isStoryTeller(thisUser) &&
@@ -64,8 +65,8 @@ export default function GameWindow() {
                     onInviteClick={() => togglePanel('user')}
                     scriptIsOpen={isPanelOpen('script')}
                     onScriptClick={() => togglePanel('script')}
-                    showDraftRoles={showDraftRoles}
-                    onDraftToggle={() => setShowDraftRoles(prev => !prev)}
+                    showDraftRoles={isDraftMode}
+                    onDraftToggle={() => setIsDraftMode(prev => !prev)}
                 />
             }
             <CenterHud/>

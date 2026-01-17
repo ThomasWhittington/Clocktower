@@ -7,16 +7,18 @@ interface TokenProps {
     role?: Role;
     size?: number;
     isDead?: boolean;
-    onClick: () => void;
+    onClick?: () => void;
+    customName?: string;
+    className?: string;
 }
 
 
-export const Token = memo(({role, size = 40, isDead, onClick}: TokenProps) => {
+export const Token = memo(({role, size = 40, isDead, onClick, customName, className}: TokenProps) => {
     const reminderLeaves = (role?.reminders || []).length + (role?.remindersGlobal || []).length;
 
     return (
         <span
-            className={`token${isDead ? ' token-is-dead' : ''}`}
+            className={`token${isDead ? ' token-is-dead' : ''}${className ? ` ${className}` : ''}`}
             style={{backgroundImage: `url(${aliveTokenBase})`, width: size, height: size}}
             onClick={onClick}
         >
@@ -25,7 +27,7 @@ export const Token = memo(({role, size = 40, isDead, onClick}: TokenProps) => {
             {(Boolean(role?.otherNight) || role?.otherNightReminder) && <RightLeaf/>}
             {reminderLeaves > 0 && <TopLeaf leafCount={reminderLeaves}/>}
             {role?.setup && <OrangeLeaf/>}
-            {role?.name && <RoleName roleName={role.name}/>}
+            {role?.name ? <RoleName roleName={role.name}/> : <RoleName roleName={customName ?? ''}/>}
         </span>
     )
 });
