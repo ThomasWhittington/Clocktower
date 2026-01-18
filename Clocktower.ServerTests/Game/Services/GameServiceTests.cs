@@ -953,6 +953,16 @@ public class GameServiceTests
     }
 
     [TestMethod]
+    public async Task SetPerspectiveRole_ReturnsError_WhenRoleNotFound()
+    {
+        Setup_SetPerspectiveRole();
+
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, "invalid");
+
+        result.ShouldFailWith(ErrorKind.NotFound, "role.not_found");
+    }
+
+    [TestMethod]
     public async Task SetPerspectiveRole_ReturnsOk_RoleNotNull()
     {
         Setup_SetPerspectiveRole();
@@ -1048,6 +1058,16 @@ public class GameServiceTests
         var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger().Id);
 
         result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetDraftRole_ReturnsError_WhenRoleNotFound()
+    {
+        Setup_SetDraftRole();
+
+        var result = await _sut.SetDraftRole(GameId, UserId, "invalid");
+
+        result.ShouldFailWith(ErrorKind.NotFound, "role.not_found");
     }
 
     [TestMethod]
@@ -1148,6 +1168,16 @@ public class GameServiceTests
         var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
 
         result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetRole_ReturnsError_WhenRoleNotFound()
+    {
+        Setup_SetRole();
+
+        var result = await _sut.SetRole(GameId, UserId, "invalid");
+
+        result.ShouldFailWith(ErrorKind.NotFound, "role.not_found");
     }
 
     [TestMethod]

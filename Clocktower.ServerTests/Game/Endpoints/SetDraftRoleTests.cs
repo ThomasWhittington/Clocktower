@@ -30,7 +30,7 @@ public class SetDraftRoleTests
     }
 
     [TestMethod]
-    public async Task Handle_ReturnsBadRequest_WhenServiceReturnsFalse()
+    public async Task Handle_ReturnsBadRequest_WhenServiceReturnsInvalidError()
     {
         var request = new SetDraftRole.Request(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString());
         var error = Result.Fail<string>(ErrorKind.Invalid, "error code", "error message");
@@ -46,7 +46,7 @@ public class SetDraftRoleTests
     }
 
     [TestMethod]
-    public async Task Handle_ReturnsNotFound_WhenServiceReturnsFalse()
+    public async Task Handle_ReturnsNotFound_WhenServiceReturnsNotFoundError()
     {
         var request = new SetDraftRole.Request(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString());
         var error = Result.Fail<string>(ErrorKind.NotFound, "error code", "error message");
@@ -62,7 +62,7 @@ public class SetDraftRoleTests
     }
 
     [TestMethod]
-    public async Task Handle_ReturnsOk_WhenServiceReturnsTrue()
+    public async Task Handle_ReturnsOk_WhenServiceReturnsOk()
     {
         var request = new SetDraftRole.Request(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString());
         var success = Result.Ok("success");

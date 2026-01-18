@@ -20,14 +20,12 @@ interface TokenPanelProps {
 }
 
 export const TokenPanel = ({isOpen, onClose, player, isDraftMode, setRole}: TokenPanelProps) => {
-    if (!player) return null;
     const currentUser = useAppStore((state) => state.currentUser);
-    if (!currentUser) return null;
     const {script} = useServerHub();
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
+    if (!player || !currentUser) return null;
 
     const playerRole = isDraftMode ? player.draftRole : player.role;
-
 
     const tokenClicked = async (role: Role | undefined) => {
         await setRole(role, player.id);

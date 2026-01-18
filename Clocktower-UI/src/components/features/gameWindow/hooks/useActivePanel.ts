@@ -1,4 +1,7 @@
-﻿import {useCallback, useState} from 'react';
+﻿import {
+    useCallback,
+    useState
+} from 'react';
 import {User} from "@/types";
 
 type PanelType = "script" | "user" | "role" | "night" | "token";
@@ -34,18 +37,13 @@ export const useActivePanel = (): UseActivePanelReturn => {
         setActivePanel(null);
         setPanelData(null);
     }, []);
-
     const togglePanel = useCallback(<T extends PanelType>(panel: T, data?: PanelDataMap[T]) => {
         setActivePanel(prev => {
-            if (prev === panel) {
-                setPanelData(null);
-                return null;
-            }
-            setPanelData(data ?? null);
-            return panel;
+            const isClosing = prev === panel;
+            setPanelData(isClosing ? null : (data ?? null));
+            return isClosing ? null : panel;
         });
     }, []);
-
 
     const isPanelOpen = useCallback((panel: PanelType) => {
         return activePanel === panel;

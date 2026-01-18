@@ -8,7 +8,7 @@ public class CommitDraftRoles : IEndpoint
         .RequireAuthorization("StoryTellerForGame")
         .SetOpenApiOperationId<CommitDraftRoles>()
         .WithSummary("Commits draft roles")
-        .WithDescription("Commits the draft roles for a user in a game, moving them to the role fields.")
+        .WithDescription("Commits the draft roles for all users in a game, moving them to the role fields.")
         .WithRequestValidation<GameIdRequest>();
 
 

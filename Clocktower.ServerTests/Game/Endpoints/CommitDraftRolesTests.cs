@@ -27,7 +27,7 @@ public class CommitDraftRolesTests
             .ShouldHaveStorytellerAuthorization()
             .ShouldHaveOperationId("commitDraftRolesApi")
             .ShouldHaveSummary("Commits draft roles")
-            .ShouldHaveDescription("Commits the draft roles for a user in a game, moving them to the role fields.")
+            .ShouldHaveDescription("Commits the draft roles for all users in a game, moving them to the role fields.")
             .ShouldHaveValidation();
     }
 

@@ -237,6 +237,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         var targetUser = guild.GetUser(targetUserId);
         if (targetUser is null) return Result.Fail<string>(Errors.UserNotFound(targetUserId));
         var role = Role.AllRoles.FirstOrDefault(o => o.Id == roleId);
+        if (roleId is not null && role is null) return Result.Fail<string>(ErrorKind.NotFound, "role.not_found", $"Role '{roleId}' was not found");
 
         var updateOccurred = gamePerspectiveService.SetRoleOnPerspective(gameId, userId, targetUserId, role);
 
@@ -256,6 +257,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         var targetUser = guild.GetUser(targetUserId);
         if (targetUser is null) return Result.Fail<string>(Errors.UserNotFound(targetUserId));
         var role = Role.AllRoles.FirstOrDefault(o => o.Id == roleId);
+        if (roleId is not null && role is null) return Result.Fail<string>(ErrorKind.NotFound, "role.not_found", $"Role '{roleId}' was not found");
 
         var updateOccurred = gamePerspectiveService.UpdatePrivateUser(gameId, targetUserId, new PrivateGameUserUpdate
         {
@@ -279,6 +281,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         var targetUser = guild.GetUser(targetUserId);
         if (targetUser is null) return Result.Fail<string>(Errors.UserNotFound(targetUserId));
         var role = Role.AllRoles.FirstOrDefault(o => o.Id == roleId);
+        if (roleId is not null && role is null) return Result.Fail<string>(ErrorKind.NotFound, "role.not_found", $"Role '{roleId}' was not found");
 
         var updateOccurred = gamePerspectiveService.UpdateDraftRole(gameId, targetUserId, role);
 
