@@ -1,18 +1,11 @@
 ﻿import {Spinner} from "@/components/ui";
-import {useDiscordActions,} from "@/components/features/discordTownPanel/hooks";
 import {useTimerActions} from "@/hooks/useTimerActions.ts";
-import {useMemo, useState} from "react";
-import {TimeOfDaySwitch} from "@/components/features/discordTownPanel/components/TimeOfDaySwitch";
+import {
+    useMemo,
+    useState
+} from "react";
 
 function DiscordAdminPanel() {
-    const {
-        sendToCottages,
-        sendToTownSquare,
-        error,
-        result,
-        isLoading,
-        canRun: discordActionsCanRun
-    } = useDiscordActions();
     const {
         startOrEditTimer,
         cancelTimer,
@@ -31,23 +24,7 @@ function DiscordAdminPanel() {
 
     return (
         <div className="flex flex-col space-y-2">
-            {isLoading &&
-                <Spinner/>}
-            {result &&
-                <p className="text-green-500 text-sm">{result}</p>}
-            {error &&
-                <p className="error-text">{error}</p>}
             <div>
-                {discordActionsCanRun &&
-                    <>
-                        <button className="btn-primary" aria-label="Send to Town Square" onClick={sendToTownSquare}>
-                            ⛲
-                        </button>
-                        <button className="btn-secondary" aria-label="Send to Cottages" onClick={sendToCottages}>
-                            🛌
-                        </button>
-                    </>
-                }
                 {isTimerLoading &&
                     <Spinner/>}
                 {timerResult &&
@@ -65,7 +42,6 @@ function DiscordAdminPanel() {
                         <button className="btn-danger" aria-label="Cancel timer" disabled={!timerActionsCanRun || isTimerLoading} onClick={cancelTimer}>
                             ❌
                         </button>
-                        <TimeOfDaySwitch/>
                     </>
                 }
             </div>

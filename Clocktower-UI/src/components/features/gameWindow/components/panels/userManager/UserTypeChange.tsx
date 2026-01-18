@@ -34,6 +34,7 @@ export const UserTypeChange = ({
                     variant="primary"
                     isEnabled={user.userType !== UserType.StoryTeller}
                     onClick={() => changeUserType(user, UserType.StoryTeller)}
+                    tooltip="Change user type to Storyteller"
                 />
 
                 <IconButton
@@ -41,6 +42,7 @@ export const UserTypeChange = ({
                     variant="primary"
                     isEnabled={user.userType !== UserType.Player}
                     onClick={() => changeUserType(user, UserType.Player)}
+                    tooltip="Change user type to Player"
                 />
 
                 <IconButton
@@ -48,6 +50,7 @@ export const UserTypeChange = ({
                     variant="primary"
                     isEnabled={user.userType !== UserType.Spectator}
                     onClick={() => changeUserType(user, UserType.Spectator)}
+                    tooltip="Change user type to Spectator"
                 />
             </>
             }

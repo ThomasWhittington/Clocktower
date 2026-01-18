@@ -4,7 +4,7 @@
     }
 
     .controls-storyteller {
-        @apply absolute left-0 top-0 h-screen z-50  flex flex-col items-center;
+        @apply absolute left-0 top-0 h-screen z-50 flex flex-col items-center gap-10;
     }
 
     .controls-right {

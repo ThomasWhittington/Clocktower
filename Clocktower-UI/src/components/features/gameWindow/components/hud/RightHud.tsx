@@ -1,4 +1,7 @@
-﻿import {DiscordUserStatus, IconButton} from "@/components/ui";
+﻿import {
+    DiscordUserStatus,
+    IconButton
+} from "@/components/ui";
 import {HelpIcon} from "@/components/ui/icons";
 import {useDropdown} from "@/hooks";
 
@@ -21,6 +24,7 @@ export const RightHud = ({
                     icon={<HelpIcon/>}
                     isActive={isOpen}
                     onClick={toggle}
+                    tooltip="Help Menu"
                 />
                 {isOpen && (
                     <div className="help-menu">
