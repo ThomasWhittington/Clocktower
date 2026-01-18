@@ -36,7 +36,8 @@ export const StoryTellerHud = (
     const setTime = useTimeOfDay();
     const {
         sendToCottages,
-        sendToTownSquare
+        sendToTownSquare,
+        isLoading: isDiscordLoading
     } = useDiscordActions();
     return (
         <div className="controls-storyteller">
@@ -66,11 +67,13 @@ export const StoryTellerHud = (
                 <IconButton
                     icon={<TownsquareIcon/>}
                     onClick={sendToTownSquare}
+                    isEnabled={!isDiscordLoading}
                     tooltip="Send to Town Square"
                 />
                 <IconButton
                     icon={<BedIcon/>}
                     onClick={sendToCottages}
+                    isEnabled={!isDiscordLoading}
                     tooltip="Send to Cottages"
                 />
             </div>
