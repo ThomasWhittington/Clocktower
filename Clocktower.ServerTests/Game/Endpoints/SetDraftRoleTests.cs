@@ -21,7 +21,7 @@ public class SetDraftRoleTests
 
         SetDraftRole.Map(builder);
 
-        builder.GetEndpoint("/{gameId}/set-draft-role/{targetUserId}/{roleId}")
+        builder.GetEndpoint("/{gameId}/set-draft-role/{targetUserId}/{roleId?}")
             .ShouldHaveMethod(HttpMethod.Post)
             .ShouldHaveStorytellerAuthorization()
             .ShouldHaveOperationId("setDraftRoleApi")
