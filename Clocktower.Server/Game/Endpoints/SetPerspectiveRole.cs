@@ -4,7 +4,7 @@
 public class SetPerspectiveRole : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{gameId}/set-perspective-role/{userId}/{targetUserId}/{roleId}", Handle)
+        .MapPost("/{gameId}/set-perspective-role/{userId}/{targetUserId}/{roleId?}", Handle)
         .SetOpenApiOperationId<SetPerspectiveRole>()
         .WithSummaryAndDescription("Sets the role for the target user on the users perspective of the game")
         .WithRequestValidation<Request>();

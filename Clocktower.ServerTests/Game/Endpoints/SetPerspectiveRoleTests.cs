@@ -21,7 +21,7 @@ public class SetPerspectiveRoleTests
 
         SetPerspectiveRole.Map(builder);
 
-        builder.GetEndpoint("/{gameId}/set-perspective-role/{userId}/{targetUserId}/{roleId}")
+        builder.GetEndpoint("/{gameId}/set-perspective-role/{userId}/{targetUserId}/{roleId?}")
             .ShouldHaveMethod(HttpMethod.Post)
             .ShouldHaveOperationId("setPerspectiveRoleApi")
             .ShouldHaveSummaryAndDescription("Sets the role for the target user on the users perspective of the game")

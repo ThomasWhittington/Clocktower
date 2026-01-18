@@ -21,7 +21,7 @@ public class SetRoleTests
 
         SetRole.Map(builder);
 
-        builder.GetEndpoint("/{gameId}/set-role/{targetUserId}/{roleId}")
+        builder.GetEndpoint("/{gameId}/set-role/{targetUserId}/{roleId?}")
             .ShouldHaveMethod(HttpMethod.Post)
             .ShouldHaveStorytellerAuthorization()
             .ShouldHaveOperationId("setRoleApi")

@@ -251,7 +251,7 @@ async function setPerspectiveRole(gameId: string, userId: string, targetUserId: 
             gameId: gameId,
             userId: userId,
             targetUserId: targetUserId,
-            roleId: roleId
+            roleId: roleId ?? ''
         }
     });
 
@@ -272,7 +272,7 @@ async function setRole(gameId: string, targetUserId: string, roleId: string | un
         path: {
             gameId: gameId,
             targetUserId: targetUserId,
-            roleId: roleId
+            roleId: roleId ?? '' 
         }
     });
 
@@ -293,7 +293,7 @@ async function setDraftRole(gameId: string, targetUserId: string, roleId: string
         path: {
             gameId: gameId,
             targetUserId: targetUserId,
-            roleId: roleId
+            roleId: roleId ?? ''
         }
     });
 
