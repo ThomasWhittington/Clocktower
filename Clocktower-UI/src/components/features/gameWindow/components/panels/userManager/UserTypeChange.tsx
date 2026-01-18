@@ -1,10 +1,30 @@
-﻿import {type User, UserType} from "@/types";
-import {IconButton, Spinner} from "@/components/ui";
-import {useUserControls} from "@/components/features/gameWindow/hooks";
-import {Eye, Person, Quill} from "@/components/ui/icons";
+﻿import {
+    type User,
+    UserType
+} from "@/types";
+import {
+    IconButton,
+    Spinner
+} from "@/components/ui";
+import {
+    Eye,
+    Person,
+    Quill
+} from "@/components/ui/icons";
 
-export const UserTypeChange = ({user}: { user: User }) => {
-    const {isLoading, canRun, changeUserType} = useUserControls();
+interface UserTypeChangeProps {
+    user: User,
+    isLoading: boolean,
+    canRun: boolean,
+    changeUserType: (user: User, type: UserType) => void
+}
+
+export const UserTypeChange = ({
+                                   user,
+                                   isLoading,
+                                   canRun,
+                                   changeUserType
+                               }: UserTypeChangeProps) => {
     return (
         <div className="user-type-change">
             {isLoading && <Spinner/>}
