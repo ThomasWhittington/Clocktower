@@ -156,6 +156,7 @@ public class DiscordTownService(
 
         foreach (var userId in perspectives.Select(o => o.UserId))
         {
+            if (userId == IGamePerspectiveStore.OmniscientKey) continue;
             var (outcome, message) = await InviteUser(gameId, userId, sendInvite);
             if (outcome == InviteUserOutcome.InviteSent)
             {

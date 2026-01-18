@@ -65,7 +65,7 @@
 
     .night-order-container {
         @apply flex-1 flex gap-4 select-none rounded-2xl bg-black/50;
-        
+
         & .night-order-list {
             @apply p-4 max-h-full overflow-y-auto;
 
@@ -202,59 +202,143 @@
             }
         }
     }
-}
 
 
-.role-list {
-    @apply flex flex-wrap gap-4 select-none p-4;
+    .role-list {
+        @apply flex flex-wrap gap-4 select-none p-4;
 
-    .role-record {
-        @apply flex items-center w-[420px];
+        .role-record {
+            @apply flex items-center w-[420px];
 
-        .role-icon {
-            @apply w-[8vh] bg-cover shrink-0 bg-position-[center_top_-5px];
+            .role-icon {
+                @apply w-[8vh] bg-cover shrink-0 bg-position-[center_top_-5px];
 
-            &:after {
-                content: " ";
-                @apply block pt-[75%];
+                &:after {
+                    content: " ";
+                    @apply block pt-[75%];
+                }
+            }
+
+            .role {
+                @apply leading-[0.8];
+            }
+
+            .role-name {
+                @apply block font-bold text-[95%];
+            }
+
+            .role-player {
+                @apply text-gray-500 float-right text-[80%];
+
+                > .dead {
+                    @apply line-through;
+                }
+            }
+
+            .role-ability {
+                @apply text-[70%];
             }
         }
+    }
 
-        .role {
-            @apply leading-[0.8];
+    .role-aside {
+        @apply w-[30px] flex grow-0 shrink-0 items-center justify-center content-center overflow-hidden self-stretch shadow-[0_0_4px_black] select-none;
+
+        > h4 {
+            @apply uppercase text-center rotate-90 text-[80%] origin-center;
+        }
+    }
+
+    .team {
+        @apply flex self-start relative flex-1;
+
+        &:not(:last-child):after {
+            content: " ";
+            @apply block w-1/4 h-px absolute left-0 bottom-0 bg-linear-to-r from-[#ffffffaa] to-transparent;
+        }
+    }
+
+    .token.current-role {
+        @apply opacity-50 pointer-events-none;
+    }
+
+    .token-panel {
+        @apply w-full h-full flex flex-col gap-6 overflow-y-auto;
+
+        .outsider-minion-demon-group {
+            @apply grid grid-cols-3 gap-6;
         }
 
-        .role-name {
-            @apply block font-bold text-[95%];
+        .no-role-token {
+            @apply fixed bottom-0 left-2;
         }
 
-        .role-player {
-            @apply text-gray-500 float-right text-[80%];
+        .role-group {
+            h3 {
+                @apply text-lg font-semibold mb-2;
+            }
 
-            > .dead {
-                @apply line-through;
+            div {
+                @apply flex flex-wrap justify-center items-center gap-2 p-4 rounded-lg;
+            }
+
+            &.townsfolk {
+                h3 {
+                    @apply text-townsfolk;
+                }
+
+                div {
+                    @apply bg-townsfolk/50;
+                }
+            }
+
+            &.outsiders {
+                @apply h-full;
+
+                h3 {
+                    @apply text-outsider;
+                }
+
+                div {
+                    @apply bg-outsider/50 h-full;
+                }
+            }
+
+            &.minions {
+                @apply h-full;
+
+                h3 {
+                    @apply text-minion;
+                }
+
+                div {
+                    @apply bg-minion/50 h-full;
+                }
+            }
+
+            &.demons {
+                @apply h-full;
+
+                h3 {
+                    @apply text-demon;
+                }
+
+                div {
+                    @apply bg-demon/50 h-full;
+                }
+            }
+
+            &.travellers {
+                @apply fixed bottom-0 left-1/2 translate-x-[-50%];
+
+                h3 {
+                    @apply text-traveller;
+                }
+
+                div {
+                    @apply bg-traveller/50;
+                }
             }
         }
-
-        .role-ability {
-            @apply text-[70%];
-        }
-    }
-}
-
-.role-aside {
-    @apply w-[30px] flex grow-0 shrink-0 items-center justify-center content-center overflow-hidden self-stretch shadow-[0_0_4px_black] select-none;
-
-    > h4 {
-        @apply uppercase text-center rotate-90 text-[80%] origin-center;
-    }
-}
-
-.team {
-    @apply flex self-start relative flex-1;
-
-    &:not(:last-child):after {
-        content: " ";
-        @apply block w-1/4 h-px absolute left-0 bottom-0 bg-linear-to-r from-[#ffffffaa] to-transparent;
     }
 }

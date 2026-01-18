@@ -1,6 +1,31 @@
-﻿import {type GamePerspective, GameTime, mapToGamePerspective, mapToUser, ScriptSelect, type User,} from "@/types";
-import {addUserToGameApi, type ClocktowerServerDataTypesEnumGameTime, type ClocktowerServerDataTypesEnumScriptSelect, getAvailableGameUsersApi, getGamesApi, randomiseSeatingPositionsApi, removeUserFromGameApi, setPlayerHasVoteTokenApi, setPlayerIsDeadApi, setScriptApi, setTimeApi, startGameApi, swapSeatingPositionsApi} from "@/api";
+﻿import {
+    type GamePerspective,
+    GameTime,
+    mapToGamePerspective,
+    mapToUser,
+    ScriptSelect,
+    type User,
+} from "@/types";
 import {apiClient} from "@/api/api-client.ts";
+import {
+    addUserToGameApi,
+    type ClocktowerServerDataTypesEnumGameTime,
+    type ClocktowerServerDataTypesEnumScriptSelect,
+    commitDraftRolesApi,
+    getAvailableGameUsersApi,
+    getGamesApi,
+    randomiseSeatingPositionsApi,
+    removeUserFromGameApi,
+    setDraftRoleApi,
+    setPerspectiveRoleApi,
+    setPlayerHasVoteTokenApi,
+    setPlayerIsDeadApi,
+    setRoleApi,
+    setScriptApi,
+    setTimeApi,
+    startGameApi,
+    swapSeatingPositionsApi
+} from "@/api";
 
 async function getGames(): Promise<GamePerspective[]> {
 
@@ -216,6 +241,89 @@ async function setScript(gameId: string, scriptSelect: ScriptSelect, json?: stri
     }
 }
 
+async function setPerspectiveRole(gameId: string, userId: string, targetUserId: string, roleId: string | undefined) {
+    const {
+        data,
+        error
+    } = await setPerspectiveRoleApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId,
+            targetUserId: targetUserId,
+            roleId: roleId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set perspective role for user:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
+
+async function setRole(gameId: string, targetUserId: string, roleId: string | undefined) {
+    const {
+        data,
+        error
+    } = await setRoleApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            targetUserId: targetUserId,
+            roleId: roleId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set role for user:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
+
+async function setDraftRole(gameId: string, targetUserId: string, roleId: string | undefined) {
+    const {
+        data,
+        error
+    } = await setDraftRoleApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            targetUserId: targetUserId,
+            roleId: roleId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set draft role for user:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
+
+async function commitDraftRoles(gameId: string) {
+    const {
+        data,
+        error
+    } = await commitDraftRolesApi({
+        client: apiClient,
+        path: {
+            gameId: gameId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to commit draft roles:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
+
 const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGameTime => {
     switch (gameTime) {
         case GameTime.Unknown:
@@ -267,5 +375,9 @@ export const gamesService = {
     setPlayerIsDead,
     setPlayerHasVoteToken,
     setTime,
-    setScript
+    setScript,
+    setRole,
+    setDraftRole,
+    setPerspectiveRole,
+    commitDraftRoles
 }

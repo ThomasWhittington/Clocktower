@@ -1,5 +1,4 @@
-﻿using Clocktower.Server.Data.Dto;
-using Clocktower.Server.Data.Wrappers;
+﻿using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Discord;
 
 namespace Clocktower.Server.Common.Services;
@@ -156,7 +155,9 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore, IUserIdentit
 
         gameUsers ??= [];
         var gameUserList = gameUsers.ToList();
-        var gameUserLookup = gameUserList.ToDictionary(u => u.Id);
+        var gameUserLookup = gameUserList
+            .GroupBy(u => u.Id)
+            .ToDictionary(g => g.Key, g => g.First());
         var gUsers = gameUserList.Select(o =>
         {
             var townUser = userIdentityStore.GetIdentity(o.Id);

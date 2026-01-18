@@ -3,6 +3,7 @@ using Clocktower.Server.Common.Services;
 using Clocktower.Server.Common.UpdateModels;
 using Clocktower.Server.Data;
 using Clocktower.Server.Data.Dto;
+using Clocktower.Server.Data.Stores;
 using Clocktower.Server.Data.Types;
 using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Data.Wrappers;
@@ -986,6 +987,19 @@ public class DiscordTownServiceTests
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be("Invites sent to all 2 users");
+    }
+
+    [TestMethod]
+    public async Task InviteAll_ReturnsOk_SkipsOmniscient()
+    {
+        var users = new[] { "u1", IGamePerspectiveStore.OmniscientKey };
+        var outcomes = users.ToDictionary(u => u, _ => (InviteUserOutcome.InviteSent, "Sent message to user"));
+        Setup_InviteAll(users, outcomes);
+
+        var result = await _sut.InviteAll(GameId, true);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be("Invites sent to all 1 users");
     }
 
     [TestMethod]

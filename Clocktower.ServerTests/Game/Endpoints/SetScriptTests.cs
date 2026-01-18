@@ -33,7 +33,7 @@ public class SetScriptTests
     }
 
     [TestMethod]
-    public async Task Handle_ReturnsBadRequest_WhenServiceReturnsFalse()
+    public async Task Handle_ReturnsBadRequest_WhenServiceReturnsInvalidError()
     {
         const string json = "{}";
         var request = new SetScript.Request(CommonMethods.GetRandomString(), ScriptSelect.SectsAndViolets, json);
@@ -50,7 +50,24 @@ public class SetScriptTests
     }
 
     [TestMethod]
-    public async Task Handle_ReturnsOk_WhenServiceReturnsTrue()
+    public async Task Handle_ReturnsNotFound_WhenServiceReturnsNotFoundError()
+    {
+        const string json = "{}";
+        var request = new SetScript.Request(CommonMethods.GetRandomString(), ScriptSelect.SectsAndViolets, json);
+        var error = Result.Fail<Script>(ErrorKind.NotFound, "error code", "error message");
+
+        _mockGameService.Setup(o => o.SetScript(request.GameId, request.ScriptSelect, request.Json)).ReturnsAsync(error);
+
+        var result = await SetScript.Handle(request, _mockGameService.Object);
+
+        _mockGameService.Verify(o => o.SetScript(request.GameId, request.ScriptSelect, request.Json), Times.Once);
+
+        var response = result.Result.Should().BeOfType<NotFound<ErrorResponse>>().Subject;
+        response.Value.ShouldBeError(error);
+    }
+
+    [TestMethod]
+    public async Task Handle_ReturnsOk_WhenServiceReturnsOk()
     {
         const string json = "{}";
         var request = new SetScript.Request(CommonMethods.GetRandomString(), ScriptSelect.SectsAndViolets, json);

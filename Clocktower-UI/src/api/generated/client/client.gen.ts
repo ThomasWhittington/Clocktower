@@ -3,8 +3,21 @@
 import {createSseClient} from '../core/serverSentEvents.gen';
 import type {HttpMethod} from '../core/types.gen';
 import {getValidRequestBody} from '../core/utils.gen';
-import type {Client, Config, RequestOptions, ResolvedRequestOptions,} from './types.gen';
-import {buildUrl, createConfig, createInterceptors, getParseAs, mergeConfigs, mergeHeaders, setAuthParams,} from './utils.gen';
+import type {
+    Client,
+    Config,
+    RequestOptions,
+    ResolvedRequestOptions,
+} from './types.gen';
+import {
+    buildUrl,
+    createConfig,
+    createInterceptors,
+    getParseAs,
+    mergeConfigs,
+    mergeHeaders,
+    setAuthParams,
+} from './utils.gen';
 
 type ReqInit = Omit<RequestInit, 'body' | 'headers'> & {
     body?: any;

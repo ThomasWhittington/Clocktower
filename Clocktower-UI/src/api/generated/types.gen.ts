@@ -59,6 +59,7 @@ export type ClocktowerServerDataDtoUserDto = {
     isDead?: boolean;
     isMarked?: boolean;
     role?: ClocktowerServerDataTypesRoleRole;
+    draftRole?: ClocktowerServerDataTypesRoleRole;
 };
 
 export type ClocktowerServerDataGamePerspective = {
@@ -84,6 +85,7 @@ export type ClocktowerServerDataGameUser = {
     isDead?: boolean;
     isMarked?: boolean;
     role?: ClocktowerServerDataTypesRoleRole;
+    draftRole?: ClocktowerServerDataTypesRoleRole;
 };
 
 export type ClocktowerServerDataMiniChannel = {
@@ -233,6 +235,7 @@ export type ClocktowerServerDataDtoUserDtoWritable = {
     isDead?: boolean;
     isMarked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
+    draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
 };
 
 export type ClocktowerServerDataGamePerspectiveWritable = {
@@ -255,6 +258,7 @@ export type ClocktowerServerDataGameUserWritable = {
     isDead?: boolean;
     isMarked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
+    draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
 };
 
 export type ClocktowerServerDataMiniGamePerspectiveWritable = {
@@ -904,6 +908,37 @@ export type AddUserToGameApiResponses = {
 
 export type AddUserToGameApiResponse = AddUserToGameApiResponses[keyof AddUserToGameApiResponses];
 
+export type CommitDraftRolesApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/commit-draft-roles';
+};
+
+export type CommitDraftRolesApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type CommitDraftRolesApiError = CommitDraftRolesApiErrors[keyof CommitDraftRolesApiErrors];
+
+export type CommitDraftRolesApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type CommitDraftRolesApiResponse = CommitDraftRolesApiResponses[keyof CommitDraftRolesApiResponses];
+
 export type DeleteGameApiData = {
     body?: never;
     path: {
@@ -1084,6 +1119,73 @@ export type RemoveUserFromGameApiResponses = {
 
 export type RemoveUserFromGameApiResponse = RemoveUserFromGameApiResponses[keyof RemoveUserFromGameApiResponses];
 
+export type SetDraftRoleApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        targetUserId: string;
+        roleId?: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/set-draft-role/{targetUserId}/{roleId}';
+};
+
+export type SetDraftRoleApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetDraftRoleApiError = SetDraftRoleApiErrors[keyof SetDraftRoleApiErrors];
+
+export type SetDraftRoleApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetDraftRoleApiResponse = SetDraftRoleApiResponses[keyof SetDraftRoleApiResponses];
+
+export type SetPerspectiveRoleApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+        targetUserId: string;
+        roleId?: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/set-perspective-role/{userId}/{targetUserId}/{roleId}';
+};
+
+export type SetPerspectiveRoleApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetPerspectiveRoleApiError = SetPerspectiveRoleApiErrors[keyof SetPerspectiveRoleApiErrors];
+
+export type SetPerspectiveRoleApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetPerspectiveRoleApiResponse = SetPerspectiveRoleApiResponses[keyof SetPerspectiveRoleApiResponses];
+
 export type SetPlayerHasVoteTokenApiData = {
     body?: never;
     path: {
@@ -1149,6 +1251,39 @@ export type SetPlayerIsDeadApiResponses = {
 };
 
 export type SetPlayerIsDeadApiResponse = SetPlayerIsDeadApiResponses[keyof SetPlayerIsDeadApiResponses];
+
+export type SetRoleApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        targetUserId: string;
+        roleId?: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/set-role/{targetUserId}/{roleId}';
+};
+
+export type SetRoleApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetRoleApiError = SetRoleApiErrors[keyof SetRoleApiErrors];
+
+export type SetRoleApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetRoleApiResponse = SetRoleApiResponses[keyof SetRoleApiResponses];
 
 export type SetScriptApiData = {
     body?: never;

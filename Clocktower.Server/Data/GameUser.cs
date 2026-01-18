@@ -9,6 +9,7 @@ public record GameUser(string Id) : IGameUser
     [UsedImplicitly] public bool IsDead { get; set; }
     [UsedImplicitly] public bool IsMarked { get; set; }
     [UsedImplicitly] public Role? Role { get; set; }
+    [UsedImplicitly] public Role? DraftRole { get; set; }
 }
 
 public interface IGameUser : IIdentifiable
@@ -20,4 +21,5 @@ public interface IGameUser : IIdentifiable
     [UsedImplicitly] bool IsDead { get; set; }
     [UsedImplicitly] bool IsMarked { get; set; }
     [UsedImplicitly] Role? Role { get; set; }
+    [UsedImplicitly] Role? DraftRole { get; set; }
 }

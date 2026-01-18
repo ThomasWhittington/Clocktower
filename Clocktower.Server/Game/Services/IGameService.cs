@@ -16,4 +16,8 @@ public interface IGameService
     Task<Result<string>> SwapSeatingPositions(string gameId, string userId1, string userId2);
     Task<Result<string>> SetPlayerIsDead(string gameId, string userId, bool isDead);
     Task<Result<string>> SetPlayerHasVoteToken(string gameId, string userId, bool hasVoteToken);
+    Task<Result<string>> SetPerspectiveRole(string gameId, string userId, string targetUserId, string? roleId);
+    Task<Result<string>> SetRole(string gameId, string targetUserId, string? roleId);
+    Task<Result<string>> SetDraftRole(string gameId, string targetUserId, string? roleId);
+    Task<Result<string>> CommitDraftRoles(string gameId);
 }

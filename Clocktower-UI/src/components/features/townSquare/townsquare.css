@@ -10,6 +10,10 @@
         @apply absolute top-6 right-6 z-50 flex items-center gap-4 bg-neutral-900/90 p-4 rounded-lg border border-neutral-700 shadow-2xl backdrop-blur-md;
     }
 
+    .draft-mode-indicator {
+        @apply absolute bottom-5 left-1/2 translate-x-[-50%] py-3 px-6 bg-discord-warning/50 font-bold rounded-lg z-1000 select-none shadow-[0_4px_12px_rgba(0,0,0,0.3)];
+    }
+
     .action-banner-content {
         @apply flex items-center gap-3 font-medium text-white select-none;
 

@@ -1,19 +1,36 @@
-﻿import type {User} from "@/types";
-import {useUserControls} from "@/components/features/gameWindow/hooks";
-import {IconButton, Spinner} from "@/components/ui";
+﻿import {
+    type User,
+    UserType
+} from "@/types";
+import {
+    IconButton,
+    Spinner
+} from "@/components/ui";
 import {UserAvatar} from "@/components/ui/UserAvatar.tsx";
 import {UserTypeChange} from "./UserTypeChange";
-import {ArrowRightCircle, OpenLetter, RemoveIcon} from "@/components/ui/icons";
+import {
+    ArrowRightCircle,
+    OpenLetter,
+    RemoveIcon
+} from "@/components/ui/icons";
 import {UserUtils} from "@/utils";
 import {TokenRoleIcon} from "@/components/tokens";
 
-export const UserRow = ({user}: { user: User }) => {
-    const {isLoading, canRun, inviteUser, removeUser} = useUserControls();
+interface UserRowProps {
+    user: User,
+    controlsLoading: boolean,
+    controlsCanRun: boolean,
+    inviteUser: (user: User) => Promise<void>,
+    removeUser: (user: User) => Promise<void>,
+    changeUserType: (user: User, type: UserType) => void
+}
+
+export const UserRow = ({user, controlsLoading, controlsCanRun, removeUser, inviteUser, changeUserType}: UserRowProps) => {
     return (
         <div className={`user-row user-row-${user.id}`}>
             <div className="user-row-section">
-                {isLoading && <Spinner/>}
-                {canRun &&
+                {controlsLoading && <Spinner/>}
+                {controlsCanRun &&
                     <IconButton
                         icon={[<OpenLetter key="openLetter"/>, <ArrowRightCircle key="arrowRightCircle"/>]}
                         variant="primary"
@@ -25,7 +42,7 @@ export const UserRow = ({user}: { user: User }) => {
             </div>
             <div className="user-row-section">
                 {user?.role && <TokenRoleIcon role={user.role} className="role-icon"/>}
-                <UserTypeChange user={user}/>
+                <UserTypeChange user={user} isLoading={controlsLoading} canRun={controlsCanRun} changeUserType={changeUserType}/>
                 <IconButton
                     className={UserUtils.isStoryTeller(user) ? "invisible" : "visible"}
                     icon={<RemoveIcon/>}
