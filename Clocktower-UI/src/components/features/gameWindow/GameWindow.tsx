@@ -91,8 +91,8 @@ export default function GameWindow() {
             )}
             {UserUtils.isStoryTeller(thisUser) &&
                 <StoryTellerHud
-                    inviteIsOpen={isPanelOpen('user')}
-                    onInviteClick={() => togglePanel('user')}
+                    usersIsOpen={isPanelOpen('user')}
+                    onUsersClick={() => togglePanel('user')}
                     scriptIsOpen={isPanelOpen('script')}
                     onScriptClick={() => togglePanel('script')}
                     showDraftRoles={isDraftMode}

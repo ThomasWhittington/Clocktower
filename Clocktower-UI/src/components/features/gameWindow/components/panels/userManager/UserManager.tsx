@@ -44,6 +44,7 @@ export const UserManager = ({
                     text="Randomise seat positions"
                     variant="secondary"
                     onClick={randomiseSeatingPositions}
+                    tooltip="Randomise seating positions"
                 />
             }
 
@@ -86,6 +87,7 @@ export const UserManager = ({
                     text="Invite all Players"
                     variant="primary"
                     onClick={inviteAll}
+                    tooltip="Invite all Players to the game"
                 />
             }
         </div>

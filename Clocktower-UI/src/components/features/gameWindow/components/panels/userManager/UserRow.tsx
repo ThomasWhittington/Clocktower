@@ -35,6 +35,7 @@ export const UserRow = ({user, controlsLoading, controlsCanRun, removeUser, invi
                         icon={[<OpenLetter key="openLetter"/>, <ArrowRightCircle key="arrowRightCircle"/>]}
                         variant="primary"
                         onClick={() => inviteUser(user)}
+                        tooltip="Invite user to the game"
                     />
                 }
                 <UserAvatar user={user} size={48} className="discord-user-avatar"/>
@@ -48,6 +49,7 @@ export const UserRow = ({user, controlsLoading, controlsCanRun, removeUser, invi
                     icon={<RemoveIcon/>}
                     variant="danger"
                     onClick={() => removeUser(user)}
+                    tooltip="Remove user from the game"
                 />
             </div>
         </div>

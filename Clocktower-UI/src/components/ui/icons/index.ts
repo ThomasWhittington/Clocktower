@@ -15,3 +15,8 @@ export {default as Shroud} from "#/icons/shroud.svg?react";
 export {default as ScriptIcon} from "#/icons/script.svg?react";
 export {default as HelpIcon} from "#/icons/help.svg?react";
 export {default as DraftIcon} from "#/icons/draft.svg?react";
+export {default as DayIcon} from "#/icons/day.svg?react";
+export {default as EveningIcon} from "#/icons/evening.svg?react";
+export {default as NightIcon} from "#/icons/night.svg?react";
+export {default as TownsquareIcon} from "#/icons/townsquare.svg?react";
+export {default as BedIcon} from "#/icons/bed.svg?react";

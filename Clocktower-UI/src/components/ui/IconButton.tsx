@@ -1,4 +1,9 @@
-﻿import {type ButtonHTMLAttributes, Children, isValidElement, type ReactNode} from "react";
+﻿import {
+    type ButtonHTMLAttributes,
+    Children,
+    isValidElement,
+    type ReactNode
+} from "react";
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     icon: ReactNode | ReactNode[];
@@ -7,6 +12,7 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     isActiveVariant?: "primary" | "secondary" | "outline" | "danger";
     isActive?: boolean;
     isEnabled?: boolean;
+    tooltip?: string;
 }
 
 export const IconButton = ({
@@ -17,6 +23,7 @@ export const IconButton = ({
                                isActiveVariant,
                                isEnabled = true,
                                className = "",
+                               tooltip,
                                ...props
                            }: IconButtonProps) => {
     const activeClass = isActiveVariant ? `btn-${isActiveVariant}` : "btn-outline";
@@ -26,6 +33,7 @@ export const IconButton = ({
         <button
             disabled={!isEnabled}
             className={`${baseClass} btn-icon ${className}`}
+            title={tooltip}
             {...props}
         >
             {Children.toArray(icon).map((item) => (
