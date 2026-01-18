@@ -25,7 +25,10 @@ import {
     useActivePanel,
     useSetRoles
 } from "@/components/features/gameWindow/hooks";
-import {useState} from "react";
+import {
+    useEffect,
+    useState
+} from "react";
 import {User} from "@/types";
 
 export default function GameWindow() {
@@ -36,7 +39,12 @@ export default function GameWindow() {
     const [isDraftMode, setIsDraftMode] = useState(false);
     const {togglePanel, isPanelOpen, closePanel, openPanel, getPanelData} = useActivePanel();
     const {setRole, commitDraftRoles} = useSetRoles(currentUser?.id ?? "", UserUtils.isStoryTeller(thisUser), isDraftMode);
-
+    useEffect(() => {
+        if (script && isPanelOpen('script')) {
+            closePanel();
+        }
+    }, [script]);
+    
     useKeyboardShortcut({
         key: 'u',
         onKeyPress: () => togglePanel('user'),
@@ -49,11 +57,14 @@ export default function GameWindow() {
     });
     useKeyboardShortcut({
         key: 'r',
-        onKeyPress: () => togglePanel('role')
+        onKeyPress: () => togglePanel('role'),
+        enabled: script !== undefined
     });
     useKeyboardShortcut({
         key: 'n',
         onKeyPress: () => togglePanel('night')
+        ,
+        enabled: script !== undefined
     });
     useKeyboardShortcut({
         key: 'd',
@@ -102,8 +113,8 @@ export default function GameWindow() {
             <CenterHud/>
             <TopHud scriptName={script?.name}/>
             <RightHud
-                onRoleListClick={() => togglePanel('role')}
-                onNightOrderClick={() => togglePanel('night')}
+                onRoleListClick={() => script && togglePanel('role')}
+                onNightOrderClick={() => script && togglePanel('night')}
             />
             <BottomHud gameId={gameId} storyTellers={discordTown?.storyTellers ?? []}/>
         </div>
