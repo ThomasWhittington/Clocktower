@@ -1122,20 +1122,26 @@ public class GameServiceTests
 
     #region SetRole
 
-    private void Setup_SetRole(bool hasGame = true, bool hasGuild = true, bool hasTargetUser = true, bool updated = true)
+    private void Setup_SetRole(bool hasGame = true, bool hasGuild = true, bool hasTargetUser = true, bool updated = true, Role? existingRole = null)
     {
         var guild = StrictMockFactory.Create<IDiscordGuild>();
         var targetUser = StrictMockFactory.Create<IDiscordGuildUser>();
         targetUser.Setup(o => o.DisplayName).Returns(DisplayName);
         var perspective = new GamePerspective(GameId, UserId, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow);
 
-        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? perspective : null);
+        if (existingRole != null)
+        {
+            perspective = perspective with { Users = [new GameUser(UserId) { Role = existingRole }] };
+        }
+
+        _mockGamePerspectiveService.Setup(o => o.GetPerspective(GameId, IGamePerspectiveStore.OmniscientKey)).Returns(hasGame ? perspective : null);
 
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guild.Object : null);
 
         guild.Setup(o => o.GetUser(UserId)).Returns(hasTargetUser ? targetUser.Object : null);
 
 
+        _mockGamePerspectiveService.Setup(o => o.SetRoleOnAllPerspectives(GameId, UserId, It.IsAny<Role>())).Returns(updated);
         _mockGamePerspectiveService.Setup(o => o.UpdatePrivateUser(GameId, UserId, It.IsAny<PrivateGameUserUpdate>())).Returns(updated);
         _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
     }
@@ -1185,11 +1191,11 @@ public class GameServiceTests
     {
         Setup_SetRole();
 
-        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetRole(GameId, UserId, Role.Empath().Id);
 
-        result.ShouldSucceedWith<string>("display name now has the role: Gunslinger");
+        result.ShouldSucceedWith<string>("display name now has the role: Empath");
         _mockGamePerspectiveService.Verify(o => o.UpdatePrivateUser(GameId, UserId, It.Is<PrivateGameUserUpdate>(u =>
-            u.Role == Role.Gunslinger() &&
+            u.Role == Role.Empath() &&
             !u.RemoveRole
         )), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
@@ -1230,14 +1236,42 @@ public class GameServiceTests
     {
         Setup_SetRole(updated: false);
 
-        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetRole(GameId, UserId, Role.Empath().Id);
 
-        result.ShouldSucceedWith<string>("display name already has the role: Gunslinger");
+        result.ShouldSucceedWith<string>("display name already has the role: Empath");
         _mockGamePerspectiveService.Verify(o => o.UpdatePrivateUser(GameId, UserId, It.Is<PrivateGameUserUpdate>(u =>
-            u.Role == Role.Gunslinger() &&
+            u.Role == Role.Empath() &&
             !u.RemoveRole
         )), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task SetRole_ReturnsOk_ChangeToTraveller()
+    {
+        Setup_SetRole();
+
+        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
+
+        result.ShouldSucceedWith<string>("display name now has the role: Gunslinger");
+        _mockGamePerspectiveService.Verify(o => o.SetRoleOnAllPerspectives(GameId, UserId, Role.Gunslinger()), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task SetRole_ReturnsOk_ChangeFromTraveller()
+    {
+        Setup_SetRole(existingRole: Role.Gunslinger());
+
+        var result = await _sut.SetRole(GameId, UserId, Role.Empath().Id);
+
+        result.ShouldSucceedWith<string>("display name now has the role: Empath");
+        _mockGamePerspectiveService.Verify(o => o.SetRoleOnAllPerspectives(GameId, UserId, null), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.UpdatePrivateUser(GameId, UserId, It.Is<PrivateGameUserUpdate>(u =>
+            u.Role == Role.Empath() &&
+            !u.RemoveRole
+        )), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     #endregion

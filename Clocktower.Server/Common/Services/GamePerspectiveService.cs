@@ -121,6 +121,27 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         return updated;
     }
 
+    public bool SetRoleOnAllPerspectives(string gameId, string targetUserId, Role? role)
+    {
+        bool updated = false;
+
+        store.UpdateAllPerspectives(gameId, state =>
+        {
+            var user = state.Users.FirstOrDefault(o => o.Id == targetUserId);
+            if (user is null || (user.Role == null && role is null) || user.Role?.Id == role?.Id) return state;
+            updated = true;
+
+            var updatedUser = user with
+            {
+                Role = role
+            };
+
+            return state with { Users = state.Users.Select(u => u.Id == targetUserId ? updatedUser : u).ToList() };
+        });
+
+        return updated;
+    }
+
 
     public bool AddUserToGame(string gameId, GameUser gameUser)
     {
@@ -235,6 +256,15 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
 
         foreach (var user in usersWithDrafts)
         {
+            if (user.DraftRole is { Type: RoleType.Traveller })
+            {
+                SetRoleOnAllPerspectives(gameId, user.Id, user.DraftRole);
+                continue;
+            }
+
+            var userIsCurrentlyTraveller = omniscient.Users.FirstOrDefault(o => o.Id == user.Id)?.Role?.Type == RoleType.Traveller;
+            if (userIsCurrentlyTraveller) SetRoleOnAllPerspectives(gameId, user.Id, null);
+
             UpdatePrivateUser(gameId, user.Id, new PrivateGameUserUpdate { Role = user.DraftRole });
         }
 

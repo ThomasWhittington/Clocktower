@@ -29,7 +29,10 @@ import {
     useEffect,
     useState
 } from "react";
-import {User} from "@/types";
+import {
+    RoleType,
+    User
+} from "@/types";
 
 export default function GameWindow() {
     const {gameId, currentUser} = useAppStore();
@@ -39,12 +42,14 @@ export default function GameWindow() {
     const [isDraftMode, setIsDraftMode] = useState(false);
     const {togglePanel, isPanelOpen, closePanel, openPanel, getPanelData} = useActivePanel();
     const {setRole, commitDraftRoles} = useSetRoles(currentUser?.id ?? "", UserUtils.isStoryTeller(thisUser), isDraftMode);
+    const isStoryteller = UserUtils.isStoryTeller(thisUser);
+
     useEffect(() => {
         if (script && isPanelOpen('script')) {
             closePanel();
         }
     }, [script]);
-    
+
     useKeyboardShortcut({
         key: 'u',
         onKeyPress: () => togglePanel('user'),
@@ -82,6 +87,7 @@ export default function GameWindow() {
             <TownSquare
                 showDraftRoles={isDraftMode}
                 onTokenClick={(player: User) => {
+                    if (!script || (!isStoryteller && player.role?.type === RoleType.Traveller)) return;
                     openPanel('token', {player});
                 }}
                 onCommitDraftRoles={isDraftMode ? handleCommitDraftRoles : undefined}
@@ -100,7 +106,7 @@ export default function GameWindow() {
                     setRole={setRole}
                 />
             )}
-            {UserUtils.isStoryTeller(thisUser) &&
+            {isStoryteller &&
                 <StoryTellerHud
                     usersIsOpen={isPanelOpen('user')}
                     onUsersClick={() => togglePanel('user')}
