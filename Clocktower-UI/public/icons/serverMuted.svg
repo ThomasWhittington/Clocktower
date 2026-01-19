@@ -1,11 +1,5 @@
-﻿<svg class="user-status-icon user-status-icon-server"
-     aria-describedby="«rag»"
-     aria-hidden="true"
-     role="img"
+﻿<svg class="user-status-icon-server"
      xmlns="http://www.w3.org/2000/svg"
-     width="24"
-     height="24"
-     fill="none"
      viewBox="0 0 24 24">
     <path fill="currentColor"
           fill-rule="evenodd"

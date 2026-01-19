@@ -159,6 +159,22 @@
         transform: translate(-10%, 10%);
     }
 
+    .voice-status-badge .discord-user-voice-status {
+        display: flex;
+        flex-direction: row;
+        gap: 2px;
+        width: 60%;
+        height: 60%;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .voice-status-badge svg {
+        width: auto;
+        height: 100%;
+        flex-shrink: 0;
+    }
+
     .vote-token-badge {
         @apply right-0 pointer-events-none;
         transform: translate(10%, 10%);
