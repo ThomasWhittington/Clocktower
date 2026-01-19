@@ -2,6 +2,5 @@
     townsfolk: number,
     outsiders: number,
     minions: number,
-    demons: number,
-    travellers: number
+    demons: number
 }

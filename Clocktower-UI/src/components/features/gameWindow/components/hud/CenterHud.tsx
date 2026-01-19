@@ -1,5 +1,7 @@
-﻿import {Timer} from "@/components/ui";
-import {RoleDistributionWidget} from "@/components/ui/RoleDistributionWidget.tsx";
+﻿import {
+    RoleDistributionWidget,
+    Timer
+} from "@/components/ui";
 
 export const CenterHud = () => {
     return (
