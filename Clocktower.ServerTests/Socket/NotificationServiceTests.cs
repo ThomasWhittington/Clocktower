@@ -89,7 +89,7 @@ public class NotificationServiceTests
         const string gameId = "test-game-456";
         const string userId = "user-123";
         const bool inVoice = true;
-        var voiceState = new VoiceState(true, false, true, false);
+        var voiceState = new VoiceState(inVoice, true, false, true, false);
 
         _mockClients.Setup(c => c.Group("game:test-game-456")).Returns(_mockClientProxy1.Object);
 

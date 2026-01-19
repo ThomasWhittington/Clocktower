@@ -51,7 +51,6 @@ export type ClocktowerServerDataDtoUserDto = {
     name?: string | null;
     avatarUrl?: string | null;
     voiceState?: ClocktowerServerDataVoiceState;
-    isPresent?: boolean;
     isPlaying?: boolean;
     userType?: ClocktowerServerDataTypesEnumUserType;
     seatingPosition?: number;
@@ -115,7 +114,6 @@ export type ClocktowerServerDataTownUser = {
     name?: string | null;
     avatarUrl?: string | null;
     voiceState?: ClocktowerServerDataVoiceState;
-    isPresent?: boolean;
 };
 
 export type ClocktowerServerDataTypesEnumEdition = 'Unknown' | 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Carousel';
@@ -156,6 +154,7 @@ export type ClocktowerServerDataUserAuthData = {
 };
 
 export type ClocktowerServerDataVoiceState = {
+    isPresent?: boolean;
     isServerMuted?: boolean;
     isServerDeafened?: boolean;
     isSelfMuted?: boolean;
@@ -227,7 +226,6 @@ export type ClocktowerServerDataDtoUserDtoWritable = {
     name?: string | null;
     avatarUrl?: string | null;
     voiceState?: ClocktowerServerDataVoiceState;
-    isPresent?: boolean;
     isPlaying?: boolean;
     userType?: ClocktowerServerDataTypesEnumUserType;
     seatingPosition?: number;

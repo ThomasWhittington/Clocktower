@@ -38,8 +38,7 @@ public class DiscordGameActionServiceTests
             var townUsers = users.Where(o => o.muted == !checkMuted && o is { isPresent: true, userType: UserType.StoryTeller }).Select(user =>
             {
                 var thisUser = CommonMethods.GetRandomTownUser(user.userId);
-                thisUser.IsPresent = true;
-                thisUser.VoiceState = new VoiceState(user.muted, false, false, false);
+                thisUser.VoiceState = new VoiceState(true, user.muted, false, false, false);
                 return thisUser;
             }).ToList();
 
@@ -198,9 +197,9 @@ public class DiscordGameActionServiceTests
         _capturedPredicate.Should().NotBeNull();
         var defaultUser = CommonMethods.GetRandomTownUser();
 
-        var presentMutedUser = defaultUser with { IsPresent = true, VoiceState = new VoiceState(true, false, false, false) };
-        var presentUnmutedUser = defaultUser with { IsPresent = true, VoiceState = new VoiceState(false, false, false, false) };
-        var absentUser = defaultUser with { IsPresent = false, VoiceState = new VoiceState(false, false, false, false) };
+        var presentMutedUser = defaultUser with { VoiceState = new VoiceState(true, true, false, false, false) };
+        var presentUnmutedUser = defaultUser with { VoiceState = new VoiceState(true, false, false, false, false) };
+        var absentUser = defaultUser with { VoiceState = new VoiceState(false, false, false, false, false) };
 
         if (muted)
         {

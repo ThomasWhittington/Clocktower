@@ -1,5 +1,11 @@
-﻿import {type User, UserType} from "@/types";
-import {DiscordUserVoiceStatus, UserAvatar} from "@/components/ui";
+﻿import {
+    type User,
+    UserType
+} from "@/types";
+import {
+    DiscordUserVoiceStatus,
+    UserAvatar
+} from "@/components/ui";
 
 function DiscordTownUser({user}: Readonly<{
     user: User

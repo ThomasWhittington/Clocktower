@@ -5,11 +5,10 @@ namespace Clocktower.Server.Common.Services;
 
 public class DiscordTownManager(IDiscordTownStore discordTownStore, IUserIdentityStore userIdentityStore, IDiscordConstantsService discordConstantsService) : IDiscordTownManager
 {
-    public DiscordTown MoveUser(DiscordTown current, IDiscordGuildUser user, IDiscordVoiceChannel? newChannel)
+    public DiscordTown MoveUser(DiscordTown current, IDiscordGuildUser user, IDiscordVoiceChannel? newChannel, VoiceState? voiceState = null)
     {
         var currentChannel = FindUserChannel(current, user.Id);
-        if (currentChannel is not null && newChannel is not null &&
-            currentChannel.Channel.Id == newChannel.Id)
+        if (currentChannel is not null && newChannel is not null && currentChannel.Channel.Id == newChannel.Id)
             return current;
 
         var newChannelCategories = current.ChannelCategories.Select(category =>
@@ -23,7 +22,9 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore, IUserIdentit
 
                     if (newChannel?.Id == channel.Channel.Id)
                     {
-                        occupantsList.Add(user.AsTownUser());
+                        var townUser = user.AsTownUser();
+                        if (voiceState != null) townUser = townUser with { VoiceState = voiceState };
+                        occupantsList.Add(townUser);
                     }
 
                     return channel with { Occupants = occupantsList };
@@ -43,7 +44,7 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore, IUserIdentit
             .FirstOrDefault(channel => channel.Occupants.Any(occupant => occupant.Id == userId));
     }
 
-    public bool UpdateUserStatus(string guildId, string userId, bool isPresent, VoiceState discordVoiceState)
+    public bool UpdateUserStatus(string guildId, string userId, VoiceState discordVoiceState)
     {
         var discordTown = discordTownStore.Get(guildId);
         if (discordTown is null) return false;
@@ -56,7 +57,7 @@ public class DiscordTownManager(IDiscordTownStore discordTownStore, IUserIdentit
                     {
                         Occupants = channel.Occupants.Select(occupant =>
                             occupant.Id == userId
-                                ? occupant with { IsPresent = isPresent, VoiceState = discordVoiceState }
+                                ? occupant with { VoiceState = discordVoiceState }
                                 : occupant
                         ).ToList()
                     }

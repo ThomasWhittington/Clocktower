@@ -74,10 +74,10 @@ public class DiscordGuildUser(SocketGuildUser user) : IDiscordGuildUser
 
     public TownUser AsTownUser()
     {
+        var isPresent = VoiceState?.VoiceChannel != null;
         var result = new TownUser(user.Id.ToString(), user.DisplayName, DisplayAvatarUrl)
         {
-            VoiceState = new VoiceState(IsServerMuted, IsServerDeafened, IsSelfMuted, IsSelfDeafened),
-            IsPresent = VoiceState?.VoiceChannel != null
+            VoiceState = new VoiceState(isPresent, IsServerMuted, IsServerDeafened, IsSelfMuted, IsSelfDeafened),
         };
 
         return result;
