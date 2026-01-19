@@ -10,14 +10,14 @@ export class DiscordTown {
     readonly townUsers: User[];
     readonly gameUsers: User[];
     channelCategories: MiniCategory[];
-    defaultRoleDistributions: RoleDistribution | undefined;
+    defaultRoleDistribution: RoleDistribution | undefined;
 
     constructor(data: Partial<DiscordTown>) {
         this.gameId = data.gameId ?? '';
         this.townUsers = (data.townUsers ?? []).map(user => new User(user));
         this.gameUsers = (data.gameUsers ?? []).map(user => new User(user));
         this.channelCategories = data.channelCategories ?? [];
-        this.defaultRoleDistributions = data.defaultRoleDistributions;
+        this.defaultRoleDistribution = data.defaultRoleDistribution;
     }
 
     get players(): User[] {

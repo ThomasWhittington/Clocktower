@@ -6,6 +6,7 @@
     VoteToken
 } from "@/components/ui/icons";
 import {useDiscordTown} from "@/components/features/discordTownPanel/hooks";
+import {RoleType} from "@/types";
 
 const getRoleIcon = (count: number | undefined) => {
     const Icon = count && count > 1 ? UsersIcon : UserIcon;
@@ -14,13 +15,15 @@ const getRoleIcon = (count: number | undefined) => {
 export const RoleDistributionWidget = () => {
     const {discordTown} = useDiscordTown();
     const players = discordTown?.players ?? [];
-    const roleDistribution = discordTown?.defaultRoleDistributions;
-    const playerCount = players?.length ?? 0;
-    const aliveCount = players?.filter(o => !o.isDead).length ?? 0;
-    const voteCount = players?.filter(o => !o.isDead || o.hasVoteToken).length ?? 0;
+    const roleDistribution = discordTown?.defaultRoleDistribution;
+    const playerCount = players.length ?? 0;
+    const aliveCount = players.filter(o => !o.isDead).length ?? 0;
+    const voteCount = players.filter(o => !o.isDead || o.hasVoteToken).length ?? 0;
+    const travellerCount = players.filter(o => o.role?.type == RoleType.Traveller).length ?? 0;
+
     return (
         <div className="role-distribution">
-            {players &&
+            {playerCount > 0 &&
                 <div>
                     <span className="players">{playerCount}{<GroupIcon/>}</span>
                     <span className="alive">{aliveCount}{<HeartIcon/>}</span>
@@ -36,12 +39,11 @@ export const RoleDistributionWidget = () => {
                         <span className="minion">{roleDistribution.minions}{getRoleIcon(roleDistribution.minions)}</span>
                         <span className="demon">{roleDistribution.demons}{getRoleIcon(roleDistribution.demons)}</span>
 
-                        {roleDistribution.travellers > 0 &&
-                            <span className="traveller"> {getRoleIcon(roleDistribution.travellers)}{roleDistribution.travellers}</span>}
+                        {travellerCount > 0 &&
+                            <span className="traveller">{travellerCount}{getRoleIcon(travellerCount)}</span>}
                     </div>
                     : <p>Add more players</p>
             }
         </div>
-    )
-        ;
+    );
 }

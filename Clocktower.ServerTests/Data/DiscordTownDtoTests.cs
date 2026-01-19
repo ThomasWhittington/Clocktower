@@ -17,7 +17,7 @@ public class DiscordTownDtoTests
     {
         var perspective = GetDiscordTownDto(playerCount);
 
-        perspective.DefaultRoleDistributions.Should().BeNull();
+        perspective.DefaultRoleDistribution.Should().BeNull();
     }
 
     [TestMethod]
@@ -58,10 +58,10 @@ public class DiscordTownDtoTests
 
         var dto = GetDiscordTownDto(playerCount);
 
-        dto.DefaultRoleDistributions.Should().NotBeNull();
-        dto.DefaultRoleDistributions.Townsfolk.Should().Be(expectedDistribution.Townsfolk);
-        dto.DefaultRoleDistributions.Outsiders.Should().Be(expectedDistribution.Outsiders);
-        dto.DefaultRoleDistributions.Minions.Should().Be(expectedDistribution.Minions);
-        dto.DefaultRoleDistributions.Demons.Should().Be(expectedDistribution.Demons);
+        dto.DefaultRoleDistribution.Should().NotBeNull();
+        dto.DefaultRoleDistribution!.Townsfolk.Should().Be(expectedDistribution.Townsfolk);
+        dto.DefaultRoleDistribution!.Outsiders.Should().Be(expectedDistribution.Outsiders);
+        dto.DefaultRoleDistribution!.Minions.Should().Be(expectedDistribution.Minions);
+        dto.DefaultRoleDistribution!.Demons.Should().Be(expectedDistribution.Demons);
     }
 }

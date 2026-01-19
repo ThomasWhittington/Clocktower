@@ -91,6 +91,10 @@
                 @apply text-traveller;
             }
         }
+
+        p {
+            @apply select-none;
+        }
     }
 
 

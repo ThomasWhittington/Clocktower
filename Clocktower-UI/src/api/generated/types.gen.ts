@@ -38,6 +38,7 @@ export type ClocktowerServerDataDtoDiscordTownDto = {
     channelCategories?: Array<ClocktowerServerDataDtoMiniCategoryDto> | null;
     readonly townUsers?: Array<ClocktowerServerDataDtoUserDto> | null;
     gameUsers?: Array<ClocktowerServerDataDtoUserDto> | null;
+    defaultRoleDistribution?: ClocktowerServerDataRoleDistribution;
 };
 
 export type ClocktowerServerDataDtoMiniCategoryDto = {
@@ -73,7 +74,6 @@ export type ClocktowerServerDataGamePerspective = {
     readonly spectators?: Array<ClocktowerServerDataGameUser> | null;
     gameTime?: ClocktowerServerDataTypesEnumGameTime;
     script?: ClocktowerServerDataScript;
-    defaultRoleDistributions?: ClocktowerServerDataRoleDistribution;
 };
 
 export type ClocktowerServerDataGameUser = {
@@ -221,6 +221,7 @@ export type ClocktowerServerDataDtoDiscordTownDtoWritable = {
     gameId?: string | null;
     channelCategories?: Array<ClocktowerServerDataDtoMiniCategoryDtoWritable> | null;
     gameUsers?: Array<ClocktowerServerDataDtoUserDtoWritable> | null;
+    defaultRoleDistribution?: ClocktowerServerDataRoleDistribution;
 };
 
 export type ClocktowerServerDataDtoMiniCategoryDtoWritable = {
@@ -253,7 +254,6 @@ export type ClocktowerServerDataGamePerspectiveWritable = {
     users?: Array<ClocktowerServerDataGameUserWritable> | null;
     gameTime?: ClocktowerServerDataTypesEnumGameTime;
     script?: ClocktowerServerDataScriptWritable;
-    defaultRoleDistributions?: ClocktowerServerDataRoleDistribution;
 };
 
 export type ClocktowerServerDataGameUserWritable = {
