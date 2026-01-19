@@ -83,7 +83,7 @@
     }
 
     .portrait-icon {
-        @apply text-6xl;
+        @apply rounded-full;
     }
 
     .avatar-container {

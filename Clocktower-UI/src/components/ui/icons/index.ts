@@ -20,3 +20,4 @@ export {default as EveningIcon} from "#/icons/evening.svg?react";
 export {default as NightIcon} from "#/icons/night.svg?react";
 export {default as TownsquareIcon} from "#/icons/townsquare.svg?react";
 export {default as BedIcon} from "#/icons/bed.svg?react";
+export {default as SwapIcon} from "#/icons/swap.svg?react";
