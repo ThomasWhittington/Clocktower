@@ -2,8 +2,7 @@
 
 public record TownUser(string Id, string Name, string AvatarUrl) : ITownUser
 {
-    public VoiceState VoiceState { get; set; } = new (false, false, false, false);
-    public bool IsPresent { get; set; }
+    public VoiceState VoiceState { get; set; } = new(false, false, false, false, false);
 }
 
 public interface ITownUser : IIdentifiable
@@ -11,5 +10,4 @@ public interface ITownUser : IIdentifiable
     [UsedImplicitly] string Name { get; }
     [UsedImplicitly] string AvatarUrl { get; }
     [UsedImplicitly] VoiceState VoiceState { get; set; }
-    [UsedImplicitly] bool IsPresent { get; set; }
 }

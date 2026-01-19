@@ -61,9 +61,9 @@ public class UserServiceTests
 
     #region UpdateDiscordPresence
 
-    private void SetUp_UpdateDiscordPresence(string userId, string guildId, bool isPresent, VoiceState voiceState, bool updateReturn)
+    private void SetUp_UpdateDiscordPresence(string userId, string guildId, VoiceState voiceState, bool updateReturn)
     {
-        _mockDiscordTownManager.Setup(o => o.UpdateUserStatus(guildId, userId, isPresent, voiceState)).Returns(updateReturn);
+        _mockDiscordTownManager.Setup(o => o.UpdateUserStatus(guildId, userId, voiceState)).Returns(updateReturn);
     }
 
     [TestMethod]
@@ -71,12 +71,11 @@ public class UserServiceTests
     {
         const string userId = "123456";
         const string guildId = "987654";
-        const bool isPresent = true;
-        var voiceState = new VoiceState(true, false, true, false);
+        var voiceState = new VoiceState(true, true, false, true, false);
         const bool updateReturn = true;
-        SetUp_UpdateDiscordPresence(userId, guildId, isPresent, voiceState, updateReturn);
+        SetUp_UpdateDiscordPresence(userId, guildId, voiceState, updateReturn);
 
-        var result = _sut.UpdateDiscordPresence(userId, guildId, isPresent, voiceState);
+        var result = _sut.UpdateDiscordPresence(userId, guildId, voiceState);
 
         result.Should().Be(updateReturn);
     }
@@ -147,13 +146,13 @@ public class UserServiceTests
         };
         const string guildId = "guild123";
 
-        var townUser1 = new TownUser("user1", "User One", "Avatar1") { IsPresent = true };
-        var townUser2 = new TownUser("user2", "User Two", "Avatar2") { IsPresent = false };
+        var townUser1 = new TownUser("user1", "User One", "Avatar1") { VoiceState = new VoiceState(true, false, false, false, false) };
+        var townUser2 = new TownUser("user2", "User Two", "Avatar2") { VoiceState = new VoiceState(false, false, false, false, false) };
 
         var discordTown = CreateDiscordTown(townUser1, townUser2);
         _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
-        var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId, u => u.IsPresent).ToArray();
+        var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId, u => u.VoiceState.IsPresent).ToArray();
 
         result.Should().HaveCount(1);
         result.Should().Contain(u => u.Id == "user1");
@@ -166,11 +165,11 @@ public class UserServiceTests
         var gameUsers = new[] { new GameUser("user1") };
         const string guildId = "guild123";
 
-        var townUser1 = new TownUser("user1", "User One", "Avatar1") { IsPresent = false };
+        var townUser1 = new TownUser("user1", "User One", "Avatar1") { VoiceState = new VoiceState(false, false, false, false, false) };
         var discordTown = CreateDiscordTown(townUser1);
         _mockDiscordTownStore.Setup(x => x.Get(guildId)).Returns(discordTown);
 
-        var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId, u => u.IsPresent);
+        var result = _sut.GetTownUsersForGameUsers(gameUsers, guildId, u => u.VoiceState.IsPresent);
 
         result.Should().BeEmpty();
     }

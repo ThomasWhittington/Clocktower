@@ -18,36 +18,34 @@ public class DiscordBotHandler(
         if (guildId is null) return;
         var guildUser = user.GetGuildUser();
         if (guildUser is null) return;
-        var guildGameIds = gamePerspectiveService.GetGuildGameIds(guildId);
+        var guildGameIds = gamePerspectiveService.GetGuildGameIds(guildId).ToArray();
+        if (!guildGameIds.Any()) return;
+
+        bool inVoice = after.VoiceChannel != null;
+        var discordVoiceState = new VoiceState(inVoice, after.IsMuted, after.IsDeafened, after.IsSelfMuted, after.IsSelfDeafened);
 
         var channelsAreSame = before.VoiceChannel?.Id == after.VoiceChannel?.Id;
-        Func<string, Task> updateAction = channelsAreSame
-            ? id => UpdateVoiceStatus(guildUser, after, id, guildId)
-            : id => UpdateDiscordTown(guildUser, after, id, guildId);
+        if (channelsAreSame || after.VoiceChannel == null)
+        {
+            userService.UpdateDiscordPresence(guildUser.Id, guildId, discordVoiceState);
+        }
+        else
+        {
+            await UpdateDiscordTown(guildUser, after, guildId, discordVoiceState);
+        }
 
         foreach (var gameId in guildGameIds)
         {
-            await updateAction(gameId);
+            await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         }
     }
 
-    public virtual async Task UpdateDiscordTown(IDiscordGuildUser user, IDiscordVoiceState after, string gameId, string guildId)
+    public virtual async Task UpdateDiscordTown(IDiscordGuildUser user, IDiscordVoiceState after, string guildId, VoiceState voiceState)
     {
         using var scope = serviceScopeFactory.CreateScope();
         var townService = scope.ServiceProvider.GetRequiredService<IDiscordTownService>();
         var (success, discordTown, _) = await townService.GetDiscordTown(guildId);
         if (!success || discordTown is null) return;
-        discordDiscordTownManager.MoveUser(discordTown, user, after.VoiceChannel);
-
-        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
-    }
-
-    public virtual async Task UpdateVoiceStatus(IDiscordGuildUser user, IDiscordVoiceState after, string gameId, string guildId)
-    {
-        bool inVoice = after.VoiceChannel != null;
-        var discordVoiceState = new VoiceState(after.IsMuted, after.IsDeafened, after.IsSelfMuted, after.IsSelfDeafened);
-        userService.UpdateDiscordPresence(user.Id, guildId, inVoice, discordVoiceState);
-
-        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+        discordDiscordTownManager.MoveUser(discordTown, user, after.VoiceChannel, voiceState);
     }
 }

@@ -26,8 +26,8 @@ public class UserService(IDiscordTownStore discordTownStore, IDiscordTownManager
         }
     }
 
-    public bool UpdateDiscordPresence(string userId, string guildId, bool isPresent, VoiceState voiceState) =>
-        discordTownManager.UpdateUserStatus(guildId, userId, isPresent: isPresent, discordVoiceState: voiceState);
+    public bool UpdateDiscordPresence(string userId, string guildId, VoiceState voiceState) =>
+        discordTownManager.UpdateUserStatus(guildId, userId, voiceState);
 
     public string? GetUserName(string userId) => discordTownManager.GetTownUser(userId)?.Name;
 }

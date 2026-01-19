@@ -52,6 +52,7 @@
         @apply text-white;
     }
 
+    .user-status-icon-disconnected,
     .user-status-icon-server {
         @apply text-discord-warning;
     }

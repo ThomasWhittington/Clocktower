@@ -6,7 +6,7 @@
     @apply scheme-dark bg-[#242424];
     @apply antialiased;
 
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 .unstyled-button {

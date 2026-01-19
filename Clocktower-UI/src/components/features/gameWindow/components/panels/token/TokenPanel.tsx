@@ -10,6 +10,8 @@ import {
 import {TokenGroup} from "@/components/features/gameWindow/components";
 import {Token} from "@/components/tokens";
 import {useAppStore} from "@/store";
+import {useUser} from "@/components/features/discordTownPanel/hooks";
+import {UserUtils} from "@/utils";
 
 interface TokenPanelProps {
     isOpen: boolean,
@@ -21,6 +23,7 @@ interface TokenPanelProps {
 
 export const TokenPanel = ({isOpen, onClose, player, isDraftMode, setRole}: TokenPanelProps) => {
     const currentUser = useAppStore((state) => state.currentUser);
+    const {thisUser} = useUser(currentUser?.id);
     const {script} = useServerHub();
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
     if (!player || !currentUser) return null;
@@ -53,7 +56,9 @@ export const TokenPanel = ({isOpen, onClose, player, isDraftMode, setRole}: Toke
                         onClick={() => tokenClicked(undefined)}
                     />
                 </div>
-                <TokenGroup name="Travellers" roles={script?.travellers} tokenSize={dynamicSize} currentRoleId={playerRole?.id} onClick={tokenClicked}/>
+                {UserUtils.isStoryTeller(thisUser) &&
+                    <TokenGroup name="Travellers" roles={script?.travellers} tokenSize={dynamicSize} currentRoleId={playerRole?.id} onClick={tokenClicked}/>
+                }
             </div>
         </BasePanel>
     )

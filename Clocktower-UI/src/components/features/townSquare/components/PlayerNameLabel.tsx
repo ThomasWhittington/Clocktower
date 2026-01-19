@@ -1,4 +1,7 @@
-﻿import type {MouseEvent, ReactNode} from "react";
+﻿import type {
+    MouseEvent,
+    ReactNode
+} from "react";
 import {type User} from "@/types";
 
 export function PlayerNameLabel({player, onClick, children}: Readonly<{
@@ -8,10 +11,8 @@ export function PlayerNameLabel({player, onClick, children}: Readonly<{
 }>) {
     return (
         <div className="player-name-container">
-            <button onClick={onClick}>
-                <span>
-                    {player.name}
-                </span>
+            <button className={player.isDead ? 'is-dead' : ''} onClick={onClick}>
+                {player.name}
             </button>
             {children}
         </div>

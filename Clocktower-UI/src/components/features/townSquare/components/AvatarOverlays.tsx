@@ -1,4 +1,7 @@
-﻿import {Shroud, VoteToken} from "@/components/ui/icons";
+﻿import {
+    Shroud,
+    VoteToken
+} from "@/components/ui/icons";
 import {DiscordUserVoiceStatus} from "@/components/ui";
 import type {User} from "@/types";
 import {UserUtils} from "@/utils";
@@ -39,7 +42,7 @@ export function AvatarOverlays({player}: Readonly<AvatarOverlaysProps>) {
 
             {player.voiceState && (
                 <div className="voice-status-badge">
-                    <DiscordUserVoiceStatus voiceState={player.voiceState} iconSize={35}/>
+                    <DiscordUserVoiceStatus voiceState={player.voiceState}/>
                 </div>
             )}
         </>

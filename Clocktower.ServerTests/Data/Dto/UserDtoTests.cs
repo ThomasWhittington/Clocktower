@@ -10,8 +10,7 @@ public class UserDtoTests
 {
     private readonly TownUser _townUser = CommonMethods.GetRandomTownUser() with
     {
-        VoiceState = new VoiceState(true, false, false, true),
-        IsPresent = true
+        VoiceState = new VoiceState(true, true, false, false, true)
     };
 
     private readonly GameUser _gameUser = CommonMethods.GetRandomGameUser() with
@@ -35,7 +34,6 @@ public class UserDtoTests
         result.Name.Should().Be(_townUser.Name);
         result.AvatarUrl.Should().Be(_townUser.AvatarUrl);
         result.VoiceState.Should().Be(_townUser.VoiceState);
-        result.IsPresent.Should().Be(_townUser.IsPresent);
         result.IsPlaying.Should().BeFalse();
         result.UserType.Should().Be(UserType.Unknown);
         result.SeatingPosition.Should().Be(-1);
@@ -55,7 +53,6 @@ public class UserDtoTests
         result.Name.Should().Be(_townUser.Name);
         result.AvatarUrl.Should().Be(_townUser.AvatarUrl);
         result.VoiceState.Should().Be(_townUser.VoiceState);
-        result.IsPresent.Should().Be(_townUser.IsPresent);
         result.IsPlaying.Should().Be(_gameUser.IsPlaying);
         result.UserType.Should().Be(_gameUser.UserType);
         result.SeatingPosition.Should().Be(_gameUser.SeatingPosition);
@@ -74,8 +71,7 @@ public class UserDtoTests
         result.Id.Should().Be(_gameUser.Id);
         result.Name.Should().Be(_gameUser.Id);
         result.AvatarUrl.Should().BeEmpty();
-        result.VoiceState.Should().BeEquivalentTo(new VoiceState(false, false, false, false));
-        result.IsPresent.Should().BeFalse();
+        result.VoiceState.Should().BeEquivalentTo(new VoiceState(false, false, false, false, false));
         result.IsPlaying.Should().Be(_gameUser.IsPlaying);
         result.UserType.Should().Be(_gameUser.UserType);
         result.SeatingPosition.Should().Be(_gameUser.SeatingPosition);
@@ -95,7 +91,6 @@ public class UserDtoTests
         result.Name.Should().Be(_townUser.Name);
         result.AvatarUrl.Should().Be(_townUser.AvatarUrl);
         result.VoiceState.Should().Be(_townUser.VoiceState);
-        result.IsPresent.Should().Be(_townUser.IsPresent);
         result.IsPlaying.Should().Be(_gameUser.IsPlaying);
         result.UserType.Should().Be(_gameUser.UserType);
         result.SeatingPosition.Should().Be(_gameUser.SeatingPosition);

@@ -393,7 +393,7 @@ public class GameBroadcastServiceTests
     public async Task BroadcastUserVoiceStateChanged_CallsNotificationService()
     {
         const bool inVoice = true;
-        var voiceState = new VoiceState(true, false, true, false);
+        var voiceState = new VoiceState(inVoice, true, false, true, false);
         _mockNotificationService.Setup(o => o.SendUserVoiceStateToGroup(GameId, UserId, inVoice, voiceState)).Returns(Task.CompletedTask);
 
         await _sut.BroadcastUserVoiceStateChanged(GameId, UserId, inVoice, voiceState);

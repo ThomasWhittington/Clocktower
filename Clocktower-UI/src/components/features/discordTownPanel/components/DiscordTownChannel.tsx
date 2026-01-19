@@ -1,21 +1,9 @@
-﻿import type {
-    ChannelOccupants,
-} from "@/types";
-import {
-    DiscordTownUser
-} from "./index.ts";
-import {
-    discordService
-} from "@/services";
-import {
-    useAppStore
-} from "@/store";
-import {
-    ValidationUtils
-} from "@/utils";
-import {
-    useUserPresenceStatus
-} from "@/components/features/discordTownPanel/hooks";
+﻿import type {ChannelOccupants,} from "@/types";
+import {DiscordTownUser} from "./index.ts";
+import {discordService} from "@/services";
+import {useAppStore} from "@/store";
+import {ValidationUtils} from "@/utils";
+import {useUserPresenceStatus} from "@/components/features/discordTownPanel/hooks";
 
 
 function DiscordTownChannel({channel}: Readonly<{
@@ -25,7 +13,7 @@ function DiscordTownChannel({channel}: Readonly<{
     const guildId = useAppStore((state) => state.guildId);
     const currentUser = useAppStore((state) => state.currentUser);
     const {isInVoiceChannel} = useUserPresenceStatus();
-    
+
     const moveUserHere = async () => {
         if (!(ValidationUtils.isValidDiscordId(guildId) &&
             ValidationUtils.isValidDiscordId(channel.channel.id) &&
@@ -48,11 +36,16 @@ function DiscordTownChannel({channel}: Readonly<{
                className={`channel-button channel-button-${isInVoiceChannel ? "enabled" :
                    "disabled"}`}>{channel.channel.name}</a>
             <div
-                className="channel-occupants">{channel.occupants.map(user => (
-                <DiscordTownUser
-                    key={user.id}
-                    user={user}/>
-            ))}</div>
+                className="channel-occupants">
+                {channel.occupants
+                    .filter(user => user.voiceState?.isPresent)
+                    .map(user => (
+                        <DiscordTownUser
+                            key={user.id}
+                            user={user}/>
+                    ))
+                }
+            </div>
         </div>
     );
 }

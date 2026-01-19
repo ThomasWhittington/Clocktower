@@ -1271,5 +1271,160 @@ public class GamePerspectiveServiceTests
         }
     }
 
+    [TestMethod]
+    public void CommitDraftRoles_UpdatesCorrect_WithTravellersBeingSet()
+    {
+        var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId1) { UserType = UserType.Player };
+        var player2 = new GameUser(UserId2) { UserType = UserType.Player };
+        var player3 = new GameUser(UserId3) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyteller);
+        _sut.AddUserToGame(GameId1, player1);
+        _sut.AddUserToGame(GameId1, player2);
+        _sut.AddUserToGame(GameId1, player3);
+        _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef());
+        _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp());
+        _sut.UpdateDraftRole(GameId1, UserId3, Role.Gunslinger());
+
+        _sut.CommitDraftRoles(GameId1);
+
+        foreach (var userId in new[] { "storyteller", UserId1, UserId2, UserId3 })
+        {
+            var playerPerspective = _sut.GetPerspective(GameId1, userId);
+            playerPerspective.Should().NotBeNull();
+
+            var user1 = playerPerspective.Players.First(o => o.Id == UserId1);
+            user1.DraftRole.Should().BeNull();
+            if (playerPerspective.UserId is UserId1 or "omniscient")
+            {
+                user1.Role.Should().BeEquivalentTo(Role.Chef());
+            }
+            else
+            {
+                user1.Role.Should().BeNull();
+            }
+
+            var user2 = playerPerspective.Players.First(o => o.Id == UserId2);
+            user2.DraftRole.Should().BeNull();
+            if (playerPerspective.UserId is UserId2 or "omniscient")
+            {
+                user2.Role.Should().BeEquivalentTo(Role.Imp());
+            }
+            else
+            {
+                user2.Role.Should().BeNull();
+            }
+
+            var user3 = playerPerspective.Players.First(o => o.Id == UserId3);
+            user3.DraftRole.Should().BeNull();
+            user3.Role.Should().BeEquivalentTo(Role.Gunslinger());
+        }
+    }
+
+    [TestMethod]
+    public void CommitDraftRoles_UpdatesCorrect_WithExistingTravellers()
+    {
+        var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId1) { UserType = UserType.Player };
+        var player2 = new GameUser(UserId2) { UserType = UserType.Player };
+        var player3 = new GameUser(UserId3) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyteller);
+        _sut.AddUserToGame(GameId1, player1);
+        _sut.AddUserToGame(GameId1, player2);
+        _sut.AddUserToGame(GameId1, player3);
+        _sut.SetRoleOnAllPerspectives(GameId1, UserId3, Role.Gunslinger());
+        _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef());
+        _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp());
+        _sut.UpdateDraftRole(GameId1, UserId3, Role.FortuneTeller());
+
+        _sut.CommitDraftRoles(GameId1);
+
+        foreach (var userId in new[] { "storyteller", UserId1, UserId2, UserId3 })
+        {
+            var playerPerspective = _sut.GetPerspective(GameId1, userId);
+            playerPerspective.Should().NotBeNull();
+
+            var user1 = playerPerspective.Players.First(o => o.Id == UserId1);
+            user1.DraftRole.Should().BeNull();
+            if (playerPerspective.UserId is UserId1 or "omniscient")
+            {
+                user1.Role.Should().BeEquivalentTo(Role.Chef());
+            }
+            else
+            {
+                user1.Role.Should().BeNull();
+            }
+
+            var user2 = playerPerspective.Players.First(o => o.Id == UserId2);
+            user2.DraftRole.Should().BeNull();
+            if (playerPerspective.UserId is UserId2 or "omniscient")
+            {
+                user2.Role.Should().BeEquivalentTo(Role.Imp());
+            }
+            else
+            {
+                user2.Role.Should().BeNull();
+            }
+
+            var user3 = playerPerspective.Players.First(o => o.Id == UserId3);
+            user3.DraftRole.Should().BeNull();
+            if (playerPerspective.UserId is UserId3 or "omniscient")
+            {
+                user3.Role.Should().BeEquivalentTo(Role.FortuneTeller());
+            }
+            else
+            {
+                user3.Role.Should().BeNull();
+            }
+        }
+    }
+
+    #endregion
+
+    #region SetRoleOnAllPerspectives
+
+    [TestMethod]
+    public void SetRoleOnAllPerspectives_SetsAsExpected()
+    {
+        var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId1) { UserType = UserType.Player };
+        var player2 = new GameUser(UserId2) { UserType = UserType.Player };
+        var player3 = new GameUser(UserId3) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyteller);
+        _sut.AddUserToGame(GameId1, player1);
+        _sut.AddUserToGame(GameId1, player2);
+        _sut.AddUserToGame(GameId1, player3);
+
+        var result = _sut.SetRoleOnAllPerspectives(GameId1, UserId2, Role.Imp());
+
+        result.Should().BeTrue();
+        foreach (var userId in new[] { "storyteller", UserId1, UserId2, UserId3 })
+        {
+            var playerPerspective = _sut.GetPerspective(GameId1, userId);
+            playerPerspective.Should().NotBeNull();
+            playerPerspective.Players.First(o => o.Id == UserId1).Role.Should().BeNull();
+            playerPerspective.Players.First(o => o.Id == UserId2).Role.Should().BeEquivalentTo(Role.Imp());
+            playerPerspective.Players.First(o => o.Id == UserId3).Role.Should().BeNull();
+        }
+    }
+
+    [TestMethod]
+    public void SetRoleOnAllPerspectives_ChangesNothing_WhenNoUpdateNeeded()
+    {
+        var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId1) { UserType = UserType.Player };
+        var player2 = new GameUser(UserId2) { UserType = UserType.Player };
+        var player3 = new GameUser(UserId3) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyteller);
+        _sut.AddUserToGame(GameId1, player1);
+        _sut.AddUserToGame(GameId1, player2);
+        _sut.AddUserToGame(GameId1, player3);
+        _sut.SetRoleOnAllPerspectives(GameId1, UserId2, Role.Imp());
+
+        var result = _sut.SetRoleOnAllPerspectives(GameId1, UserId2, Role.Imp());
+
+        result.Should().BeFalse();
+    }
+
     #endregion
 }

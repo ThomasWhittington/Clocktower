@@ -188,7 +188,7 @@ public class DiscordTownManagerTests
         var mockUser = CreateMockDiscordUser("3003");
         var mockChannel = CreateMockDiscordVoiceChannel("2001");
 
-        var result = _sut.MoveUser(dummyDiscordTown, mockUser, mockChannel);
+        var result = _sut.MoveUser(dummyDiscordTown, mockUser, mockChannel, new VoiceState(true, false, true, false, true));
 
         var sourceChannel = result.ChannelCategories
             .SelectMany(c => c.Channels)
@@ -399,11 +399,10 @@ public class DiscordTownManagerTests
     public void UpdateUserStatus_ReturnsFalse_WhenNoTownFound()
     {
         const string userId = "3003";
-        const bool isPresent = true;
-        VoiceState voiceState = new VoiceState(true, false, true, false);
+        VoiceState voiceState = new VoiceState(true, true, false, true, false);
         Setup_UpdateUserStatus(null);
 
-        var result = _sut.UpdateUserStatus(GuildId, userId, isPresent, voiceState);
+        var result = _sut.UpdateUserStatus(GuildId, userId, voiceState);
 
         result.Should().BeFalse();
     }
@@ -413,18 +412,16 @@ public class DiscordTownManagerTests
     public void UpdateUserStatus_CallsSetState_WhenTownFound()
     {
         const string userId = "3003";
-        const bool isPresent = true;
-        VoiceState voiceState = new VoiceState(true, false, true, false);
+        VoiceState voiceState = new VoiceState(true, true, false, true, false);
         var town = GetDummyDiscordTown();
         Setup_UpdateUserStatus(town);
 
-        var result = _sut.UpdateUserStatus(GuildId, userId, isPresent, voiceState);
+        var result = _sut.UpdateUserStatus(GuildId, userId, voiceState);
 
         result.Should().BeTrue();
         var updatedUser = _capturedDiscordTown.TownUsers.FirstOrDefault(townUser => townUser.Id == userId);
 
         updatedUser.Should().NotBeNull();
-        updatedUser.IsPresent.Should().Be(isPresent);
         updatedUser.VoiceState.Should().Be(voiceState);
     }
 

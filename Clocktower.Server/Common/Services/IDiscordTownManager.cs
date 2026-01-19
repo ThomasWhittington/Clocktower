@@ -1,13 +1,12 @@
-﻿using Clocktower.Server.Data.Dto;
-using Clocktower.Server.Data.Wrappers;
+﻿using Clocktower.Server.Data.Wrappers;
 
 namespace Clocktower.Server.Common.Services;
 
 public interface IDiscordTownManager
 {
-    DiscordTown MoveUser(DiscordTown current, IDiscordGuildUser user, IDiscordVoiceChannel? newChannel);
+    DiscordTown MoveUser(DiscordTown current, IDiscordGuildUser user, IDiscordVoiceChannel? newChannel, VoiceState? voiceState = null);
     ChannelOccupants? FindUserChannel(DiscordTown occupants, string userId);
-    bool UpdateUserStatus(string guildId, string userId, bool isPresent, VoiceState discordVoiceState);
+    bool UpdateUserStatus(string guildId, string userId, VoiceState discordVoiceState);
     DiscordTown? GetDiscordTown(string guildId);
     string? GetVoiceChannelIdByName(string guildId, string voiceChannelName);
     TownUser? GetTownUser(string userId);

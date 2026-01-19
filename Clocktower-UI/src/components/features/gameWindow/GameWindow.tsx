@@ -25,8 +25,14 @@ import {
     useActivePanel,
     useSetRoles
 } from "@/components/features/gameWindow/hooks";
-import {useState} from "react";
-import {User} from "@/types";
+import {
+    useEffect,
+    useState
+} from "react";
+import {
+    RoleType,
+    User
+} from "@/types";
 
 export default function GameWindow() {
     const {gameId, currentUser} = useAppStore();
@@ -36,6 +42,13 @@ export default function GameWindow() {
     const [isDraftMode, setIsDraftMode] = useState(false);
     const {togglePanel, isPanelOpen, closePanel, openPanel, getPanelData} = useActivePanel();
     const {setRole, commitDraftRoles} = useSetRoles(currentUser?.id ?? "", UserUtils.isStoryTeller(thisUser), isDraftMode);
+    const isStoryteller = UserUtils.isStoryTeller(thisUser);
+
+    useEffect(() => {
+        if (script && isPanelOpen('script')) {
+            closePanel();
+        }
+    }, [script]);
 
     useKeyboardShortcut({
         key: 'u',
@@ -49,11 +62,14 @@ export default function GameWindow() {
     });
     useKeyboardShortcut({
         key: 'r',
-        onKeyPress: () => togglePanel('role')
+        onKeyPress: () => togglePanel('role'),
+        enabled: script !== undefined
     });
     useKeyboardShortcut({
         key: 'n',
         onKeyPress: () => togglePanel('night')
+        ,
+        enabled: script !== undefined
     });
     useKeyboardShortcut({
         key: 'd',
@@ -71,6 +87,7 @@ export default function GameWindow() {
             <TownSquare
                 showDraftRoles={isDraftMode}
                 onTokenClick={(player: User) => {
+                    if (!script || (!isStoryteller && player.role?.type === RoleType.Traveller)) return;
                     openPanel('token', {player});
                 }}
                 onCommitDraftRoles={isDraftMode ? handleCommitDraftRoles : undefined}
@@ -89,7 +106,7 @@ export default function GameWindow() {
                     setRole={setRole}
                 />
             )}
-            {UserUtils.isStoryTeller(thisUser) &&
+            {isStoryteller &&
                 <StoryTellerHud
                     usersIsOpen={isPanelOpen('user')}
                     onUsersClick={() => togglePanel('user')}
@@ -102,8 +119,8 @@ export default function GameWindow() {
             <CenterHud/>
             <TopHud scriptName={script?.name}/>
             <RightHud
-                onRoleListClick={() => togglePanel('role')}
-                onNightOrderClick={() => togglePanel('night')}
+                onRoleListClick={() => script && togglePanel('role')}
+                onNightOrderClick={() => script && togglePanel('night')}
             />
             <BottomHud gameId={gameId} storyTellers={discordTown?.storyTellers ?? []}/>
         </div>

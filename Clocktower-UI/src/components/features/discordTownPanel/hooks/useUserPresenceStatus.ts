@@ -1,12 +1,6 @@
-﻿import {
-    useAppStore
-} from '@/store';
-import {
-    useServerHub
-} from "@/hooks";
-import {
-    findGameUserById
-} from "@/types";
+﻿import {useAppStore} from '@/store';
+import {useServerHub} from "@/hooks";
+import {findGameUserById} from "@/types";
 
 export const useUserPresenceStatus = () => {
     const currentUser = useAppStore((state) => state.currentUser);
@@ -19,8 +13,8 @@ export const useUserPresenceStatus = () => {
     if (discordTown && currentUser?.id && connectionState === 'Connected') {
         const thisUser = findGameUserById(discordTown, currentUser.id);
         if (thisUser === undefined) isInVoiceChannel = false;
-        else isInVoiceChannel = thisUser.isPresent;
+        else isInVoiceChannel = thisUser.voiceState?.isPresent ?? false;
     }
 
-    return {isInVoiceChannel};
+    return {isInVoiceChannel: isInVoiceChannel ?? false};
 };

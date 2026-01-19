@@ -11,6 +11,7 @@ public interface IGamePerspectiveService
     bool UpdatePublicUser(string gameId, string userId, PublicGameUserUpdate update);
     bool UpdatePrivateUser(string gameId, string userId, PrivateGameUserUpdate update);
     bool SetRoleOnPerspective(string gameId, string userId, string targetUserId, Role? role);
+    bool SetRoleOnAllPerspectives(string gameId, string targetUserId, Role? role);
     bool AddUserToGame(string gameId, GameUser gameUser);
     GamePerspective? InitializeGame(string gameId, string guildId, GameUser initialUser);
     IEnumerable<GamePerspective> GetAllPerspectivesForGame(string gameId);

@@ -4,6 +4,7 @@ import {
     PlayerActionMenu,
     PlayerIcon
 } from "@/components/features/townSquare/components";
+import {SwapIcon} from "@/components/ui/icons";
 import {
     getPlayerGlowColor,
     useCircleLayout,
@@ -102,7 +103,7 @@ export default function TownSquare({showDraftRoles = false, onTokenClick, onComm
                         onTokenClick={onTokenClick}
                         avatarOverlay={isSwappingTarget && (
                             <button className="clickable-portrait" onClick={() => confirmSwap(player)}>
-                                <span className="portrait-icon">🔄</span>
+                                <SwapIcon className="portrait-icon"/>
                             </button>
                         )}
                     >

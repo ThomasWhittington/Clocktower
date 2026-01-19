@@ -20,7 +20,7 @@ public class DiscordGameActionService(
             gamePerspective.StoryTellers,
             guild.Id,
             user =>
-                user.IsPresent &&
+                user.VoiceState.IsPresent &&
                 user.VoiceState.IsServerMuted == !muted
         );
 

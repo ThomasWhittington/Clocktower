@@ -1,12 +1,18 @@
 ﻿import type {ClocktowerServerDataDtoUserDto} from "@/api";
-import {mapToVoiceState, type VoiceState} from "@/types/voiceState.ts";
-import {mapToRole, Role, UserType} from "@/types";
+import {
+    mapToVoiceState,
+    type VoiceState
+} from "@/types/voiceState.ts";
+import {
+    mapToRole,
+    Role,
+    UserType
+} from "@/types";
 
 export class User {
     readonly id: string;
     readonly name: string;
     readonly avatarUrl: string | undefined;
-    readonly isPresent: boolean;
     readonly voiceState: VoiceState | undefined;
     readonly isPlaying: boolean;
     readonly userType: UserType;
@@ -21,7 +27,6 @@ export class User {
         this.id = data.id ?? '';
         this.name = data.name ?? '';
         this.avatarUrl = data.avatarUrl;
-        this.isPresent = data.isPresent ?? false;
         this.voiceState = data.voiceState;
         this.isPlaying = data.isPlaying ?? false;
         this.userType = data.userType ?? UserType.Unknown;
@@ -39,7 +44,6 @@ export function mapToUser(userDto: ClocktowerServerDataDtoUserDto): User {
         id: userDto.id!,
         name: userDto.name!,
         avatarUrl: userDto.avatarUrl ?? undefined,
-        isPresent: userDto.isPresent ?? false,
         voiceState: userDto.voiceState ? mapToVoiceState(userDto.voiceState) : undefined,
         isPlaying: userDto.isPlaying ?? false,
         userType: (UserType[userDto.userType as keyof typeof UserType]) ?? UserType.Unknown,

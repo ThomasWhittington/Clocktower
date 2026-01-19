@@ -591,7 +591,7 @@ export const addUserToGameApi = <ThrowOnError extends boolean = false>(options: 
 /**
  * Commits draft roles
  *
- * Commits the draft roles for a user in a game, moving them to the role fields.
+ * Commits the draft roles for all users in a game, moving them to the role fields.
  */
 export const commitDraftRolesApi = <ThrowOnError extends boolean = false>(options: Options<CommitDraftRolesApiData, ThrowOnError>) => {
     return (options.client ?? client).post<CommitDraftRolesApiResponses, CommitDraftRolesApiErrors, ThrowOnError>({
