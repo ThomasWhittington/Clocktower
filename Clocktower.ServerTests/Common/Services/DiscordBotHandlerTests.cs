@@ -79,7 +79,7 @@ public class DiscordBotHandlerTests
         _mockTownService.Setup(o => o.GetDiscordTown(GuildId)).ReturnsAsync((getDiscordTownValue is not null, getDiscordTownValue, string.Empty));
         if (moveUserValue != null && getDiscordTownValue != null)
         {
-            _mockDiscordTownManager.Setup(o => o.MoveUser(getDiscordTownValue, _guildUser.Object, It.IsAny<IDiscordVoiceChannel>())).Returns(moveUserValue);
+            _mockDiscordTownManager.Setup(o => o.MoveUser(getDiscordTownValue, _guildUser.Object, It.IsAny<IDiscordVoiceChannel>(), It.IsAny<VoiceState?>())).Returns(moveUserValue);
         }
     }
 
@@ -212,7 +212,8 @@ public class DiscordBotHandlerTests
         _mockDiscordTownManager.Verify(o => o.MoveUser(
             It.IsAny<DiscordTown>(),
             It.IsAny<IDiscordGuildUser>(),
-            It.IsAny<IDiscordVoiceChannel>()
+            It.IsAny<IDiscordVoiceChannel>(),
+            It.IsAny<VoiceState?>()
         ), Times.Never);
     }
 

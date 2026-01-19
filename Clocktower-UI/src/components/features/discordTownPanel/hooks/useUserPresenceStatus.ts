@@ -13,8 +13,8 @@ export const useUserPresenceStatus = () => {
     if (discordTown && currentUser?.id && connectionState === 'Connected') {
         const thisUser = findGameUserById(discordTown, currentUser.id);
         if (thisUser === undefined) isInVoiceChannel = false;
-        else isInVoiceChannel = thisUser.voiceState?.isPresent;
+        else isInVoiceChannel = thisUser.voiceState?.isPresent ?? false;
     }
 
-    return {isInVoiceChannel};
+    return {isInVoiceChannel: isInVoiceChannel ?? false};
 };
