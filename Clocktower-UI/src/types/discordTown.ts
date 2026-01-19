@@ -1,17 +1,23 @@
 ﻿import {type MiniCategory} from "./miniCategory.ts";
-import {User, UserType} from "@/types";
+import {
+    type RoleDistribution,
+    User,
+    UserType
+} from "@/types";
 
 export class DiscordTown {
     readonly gameId: string;
     readonly townUsers: User[];
     readonly gameUsers: User[];
     channelCategories: MiniCategory[];
+    defaultRoleDistribution: RoleDistribution | undefined;
 
     constructor(data: Partial<DiscordTown>) {
         this.gameId = data.gameId ?? '';
         this.townUsers = (data.townUsers ?? []).map(user => new User(user));
         this.gameUsers = (data.gameUsers ?? []).map(user => new User(user));
         this.channelCategories = data.channelCategories ?? [];
+        this.defaultRoleDistribution = data.defaultRoleDistribution;
     }
 
     get players(): User[] {

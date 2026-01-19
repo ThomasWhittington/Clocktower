@@ -211,6 +211,9 @@ const clocktowerServerDataGamePerspectiveSchemaResponseTransformer = (data: any)
     if (data.script) {
         data.script = clocktowerServerDataScriptSchemaResponseTransformer(data.script);
     }
+    if (data.defaultRoleDistributions) {
+        data.defaultRoleDistributions = clocktowerServerDataRoleDistributionSchemaResponseTransformer(data.defaultRoleDistributions);
+    }
     return data;
 };
 

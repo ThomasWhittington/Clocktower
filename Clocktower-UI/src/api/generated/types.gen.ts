@@ -38,6 +38,7 @@ export type ClocktowerServerDataDtoDiscordTownDto = {
     channelCategories?: Array<ClocktowerServerDataDtoMiniCategoryDto> | null;
     readonly townUsers?: Array<ClocktowerServerDataDtoUserDto> | null;
     gameUsers?: Array<ClocktowerServerDataDtoUserDto> | null;
+    defaultRoleDistribution?: ClocktowerServerDataRoleDistribution;
 };
 
 export type ClocktowerServerDataDtoMiniCategoryDto = {
@@ -101,6 +102,13 @@ export type ClocktowerServerDataMiniGamePerspective = {
 export type ClocktowerServerDataMiniGuild = {
     id?: string | null;
     name?: string | null;
+};
+
+export type ClocktowerServerDataRoleDistribution = {
+    townsfolk?: number;
+    outsiders?: number;
+    minions?: number;
+    demons?: number;
 };
 
 export type ClocktowerServerDataScript = {
@@ -213,6 +221,7 @@ export type ClocktowerServerDataDtoDiscordTownDtoWritable = {
     gameId?: string | null;
     channelCategories?: Array<ClocktowerServerDataDtoMiniCategoryDtoWritable> | null;
     gameUsers?: Array<ClocktowerServerDataDtoUserDtoWritable> | null;
+    defaultRoleDistribution?: ClocktowerServerDataRoleDistribution;
 };
 
 export type ClocktowerServerDataDtoMiniCategoryDtoWritable = {

@@ -12,3 +12,4 @@ export {InputField} from './InputField';
 export {BasePanel} from './BasePanel';
 export {UserAvatar} from './UserAvatar';
 export {StatusIndicator} from './StatusIndicator';
+export {RoleDistributionWidget} from './RoleDistributionWidget';

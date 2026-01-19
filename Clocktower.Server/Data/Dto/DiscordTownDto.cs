@@ -11,4 +11,7 @@ public record DiscordTownDto(string GameId, List<MiniCategoryDto> ChannelCategor
         .SelectMany(ch => ch.Occupants).ToArray();
 
     [UsedImplicitly] public IEnumerable<UserDto> GameUsers { get; init; } = [];
+
+    public RoleDistribution? DefaultRoleDistribution =>
+        Calculator.GetDefaultRoleDistribution(GameUsers.Count(o => o.UserType == UserType.Player && o.Role?.Type != RoleType.Traveller));
 }
