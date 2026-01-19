@@ -8,27 +8,4 @@ public record GamePerspective(string Id, string UserId, string GuildId, GameUser
     public IEnumerable<GameUser> Spectators => Users.Where(o => o.UserType == UserType.Spectator);
     public GameTime GameTime { get; init; }
     public Script? Script { get; init; }
-
-    public RoleDistribution? DefaultRoleDistributions
-    {
-        get
-        {
-            int playerCount = Players.Count();
-            if (playerCount < 5) return null;
-
-            const int demons = 1;
-            int minions = (playerCount - 7) / 3 + 1;
-            int outsiders = playerCount switch
-            {
-                5 => 0,
-                6 => 1,
-                _ => (playerCount - 7) % 3
-            };
-            int townsfolk = playerCount - outsiders - minions - demons;
-
-            return new RoleDistribution(townsfolk, outsiders, minions, demons);
-        }
-    }
 }
-
-public record RoleDistribution(int Townsfolk, int Outsiders, int Minions, int Demons);

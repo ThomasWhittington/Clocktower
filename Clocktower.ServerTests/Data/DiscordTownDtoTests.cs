@@ -1,10 +1,11 @@
 ﻿using Clocktower.Server.Data;
+using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Data.Types.Enum;
 
 namespace Clocktower.ServerTests.Data;
 
 [TestClass]
-public class GamePerspectiveTests
+public class DiscordTownDtoTests
 {
     [TestMethod]
     [DataRow(0)]
@@ -14,7 +15,7 @@ public class GamePerspectiveTests
     [DataRow(4)]
     public void DefaultRoleDistribution_LessThan5Players_BeNull(int playerCount)
     {
-        var perspective = GetGamePerspective(playerCount);
+        var perspective = GetDiscordTownDto(playerCount);
 
         perspective.DefaultRoleDistributions.Should().BeNull();
     }
@@ -37,16 +38,17 @@ public class GamePerspectiveTests
         AssertDefaultRoleDistribution(playerCount, new RoleDistribution(townsfolk, outsiders, minions, demons));
     }
 
-    private static GamePerspective GetGamePerspective(int playerCount)
+    private static DiscordTownDto GetDiscordTownDto(int playerCount)
     {
-        var players = new List<GameUser>();
+        var players = new List<UserDto>();
 
         for (int i = 0; i < playerCount; i++)
         {
-            players.Add(CommonMethods.GetRandomGameUser() with { UserType = UserType.Player });
+            players.Add(new UserDto(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), CommonMethods.GetRandomString())
+                { UserType = UserType.Player });
         }
 
-        return CommonMethods.GetGamePerspective() with { Users = players };
+        return new DiscordTownDto("game-id", []) { GameUsers = players };
     }
 
     private static void AssertDefaultRoleDistribution(int playerCount, RoleDistribution expectedDistribution)
@@ -54,12 +56,12 @@ public class GamePerspectiveTests
         var roleDistributionTotal = expectedDistribution.Townsfolk + expectedDistribution.Outsiders + expectedDistribution.Minions + expectedDistribution.Demons;
         roleDistributionTotal.Should().Be(playerCount);
 
-        var perspective = GetGamePerspective(playerCount);
+        var dto = GetDiscordTownDto(playerCount);
 
-        perspective.DefaultRoleDistributions.Should().NotBeNull();
-        perspective.DefaultRoleDistributions.Townsfolk.Should().Be(expectedDistribution.Townsfolk);
-        perspective.DefaultRoleDistributions.Outsiders.Should().Be(expectedDistribution.Outsiders);
-        perspective.DefaultRoleDistributions.Minions.Should().Be(expectedDistribution.Minions);
-        perspective.DefaultRoleDistributions.Demons.Should().Be(expectedDistribution.Demons);
+        dto.DefaultRoleDistributions.Should().NotBeNull();
+        dto.DefaultRoleDistributions.Townsfolk.Should().Be(expectedDistribution.Townsfolk);
+        dto.DefaultRoleDistributions.Outsiders.Should().Be(expectedDistribution.Outsiders);
+        dto.DefaultRoleDistributions.Minions.Should().Be(expectedDistribution.Minions);
+        dto.DefaultRoleDistributions.Demons.Should().Be(expectedDistribution.Demons);
     }
 }
