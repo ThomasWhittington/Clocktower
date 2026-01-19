@@ -2,7 +2,7 @@
 
 @layer components {
     .token {
-        @apply rounded-full w-full aspect-square bg-size-[100%] text-center border-[3px] border-black shadow-[0_0_10px_rgba(0,0,0,0.5)] cursor-pointer flex items-center justify-center relative overflow-hidden hover:brightness-75;
+        @apply rounded-full w-full aspect-square bg-size-[100%] text-center shadow-[0_0_10px_rgba(0,0,0,0.5)] cursor-pointer flex items-center justify-center relative overflow-hidden hover:brightness-75;
     }
 
     .token-is-dead {
