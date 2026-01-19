@@ -73,6 +73,7 @@ export type ClocktowerServerDataGamePerspective = {
     readonly spectators?: Array<ClocktowerServerDataGameUser> | null;
     gameTime?: ClocktowerServerDataTypesEnumGameTime;
     script?: ClocktowerServerDataScript;
+    defaultRoleDistributions?: ClocktowerServerDataRoleDistribution;
 };
 
 export type ClocktowerServerDataGameUser = {
@@ -101,6 +102,13 @@ export type ClocktowerServerDataMiniGamePerspective = {
 export type ClocktowerServerDataMiniGuild = {
     id?: string | null;
     name?: string | null;
+};
+
+export type ClocktowerServerDataRoleDistribution = {
+    townsfolk?: number;
+    outsiders?: number;
+    minions?: number;
+    demons?: number;
 };
 
 export type ClocktowerServerDataScript = {
@@ -245,6 +253,7 @@ export type ClocktowerServerDataGamePerspectiveWritable = {
     users?: Array<ClocktowerServerDataGameUserWritable> | null;
     gameTime?: ClocktowerServerDataTypesEnumGameTime;
     script?: ClocktowerServerDataScriptWritable;
+    defaultRoleDistributions?: ClocktowerServerDataRoleDistribution;
 };
 
 export type ClocktowerServerDataGameUserWritable = {
