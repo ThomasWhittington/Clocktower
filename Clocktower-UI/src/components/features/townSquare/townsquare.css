@@ -23,46 +23,62 @@
     }
 
     .player-action-menu {
-        @apply absolute z-50 min-w-40 bg-neutral-900 border border-neutral-700 rounded-lg shadow-2xl overflow-hidden;
-        max-height: 300px;
+        @apply absolute z-50 bg-neutral-900 border border-neutral-700 rounded-lg shadow-2xl overflow-hidden;
+        min-width: 10vmin;
+        max-height: 30vmin;
         overflow-y: auto;
+        border-width: 0.1vmin;
+        border-radius: 0.8vmin;
     }
 
     .player-name-container:has(+ .avatar-container) .player-action-menu {
         top: 100%;
-        margin-top: 0.5rem;
+        margin-top: 0.5vmin;
     }
 
     .player-name-container:not(:has(+ .avatar-container)) .player-action-menu {
         bottom: 100%;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.5vmin;
     }
 
     .player-action-menu-header {
-        @apply px-3 py-2 border-b border-neutral-700 bg-neutral-800/50;
+        @apply border-b border-neutral-700 bg-neutral-800/50;
+        padding: 0.5vmin 0.8vmin;
+        border-bottom-width: 0.1vmin;
 
         > .descriptor {
-            @apply text-xs font-semibold uppercase tracking-wider text-neutral-500;
+            @apply font-semibold uppercase tracking-wider text-neutral-500;
+            font-size: 0.9vmin;
         }
 
         > .title {
-            @apply text-sm text-white truncate;
+            @apply text-white truncate;
+            font-size: 1vmin;
         }
     }
 
     .player-action-menu-items {
-        @apply p-1 flex flex-col gap-0.5;
+        @apply flex flex-col;
+        padding: 0.3vmin;
+        gap: 0.15vmin;
     }
 
     .player-action-menu-item {
-        @apply w-full flex items-center gap-2 px-3 py-2 text-sm text-neutral-200 hover:bg-neutral-700 hover:text-white rounded-md transition-colors;
+        @apply w-full flex items-center hover:bg-neutral-700 hover:text-white rounded-md transition-colors;
+        gap: 0.5vmin;
+        padding: 0.5vmin 0.8vmin;
+        font-size: 1vmin;
+        border-radius: 0.4vmin;
     }
 
     .player-name-container {
         @apply flex flex-col items-center select-none;
 
         > button {
-            @apply px-2 py-1.5 rounded-md text-center text-xl transition-colors cursor-pointer border border-transparent active:border-white/20 bg-neutral-800/70;
+            @apply rounded-md text-center transition-colors cursor-pointer border border-transparent active:border-white/20 bg-neutral-800/70;
+            font-size: 1.2vmin;
+            padding: 0.8vmin 1.5vmin;
+            border-width: 0.1vmin;
 
             &.is-dead {
                 @apply bg-neutral-800/30 text-neutral-400;
@@ -136,23 +152,22 @@
         @apply absolute bottom-0 flex items-center justify-center select-none;
         width: 30%;
         height: 30%;
-        transform: translate(10%, 10%);
-    }
-
-    .vote-token-badge {
-        @apply right-0;
-        pointer-events: none;
-    }
-
-    .vote-token-badge.is-interactive {
-        @apply cursor-pointer;
-        pointer-events: auto;
     }
 
     .voice-status-badge {
         @apply left-0 pointer-events-none;
         transform: translate(-10%, 10%);
     }
+
+    .vote-token-badge {
+        @apply right-0 pointer-events-none;
+        transform: translate(10%, 10%);
+    }
+
+    .vote-token-badge.is-interactive {
+        @apply cursor-pointer pointer-events-auto;
+    }
+
 
     .users-container {
         @apply max-h-full overflow-y-auto;
