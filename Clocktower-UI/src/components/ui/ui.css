@@ -44,4 +44,54 @@
     .user-avatar > img {
         @apply object-cover w-full h-full;
     }
+
+    .role-distribution {
+        @apply rounded-lg bg-black/50 p-4 gap-4 flex flex-col w-fit items-center;
+
+        div {
+            @apply flex flex-wrap gap-4 items-center justify-center;
+        }
+
+        span {
+            @apply flex items-center gap-1 select-none;
+
+            svg {
+                @apply w-4 h-4 inline-block;
+            }
+
+            &.players svg {
+                @apply text-forestgreen;
+            }
+
+            &.alive svg {
+                @apply text-red-500;
+            }
+
+            &.votes svg {
+                @apply text-white;
+            }
+
+            &.townsfolk svg {
+                @apply text-townsfolk;
+            }
+
+            &.outsider svg {
+                @apply text-outsider;
+            }
+
+            &.minion svg {
+                @apply text-minion;
+            }
+
+            &.demon svg {
+                @apply text-demon;
+            }
+
+            &.traveller svg {
+                @apply text-traveller;
+            }
+        }
+    }
+
+
 }

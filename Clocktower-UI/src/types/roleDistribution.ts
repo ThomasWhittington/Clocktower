@@ -3,4 +3,5 @@
     outsiders: number,
     minions: number,
     demons: number,
+    travellers: number
 }
