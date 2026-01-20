@@ -20,6 +20,8 @@ using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 namespace Clocktower.Server;
@@ -138,7 +140,12 @@ public static class ConfigureServices
 
         private void AddSerilog()
         {
-            builder.Host.UseSerilog((context, configuration) => { configuration.ReadFrom.Configuration(context.Configuration); }, preserveStaticLogger: false);
+            builder.Host.UseSerilog((context, configuration) =>
+            {
+                configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .Enrich.With(new RenderedMessageEnricher());
+            }, preserveStaticLogger: false);
         }
 
         private void AddOpenTelemetry()
@@ -172,5 +179,15 @@ public static class ConfigureServices
                         });
                 });
         }
+    }
+}
+
+public class RenderedMessageEnricher : ILogEventEnricher
+{
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+    {
+        var rendered = logEvent.RenderMessage();
+        var property = propertyFactory.CreateProperty("RenderedMessage", rendered);
+        logEvent.AddPropertyIfAbsent(property);
     }
 }
