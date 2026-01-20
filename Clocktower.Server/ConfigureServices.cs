@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
@@ -48,6 +50,7 @@ public static class ConfigureServices
             });
 
             builder.AddSerilog();
+            builder.AddOpenTelemetry();
             builder.AddSwagger();
             builder.Services.AddSignalR();
             builder.ConfigureJson();
@@ -136,6 +139,38 @@ public static class ConfigureServices
         private void AddSerilog()
         {
             builder.Host.UseSerilog((context, configuration) => { configuration.ReadFrom.Configuration(context.Configuration); }, preserveStaticLogger: false);
+        }
+
+        private void AddOpenTelemetry()
+        {
+            var serviceName = builder.Configuration["OpenTelemetry:ServiceName"] ?? "Clocktower.Server";
+            var otlpEndpoint = builder.Configuration["OpenTelemetry:OtlpEndpoint"];
+            var betterStackToken = builder.Configuration["OpenTelemetry:BetterStackToken"];
+
+            if (string.IsNullOrEmpty(otlpEndpoint) || string.IsNullOrEmpty(betterStackToken))
+            {
+                Console.WriteLine("OpenTelemetry configuration missing or incomplete. Skipping OpenTelemetry setup.");
+                return;
+            }
+
+            builder.Services.AddOpenTelemetry()
+                .ConfigureResource(resource => resource.AddService(serviceName))
+                .WithTracing(tracing =>
+                {
+                    tracing
+                        .AddAspNetCoreInstrumentation(options =>
+                        {
+                            options.RecordException = true;
+                            options.Filter = httpContext => !httpContext.Request.Path.StartsWithSegments("/swagger");
+                        })
+                        .AddHttpClientInstrumentation(options => { options.RecordException = true; })
+                        .AddSource("Clocktower.*")
+                        .AddOtlpExporter(options =>
+                        {
+                            options.Endpoint = new Uri(otlpEndpoint);
+                            options.Headers = $"Authorization=Bearer {betterStackToken}";
+                        });
+                });
         }
     }
 }
