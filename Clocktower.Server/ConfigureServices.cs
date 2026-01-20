@@ -135,7 +135,7 @@ public static class ConfigureServices
 
         private void AddSerilog()
         {
-            builder.Host.UseSerilog((context, configuration) => { configuration.ReadFrom.Configuration(context.Configuration); });
+            builder.Host.UseSerilog((context, configuration) => { configuration.ReadFrom.Configuration(context.Configuration); }, preserveStaticLogger: false);
         }
     }
 }
