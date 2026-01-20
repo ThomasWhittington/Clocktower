@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 using System.Text.Json.Serialization;
 using Clocktower.Server.Admin.Services;
@@ -20,6 +21,8 @@ using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
 
 namespace Clocktower.Server;
@@ -138,8 +141,18 @@ public static class ConfigureServices
 
         private void AddSerilog()
         {
-            builder.Host.UseSerilog((context, configuration) => { configuration.ReadFrom.Configuration(context.Configuration); }, preserveStaticLogger: false);
+            builder.Host.UseSerilog((context, configuration) =>
+            {
+                configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .Enrich.FromLogContext()
+                    .Enrich.With(new MachineNameEnricher())
+                    .Enrich.With(new RenderedMessageEnricher())
+                    .Enrich.With(new ActivityEnricher())
+                    .Enrich.With(new HttpContextEnricher());
+            }, preserveStaticLogger: false);
         }
+
 
         private void AddOpenTelemetry()
         {
@@ -172,5 +185,60 @@ public static class ConfigureServices
                         });
                 });
         }
+    }
+}
+
+public class RenderedMessageEnricher : ILogEventEnricher
+{
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+    {
+        var rendered = logEvent.RenderMessage();
+        var property = propertyFactory.CreateProperty("RenderedMessage", rendered);
+        logEvent.AddPropertyIfAbsent(property);
+    }
+}
+
+public class ActivityEnricher : ILogEventEnricher
+{
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+    {
+        var activity = Activity.Current;
+        if (activity == null)
+            return;
+
+        logEvent.AddPropertyIfAbsent(
+            propertyFactory.CreateProperty("TraceId", activity.TraceId.ToString()));
+
+        logEvent.AddPropertyIfAbsent(
+            propertyFactory.CreateProperty("SpanId", activity.SpanId.ToString()));
+    }
+}
+
+public class HttpContextEnricher : ILogEventEnricher
+{
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+    {
+        var httpContext = new HttpContextAccessor().HttpContext;
+        if (httpContext == null)
+            return;
+
+        logEvent.AddPropertyIfAbsent(
+            propertyFactory.CreateProperty("RequestPath", httpContext.Request.Path.Value));
+
+        logEvent.AddPropertyIfAbsent(
+            propertyFactory.CreateProperty("RequestId", httpContext.TraceIdentifier));
+
+        logEvent.AddPropertyIfAbsent(
+            propertyFactory.CreateProperty("ConnectionId", httpContext.Connection.Id));
+    }
+}
+
+public class MachineNameEnricher : ILogEventEnricher
+{
+    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+    {
+        var machine = Environment.MachineName;
+        var property = propertyFactory.CreateProperty("MachineName", machine);
+        logEvent.AddPropertyIfAbsent(property);
     }
 }
