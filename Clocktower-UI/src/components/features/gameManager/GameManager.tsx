@@ -6,6 +6,7 @@ import {useAppStore} from "@/store";
 import {GameList} from "@/components/features/gameManager/components";
 import {BottomHud} from "@/components/features/gameWindow/components";
 import {useNavigate} from "react-router-dom";
+import ReactGA from "react-ga4";
 
 function GameManager() {
     const navigate = useNavigate();
@@ -51,6 +52,11 @@ function GameManager() {
         setIsLoading(true);
         gamesService.startGame(text, guildId, currentUser.id).then(data => {
             if (data?.id) {
+                ReactGA.event({
+                    category: "Game Manager",
+                    action: "start_game",
+                    label: data.id
+                });
                 setGameId(data.id);
                 navigate('/game');
             } else {
