@@ -25,22 +25,22 @@ export const RoleDistributionWidget = () => {
         <div className="role-distribution">
             {playerCount > 0 &&
                 <div>
-                    <span className="players">{playerCount}{<GroupIcon/>}</span>
-                    <span className="alive">{aliveCount}{<HeartIcon/>}</span>
-                    <span className="votes">{voteCount}{<VoteToken/>}</span>
+                    <span className="players" title="Number of Players">{playerCount}{<GroupIcon/>}</span>
+                    <span className="alive" title="Number of Alive Players">{aliveCount}{<HeartIcon/>}</span>
+                    <span className="votes" title="Number of available votes">{voteCount}{<VoteToken/>}</span>
                 </div>
             }
 
             {
                 roleDistribution ?
                     <div>
-                        <span className="townsfolk">{roleDistribution.townsfolk}{getRoleIcon(roleDistribution.townsfolk)}</span>
-                        <span className="outsider">{roleDistribution.outsiders}{getRoleIcon(roleDistribution.outsiders)}</span>
-                        <span className="minion">{roleDistribution.minions}{getRoleIcon(roleDistribution.minions)}</span>
-                        <span className="demon">{roleDistribution.demons}{getRoleIcon(roleDistribution.demons)}</span>
+                        <span className="townsfolk" title="Number of Townsfolk">{roleDistribution.townsfolk}{getRoleIcon(roleDistribution.townsfolk)}</span>
+                        <span className="outsider" title="Number of Outsiders">{roleDistribution.outsiders}{getRoleIcon(roleDistribution.outsiders)}</span>
+                        <span className="minion" title="Number of Minions">{roleDistribution.minions}{getRoleIcon(roleDistribution.minions)}</span>
+                        <span className="demon" title="Number of Demons">{roleDistribution.demons}{getRoleIcon(roleDistribution.demons)}</span>
 
                         {travellerCount > 0 &&
-                            <span className="traveller">{travellerCount}{getRoleIcon(travellerCount)}</span>}
+                            <span className="traveller" title="Number of Travellers">{travellerCount}{getRoleIcon(travellerCount)}</span>}
                     </div>
                     : <p>Add more players</p>
             }

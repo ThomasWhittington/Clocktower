@@ -76,7 +76,7 @@
 
         > button {
             @apply rounded-md text-center transition-colors cursor-pointer border border-transparent active:border-white/20 bg-neutral-800/70;
-            font-size: 1.2vmin;
+            font-size: 1.5vmin;
             padding: 0.8vmin 1.5vmin;
             border-width: 0.1vmin;
 

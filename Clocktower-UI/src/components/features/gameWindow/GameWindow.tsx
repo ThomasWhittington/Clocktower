@@ -51,7 +51,7 @@ export default function GameWindow() {
     }, [script]);
 
     useKeyboardShortcut({
-        key: 'u',
+        key: 'a',
         onKeyPress: () => togglePanel('user'),
         enabled: UserUtils.isStoryTeller(thisUser)
     });
