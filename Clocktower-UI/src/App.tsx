@@ -1,10 +1,58 @@
 import './App.css'
-import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
-import {AuthCallback, BotCallback, ErrorPage, Game, Home, Join, LoginPage, Playground} from "./pages";
+import {
+    BrowserRouter as Router,
+    Route,
+    Routes
+} from 'react-router-dom';
+import {
+    AuthCallback,
+    BotCallback,
+    ErrorPage,
+    Game,
+    Home,
+    Join,
+    LoginPage,
+    Playground
+} from "./pages";
 import {ServerDisconnected} from "@/components/ui";
-import {useServerHeartbeat} from "@/hooks";
+import {
+    useButtonTracking,
+    useErrorTracking,
+    useLinkTracking,
+    usePageTracking,
+    useServerHeartbeat,
+    useUserTracking
+} from "@/hooks";
+import ReactGA from 'react-ga4';
+
+const gaMeasurement = import.meta.env.VITE_GA_MEASUREMENT_ID;
+if (gaMeasurement) {
+    ReactGA.initialize(gaMeasurement);
+}
+
+function AppRoutes() {
+    usePageTracking();
+    useButtonTracking();
+    useLinkTracking();
+
+    return (
+        <Routes>
+            <Route path="/playground" element={<Playground/>}/>
+            <Route path="/login" element={<LoginPage/>}/>
+            <Route path="/auth/callback" element={<AuthCallback/>}/>
+            <Route path="/auth/bot-callback" element={<BotCallback/>}/>
+            <Route path="/" element={<Home/>}/>
+            <Route path="/game" element={<Game/>}/>
+            <Route path="/join" element={<Join/>}/>
+            <Route path="/error" element={<ErrorPage/>}/>
+        </Routes>
+    );
+}
 
 function App() {
+    useErrorTracking();
+    useUserTracking();
+
     const heartbeat = useServerHeartbeat();
     const playground = import.meta.env.VITE_PLAYGROUND_MODE === 'true';
     return (
@@ -15,16 +63,7 @@ function App() {
                     {
                         heartbeat.status === 'Healthy' ? (
                             <Router>
-                                <Routes>
-                                    <Route path="/playground" element={<Playground/>}/>
-                                    <Route path="/login" element={<LoginPage/>}/>
-                                    <Route path="/auth/callback" element={<AuthCallback/>}/>
-                                    <Route path="/auth/bot-callback" element={<BotCallback/>}/>
-                                    <Route path="/" element={<Home/>}/>
-                                    <Route path="/game" element={<Game/>}/>
-                                    <Route path="/join" element={<Join/>}/>
-                                    <Route path="/error" element={<ErrorPage/>}/>
-                                </Routes>
+                                <AppRoutes/>
                             </Router>
                         ) : (
                             <ServerDisconnected {...heartbeat}/>
