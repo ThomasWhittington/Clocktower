@@ -2,6 +2,7 @@
 import {
     AddUserIcon,
     BedIcon,
+    BookIcon,
     DayIcon,
     DraftIcon,
     EveningIcon,
@@ -20,6 +21,8 @@ interface StoryTellerHudProps {
     onUsersClick: () => void;
     scriptIsOpen: boolean;
     onScriptClick: () => void;
+    rolePlannerIsOpen: boolean;
+    onRolePlannerClick: () => void;
     showDraftRoles: boolean;
     onDraftToggle: () => void;
 }
@@ -30,6 +33,8 @@ export const StoryTellerHud = (
         onUsersClick,
         scriptIsOpen,
         onScriptClick,
+        rolePlannerIsOpen,
+        onRolePlannerClick,
         showDraftRoles,
         onDraftToggle
     }: StoryTellerHudProps) => {
@@ -53,6 +58,12 @@ export const StoryTellerHud = (
                     isActive={scriptIsOpen}
                     onClick={onScriptClick}
                     tooltip="Script Manager"
+                />
+                <IconButton
+                    icon={<BookIcon/>}
+                    isActive={rolePlannerIsOpen}
+                    onClick={onRolePlannerClick}
+                    tooltip="Role Planner"
                 />
                 <IconButton
                     icon={<DraftIcon/>}

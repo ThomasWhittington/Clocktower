@@ -26,3 +26,4 @@ export {default as UserIcon} from "#/icons/user.svg?react";
 export {default as UsersIcon} from "#/icons/users.svg?react";
 export {default as GroupIcon} from "#/icons/group.svg?react";
 export {default as HeartIcon} from "#/icons/heart.svg?react";
+export {default as BookIcon} from "#/icons/book.svg?react";

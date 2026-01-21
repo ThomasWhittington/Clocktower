@@ -6,6 +6,7 @@ import {
     NightOrderPanel,
     RightHud,
     RoleListPanel,
+    RolePlannerPanel,
     ScriptManagerPanel,
     StoryTellerHud,
     TokenPanel,
@@ -76,6 +77,12 @@ export default function GameWindow() {
         onKeyPress: () => setIsDraftMode(prev => !prev),
         enabled: UserUtils.isStoryTeller(thisUser)
     });
+    useKeyboardShortcut({
+        key: 'p',
+        onKeyPress: () => togglePanel('rolePlanner'),
+        enabled: UserUtils.isStoryTeller(thisUser)
+    });
+
     const tokenData = getPanelData('token');
     const handleCommitDraftRoles = async () => {
         await commitDraftRoles();
@@ -97,6 +104,8 @@ export default function GameWindow() {
             <ScriptManagerPanel isOpen={isPanelOpen('script')} onClose={closePanel}/>
             <RoleListPanel isOpen={isPanelOpen('role')} onClose={closePanel}/>
             <NightOrderPanel isOpen={isPanelOpen('night')} onClose={closePanel}/>
+            <RolePlannerPanel isOpen={isPanelOpen('rolePlanner')} onClose={closePanel}/>
+            
             {tokenData && (
                 <TokenPanel
                     isOpen={isPanelOpen('token')}
@@ -112,6 +121,8 @@ export default function GameWindow() {
                     onUsersClick={() => togglePanel('user')}
                     scriptIsOpen={isPanelOpen('script')}
                     onScriptClick={() => togglePanel('script')}
+                    rolePlannerIsOpen={isPanelOpen('rolePlanner')}
+                    onRolePlannerClick={() => togglePanel('rolePlanner')}
                     showDraftRoles={isDraftMode}
                     onDraftToggle={() => setIsDraftMode(prev => !prev)}
                 />
