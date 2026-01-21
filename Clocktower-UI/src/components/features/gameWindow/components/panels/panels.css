@@ -271,7 +271,7 @@
 
         .role-group {
             h3 {
-                @apply text-lg font-semibold mb-2;
+                @apply text-lg font-semibold mb-2 select-none;
             }
 
             div {
@@ -335,6 +335,60 @@
                     @apply bg-traveller/50;
                 }
             }
+
+            .unselected-role {
+                opacity: 0.5;
+                filter: grayscale(100%);
+                position: relative;
+            }
+
+            .unselected-role::after {
+                content: '+';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 3em;
+                color: white;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+                pointer-events: none;
+                transition: opacity 0.2s ease;
+            }
+
+            .unselected-role:hover {
+                opacity: 0.7;
+                filter: grayscale(80%);
+            }
+
+            .unselected-role:hover::after {
+                opacity: 0.8;
+            }
+        }
+
+        .role-counts {
+            @apply flex flex-row justify-evenly select-none;
+
+            .role-count {
+                @apply text-base font-semibold p-4 rounded-2xl;
+            }
+
+            .townsfolk {
+                @apply bg-townsfolk;
+            }
+
+            .outsiders {
+                @apply bg-outsider;
+            }
+
+            .minions {
+                @apply bg-minion;
+            }
+
+            .demons {
+                @apply bg-demon;
+            }
         }
     }
+
+
 }
