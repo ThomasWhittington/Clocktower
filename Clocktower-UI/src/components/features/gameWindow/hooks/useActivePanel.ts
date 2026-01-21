@@ -4,9 +4,9 @@
 } from 'react';
 import {User} from "@/types";
 
-type PanelType = "script" | "user" | "role" | "night" | "token" | "rolePlanner";
+export type PanelType = "script" | "user" | "role" | "night" | "token" | "rolePlanner";
 
-type PanelDataMap = {
+export type PanelDataMap = {
     script: undefined;
     user: undefined;
     role: undefined;

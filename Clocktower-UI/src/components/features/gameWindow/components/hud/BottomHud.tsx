@@ -2,11 +2,10 @@
 import {Quill} from "@/components/ui/icons";
 
 interface BottomHudProps {
-    gameId: string | null,
     storyTellers: User[]
 }
 
-export const BottomHud = ({gameId, storyTellers}: BottomHudProps) => {
+export const BottomHud = ({storyTellers}: BottomHudProps) => {
     return (
         <div className="controls-bottom">
             {storyTellers.map((storyTeller) => (
@@ -15,11 +14,6 @@ export const BottomHud = ({gameId, storyTellers}: BottomHudProps) => {
                     {storyTeller.name}
                 </div>
             ))}
-            {gameId &&
-                <div className="game-id-label">
-                    {gameId}
-                </div>
-            }
         </div>
     );
 }
