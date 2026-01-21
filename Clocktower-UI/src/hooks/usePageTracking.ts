@@ -11,5 +11,5 @@ export const usePageTracking = () => {
             page: location.pathname + location.search,
             title: document.title
         });
-    }, [location]);
+    }, [location.pathname, location.search]);
 };

@@ -9,7 +9,6 @@ export const useUserTracking = () => {
         if (currentUser?.id) {
             ReactGA.set({
                 userId: currentUser.id,
-                user_properties: {}
             });
         } else {
             ReactGA.set({userId: null});

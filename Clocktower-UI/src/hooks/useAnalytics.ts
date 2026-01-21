@@ -1,7 +1,7 @@
 ﻿import {useButtonTracking} from './useButtonTracking';
 import {usePageTracking} from './usePageTracking';
-import {useLinkTracking} from "@/hooks/useLinkTracking.ts";
-import {useErrorTracking} from "@/hooks/useErrorTracking.ts";
+import {useLinkTracking} from "@/hooks/useLinkTracking";
+import {useErrorTracking} from "@/hooks/useErrorTracking";
 
 export const useAnalytics = () => {
     usePageTracking();

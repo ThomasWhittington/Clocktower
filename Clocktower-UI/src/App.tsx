@@ -24,7 +24,11 @@ import {
     useUserTracking
 } from "@/hooks";
 import ReactGA from 'react-ga4';
-import {useEffect} from "react";
+
+const gaMeasurement = import.meta.env.VITE_GA_MEASUREMENT_ID;
+if (gaMeasurement) {
+    ReactGA.initialize(gaMeasurement);
+}
 
 function AppRoutes() {
     usePageTracking();
@@ -46,13 +50,8 @@ function AppRoutes() {
 }
 
 function App() {
-    const gaMeasurement = import.meta.env.VITE_GA_MEASUREMENT_ID;
     useErrorTracking();
     useUserTracking();
-
-    useEffect(() => {
-        ReactGA.initialize(gaMeasurement);
-    }, [gaMeasurement]);
 
     const heartbeat = useServerHeartbeat();
     const playground = import.meta.env.VITE_PLAYGROUND_MODE === 'true';
