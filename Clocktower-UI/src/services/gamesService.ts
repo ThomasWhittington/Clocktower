@@ -17,6 +17,7 @@ import {
     randomiseSeatingPositionsApi,
     removeUserFromGameApi,
     setDraftRoleApi,
+    setDraftRolesApi,
     setPerspectiveRoleApi,
     setPlayerHasVoteTokenApi,
     setPlayerIsDeadApi,
@@ -339,6 +340,27 @@ const gameTimeToString = (gameTime: GameTime): ClocktowerServerDataTypesEnumGame
     }
 };
 
+async function setDraftRoles(gameId: string, playerRoles: Record<string, string>) {
+    const {
+        data,
+        error
+    } = await setDraftRolesApi({
+        client: apiClient,
+        path: {
+            gameId: gameId
+        },
+        body: {
+            playerRoles: playerRoles
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set draft roles:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
 const scriptSelectToString = (scriptSelect: ScriptSelect): ClocktowerServerDataTypesEnumScriptSelect => {
     switch (scriptSelect) {
         case ScriptSelect.Unknown:
@@ -378,6 +400,7 @@ export const gamesService = {
     setScript,
     setRole,
     setDraftRole,
+    setDraftRoles,
     setPerspectiveRole,
     commitDraftRoles
 }

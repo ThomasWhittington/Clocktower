@@ -86,6 +86,9 @@ const clocktowerServerDataDtoDiscordTownDtoSchemaResponseTransformer = (data: an
             return clocktowerServerDataDtoUserDtoSchemaResponseTransformer(item);
         });
     }
+    if (data.defaultRoleDistribution) {
+        data.defaultRoleDistribution = clocktowerServerDataRoleDistributionSchemaResponseTransformer(data.defaultRoleDistribution);
+    }
     return data;
 };
 
@@ -210,9 +213,6 @@ const clocktowerServerDataGamePerspectiveSchemaResponseTransformer = (data: any)
     }
     if (data.script) {
         data.script = clocktowerServerDataScriptSchemaResponseTransformer(data.script);
-    }
-    if (data.defaultRoleDistributions) {
-        data.defaultRoleDistributions = clocktowerServerDataRoleDistributionSchemaResponseTransformer(data.defaultRoleDistributions);
     }
     return data;
 };

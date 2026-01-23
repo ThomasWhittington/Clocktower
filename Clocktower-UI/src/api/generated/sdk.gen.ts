@@ -99,6 +99,9 @@ import type {
     SetDraftRoleApiData,
     SetDraftRoleApiErrors,
     SetDraftRoleApiResponses,
+    SetDraftRolesApiData,
+    SetDraftRolesApiErrors,
+    SetDraftRolesApiResponses,
     SetMuteAllPlayersApiData,
     SetMuteAllPlayersApiErrors,
     SetMuteAllPlayersApiResponses,
@@ -747,6 +750,28 @@ export const setDraftRoleApi = <ThrowOnError extends boolean = false>(options: O
         ],
         url: '/api/games/{gameId}/set-draft-role/{targetUserId}/{roleId}',
         ...options
+    });
+};
+
+/**
+ * Sets draft roles for multiple players
+ *
+ * Sets draft roles for multiple players
+ */
+export const setDraftRolesApi = <ThrowOnError extends boolean = false>(options: Options<SetDraftRolesApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetDraftRolesApiResponses, SetDraftRolesApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/set-draft-roles',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
     });
 };
 

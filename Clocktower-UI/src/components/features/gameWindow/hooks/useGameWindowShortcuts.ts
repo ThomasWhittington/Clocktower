@@ -1,6 +1,9 @@
 ﻿import {useKeyboardShortcut} from "@/hooks";
 import {UserUtils} from "@/utils";
-import {User} from "@/types";
+import {
+    Role,
+    User
+} from "@/types";
 import type {
     PanelDataMap,
     PanelType
@@ -11,16 +14,22 @@ interface UseGameWindowShortcutsProps {
     script: any;
     togglePanel: <T extends PanelType>(panel: T, data?: PanelDataMap[T]) => void;
     setIsDraftMode: (callback: (prev: boolean) => boolean) => void;
+    selectedDraftRoles: Role[];
+    assignToDraft: () => Promise<void>;
+
 }
 
 export function useGameWindowShortcuts({
                                            thisUser,
                                            script,
                                            togglePanel,
-                                           setIsDraftMode
+                                           setIsDraftMode,
+                                           selectedDraftRoles,
+                                           assignToDraft
                                        }: UseGameWindowShortcutsProps) {
     const isStoryTeller = UserUtils.isStoryTeller(thisUser);
     const hasScript = script !== undefined;
+    const canAssignToDraft = selectedDraftRoles.length > 0;
 
     useKeyboardShortcut({
         key: 'a',
@@ -56,5 +65,11 @@ export function useGameWindowShortcuts({
         key: 'p',
         onKeyPress: () => togglePanel('rolePlanner'),
         enabled: isStoryTeller && hasScript
+    });
+
+    useKeyboardShortcut({
+        key: 'x',
+        onKeyPress: () => assignToDraft(),
+        enabled: isStoryTeller && hasScript && canAssignToDraft
     });
 }

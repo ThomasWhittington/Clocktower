@@ -189,6 +189,12 @@ export type ClocktowerServerDiscordTownEndpointsGetTownStatusResponse = {
     message?: string | null;
 };
 
+export type ClocktowerServerGameEndpointsSetDraftRolesBody = {
+    playerRoles?: {
+        [key: string]: string;
+    } | null;
+};
+
 export type ClocktowerServerRolesEndpointsGetRolesResponse = {
     roles?: Array<ClocktowerServerDataTypesRoleRole> | null;
 };
@@ -1158,6 +1164,37 @@ export type SetDraftRoleApiResponses = {
 };
 
 export type SetDraftRoleApiResponse = SetDraftRoleApiResponses[keyof SetDraftRoleApiResponses];
+
+export type SetDraftRolesApiData = {
+    body: ClocktowerServerGameEndpointsSetDraftRolesBody;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/set-draft-roles';
+};
+
+export type SetDraftRolesApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetDraftRolesApiError = SetDraftRolesApiErrors[keyof SetDraftRolesApiErrors];
+
+export type SetDraftRolesApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetDraftRolesApiResponse = SetDraftRolesApiResponses[keyof SetDraftRolesApiResponses];
 
 export type SetPerspectiveRoleApiData = {
     body?: never;

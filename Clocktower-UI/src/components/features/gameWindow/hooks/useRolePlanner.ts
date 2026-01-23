@@ -1,21 +1,24 @@
 ﻿import {
+    type Dispatch,
+    type SetStateAction,
     useCallback,
-    useMemo,
-    useState
+    useMemo
 } from "react";
-import type {RoleDistribution} from "@/types";
 import {
+    DiscordTown,
     Role,
+    type RoleDistribution,
     Script
 } from "@/types";
-import {useAppStore} from "@/store";
-import {useAction} from "@/hooks";
+import {useAssignToDraft} from "@/components/features/gameWindow/hooks/";
 
 interface UseRolePlannerProps {
     script: Script | undefined;
-    roleDistribution: RoleDistribution | undefined;
+    discordTown: DiscordTown | undefined;
     setIsDraftMode: (callback: (prev: boolean) => boolean) => void;
     closePanel: () => void;
+    selectedRoles: Role[];
+    setSelectedRoles: Dispatch<SetStateAction<Role[]>>;
 }
 
 const getRandomRoles = (roles: Role[] | undefined, count: number): Role[] => {
@@ -37,10 +40,21 @@ const getRolesByDistribution = (script: Script, distribution: RoleDistribution):
     ];
 };
 
-export const useRolePlanner = ({script, roleDistribution, setIsDraftMode, closePanel}: UseRolePlannerProps) => {
-    const {runAction} = useAction();
-    const {gameId} = useAppStore();
-    const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
+export const useRolePlanner = ({
+                                   script,
+                                   discordTown,
+                                   setIsDraftMode,
+                                   closePanel,
+                                   selectedRoles,
+                                   setSelectedRoles
+                               }: UseRolePlannerProps) => {
+
+    const {assignToDraft} = useAssignToDraft({
+        selectedRoles,
+        discordTown,
+        setIsDraftMode,
+        closePanel
+    });
 
     const selectedRoleIds = useMemo(
         () => new Set(selectedRoles.map(r => r.id)),
@@ -63,11 +77,11 @@ export const useRolePlanner = ({script, roleDistribution, setIsDraftMode, closeP
     }, []);
 
     const randomizeRoles = useCallback(() => {
-        if (!script || !roleDistribution) return;
+        if (!script || !discordTown?.defaultRoleDistribution) return;
 
-        const randomRoles = getRolesByDistribution(script, roleDistribution);
+        const randomRoles = getRolesByDistribution(script, discordTown.defaultRoleDistribution);
         setSelectedRoles(randomRoles);
-    }, [script, roleDistribution]);
+    }, [script, discordTown?.defaultRoleDistribution]);
 
     const clearRoles = useCallback(() => {
         setSelectedRoles([]);
@@ -80,18 +94,6 @@ export const useRolePlanner = ({script, roleDistribution, setIsDraftMode, closeP
             .join(', '),
         [selectedRoles]
     );
-
-    const assignToDraft = useCallback(async () => {
-        if (!gameId) return;
-
-        setIsDraftMode(() => true);
-
-        await runAction(async () => {
-            console.warn('All roles:', selectedRoles);
-        });
-
-        closePanel();
-    }, [gameId, runAction, setIsDraftMode, closePanel, selectedRoles]);
 
     return {
         selectedRoles,

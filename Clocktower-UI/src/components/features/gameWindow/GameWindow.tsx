@@ -5,10 +5,14 @@ import {
     GamePanels
 } from "@/components/features/gameWindow/components";
 import {UserUtils} from "@/utils";
-import {useUser} from "@/components/features/discordTownPanel/hooks";
+import {
+    useDiscordTown,
+    useUser
+} from "@/components/features/discordTownPanel/hooks";
 import {useServerHub} from "@/hooks";
 import {
     useActivePanel,
+    useAssignToDraft,
     useGameWindowShortcuts,
     useSetRoles
 } from "@/components/features/gameWindow/hooks";
@@ -17,6 +21,7 @@ import {
     useState
 } from "react";
 import {
+    Role,
     RoleType,
     User
 } from "@/types";
@@ -25,7 +30,9 @@ export default function GameWindow() {
     const {currentUser} = useAppStore();
     const {thisUser} = useUser(currentUser?.id);
     const {script} = useServerHub();
+    const {discordTown} = useDiscordTown();
     const [isDraftMode, setIsDraftMode] = useState(false);
+    const [selectedDraftRoles, setSelectedDraftRoles] = useState<Role[]>([]);
     const {togglePanel, isPanelOpen, closePanel, openPanel, getPanelData} = useActivePanel();
     const {setRole, commitDraftRoles} = useSetRoles(currentUser?.id ?? "", UserUtils.isStoryTeller(thisUser), isDraftMode);
     const isStoryteller = UserUtils.isStoryTeller(thisUser);
@@ -36,11 +43,19 @@ export default function GameWindow() {
         }
     }, [script]);
 
+    const {assignToDraft} = useAssignToDraft({
+        selectedRoles: selectedDraftRoles,
+        discordTown,
+        setIsDraftMode,
+        closePanel
+    });
     useGameWindowShortcuts({
         thisUser,
         script,
         togglePanel,
-        setIsDraftMode
+        setIsDraftMode,
+        assignToDraft,
+        selectedDraftRoles
     });
     const handleTokenClick = (player: User) => {
         const canOpenToken = script && (isStoryteller || player.role?.type !== RoleType.Traveller);
@@ -70,6 +85,8 @@ export default function GameWindow() {
                 isDraftMode={isDraftMode}
                 setIsDraftMode={setIsDraftMode}
                 setRole={setRole}
+                selectedRoles={selectedDraftRoles}
+                setSelectedRoles={setSelectedDraftRoles}
             />
 
             <GameHud

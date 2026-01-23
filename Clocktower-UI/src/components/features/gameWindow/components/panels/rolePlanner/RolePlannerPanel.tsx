@@ -17,14 +17,27 @@ import {
     RemoveIcon
 } from "@/components/ui/icons";
 import {DiscordTownUtils} from "@/utils";
+import {Role} from "@/types";
+import type {
+    Dispatch,
+    SetStateAction
+} from "react";
 
 interface RolePlannerPanelProps {
     isOpen: boolean;
     onClose: () => void;
     setIsDraftMode: (callback: (prev: boolean) => boolean) => void;
+    selectedRoles: Role[];
+    setSelectedRoles: Dispatch<SetStateAction<Role[]>>;
 }
 
-export const RolePlannerPanel = ({isOpen, onClose, setIsDraftMode}: RolePlannerPanelProps) => {
+export const RolePlannerPanel = ({
+                                     isOpen,
+                                     onClose,
+                                     setIsDraftMode,
+                                     selectedRoles,
+                                     setSelectedRoles
+                                 }: RolePlannerPanelProps) => {
     const {script} = useServerHub();
     const {discordTown} = useDiscordTown();
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
@@ -32,7 +45,6 @@ export const RolePlannerPanel = ({isOpen, onClose, setIsDraftMode}: RolePlannerP
     const playerCount = DiscordTownUtils.getPlayerCountFromDistribution(discordTown);
 
     const {
-        selectedRoles,
         selectedRoleIds,
         hasSetupRoles,
         toggleRole,
@@ -42,9 +54,11 @@ export const RolePlannerPanel = ({isOpen, onClose, setIsDraftMode}: RolePlannerP
         clearRoles
     } = useRolePlanner({
         script,
-        roleDistribution: discordTown?.defaultRoleDistribution,
+        discordTown,
         setIsDraftMode,
-        closePanel: onClose
+        closePanel: onClose,
+        selectedRoles,
+        setSelectedRoles
     });
 
     return (
@@ -62,7 +76,7 @@ export const RolePlannerPanel = ({isOpen, onClose, setIsDraftMode}: RolePlannerP
                         <div className="flex w-full">
                             <IconButton icon={<RandomizeIcon/>} text="Randomize" variant="primary" onClick={randomizeRoles} className="flex-1"/>
                             <IconButton icon={<RemoveIcon/>} text="Clear" onClick={clearRoles} className="flex-1" isEnabled={selectedRoles.length > 0}/>
-                            <IconButton icon={<AssignIcon/>} text="Assign to Draft" variant="danger" onClick={assignToDraft} className="flex-1" isEnabled={selectedRoles.length === playerCount}/>
+                            <IconButton icon={<AssignIcon/>} text="Assign to Draft [X]" variant="danger" onClick={assignToDraft} className="flex-1" isEnabled={selectedRoles.length === playerCount}/>
                         </div>
                         <RoleDistributionCounter selectedRoles={selectedRoles} discordTown={discordTown}/>
 
