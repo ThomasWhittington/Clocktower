@@ -41,7 +41,7 @@ export const RolePlannerPanel = ({
     const {script} = useServerHub();
     const {discordTown} = useDiscordTown();
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
-    const dynamicSize = Math.min(parentSize.width, parentSize.height) / 8;
+    const dynamicSize = Math.min(parentSize.width, parentSize.height) / 8 || 64;
     const playerCount = DiscordTownUtils.getPlayerCountFromDistribution(discordTown);
 
     const {
@@ -76,7 +76,7 @@ export const RolePlannerPanel = ({
                         <div className="flex w-full">
                             <IconButton icon={<RandomizeIcon/>} text="Randomize" variant="primary" onClick={randomizeRoles} className="flex-1"/>
                             <IconButton icon={<RemoveIcon/>} text="Clear" onClick={clearRoles} className="flex-1" isEnabled={selectedRoles.length > 0}/>
-                            <IconButton icon={<AssignIcon/>} text="Assign to Draft [X]" variant="danger" onClick={assignToDraft} className="flex-1" isEnabled={selectedRoles.length === playerCount}/>
+                            <IconButton icon={<AssignIcon/>} text="Assign to Draft [X]" variant="danger" onClick={assignToDraft} className="flex-1" isEnabled={playerCount > 0 && selectedRoles.length === playerCount}/>
                         </div>
                         <RoleDistributionCounter selectedRoles={selectedRoles} discordTown={discordTown}/>
 

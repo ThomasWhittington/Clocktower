@@ -7,18 +7,25 @@
     UserManagerPanel
 } from "./index";
 import type {PanelType} from "@/components/features/gameWindow/hooks";
-import {Role} from "@/types";
+import {
+    Role,
+    User
+} from "@/types";
 import type {
     Dispatch,
     SetStateAction
 } from "react";
 
+interface TokenData {
+    player: User;
+}
+
 interface GamePanelsProps {
     isPanelOpen: (panel: PanelType) => boolean;
     closePanel: () => void;
-    tokenData: any;
+    tokenData: TokenData | null;
     isDraftMode: boolean;
-    setRole: any;
+    setRole: (role: Role | undefined, playerId: string) => Promise<void>;
     setIsDraftMode: (callback: (prev: boolean) => boolean) => void;
     selectedRoles: Role[];
     setSelectedRoles: Dispatch<SetStateAction<Role[]>>;

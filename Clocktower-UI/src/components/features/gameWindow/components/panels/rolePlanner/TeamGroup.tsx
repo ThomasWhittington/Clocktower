@@ -10,32 +10,28 @@ interface TokenGroupProps {
 }
 
 export const TeamGroup = ({name, roles, tokenSize, onClick, selectedRoleIds}: TokenGroupProps) => {
-    if (roles && roles.length <= 0) return null;
+    if (!roles || roles.length === 0) return null;
     const className = `role-group ${name.toLowerCase()}`;
     return (
-        <>
-            {roles && roles.length > 0 && (
-                <div className={className}>
-                    <h3>{name}</h3>
-                    <div>
-                        {roles.map((role) => {
-                            const isSelected = selectedRoleIds?.has(role.id) ?? false;
-                            return (
-                                <div key={role.id} className="token-wrapper">
-                                    <Token
-                                        role={role}
-                                        size={tokenSize}
-                                        key={role.id}
-                                        onClick={() => onClick?.(role)}
-                                        className={isSelected ? 'selected-role' : 'unselected-role'}
-                                    />
-                                    <span className="role-ability">{role.description}</span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            )}
-        </>
+        <div className={className}>
+            <h3>{name}</h3>
+            <div>
+                {roles.map((role) => {
+                    const isSelected = selectedRoleIds?.has(role.id) ?? false;
+                    return (
+                        <div key={role.id} className="token-wrapper">
+                            <Token
+                                role={role}
+                                size={tokenSize}
+                                key={role.id}
+                                onClick={() => onClick?.(role)}
+                                className={isSelected ? 'selected-role' : 'unselected-role'}
+                            />
+                            <span className="role-ability">{role.description}</span>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
     );
 };

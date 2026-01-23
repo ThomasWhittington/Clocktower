@@ -35,7 +35,7 @@ export const TokenPanel = ({isOpen, onClose, player, isDraftMode, setRole}: Toke
         onClose();
     }
 
-    const dynamicSize = Math.min(parentSize.width, parentSize.height) / 8;
+    const dynamicSize = Math.min(parentSize.width, parentSize.height) / 8 || 64;
     return (
         <BasePanel title={`Choose a new character for ${player.name}`} isOpen={isOpen} onClose={onClose}>
             <div ref={containerRef} className="token-panel">

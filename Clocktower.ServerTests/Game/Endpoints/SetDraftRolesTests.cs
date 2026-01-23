@@ -8,6 +8,13 @@ public class SetDraftRolesTests
 {
     private Mock<IGameService> _mockGameService = null!;
 
+    private static Dictionary<string, string> TestPlayerRoles => new()
+    {
+        { "userId1", "roleId1" },
+        { "userId2", "roleId2" },
+        { "userId3", "roleId3" }
+    };
+
     [TestInitialize]
     public void SetUp()
     {
@@ -32,13 +39,7 @@ public class SetDraftRolesTests
     [TestMethod]
     public async Task Handle_ReturnsBadRequest_WhenServiceReturnsInvalidError()
     {
-        var dictionary = new Dictionary<string, string>
-        {
-            { "userId1", "roleId1" },
-            { "userId2", "roleId2" },
-            { "userId3", "roleId3" }
-        };
-        var body = new SetDraftRoles.Body(dictionary);
+        var body = new SetDraftRoles.Body(TestPlayerRoles);
         var request = new SetDraftRoles.Request(CommonMethods.GetRandomString(), body);
         var error = Result.Fail<string>(ErrorKind.Invalid, "error code", "error message");
 
@@ -55,13 +56,7 @@ public class SetDraftRolesTests
     [TestMethod]
     public async Task Handle_ReturnsNotFound_WhenServiceReturnsNotFoundError()
     {
-        var dictionary = new Dictionary<string, string>
-        {
-            { "userId1", "roleId1" },
-            { "userId2", "roleId2" },
-            { "userId3", "roleId3" }
-        };
-        var body = new SetDraftRoles.Body(dictionary);
+        var body = new SetDraftRoles.Body(TestPlayerRoles);
         var request = new SetDraftRoles.Request(CommonMethods.GetRandomString(), body);
         var error = Result.Fail<string>(ErrorKind.NotFound, "error code", "error message");
 
@@ -78,13 +73,7 @@ public class SetDraftRolesTests
     [TestMethod]
     public async Task Handle_ReturnsOk_WhenServiceReturnsOk()
     {
-        var dictionary = new Dictionary<string, string>
-        {
-            { "userId1", "roleId1" },
-            { "userId2", "roleId2" },
-            { "userId3", "roleId3" }
-        };
-        var body = new SetDraftRoles.Body(dictionary);
+        var body = new SetDraftRoles.Body(TestPlayerRoles);
         var request = new SetDraftRoles.Request(CommonMethods.GetRandomString(), body);
         var success = Result.Ok("success");
 

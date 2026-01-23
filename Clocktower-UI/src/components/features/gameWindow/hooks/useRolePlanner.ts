@@ -23,7 +23,12 @@ interface UseRolePlannerProps {
 
 const getRandomRoles = (roles: Role[] | undefined, count: number): Role[] => {
     if (!roles || roles.length === 0) return [];
-    const shuffled = [...roles].sort(() => Math.random() - 0.5);
+    const shuffled = [...roles];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
     return shuffled.slice(0, Math.min(count, shuffled.length));
 };
 
@@ -74,7 +79,7 @@ export const useRolePlanner = ({
                 ? prev.filter(r => r.id !== role.id)
                 : [...prev, role]
         );
-    }, []);
+    }, [setSelectedRoles]);
 
     const randomizeRoles = useCallback(() => {
         if (!script || !discordTown?.defaultRoleDistribution) return;

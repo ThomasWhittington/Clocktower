@@ -347,7 +347,7 @@
             }
 
             .unselected-role:hover {
-                @apply opacity-70 grayscale-80;
+                @apply opacity-70 grayscale-75;
             }
 
             .unselected-role:hover::after {
@@ -358,7 +358,8 @@
                 @apply hidden fixed z-10 bg-gray-900 text-white p-3 rounded-lg shadow-lg max-w-xs text-sm text-left top-auto left-1/2 translate-x-[-50%] bottom-5 mt-0 pointer-events-none;
             }
 
-            .token-wrapper:hover .role-ability {
+            .token-wrapper:hover .role-ability,
+            .token-wrapper:focus-within .role-ability {
                 @apply block;
             }
         }

@@ -5,12 +5,12 @@
 } from "@/types";
 import {DiscordTownUtils} from "@/utils";
 
-interface TokenGroupProps {
+interface RoleDistributionCounterProps {
     discordTown: DiscordTown;
     selectedRoles: Role[];
 }
 
-export const RoleDistributionCounter = ({discordTown, selectedRoles}: TokenGroupProps) => {
+export const RoleDistributionCounter = ({discordTown, selectedRoles}: RoleDistributionCounterProps) => {
 
     const getRoleCountStatus = (selectedCount: number, requiredCount: number) => {
         if (selectedCount > requiredCount) return 'too-many';
@@ -32,16 +32,16 @@ export const RoleDistributionCounter = ({discordTown, selectedRoles}: TokenGroup
             </span>
 
             <span className={`role-count townsfolk ${getRoleCountStatus(townsfolkCount, discordTown?.defaultRoleDistribution?.townsfolk ?? 0)}`} title="Townsfolk">
-                {townsfolkCount}/{discordTown?.defaultRoleDistribution?.townsfolk}
+                {townsfolkCount}/{discordTown?.defaultRoleDistribution?.townsfolk ?? 0}
             </span>
             <span className={`role-count outsiders ${getRoleCountStatus(outsidersCount, discordTown?.defaultRoleDistribution?.outsiders ?? 0)}`} title="Outsiders">
-                {outsidersCount}/{discordTown?.defaultRoleDistribution?.outsiders}
+                {outsidersCount}/{discordTown?.defaultRoleDistribution?.outsiders ?? 0}
             </span>
             <span className={`role-count minions ${getRoleCountStatus(minionsCount, discordTown?.defaultRoleDistribution?.minions ?? 0)}`} title="Minions">
-                {minionsCount}/{discordTown?.defaultRoleDistribution?.minions}
+                {minionsCount}/{discordTown?.defaultRoleDistribution?.minions ?? 0}
             </span>
             <span className={`role-count demons ${getRoleCountStatus(demonsCount, discordTown?.defaultRoleDistribution?.demons ?? 0)}`} title="Demons">
-                {demonsCount}/{discordTown?.defaultRoleDistribution?.demons}
+                {demonsCount}/{discordTown?.defaultRoleDistribution?.demons ?? 0}
             </span>
         </div>
     );

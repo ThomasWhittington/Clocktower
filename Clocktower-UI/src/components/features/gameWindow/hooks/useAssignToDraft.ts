@@ -38,11 +38,15 @@ export const useAssignToDraft = ({
             playerRoles[player.id] = selectedRoles[index].id;
         });
 
-        await runAction(async () => {
+        const result = await runAction(async () => {
             await gamesService.setDraftRoles(gameId, playerRoles);
+            return true;
         });
 
-        closePanel?.();
+        if (result) {
+            setIsDraftMode(() => true);
+            closePanel?.();
+        }
     }, [gameId, runAction, setIsDraftMode, closePanel, selectedRoles, discordTown?.players]);
 
     return {assignToDraft};

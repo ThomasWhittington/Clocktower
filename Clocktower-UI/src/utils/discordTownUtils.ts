@@ -23,9 +23,9 @@ export const DiscordTownUtils = {
     getPlayerCountFromDistribution(discordTown: DiscordTown | undefined): number {
         if (!discordTown?.defaultRoleDistribution) return 0;
 
-        return discordTown.defaultRoleDistribution?.townsfolk +
-            discordTown.defaultRoleDistribution?.outsiders +
-            discordTown.defaultRoleDistribution?.minions +
-            discordTown.defaultRoleDistribution?.demons;
+        return discordTown.defaultRoleDistribution.townsfolk +
+            discordTown.defaultRoleDistribution.outsiders +
+            discordTown.defaultRoleDistribution.minions +
+            discordTown.defaultRoleDistribution.demons;
     }
 };
