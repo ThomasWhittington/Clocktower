@@ -20,4 +20,5 @@ public interface IGameService
     Task<Result<string>> SetRole(string gameId, string targetUserId, string? roleId);
     Task<Result<string>> SetDraftRole(string gameId, string targetUserId, string? roleId);
     Task<Result<string>> CommitDraftRoles(string gameId);
+    Task<Result<string>> SetDraftRoles(string gameId, Dictionary<string, string> playerRoles);
 }

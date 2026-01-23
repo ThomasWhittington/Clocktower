@@ -98,7 +98,7 @@
             }
 
             .role-ability {
-                @apply hidden fixed z-10 bg-gray-900 text-white p-3 rounded-lg shadow-lg max-w-xs text-sm text-left top-auto left-1/2 translate-x-[-50%] bottom-5 mt-0 pointer-events-none;
+                @apply hidden fixed z-10 bg-gray-900 text-white p-3 rounded-lg shadow-lg max-w-xs text-sm text-left bottom-auto left-1/2 translate-x-[-50%] top-5 mt-0 pointer-events-none;
             }
 
             &:hover .role-ability {
@@ -270,20 +270,20 @@
         }
 
         .role-group {
-            h3 {
-                @apply text-lg font-semibold mb-2;
+            > h3 {
+                @apply text-lg font-semibold mb-2 select-none;
             }
 
-            div {
+            > div {
                 @apply flex flex-wrap justify-center items-center gap-2 p-4 rounded-lg;
             }
 
             &.townsfolk {
-                h3 {
+                > h3 {
                     @apply text-townsfolk;
                 }
 
-                div {
+                > div {
                     @apply bg-townsfolk/50;
                 }
             }
@@ -291,11 +291,11 @@
             &.outsiders {
                 @apply h-full;
 
-                h3 {
+                > h3 {
                     @apply text-outsider;
                 }
 
-                div {
+                > div {
                     @apply bg-outsider/50 h-full;
                 }
             }
@@ -303,11 +303,11 @@
             &.minions {
                 @apply h-full;
 
-                h3 {
+                > h3 {
                     @apply text-minion;
                 }
 
-                div {
+                > div {
                     @apply bg-minion/50 h-full;
                 }
             }
@@ -315,11 +315,11 @@
             &.demons {
                 @apply h-full;
 
-                h3 {
+                > h3 {
                     @apply text-demon;
                 }
 
-                div {
+                > div {
                     @apply bg-demon/50 h-full;
                 }
             }
@@ -327,14 +327,87 @@
             &.travellers {
                 @apply fixed bottom-0 left-1/2 translate-x-[-50%];
 
-                h3 {
+                > h3 {
                     @apply text-traveller;
                 }
 
-                div {
+                > div {
                     @apply bg-traveller/50;
                 }
             }
+
+            .unselected-role {
+                @apply opacity-50 grayscale relative;
+            }
+
+            .unselected-role::after {
+                content: '+';
+                @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl text-white pointer-events-none transition-opacity duration-200 ease-in-out;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            }
+
+            .unselected-role:hover {
+                @apply opacity-70 grayscale-75;
+            }
+
+            .unselected-role:hover::after {
+                @apply opacity-80;
+            }
+
+            .role-ability {
+                @apply hidden fixed z-10 bg-gray-900 text-white p-3 rounded-lg shadow-lg max-w-xs text-sm text-left top-auto left-1/2 translate-x-[-50%] bottom-5 mt-0 pointer-events-none;
+            }
+
+            .token-wrapper:hover .role-ability,
+            .token-wrapper:focus-within .role-ability {
+                @apply block;
+            }
+        }
+
+        .setup-warning {
+            @apply absolute top-5 left-1/2 translate-x-[-50%] py-3 px-6 bg-discord-warning/50 font-bold rounded-lg z-1000 select-none shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-opacity duration-300 ease-in-out
+        }
+
+        .role-counts {
+            @apply flex flex-row justify-evenly select-none pt-4;
+
+            .role-count {
+                @apply text-base font-semibold p-4 rounded-2xl transition-all duration-300;
+
+                &.too-many {
+                    @apply animate-pulse shadow-[0_0_15px_rgba(255,215,0,0.8),inset_0_0_10px_rgba(255,215,0,0.3)] bg-[#ffd700] text-black;
+                }
+
+                &.correct {
+                    @apply opacity-50 scale-90;
+                }
+
+                &.too-few {
+                    @apply opacity-100;
+                }
+            }
+
+            .townsfolk {
+                @apply bg-townsfolk;
+            }
+
+            .outsiders {
+                @apply bg-outsider;
+            }
+
+            .minions {
+                @apply bg-minion;
+            }
+
+            .demons {
+                @apply bg-demon;
+            }
+
+            .players {
+                @apply bg-forestgreen;
+            }
         }
     }
+
+
 }

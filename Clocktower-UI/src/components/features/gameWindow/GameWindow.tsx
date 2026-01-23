@@ -1,28 +1,19 @@
 ﻿import {TownSquare} from "@/components/features";
 import {useAppStore} from "@/store";
 import {
-    BottomHud,
-    CenterHud,
-    NightOrderPanel,
-    RightHud,
-    RoleListPanel,
-    ScriptManagerPanel,
-    StoryTellerHud,
-    TokenPanel,
-    TopHud,
-    UserManagerPanel
+    GameHud,
+    GamePanels
 } from "@/components/features/gameWindow/components";
 import {UserUtils} from "@/utils";
 import {
     useDiscordTown,
     useUser
 } from "@/components/features/discordTownPanel/hooks";
-import {
-    useKeyboardShortcut,
-    useServerHub
-} from "@/hooks";
+import {useServerHub} from "@/hooks";
 import {
     useActivePanel,
+    useAssignToDraft,
+    useGameWindowShortcuts,
     useSetRoles
 } from "@/components/features/gameWindow/hooks";
 import {
@@ -30,16 +21,18 @@ import {
     useState
 } from "react";
 import {
+    Role,
     RoleType,
     User
 } from "@/types";
 
 export default function GameWindow() {
-    const {gameId, currentUser} = useAppStore();
+    const {currentUser} = useAppStore();
     const {thisUser} = useUser(currentUser?.id);
-    const {discordTown} = useDiscordTown();
     const {script} = useServerHub();
+    const {discordTown} = useDiscordTown();
     const [isDraftMode, setIsDraftMode] = useState(false);
+    const [selectedDraftRoles, setSelectedDraftRoles] = useState<Role[]>([]);
     const {togglePanel, isPanelOpen, closePanel, openPanel, getPanelData} = useActivePanel();
     const {setRole, commitDraftRoles} = useSetRoles(currentUser?.id ?? "", UserUtils.isStoryTeller(thisUser), isDraftMode);
     const isStoryteller = UserUtils.isStoryTeller(thisUser);
@@ -50,79 +43,60 @@ export default function GameWindow() {
         }
     }, [script]);
 
-    useKeyboardShortcut({
-        key: 'u',
-        onKeyPress: () => togglePanel('user'),
-        enabled: UserUtils.isStoryTeller(thisUser)
+    const {assignToDraft} = useAssignToDraft({
+        selectedRoles: selectedDraftRoles,
+        discordTown,
+        setIsDraftMode,
+        closePanel
     });
-    useKeyboardShortcut({
-        key: 's',
-        onKeyPress: () => togglePanel('script'),
-        enabled: UserUtils.isStoryTeller(thisUser)
+    useGameWindowShortcuts({
+        thisUser,
+        script,
+        togglePanel,
+        setIsDraftMode,
+        assignToDraft,
+        selectedDraftRoles
     });
-    useKeyboardShortcut({
-        key: 'r',
-        onKeyPress: () => togglePanel('role'),
-        enabled: script !== undefined
-    });
-    useKeyboardShortcut({
-        key: 'n',
-        onKeyPress: () => togglePanel('night')
-        ,
-        enabled: script !== undefined
-    });
-    useKeyboardShortcut({
-        key: 'd',
-        onKeyPress: () => setIsDraftMode(prev => !prev),
-        enabled: UserUtils.isStoryTeller(thisUser)
-    });
-    const tokenData = getPanelData('token');
+    const handleTokenClick = (player: User) => {
+        const canOpenToken = script && (isStoryteller || player.role?.type !== RoleType.Traveller);
+        if (canOpenToken) {
+            openPanel('token', {player});
+        }
+    };
+
     const handleCommitDraftRoles = async () => {
         await commitDraftRoles();
         setIsDraftMode(false);
     };
 
+    const tokenData = getPanelData('token');
     return (
         <div className="game-window-controls">
             <TownSquare
                 showDraftRoles={isDraftMode}
-                onTokenClick={(player: User) => {
-                    if (!script || (!isStoryteller && player.role?.type === RoleType.Traveller)) return;
-                    openPanel('token', {player});
-                }}
+                onTokenClick={handleTokenClick}
                 onCommitDraftRoles={isDraftMode ? handleCommitDraftRoles : undefined}
             />
 
-            <UserManagerPanel isOpen={isPanelOpen('user')} onClose={closePanel}/>
-            <ScriptManagerPanel isOpen={isPanelOpen('script')} onClose={closePanel}/>
-            <RoleListPanel isOpen={isPanelOpen('role')} onClose={closePanel}/>
-            <NightOrderPanel isOpen={isPanelOpen('night')} onClose={closePanel}/>
-            {tokenData && (
-                <TokenPanel
-                    isOpen={isPanelOpen('token')}
-                    onClose={closePanel}
-                    player={tokenData.player}
-                    isDraftMode={isDraftMode}
-                    setRole={setRole}
-                />
-            )}
-            {isStoryteller &&
-                <StoryTellerHud
-                    usersIsOpen={isPanelOpen('user')}
-                    onUsersClick={() => togglePanel('user')}
-                    scriptIsOpen={isPanelOpen('script')}
-                    onScriptClick={() => togglePanel('script')}
-                    showDraftRoles={isDraftMode}
-                    onDraftToggle={() => setIsDraftMode(prev => !prev)}
-                />
-            }
-            <CenterHud/>
-            <TopHud scriptName={script?.name}/>
-            <RightHud
-                onRoleListClick={() => script && togglePanel('role')}
-                onNightOrderClick={() => script && togglePanel('night')}
+            <GamePanels
+                isPanelOpen={isPanelOpen}
+                closePanel={closePanel}
+                tokenData={tokenData}
+                isDraftMode={isDraftMode}
+                setIsDraftMode={setIsDraftMode}
+                setRole={setRole}
+                selectedRoles={selectedDraftRoles}
+                setSelectedRoles={setSelectedDraftRoles}
             />
-            <BottomHud gameId={gameId} storyTellers={discordTown?.storyTellers ?? []}/>
+
+            <GameHud
+                script={script}
+                isStoryteller={isStoryteller}
+                isPanelOpen={isPanelOpen}
+                togglePanel={togglePanel}
+                setIsDraftMode={setIsDraftMode}
+                isDraftMode={isDraftMode}
+            />
         </div>
     );
 };

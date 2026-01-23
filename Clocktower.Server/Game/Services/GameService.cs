@@ -1,4 +1,5 @@
 ﻿using Clocktower.Server.Common.Services;
+using Clocktower.Server.Data.Wrappers;
 using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.Server.Game.Services;
@@ -260,19 +261,24 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         if (roleId is not null && role is null) return Result.Fail<string>(ErrorKind.NotFound, "role.not_found", $"Role '{roleId}' was not found");
 
         bool updateOccurred;
-
+        var userIsCurrentlyTraveller = gamePerspective.Users
+            .FirstOrDefault(o => o.Id == targetUserId)?.Role?.Type == RoleType.Traveller;
         if (role is { Type: RoleType.Traveller })
         {
             updateOccurred = gamePerspectiveService.SetRoleOnAllPerspectives(gameId, targetUserId, role);
         }
+        else if (userIsCurrentlyTraveller)
+        {
+            gamePerspectiveService.SetRoleOnAllPerspectives(gameId, targetUserId, null);
+
+            updateOccurred = role == null || gamePerspectiveService.UpdatePrivateUser(gameId, targetUserId, new PrivateGameUserUpdate
+            {
+                RemoveRole = false,
+                Role = role
+            });
+        }
         else
         {
-            var userIsCurrentlyTraveller = gamePerspective.Users.FirstOrDefault(o => o.Id == targetUserId)?.Role?.Type == RoleType.Traveller;
-            if (userIsCurrentlyTraveller)
-            {
-                gamePerspectiveService.SetRoleOnAllPerspectives(gameId, targetUserId, null);
-            }
-
             updateOccurred = gamePerspectiveService.UpdatePrivateUser(gameId, targetUserId, new PrivateGameUserUpdate
             {
                 RemoveRole = role is null,
@@ -307,6 +313,19 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         return Result.Ok($"{targetUser.DisplayName} {updateOccurredString} has the draft role: {roleString}");
     }
 
+    public async Task<Result<string>> SetDraftRoles(string gameId, Dictionary<string, string> playerRoles)
+    {
+        var validationResult = ValidateAndBuildDraftRoleUpdates(gameId, playerRoles);
+        if (!validationResult.IsSuccess) return Result.Fail<string>(validationResult.Error!);
+
+        var updateQueue = validationResult.Value!;
+        int updateCount = ApplyDraftRoleUpdates(gameId, updateQueue);
+
+        if (updateCount > 0) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+
+        return Result.Ok($"{updateCount}/{updateQueue.Count} draft roles set for players");
+    }
+
     public async Task<Result<string>> CommitDraftRoles(string gameId)
     {
         var gameExists = gamePerspectiveService.GameExists(gameId);
@@ -316,5 +335,60 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
 
         await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         return Result.Ok($"Draft roles committed for game {gameId}");
+    }
+
+    private Result<Dictionary<IDiscordGuildUser, Role>> ValidateAndBuildDraftRoleUpdates(
+        string gameId,
+        Dictionary<string, string> playerRoles)
+    {
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<Dictionary<IDiscordGuildUser, Role>>(Errors.GameNotFound(gameId));
+
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<Dictionary<IDiscordGuildUser, Role>>(Errors.InvalidGuildId());
+
+        var updateQueue = new Dictionary<IDiscordGuildUser, Role>();
+
+        foreach ((string targetUserId, string roleId) in playerRoles)
+        {
+            var userResult = ValidateUser(guild, targetUserId);
+            if (!userResult.IsSuccess) return Result.Fail<Dictionary<IDiscordGuildUser, Role>>(userResult.Error!);
+
+            var roleResult = ValidateRole(roleId);
+            if (!roleResult.IsSuccess) return Result.Fail<Dictionary<IDiscordGuildUser, Role>>(roleResult.Error!);
+
+            updateQueue.Add(userResult.Value!, roleResult.Value!);
+        }
+
+        return Result.Ok(updateQueue);
+    }
+
+    private static Result<IDiscordGuildUser> ValidateUser(IDiscordGuild guild, string userId)
+    {
+        var user = guild.GetUser(userId);
+        return user is null
+            ? Result.Fail<IDiscordGuildUser>(Errors.UserNotFound(userId))
+            : Result.Ok(user);
+    }
+
+    private static Result<Role> ValidateRole(string roleId)
+    {
+        var role = Role.AllRoles.FirstOrDefault(o => o.Id == roleId);
+        return roleId is not null && role is null
+            ? Result.Fail<Role>(ErrorKind.NotFound, "role.not_found", $"Role '{roleId}' was not found")
+            : Result.Ok(role!);
+    }
+
+    private int ApplyDraftRoleUpdates(string gameId, Dictionary<IDiscordGuildUser, Role> updateQueue)
+    {
+        int updateCount = 0;
+
+        foreach ((IDiscordGuildUser targetUser, Role role) in updateQueue)
+        {
+            var updateOccurred = gamePerspectiveService.UpdateDraftRole(gameId, targetUser.Id, role);
+            if (updateOccurred) updateCount++;
+        }
+
+        return updateCount;
     }
 }

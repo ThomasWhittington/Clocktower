@@ -16,7 +16,6 @@ function GameManager() {
     const [hasError, setHasError] = useState(false);
     const [error, setError] = useState('');
     const guildId = useAppStore((state) => state.guildId);
-    const gameId = useAppStore((state) => state.gameId);
     const currentUser = useAppStore((state) => state.currentUser);
     const setGameId = useAppStore((state) => state.setGameId);
 
@@ -105,7 +104,7 @@ function GameManager() {
                     </>
                 )
             }
-            <BottomHud gameId={gameId} storyTellers={[]}/>
+            <BottomHud storyTellers={[]}/>
         </>
     );
 }

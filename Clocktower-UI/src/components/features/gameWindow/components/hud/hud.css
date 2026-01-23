@@ -36,10 +36,9 @@
     }
 
     .controls-bottom {
-        @apply absolute bottom-8 right-8 pointer-events-none z-50 flex flex-col gap-2 items-end;
+        @apply absolute bottom-8 right-8 pointer-events-none flex flex-col gap-2 items-end;
     }
 
-    .game-id-label,
     .script-label {
         @apply bg-black/50 backdrop-blur-sm p-3 rounded-lg pointer-events-auto select-none text-sm;
     }

@@ -1,4 +1,8 @@
-﻿import type {ChannelOccupants, DiscordTown, User} from '@/types';
+﻿import type {
+    ChannelOccupants,
+    DiscordTown,
+    User
+} from '@/types';
 
 export const DiscordTownUtils = {
     getUsersInSameChannel(discordTown: DiscordTown, userId: string): User[] {
@@ -15,5 +19,13 @@ export const DiscordTownUtils = {
             if (channel) return channel;
         }
         return undefined;
+    },
+    getPlayerCountFromDistribution(discordTown: DiscordTown | undefined): number {
+        if (!discordTown?.defaultRoleDistribution) return 0;
+
+        return discordTown.defaultRoleDistribution.townsfolk +
+            discordTown.defaultRoleDistribution.outsiders +
+            discordTown.defaultRoleDistribution.minions +
+            discordTown.defaultRoleDistribution.demons;
     }
 };
