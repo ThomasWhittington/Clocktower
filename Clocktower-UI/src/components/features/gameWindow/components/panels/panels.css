@@ -270,20 +270,20 @@
         }
 
         .role-group {
-            h3 {
+            > h3 {
                 @apply text-lg font-semibold mb-2 select-none;
             }
 
-            div {
+            > div {
                 @apply flex flex-wrap justify-center items-center gap-2 p-4 rounded-lg;
             }
 
             &.townsfolk {
-                h3 {
+                > h3 {
                     @apply text-townsfolk;
                 }
 
-                div {
+                > div {
                     @apply bg-townsfolk/50;
                 }
             }
@@ -291,11 +291,11 @@
             &.outsiders {
                 @apply h-full;
 
-                h3 {
+                > h3 {
                     @apply text-outsider;
                 }
 
-                div {
+                > div {
                     @apply bg-outsider/50 h-full;
                 }
             }
@@ -303,11 +303,11 @@
             &.minions {
                 @apply h-full;
 
-                h3 {
+                > h3 {
                     @apply text-minion;
                 }
 
-                div {
+                > div {
                     @apply bg-minion/50 h-full;
                 }
             }
@@ -315,11 +315,11 @@
             &.demons {
                 @apply h-full;
 
-                h3 {
+                > h3 {
                     @apply text-demon;
                 }
 
-                div {
+                > div {
                     @apply bg-demon/50 h-full;
                 }
             }
@@ -327,42 +327,44 @@
             &.travellers {
                 @apply fixed bottom-0 left-1/2 translate-x-[-50%];
 
-                h3 {
+                > h3 {
                     @apply text-traveller;
                 }
 
-                div {
+                > div {
                     @apply bg-traveller/50;
                 }
             }
 
             .unselected-role {
-                opacity: 0.5;
-                filter: grayscale(100%);
-                position: relative;
+                @apply opacity-50 grayscale relative;
             }
 
             .unselected-role::after {
                 content: '+';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 3em;
-                color: white;
+                @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl text-white pointer-events-none transition-opacity duration-200 ease-in-out;
                 text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-                pointer-events: none;
-                transition: opacity 0.2s ease;
             }
 
             .unselected-role:hover {
-                opacity: 0.7;
-                filter: grayscale(80%);
+                @apply opacity-70 grayscale-80;
             }
 
             .unselected-role:hover::after {
-                opacity: 0.8;
+                @apply opacity-80;
             }
+
+            .role-ability {
+                @apply hidden fixed z-10 bg-gray-900 text-white p-3 rounded-lg shadow-lg max-w-xs text-sm text-left top-auto left-1/2 translate-x-[-50%] bottom-5 mt-0 pointer-events-none;
+            }
+
+            .token-wrapper:hover .role-ability {
+                @apply block;
+            }
+        }
+
+        .setup-warning {
+            @apply absolute top-5 left-1/2 translate-x-[-50%] py-3 px-6 bg-discord-warning/50 font-bold rounded-lg z-1000 select-none shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-opacity duration-300 ease-in-out
         }
 
         .role-counts {
@@ -398,6 +400,10 @@
 
             .demons {
                 @apply bg-demon;
+            }
+
+            .players {
+                @apply bg-forestgreen;
             }
         }
     }

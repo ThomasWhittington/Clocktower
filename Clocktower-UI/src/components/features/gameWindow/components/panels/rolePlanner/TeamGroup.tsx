@@ -21,13 +21,16 @@ export const TeamGroup = ({name, roles, tokenSize, onClick, selectedRoleIds}: To
                         {roles.map((role) => {
                             const isSelected = selectedRoleIds?.has(role.id) ?? false;
                             return (
-                                <Token
-                                    role={role}
-                                    size={tokenSize}
-                                    key={role.id}
-                                    onClick={() => onClick?.(role)}
-                                    className={isSelected ? 'selected-role' : 'unselected-role'}
-                                />
+                                <div key={role.id} className="token-wrapper">
+                                    <Token
+                                        role={role}
+                                        size={tokenSize}
+                                        key={role.id}
+                                        onClick={() => onClick?.(role)}
+                                        className={isSelected ? 'selected-role' : 'unselected-role'}
+                                    />
+                                    <span className="role-ability">{role.description}</span>
+                                </div>
                             );
                         })}
                     </div>

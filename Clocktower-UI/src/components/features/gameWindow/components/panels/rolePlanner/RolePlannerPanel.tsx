@@ -31,6 +31,7 @@ export const RolePlannerPanel = ({isOpen, onClose}: RolePlannerPanelProps) => {
         () => new Set(selectedRoles.map(r => r.id)),
         [selectedRoles]
     );
+    const hasSetupRoles = selectedRoles.some(o => o.setup);
     const tokenClicked = async (role: Role | undefined) => {
         if (!role) return;
 
@@ -47,8 +48,12 @@ export const RolePlannerPanel = ({isOpen, onClose}: RolePlannerPanelProps) => {
             <div ref={containerRef} className="token-panel">
                 {discordTown?.defaultRoleDistribution ?
                     <>
-                        {selectedRoles.some(o => o.setup) && <p className="select-none">WARNING - Setup is affected</p>}
-
+                        <p
+                            className={`setup-warning ${hasSetupRoles ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                            title={selectedRoles.filter(r => r.setup).map(r => r.name || r.id).join(', ')}
+                        >
+                            WARNING - Setup is affected
+                        </p>
                         <RoleDistributionCounter selectedRoles={selectedRoles} discordTown={discordTown}/>
 
                         <TeamGroup
