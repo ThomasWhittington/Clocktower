@@ -366,10 +366,22 @@
         }
 
         .role-counts {
-            @apply flex flex-row justify-evenly select-none;
+            @apply flex flex-row justify-evenly select-none pt-4;
 
             .role-count {
-                @apply text-base font-semibold p-4 rounded-2xl;
+                @apply text-base font-semibold p-4 rounded-2xl transition-all duration-300;
+
+                &.too-many {
+                    @apply animate-pulse shadow-[0_0_15px_rgba(255,215,0,0.8),inset_0_0_10px_rgba(255,215,0,0.3)] bg-[#ffd700] text-black;
+                }
+
+                &.correct {
+                    @apply opacity-50 scale-90;
+                }
+
+                &.too-few {
+                    @apply opacity-100;
+                }
             }
 
             .townsfolk {

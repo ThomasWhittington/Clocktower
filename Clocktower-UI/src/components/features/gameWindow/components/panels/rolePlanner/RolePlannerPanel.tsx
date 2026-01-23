@@ -7,15 +7,13 @@ import {
     useElementSize,
     useServerHub
 } from "@/hooks";
-import {
-    Role,
-    RoleType
-} from "@/types";
+import {Role} from "@/types";
 import {
     useMemo,
     useState
 } from "react";
 import {useDiscordTown} from "@/components/features/discordTownPanel/hooks";
+import {RoleDistributionCounter} from "@/components/features/gameWindow/components";
 
 interface RolePlannerPanelProps {
     isOpen: boolean;
@@ -50,12 +48,8 @@ export const RolePlannerPanel = ({isOpen, onClose}: RolePlannerPanelProps) => {
                 {discordTown?.defaultRoleDistribution ?
                     <>
                         {selectedRoles.some(o => o.setup) && <p className="select-none">WARNING - Setup is affected</p>}
-                        <div className="role-counts">
-                            <span className="role-count townsfolk"><span>{selectedRoles.filter(o => o.type == RoleType.Townsfolk).length}</span>/{discordTown?.defaultRoleDistribution?.townsfolk}</span>
-                            <span className="role-count outsiders"><span>{selectedRoles.filter(o => o.type == RoleType.Outsider).length}</span>/{discordTown?.defaultRoleDistribution?.outsiders}</span>
-                            <span className="role-count minions"><span>{selectedRoles.filter(o => o.type == RoleType.Minion).length}</span>/{discordTown?.defaultRoleDistribution?.minions}</span>
-                            <span className="role-count demons"><span>{selectedRoles.filter(o => o.type == RoleType.Demon).length}</span>/{discordTown?.defaultRoleDistribution?.demons}</span>
-                        </div>
+
+                        <RoleDistributionCounter selectedRoles={selectedRoles} discordTown={discordTown}/>
 
                         <TeamGroup
                             name="Townsfolk"
