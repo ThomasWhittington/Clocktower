@@ -1259,7 +1259,7 @@ public class GameServiceTests
     }
 
     [TestMethod]
-    public async Task SetRole_ReturnsOk_ChangeFromTraveller()
+    public async Task SetRole_ReturnsOk_ChangeFromTraveller_OtherRole()
     {
         Setup_SetRole(existingRole: Role.Gunslinger());
 
@@ -1271,6 +1271,20 @@ public class GameServiceTests
             u.Role == Role.Empath() &&
             !u.RemoveRole
         )), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+
+    [TestMethod]
+    public async Task SetRole_ReturnsOk_ChangeFromTraveller_Null()
+    {
+        Setup_SetRole(existingRole: Role.Gunslinger());
+
+        var result = await _sut.SetRole(GameId, UserId, null);
+
+        result.ShouldSucceedWith<string>("display name now has the role: NONE");
+        _mockGamePerspectiveService.Verify(o => o.SetRoleOnAllPerspectives(GameId, UserId, null), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.UpdatePrivateUser(GameId, UserId, It.IsAny<PrivateGameUserUpdate>()), Times.Never);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 

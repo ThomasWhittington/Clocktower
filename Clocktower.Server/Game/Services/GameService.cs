@@ -261,19 +261,24 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         if (roleId is not null && role is null) return Result.Fail<string>(ErrorKind.NotFound, "role.not_found", $"Role '{roleId}' was not found");
 
         bool updateOccurred;
-
+        var userIsCurrentlyTraveller = gamePerspective.Users
+            .FirstOrDefault(o => o.Id == targetUserId)?.Role?.Type == RoleType.Traveller;
         if (role is { Type: RoleType.Traveller })
         {
             updateOccurred = gamePerspectiveService.SetRoleOnAllPerspectives(gameId, targetUserId, role);
         }
+        else if (userIsCurrentlyTraveller)
+        {
+            gamePerspectiveService.SetRoleOnAllPerspectives(gameId, targetUserId, null);
+
+            updateOccurred = role == null || gamePerspectiveService.UpdatePrivateUser(gameId, targetUserId, new PrivateGameUserUpdate
+            {
+                RemoveRole = false,
+                Role = role
+            });
+        }
         else
         {
-            var userIsCurrentlyTraveller = gamePerspective.Users.FirstOrDefault(o => o.Id == targetUserId)?.Role?.Type == RoleType.Traveller;
-            if (userIsCurrentlyTraveller)
-            {
-                gamePerspectiveService.SetRoleOnAllPerspectives(gameId, targetUserId, null);
-            }
-
             updateOccurred = gamePerspectiveService.UpdatePrivateUser(gameId, targetUserId, new PrivateGameUserUpdate
             {
                 RemoveRole = role is null,
