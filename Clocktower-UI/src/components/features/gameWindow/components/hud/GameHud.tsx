@@ -37,7 +37,7 @@ export function GameHud({
                     scriptIsOpen={isPanelOpen('script')}
                     onScriptClick={() => togglePanel('script')}
                     rolePlannerIsOpen={isPanelOpen('rolePlanner')}
-                    onRolePlannerClick={() => togglePanel('rolePlanner')}
+                    onRolePlannerClick={() => script && togglePanel('rolePlanner')}
                     showDraftRoles={isDraftMode}
                     onDraftToggle={() => setIsDraftMode(prev => !prev)}
                 />
