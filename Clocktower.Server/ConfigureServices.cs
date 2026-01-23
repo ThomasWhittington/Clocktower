@@ -188,6 +188,7 @@ public static class ConfigureServices
     }
 }
 
+[ExcludeFromCodeCoverage]
 public class RenderedMessageEnricher : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
@@ -198,6 +199,7 @@ public class RenderedMessageEnricher : ILogEventEnricher
     }
 }
 
+[ExcludeFromCodeCoverage]
 public class ActivityEnricher : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
@@ -214,6 +216,7 @@ public class ActivityEnricher : ILogEventEnricher
     }
 }
 
+[ExcludeFromCodeCoverage]
 public class HttpContextEnricher : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
@@ -233,6 +236,7 @@ public class HttpContextEnricher : ILogEventEnricher
     }
 }
 
+[ExcludeFromCodeCoverage]
 public class MachineNameEnricher : ILogEventEnricher
 {
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
