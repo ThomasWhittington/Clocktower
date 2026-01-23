@@ -1,5 +1,6 @@
 ﻿import {
     BasePanel,
+    IconButton,
     RoleDistributionWidget
 } from "@/components/ui";
 import {TeamGroup} from "./TeamGroup";
@@ -7,41 +8,44 @@ import {
     useElementSize,
     useServerHub
 } from "@/hooks";
-import {Role} from "@/types";
-import {
-    useMemo,
-    useState
-} from "react";
 import {useDiscordTown} from "@/components/features/discordTownPanel/hooks";
 import {RoleDistributionCounter} from "@/components/features/gameWindow/components";
+import {useRolePlanner} from "@/components/features/gameWindow/hooks";
+import {
+    AssignIcon,
+    RandomizeIcon,
+    RemoveIcon
+} from "@/components/ui/icons";
+import {DiscordTownUtils} from "@/utils";
 
 interface RolePlannerPanelProps {
     isOpen: boolean;
     onClose: () => void;
+    setIsDraftMode: (callback: (prev: boolean) => boolean) => void;
 }
 
-export const RolePlannerPanel = ({isOpen, onClose}: RolePlannerPanelProps) => {
+export const RolePlannerPanel = ({isOpen, onClose, setIsDraftMode}: RolePlannerPanelProps) => {
     const {script} = useServerHub();
     const {discordTown} = useDiscordTown();
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
     const dynamicSize = Math.min(parentSize.width, parentSize.height) / 8;
-    const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
+    const playerCount = DiscordTownUtils.getPlayerCountFromDistribution(discordTown);
 
-    const selectedRoleIds = useMemo(
-        () => new Set(selectedRoles.map(r => r.id)),
-        [selectedRoles]
-    );
-    const hasSetupRoles = selectedRoles.some(o => o.setup);
-    const tokenClicked = async (role: Role | undefined) => {
-        if (!role) return;
-
-        const isAlreadySelected = selectedRoles.some(r => r.id === role.id);
-        if (isAlreadySelected) {
-            setSelectedRoles(selectedRoles.filter(r => r.id !== role.id));
-        } else {
-            setSelectedRoles([...selectedRoles, role]);
-        }
-    }
+    const {
+        selectedRoles,
+        selectedRoleIds,
+        hasSetupRoles,
+        toggleRole,
+        randomizeRoles,
+        selectedSetupAffectingRoleNames,
+        assignToDraft,
+        clearRoles
+    } = useRolePlanner({
+        script,
+        roleDistribution: discordTown?.defaultRoleDistribution,
+        setIsDraftMode,
+        closePanel: onClose
+    });
 
     return (
         <BasePanel title="Role Planner" isOpen={isOpen} onClose={onClose} className="role-planner">
@@ -50,17 +54,23 @@ export const RolePlannerPanel = ({isOpen, onClose}: RolePlannerPanelProps) => {
                     <>
                         <p
                             className={`setup-warning ${hasSetupRoles ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-                            title={selectedRoles.filter(r => r.setup).map(r => r.name || r.id).join(', ')}
+                            title={selectedSetupAffectingRoleNames}
                         >
                             WARNING - Setup is affected
                         </p>
+
+                        <div className="flex w-full">
+                            <IconButton icon={<RandomizeIcon/>} text="Randomize" variant="primary" onClick={randomizeRoles} className="flex-1"/>
+                            <IconButton icon={<RemoveIcon/>} text="Clear" onClick={clearRoles} className="flex-1" isEnabled={selectedRoles.length > 0}/>
+                            <IconButton icon={<AssignIcon/>} text="Assign to Draft" variant="danger" onClick={assignToDraft} className="flex-1" isEnabled={selectedRoles.length === playerCount}/>
+                        </div>
                         <RoleDistributionCounter selectedRoles={selectedRoles} discordTown={discordTown}/>
 
                         <TeamGroup
                             name="Townsfolk"
                             roles={script?.townsfolk}
                             tokenSize={dynamicSize}
-                            onClick={tokenClicked}
+                            onClick={toggleRole}
                             selectedRoleIds={selectedRoleIds}
                         />
 
@@ -69,21 +79,21 @@ export const RolePlannerPanel = ({isOpen, onClose}: RolePlannerPanelProps) => {
                                 name="Outsiders"
                                 roles={script?.outsiders}
                                 tokenSize={dynamicSize}
-                                onClick={tokenClicked}
+                                onClick={toggleRole}
                                 selectedRoleIds={selectedRoleIds}
                             />
                             <TeamGroup
                                 name="Minions"
                                 roles={script?.minions}
                                 tokenSize={dynamicSize}
-                                onClick={tokenClicked}
+                                onClick={toggleRole}
                                 selectedRoleIds={selectedRoleIds}
                             />
                             <TeamGroup
                                 name="Demons"
                                 roles={script?.demons}
                                 tokenSize={dynamicSize}
-                                onClick={tokenClicked}
+                                onClick={toggleRole}
                                 selectedRoleIds={selectedRoleIds}
                             />
                         </div>

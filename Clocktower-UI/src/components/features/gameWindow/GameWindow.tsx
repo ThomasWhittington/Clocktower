@@ -63,7 +63,14 @@ export default function GameWindow() {
                 onCommitDraftRoles={isDraftMode ? handleCommitDraftRoles : undefined}
             />
 
-            <GamePanels isPanelOpen={isPanelOpen} closePanel={closePanel} tokenData={tokenData} isDraftMode={isDraftMode} setRole={setRole}/>
+            <GamePanels
+                isPanelOpen={isPanelOpen}
+                closePanel={closePanel}
+                tokenData={tokenData}
+                isDraftMode={isDraftMode}
+                setIsDraftMode={setIsDraftMode}
+                setRole={setRole}
+            />
 
             <GameHud
                 script={script}

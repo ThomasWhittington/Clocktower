@@ -14,16 +14,17 @@ interface GamePanelsProps {
     tokenData: any;
     isDraftMode: boolean;
     setRole: any;
+    setIsDraftMode: (callback: (prev: boolean) => boolean) => void;
 }
 
-export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, setRole}: Readonly<GamePanelsProps>) {
+export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, setRole, setIsDraftMode}: Readonly<GamePanelsProps>) {
     return (
         <>
             <UserManagerPanel isOpen={isPanelOpen('user')} onClose={closePanel}/>
             <ScriptManagerPanel isOpen={isPanelOpen('script')} onClose={closePanel}/>
             <RoleListPanel isOpen={isPanelOpen('role')} onClose={closePanel}/>
             <NightOrderPanel isOpen={isPanelOpen('night')} onClose={closePanel}/>
-            <RolePlannerPanel isOpen={isPanelOpen('rolePlanner')} onClose={closePanel}/>
+            <RolePlannerPanel isOpen={isPanelOpen('rolePlanner')} onClose={closePanel} setIsDraftMode={setIsDraftMode}/>
 
             {tokenData && (
                 <TokenPanel

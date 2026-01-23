@@ -1,6 +1,6 @@
 ﻿import {
     OpenLetter,
-    Randomise
+    RandomizeIcon
 } from "@/components/ui/icons";
 import {
     IconButton,
@@ -39,7 +39,7 @@ export const UserManager = ({
 
             {canRun &&
                 <IconButton
-                    icon={<Randomise/>}
+                    icon={<RandomizeIcon/>}
                     className="ml-auto"
                     text="Randomise seat positions"
                     variant="secondary"
