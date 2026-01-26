@@ -21,8 +21,8 @@ public class UserDtoTests
         HasVoteToken = true,
         IsDead = true,
         IsMarked = true,
-        Role = Role.Empath(),
-        DraftRole = Role.Baron()
+        Role = Role.Empath,
+        DraftRole = Role.Baron
     };
 
     [TestMethod]

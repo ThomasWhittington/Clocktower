@@ -80,7 +80,7 @@ public class ScriptProviderTests
     [TestMethod]
     public async Task GetScriptAsync_ReturnsOk_Custom_WhenScriptIsValid()
     {
-        var expected = new Script("NAME", "AUTHOR", [Role.Chef(), Role.Empath()]);
+        var expected = new Script("NAME", "AUTHOR", [Role.Chef, Role.Empath]);
         var result = await _sut.GetScriptAsync(ScriptSelect.Custom,
             """
             [
@@ -124,7 +124,7 @@ public class ScriptProviderTests
     [TestMethod]
     public async Task GetScriptAsync_ReturnsOk_PreDefined_WhenScriptIsValid()
     {
-        var expected = new Script("NAME", "AUTHOR", [Role.Chef(), Role.Empath()]);
+        var expected = new Script("NAME", "AUTHOR", [Role.Chef, Role.Empath]);
         _mockFileSystem.Setup(o => o.File.Exists(It.IsAny<string>())).Returns(true);
         _mockFileSystem.Setup(o => o.File.ReadAllTextAsync(It.IsAny<string>())).ReturnsAsync(
             """

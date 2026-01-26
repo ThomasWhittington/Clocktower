@@ -917,7 +917,7 @@ public class GameServiceTests
     {
         Setup_SetPerspectiveRole(hasGame: false);
 
-        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger.Id);
 
         result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
     }
@@ -927,7 +927,7 @@ public class GameServiceTests
     {
         Setup_SetPerspectiveRole(hasGuild: false);
 
-        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger.Id);
 
         result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
     }
@@ -937,7 +937,7 @@ public class GameServiceTests
     {
         Setup_SetPerspectiveRole(hasUser: false);
 
-        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger.Id);
 
         result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
     }
@@ -947,7 +947,7 @@ public class GameServiceTests
     {
         Setup_SetPerspectiveRole(hasTargetUser: false);
 
-        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger.Id);
 
         result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
     }
@@ -967,10 +967,10 @@ public class GameServiceTests
     {
         Setup_SetPerspectiveRole();
 
-        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger.Id);
 
         result.ShouldSucceedWith<string>("display name now has the perspective role: Gunslinger");
-        _mockGamePerspectiveService.Verify(o => o.SetRoleOnPerspective(GameId, UserId2, UserId, Role.Gunslinger()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.SetRoleOnPerspective(GameId, UserId2, UserId, Role.Gunslinger), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
@@ -1003,10 +1003,10 @@ public class GameServiceTests
     {
         Setup_SetPerspectiveRole(updated: false);
 
-        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger.Id);
 
         result.ShouldSucceedWith<string>("display name already has the perspective role: Gunslinger");
-        _mockGamePerspectiveService.Verify(o => o.SetRoleOnPerspective(GameId, UserId2, UserId, Role.Gunslinger()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.SetRoleOnPerspective(GameId, UserId2, UserId, Role.Gunslinger), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
     }
 
@@ -1035,7 +1035,7 @@ public class GameServiceTests
     {
         Setup_SetDraftRole(hasGame: false);
 
-        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger.Id);
 
         result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
     }
@@ -1045,7 +1045,7 @@ public class GameServiceTests
     {
         Setup_SetDraftRole(hasGuild: false);
 
-        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger.Id);
 
         result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
     }
@@ -1055,7 +1055,7 @@ public class GameServiceTests
     {
         Setup_SetDraftRole(hasTargetUser: false);
 
-        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger.Id);
 
         result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
     }
@@ -1075,10 +1075,10 @@ public class GameServiceTests
     {
         Setup_SetDraftRole();
 
-        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger.Id);
 
         result.ShouldSucceedWith<string>("display name now has the draft role: Gunslinger");
-        _mockGamePerspectiveService.Verify(o => o.UpdateDraftRole(GameId, UserId, Role.Gunslinger()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.UpdateDraftRole(GameId, UserId, Role.Gunslinger), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
@@ -1111,10 +1111,10 @@ public class GameServiceTests
     {
         Setup_SetDraftRole(updated: false);
 
-        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetDraftRole(GameId, UserId, Role.Gunslinger.Id);
 
         result.ShouldSucceedWith<string>("display name already has the draft role: Gunslinger");
-        _mockGamePerspectiveService.Verify(o => o.UpdateDraftRole(GameId, UserId, Role.Gunslinger()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.UpdateDraftRole(GameId, UserId, Role.Gunslinger), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
     }
 
@@ -1151,7 +1151,7 @@ public class GameServiceTests
     {
         Setup_SetRole(hasGame: false);
 
-        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger.Id);
 
         result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
     }
@@ -1161,7 +1161,7 @@ public class GameServiceTests
     {
         Setup_SetRole(hasGuild: false);
 
-        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger.Id);
 
         result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
     }
@@ -1171,7 +1171,7 @@ public class GameServiceTests
     {
         Setup_SetRole(hasTargetUser: false);
 
-        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger.Id);
 
         result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
     }
@@ -1191,11 +1191,11 @@ public class GameServiceTests
     {
         Setup_SetRole();
 
-        var result = await _sut.SetRole(GameId, UserId, Role.Empath().Id);
+        var result = await _sut.SetRole(GameId, UserId, Role.Empath.Id);
 
         result.ShouldSucceedWith<string>("display name now has the role: Empath");
         _mockGamePerspectiveService.Verify(o => o.UpdatePrivateUser(GameId, UserId, It.Is<PrivateGameUserUpdate>(u =>
-            u.Role == Role.Empath() &&
+            u.Role == Role.Empath &&
             !u.RemoveRole
         )), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
@@ -1236,11 +1236,11 @@ public class GameServiceTests
     {
         Setup_SetRole(updated: false);
 
-        var result = await _sut.SetRole(GameId, UserId, Role.Empath().Id);
+        var result = await _sut.SetRole(GameId, UserId, Role.Empath.Id);
 
         result.ShouldSucceedWith<string>("display name already has the role: Empath");
         _mockGamePerspectiveService.Verify(o => o.UpdatePrivateUser(GameId, UserId, It.Is<PrivateGameUserUpdate>(u =>
-            u.Role == Role.Empath() &&
+            u.Role == Role.Empath &&
             !u.RemoveRole
         )), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
@@ -1251,24 +1251,24 @@ public class GameServiceTests
     {
         Setup_SetRole();
 
-        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger().Id);
+        var result = await _sut.SetRole(GameId, UserId, Role.Gunslinger.Id);
 
         result.ShouldSucceedWith<string>("display name now has the role: Gunslinger");
-        _mockGamePerspectiveService.Verify(o => o.SetRoleOnAllPerspectives(GameId, UserId, Role.Gunslinger()), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.SetRoleOnAllPerspectives(GameId, UserId, Role.Gunslinger), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
     }
 
     [TestMethod]
     public async Task SetRole_ReturnsOk_ChangeFromTraveller_OtherRole()
     {
-        Setup_SetRole(existingRole: Role.Gunslinger());
+        Setup_SetRole(existingRole: Role.Gunslinger);
 
-        var result = await _sut.SetRole(GameId, UserId, Role.Empath().Id);
+        var result = await _sut.SetRole(GameId, UserId, Role.Empath.Id);
 
         result.ShouldSucceedWith<string>("display name now has the role: Empath");
         _mockGamePerspectiveService.Verify(o => o.SetRoleOnAllPerspectives(GameId, UserId, null), Times.Once);
         _mockGamePerspectiveService.Verify(o => o.UpdatePrivateUser(GameId, UserId, It.Is<PrivateGameUserUpdate>(u =>
-            u.Role == Role.Empath() &&
+            u.Role == Role.Empath &&
             !u.RemoveRole
         )), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
@@ -1278,7 +1278,7 @@ public class GameServiceTests
     [TestMethod]
     public async Task SetRole_ReturnsOk_ChangeFromTraveller_Null()
     {
-        Setup_SetRole(existingRole: Role.Gunslinger());
+        Setup_SetRole(existingRole: Role.Gunslinger);
 
         var result = await _sut.SetRole(GameId, UserId, null);
 
