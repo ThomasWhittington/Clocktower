@@ -4,10 +4,9 @@ import {
     GameHud,
     GamePanels
 } from "@/components/features/gameWindow/components";
-import {UserUtils} from "@/utils";
 import {
+    useCurrentUserIsStoryteller,
     useDiscordTown,
-    useUser
 } from "@/components/features/discordTownPanel/hooks";
 import {useServerHub} from "@/hooks";
 import {
@@ -28,14 +27,13 @@ import {
 
 export default function GameWindow() {
     const {currentUser} = useAppStore();
-    const {thisUser} = useUser(currentUser?.id);
     const {script} = useServerHub();
     const {discordTown} = useDiscordTown();
     const [isDraftMode, setIsDraftMode] = useState(false);
     const [selectedDraftRoles, setSelectedDraftRoles] = useState<Role[]>([]);
     const {togglePanel, isPanelOpen, closePanel, openPanel, getPanelData} = useActivePanel();
-    const {setRole, commitDraftRoles} = useSetRoles(currentUser?.id ?? "", UserUtils.isStoryTeller(thisUser), isDraftMode);
-    const isStoryteller = UserUtils.isStoryTeller(thisUser);
+    const isStoryteller = useCurrentUserIsStoryteller();
+    const {setRole, commitDraftRoles} = useSetRoles(currentUser?.id ?? "", isStoryteller, isDraftMode);
 
     useEffect(() => {
         if (script && isPanelOpen('script')) {
@@ -50,7 +48,6 @@ export default function GameWindow() {
         closePanel
     });
     useGameWindowShortcuts({
-        thisUser,
         script,
         togglePanel,
         setIsDraftMode,

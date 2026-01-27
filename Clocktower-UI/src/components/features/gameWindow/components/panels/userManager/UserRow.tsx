@@ -26,6 +26,7 @@ interface UserRowProps {
 }
 
 export const UserRow = ({user, controlsLoading, controlsCanRun, removeUser, inviteUser, changeUserType}: UserRowProps) => {
+    const isStoryteller = UserUtils.isStoryTeller(user);
     return (
         <div className={`user-row user-row-${user.id}`}>
             <div className="user-row-section">
@@ -45,7 +46,7 @@ export const UserRow = ({user, controlsLoading, controlsCanRun, removeUser, invi
                 {user?.role && <TokenRoleIcon role={user.role} className="role-icon"/>}
                 <UserTypeChange user={user} isLoading={controlsLoading} canRun={controlsCanRun} changeUserType={changeUserType}/>
                 <IconButton
-                    className={UserUtils.isStoryTeller(user) ? "invisible" : "visible"}
+                    className={isStoryteller ? "invisible" : "visible"}
                     icon={<RemoveIcon/>}
                     variant="danger"
                     onClick={() => removeUser(user)}

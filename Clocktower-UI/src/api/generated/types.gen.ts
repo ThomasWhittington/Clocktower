@@ -311,6 +311,37 @@ export type ClocktowerServerRolesEndpointsGetRolesResponseWritable = {
     roles?: Array<ClocktowerServerDataTypesRoleRoleWritable> | null;
 };
 
+export type ForceUpdateApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+    };
+    query?: never;
+    url: '/api/admin/force-update/{gameId}';
+};
+
+export type ForceUpdateApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type ForceUpdateApiError = ForceUpdateApiErrors[keyof ForceUpdateApiErrors];
+
+export type ForceUpdateApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type ForceUpdateApiResponse = ForceUpdateApiResponses[keyof ForceUpdateApiResponses];
+
 export type GetAuthTokenApiData = {
     body: ClocktowerServerAdminEndpointsGetAuthTokenTokenRequest;
     path?: never;

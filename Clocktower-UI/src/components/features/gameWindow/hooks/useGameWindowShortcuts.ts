@@ -1,17 +1,15 @@
 ﻿import {useKeyboardShortcut} from "@/hooks";
-import {UserUtils} from "@/utils";
 import {
     Role,
     Script,
-    User
 } from "@/types";
 import type {
     PanelDataMap,
     PanelType
 } from "@/components/features/gameWindow/hooks/useActivePanel.ts";
+import {useCurrentUserIsStoryteller} from "@/components/features/discordTownPanel/hooks";
 
 interface UseGameWindowShortcutsProps {
-    thisUser: User | undefined;
     script: Script | undefined;
     togglePanel: <T extends PanelType>(panel: T, data?: PanelDataMap[T]) => void;
     setIsDraftMode: (callback: (prev: boolean) => boolean) => void;
@@ -21,14 +19,13 @@ interface UseGameWindowShortcutsProps {
 }
 
 export function useGameWindowShortcuts({
-                                           thisUser,
                                            script,
                                            togglePanel,
                                            setIsDraftMode,
                                            selectedDraftRoles,
                                            assignToDraft
                                        }: UseGameWindowShortcutsProps) {
-    const isStoryTeller = UserUtils.isStoryTeller(thisUser);
+    const isStoryTeller = useCurrentUserIsStoryteller();
     const hasScript = script !== undefined;
     const canAssignToDraft = selectedDraftRoles.length > 0;
 
