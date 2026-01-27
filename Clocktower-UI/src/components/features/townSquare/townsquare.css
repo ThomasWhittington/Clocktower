@@ -110,6 +110,11 @@
         transform: translate(-50%, -50%) translate(var(--player-x), var(--player-y));
     }
 
+    .player-icon.has-tooltip {
+        z-index: 30;
+    }
+
+
     .clickable-portrait {
         @apply absolute inset-0 flex items-center justify-center bg-black/60 rounded-full cursor-pointer hover:bg-black/40 transition-colors z-10 select-none;
     }
@@ -224,4 +229,36 @@
         background: #999;
     }
 
+    .role-description-tooltip {
+        @apply absolute pointer-events-none;
+        z-index: 30;
+        width: max-content;
+        max-width: min(400px, 90vw);
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .role-description-tooltip.top-half {
+        top: calc(100% + 1.5vmin);
+    }
+
+    .role-description-tooltip.bottom-half {
+        bottom: calc(100% + 1.5vmin);
+    }
+
+    .role-description-content {
+        @apply bg-neutral-900/80 text-white p-4 rounded-lg shadow-2xl border border-neutral-700;
+        min-width: 250px;
+        max-width: 400px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .role-description-content strong {
+        @apply block mb-2 text-lg font-bold;
+    }
+
+    .role-description-content p {
+        @apply text-sm text-neutral-200;
+    }
 }
