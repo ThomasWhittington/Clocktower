@@ -4,7 +4,6 @@ import {gamesService} from "@/services";
 import type {GamePerspective} from "@/types";
 import {useAppStore} from "@/store";
 import {GameList} from "@/components/features/gameManager/components";
-import {BottomHud} from "@/components/features/gameWindow/components";
 import {useNavigate} from "react-router-dom";
 
 function GameManager() {
@@ -96,7 +95,6 @@ function GameManager() {
                     </>
                 )
             }
-            <BottomHud storyTellers={[]}/>
         </>
     );
 }

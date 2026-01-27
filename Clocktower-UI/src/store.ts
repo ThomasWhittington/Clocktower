@@ -71,7 +71,13 @@ const setStoredJoinedGameId = (id: string | null) => {
 
 const getStoredPaperNotes = (): Record<string, string> => {
     const stored = localStorage.getItem('paperNotes');
-    return stored ? JSON.parse(stored) : {};
+    if (!stored) return {};
+    try {
+        return JSON.parse(stored) as Record<string, string>;
+    } catch {
+        localStorage.removeItem('paperNotes');
+        return {};
+    }
 };
 
 const setStoredPaperNotes = (notes: Record<string, string>) => {

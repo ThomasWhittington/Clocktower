@@ -21,6 +21,8 @@ export const PaperPanel = ({isOpen, onClose}: PaperPanelProps) => {
         if (gameId) {
             const savedContent = getPaperNote(gameId);
             setEditorContent(savedContent);
+        } else {
+            setEditorContent("");
         }
     }, [gameId, getPaperNote]);
 
