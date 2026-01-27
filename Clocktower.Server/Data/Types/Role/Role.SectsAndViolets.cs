@@ -18,7 +18,7 @@ public partial record Role
         => Traveller(name, description, Edition.SectsAndViolets);
 
     public static Role Clockmaker => SectsAndVioletsTownsfolk("Clockmaker", "You start knowing how many steps from the demon to it's nearest minion.")
-        .FirstNight(41, "Give the Clockmaker the number of steps from the demon to it's nearest minion. A step is a the space between players so a demon with a single player between them and a minion will result in a 2.");
+        .FirstNight(41, "Give the Clockmaker the number of steps from the demon to its nearest minion. A step is a the space between players so a demon with a single player between them and a minion will result in a 2.");
 
     public static Role Dreamer => SectsAndVioletsTownsfolk("Dreamer", "Each night, choose a player (not yourself or Travellers): you learn 1 good & 1 evil character, 1 of which is correct")
         .EachNight(42, 56, "The dreamer selects a player. Show 1 good and 1 evil character token; one of these is correct");
@@ -31,7 +31,7 @@ public partial record Role
         .EachNight(52, 71, "Give the Mathematician the number of players whose ability malfunctioned due to other abilities.")
         .WithReminders("Abnormal");
 
-    public static Role FlowerGirl => SectsAndVioletsTownsfolk("Flowergirl", "Each night*, you learn if a Demon voted today.")
+    public static Role Flowergirl => SectsAndVioletsTownsfolk("Flowergirl", "Each night*, you learn if a Demon voted today.")
         .OtherNight(57, "Give a Yes or No for if the Demon voted today.")
         .WithReminders("Demon Voted", "Demon Not Voted");
 
@@ -74,7 +74,7 @@ public partial record Role
 
     public static Role Klutz => SectsAndVioletsOutsider("Klutz", "When you learn you died, publicly choose 1 alive player: if they are evil, your team loses.");
 
-    public static Role Witch => SectsAndVioletsMinion("Witch", "Each night, choose a player: if they nominate tomorrow, they die (not executed). If just 3 players live, you loose this ability.")
+    public static Role Witch => SectsAndVioletsMinion("Witch", "Each night, choose a player: if they nominate tomorrow, they die (not executed). If just 3 players live, you lose this ability.")
         .FirstNight(24, "The Witch chooses a player. Mark them as 'Cursed'")
         .OtherNight(14, "If there are 4 or more players alive: The Witch chooses a player. Mark them as 'Cursed'")
         .WithReminders("Cursed");
@@ -83,7 +83,7 @@ public partial record Role
         .EachNight(25, 15, "The Cerenovus chooses a player and a good character. Mark them as 'Mad'. Wake the selected player and inform them that the cerenovus selected them. Inform them of their madness. If they are not \"Mad\" tomorrow, they can be executed.")
         .WithReminders("Mad");
 
-    public static Role PitHag => SectsAndVioletsMinion("Pit-Hag", "Each night*, choose a player and a character they become (if not in play). If a Demon is made, deaths tonight are arbitary.")
+    public static Role PitHag => SectsAndVioletsMinion("Pit-Hag", "Each night*, choose a player and a character they become (if not in play). If a Demon is made, deaths tonight are arbitrary.")
         .OtherNight(16, "The pithag chooses a player and a character. If this character is not in play, wake the selected player and inform them of their new role. Their alignments are not affected.");
 
     public static Role EvilTwin => SectsAndVioletsMinion("Evil Twin", "You & an opposing player know each other. If the good player is executed, evil wins. Good can't win if you both live.")
@@ -96,7 +96,7 @@ public partial record Role
         .AffectsSetup();
 
     public static Role Vigormortis => SectsAndVioletsDemon("Vigormortis", "Each night*, choose a player: they die. Minions you kill keep their ability and poison 1 Townsfolk neighbour. [-1 Outsider]")
-        .OtherNight(32, "The Vigormortis chooses a player: they die. If this player is a minion: they keep their ability and one of their Townsfolk neighours is poisoned")
+        .OtherNight(32, "The Vigormortis chooses a player: they die. If this player is a minion: they keep their ability and one of their Townsfolk neighbours is poisoned")
         .WithReminders("Dead", "Has Ability", "Poisoned")
         .AffectsSetup();
 
@@ -108,9 +108,9 @@ public partial record Role
         .OtherNight(31, "The Vortox chooses a player: they die.")
         .WithReminders("Dead");
 
-    public static Role Barista => SectsAndVioletsTraveller("Barista", "Each night, until dusk, 1) a health player becomes sober, healthy and gets true info, or 2) their ability works twice. The selected player learns which.")
+    public static Role Barista => SectsAndVioletsTraveller("Barista", "Each night, until dusk, 1) a player becomes sober, healthy and gets true info, or 2) their ability works twice. The selected player learns which.")
         .EachNight(1, 1, "Choose a player, wake them and tell them which Barista power is affecting them. Treat them accordingly (sober/healthy/true info or activate their ability twice).")
-        .WithReminders("Sober & Healthy", "Abilty Twice");
+        .WithReminders("Sober & Healthy", "Ability Twice");
 
     public static Role Harlot => SectsAndVioletsTraveller("Harlot", "Each night*, choose a living player: if they agree, you learn their character, but you both might die.")
         .OtherNight(1, "The Harlot chooses a player. Wake the chosen player, Inform them that the Harlot selected them. Ask if they wish to share their character, If yes: wake the Harlot and show them the chosen player's character token. Then, you may decide that both players die.")
@@ -122,5 +122,5 @@ public partial record Role
         .OtherNight(1, "Ask the Bone Collector if they wish to use their ability. If yes: They choose a dead player, 'Has Ability' reminder token. (They may now wake this night if their ability is in the order)")
         .WithReminders("No Ability", "Has Ability");
 
-    public static Role Deviant => SectsAndVioletsTraveller("Deviant", "If you were funny today, you cannot die by exhile.");
+    public static Role Deviant => SectsAndVioletsTraveller("Deviant", "If you were funny today, you cannot die by exile.");
 }
