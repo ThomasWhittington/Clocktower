@@ -23,12 +23,14 @@
     }
 
     .player-action-menu {
-        @apply absolute z-50 bg-neutral-900 border border-neutral-700 rounded-lg shadow-2xl overflow-hidden;
+        @apply absolute z-100 bg-neutral-900 border border-neutral-700 rounded-lg shadow-2xl overflow-hidden ;
         min-width: 10vmin;
         max-height: 30vmin;
         overflow-y: auto;
         border-width: 0.1vmin;
         border-radius: 0.8vmin;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     .player-name-container:has(+ .avatar-container) .player-action-menu {
@@ -39,6 +41,16 @@
     .player-name-container:not(:has(+ .avatar-container)) .player-action-menu {
         bottom: 100%;
         margin-bottom: 0.5vmin;
+    }
+
+    .player-name-container:has(+ .avatar-container) {
+        bottom: 100%;
+        margin-bottom: 0.5vmin;
+    }
+
+    .player-name-container:not(:has(+ .avatar-container)) {
+        top: 100%;
+        margin-top: 0.5vmin;
     }
 
     .player-action-menu-header {
@@ -72,11 +84,11 @@
     }
 
     .player-name-container {
-        @apply flex flex-col items-center select-none;
+        @apply flex flex-col absolute items-center select-none left-1/2 -translate-x-1/2;
 
         > button {
             @apply rounded-md text-center transition-colors cursor-pointer border border-transparent active:border-white/20 bg-neutral-800/70;
-            font-size: 1.5vmin;
+            font-size: 2vmin;
             padding: 0.8vmin 1.5vmin;
             border-width: 0.1vmin;
 
@@ -84,6 +96,10 @@
                 @apply bg-neutral-800/30 text-neutral-400;
             }
         }
+    }
+
+    .player-name-container:has(.player-action-menu) {
+        z-index: 100;
     }
 
     .player-icon {
