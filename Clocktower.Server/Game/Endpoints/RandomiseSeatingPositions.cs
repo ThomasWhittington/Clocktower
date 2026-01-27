@@ -6,7 +6,7 @@ public class RandomiseSeatingPositions : IEndpoint
     public static void Map(IEndpointRouteBuilder app)
     {
         app.MapPost("/{gameId}/randomise-seating-positions", Handle)
-            .RequireAuthorization("StoryTellerForGame")
+            .RequireStorytellerForGame()
             .SetOpenApiOperationId<RandomiseSeatingPositions>()
             .WithSummaryAndDescription("Randomises seating positions for players in the game")
             .WithRequestValidation<GameIdRequest>();

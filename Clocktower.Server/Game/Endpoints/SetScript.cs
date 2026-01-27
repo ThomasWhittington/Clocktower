@@ -7,7 +7,7 @@ public class SetScript : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{gameId}/script", Handle)
-        .RequireAuthorization("StoryTellerForGame")
+        .RequireStorytellerForGame()
         .SetOpenApiOperationId<SetScript>()
         .WithSummary("Sets the script of the game")
         .WithDescription("Sets the script of the game. Setting to custom requires a custom script file to be uploaded")

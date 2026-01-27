@@ -7,7 +7,7 @@ public class InviteAll : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{gameId}/invite-all", Handle)
-        .RequireAuthorization("StoryTellerForGame")
+        .RequireStorytellerForGame()
         .SetOpenApiOperationId<InviteAll>()
         .WithSummaryAndDescription("Invites all users to the specified game")
         .WithRequestValidation<GameIdRequest>();

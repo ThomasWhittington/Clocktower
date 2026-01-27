@@ -6,7 +6,7 @@ public class SwapSeatingPositions : IEndpoint
     public static void Map(IEndpointRouteBuilder app)
     {
         app.MapPost("/{gameId}/swap-seating-positions/{userId1}/{userId2}", Handle)
-            .RequireAuthorization("StoryTellerForGame")
+            .RequireStorytellerForGame()
             .SetOpenApiOperationId<SwapSeatingPositions>()
             .WithSummaryAndDescription("Swaps the seats for two players in the game")
             .WithRequestValidation<Request>();

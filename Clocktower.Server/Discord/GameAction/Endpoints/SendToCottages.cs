@@ -7,7 +7,7 @@ public class SendToCottages : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/send-to-cottages/{gameId}", Handle)
-        .RequireAuthorization("StoryTellerForGame")
+        .RequireStorytellerForGame()
         .SetOpenApiOperationId<SendToCottages>()
         .WithSummary("Sends all users to cottages")
         .WithDescription("Sends all users to cottages and storytellers to consultation")

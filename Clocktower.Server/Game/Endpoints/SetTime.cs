@@ -5,7 +5,7 @@ public class SetTime : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{gameId}/time", Handle)
-        .RequireAuthorization("StoryTellerForGame")
+        .RequireStorytellerForGame()
         .SetOpenApiOperationId<SetTime>()
         .WithSummary("Sets the time of the town")
         .WithDescription("Sets the game perspective of the town based on the day time")

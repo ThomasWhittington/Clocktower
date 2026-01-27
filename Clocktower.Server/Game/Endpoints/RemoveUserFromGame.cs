@@ -6,7 +6,7 @@ public class RemoveUserFromGame : IEndpoint
     public static void Map(IEndpointRouteBuilder app)
     {
         app.MapPost("/{gameId}/remove-user/{userId}", Handle)
-            .RequireAuthorization("StoryTellerForGame")
+            .RequireStorytellerForGame()
             .SetOpenApiOperationId<RemoveUserFromGame>()
             .WithSummaryAndDescription("Removes user from the game")
             .WithRequestValidation<GameAndUserRequest>();

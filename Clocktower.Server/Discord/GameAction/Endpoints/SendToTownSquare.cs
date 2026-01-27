@@ -7,7 +7,7 @@ public class SendToTownSquare : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/send-to-townsquare/{gameId}", Handle)
-        .RequireAuthorization("StoryTellerForGame")
+        .RequireStorytellerForGame()
         .SetOpenApiOperationId<SendToTownSquare>()
         .WithSummaryAndDescription("Sends all users to townsquare")
         .WithRequestValidation<GameIdRequest>();

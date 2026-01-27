@@ -5,7 +5,7 @@ public class SetDraftRole : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{gameId}/set-draft-role/{targetUserId}/{roleId?}", Handle)
-        .RequireAuthorization("StoryTellerForGame")
+        .RequireStorytellerForGame()
         .SetOpenApiOperationId<SetDraftRole>()
         .WithSummaryAndDescription("Sets the draft role for the target user")
         .WithRequestValidation<Request>();

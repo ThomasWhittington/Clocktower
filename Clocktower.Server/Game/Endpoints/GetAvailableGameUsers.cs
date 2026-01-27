@@ -6,7 +6,7 @@ public class GetAvailableGameUsers : IEndpoint
     public static void Map(IEndpointRouteBuilder app)
     {
         app.MapGet("/{gameId}/available-users", Handle)
-            .RequireAuthorization("StoryTellerForGame")
+            .RequireStorytellerForGame()
             .SetOpenApiOperationId<GetAvailableGameUsers>()
             .WithSummary("Get available guild users for a game")
             .WithDescription("Gets all users that are in the games guild but are not yet added to the game")
