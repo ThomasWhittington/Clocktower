@@ -2,6 +2,7 @@
 using Clocktower.Server.Common.Services;
 using Clocktower.Server.Data;
 using Clocktower.Server.Data.Types.Enum;
+using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.ServerTests.Admin.Services;
 
@@ -10,6 +11,7 @@ public class AdminServiceTests
 {
     private IAdminService _sut = null!;
     private Mock<IJwtWriter> _mockJwtWriter = null!;
+    private Mock<IGameBroadcastService> _mockGameBroadcastService = null!;
 
     private void SetUpJwtWriter(string jwt)
     {
@@ -22,8 +24,9 @@ public class AdminServiceTests
     [TestInitialize]
     public void SetUp()
     {
-        _mockJwtWriter = new Mock<IJwtWriter>();
-        _sut = new AdminService(_mockJwtWriter.Object);
+        _mockJwtWriter = StrictMockFactory.Create<IJwtWriter>();
+        _mockGameBroadcastService = StrictMockFactory.Create<IGameBroadcastService>();
+        _sut = new AdminService(_mockJwtWriter.Object, _mockGameBroadcastService.Object);
     }
 
     [TestMethod]
@@ -53,5 +56,18 @@ public class AdminServiceTests
 
         success.Should().BeFalse();
         result.Should().Be(exceptionMessage);
+    }
+
+    [TestMethod]
+    public async Task ForceUpdate_SendsUpdate()
+    {
+        const string gameId = "game-id";
+
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(gameId)).Returns(Task.CompletedTask);
+
+        var result = await _sut.ForceUpdate(gameId);
+
+        result.ShouldSucceedWith($"Update sent for game: '{gameId}'");
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(gameId), Times.Once);
     }
 }
