@@ -1,15 +1,5 @@
-﻿interface TopHudProps {
-    scriptName: string | undefined
-}
-
-export const TopHud = ({scriptName}: TopHudProps) => {
+﻿export const TopHud = () => {
     return (
-        <div className="controls-top">
-            {scriptName &&
-                <div className="script-label">
-                    {scriptName}
-                </div>
-            }
-        </div>
+        <div className="controls-top"/>
     );
 }

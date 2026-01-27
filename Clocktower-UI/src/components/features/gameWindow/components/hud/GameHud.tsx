@@ -49,13 +49,13 @@ export function GameHud({
                 />
             )}
             <CenterHud/>
-            <TopHud scriptName={script?.name}/>
+            <TopHud/>
             <RightHud
                 onRoleListClick={() => script && togglePanel('role')}
                 onNightOrderClick={() => script && togglePanel('night')}
                 onForceUpdateClick={forceUpdateGame}
             />
-            <BottomHud storyTellers={discordTown?.storyTellers ?? []}/>
+            <BottomHud scriptName={script?.name} storyTellers={discordTown?.storyTellers ?? []}/>
         </>
     );
 }
