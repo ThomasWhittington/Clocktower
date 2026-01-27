@@ -3,4 +3,5 @@
 public interface IIdGenerator
 {
     string GenerateId();
+    string GenerateGameId();
 }

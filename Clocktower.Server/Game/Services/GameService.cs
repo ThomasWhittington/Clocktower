@@ -4,7 +4,7 @@ using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.Server.Game.Services;
 
-public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiveService, IDiscordTownManager discordTownManager, IGameBroadcastService gameBroadcastService, IScriptProvider scriptProvider) : IGameService
+public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiveService, IDiscordTownManager discordTownManager, IGameBroadcastService gameBroadcastService, IScriptProvider scriptProvider, IIdGenerator idGenerator) : IGameService
 {
     private const string Now = "now";
     private const string Already = "already";
@@ -36,8 +36,9 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
             : (false, $"Game ID '{gameId}' failed to be deleted");
     }
 
-    public (bool success, GamePerspective? gamePerspective, string message) StartNewGame(string guildId, string gameId, string userId)
+    public (bool success, GamePerspective? gamePerspective, string message) StartNewGame(string guildId, string userId)
     {
+        var gameId = idGenerator.GenerateGameId();
         var guild = bot.GetGuild(guildId);
         if (guild is null) return (false, null, "Couldn't find guild");
         var user = guild.GetUser(userId);

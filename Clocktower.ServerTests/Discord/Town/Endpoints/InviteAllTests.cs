@@ -1,6 +1,7 @@
 ﻿using Clocktower.Server.Discord.Town.Endpoints;
 using Clocktower.Server.Discord.Town.Endpoints.Validation;
 using Clocktower.Server.Discord.Town.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace Clocktower.ServerTests.Discord.Town.Endpoints;
 
@@ -8,11 +9,17 @@ namespace Clocktower.ServerTests.Discord.Town.Endpoints;
 public class InviteAllTests
 {
     private Mock<IDiscordTownService> _mockDiscordTownService = null!;
+    private Mock<IConfiguration> _mockConfiguration = null!;
 
     [TestInitialize]
     public void SetUp()
     {
         _mockDiscordTownService = new Mock<IDiscordTownService>();
+        _mockConfiguration = StrictMockFactory.Create<IConfiguration>();
+
+        var mockConfigSection = new Mock<IConfigurationSection>();
+        mockConfigSection.Setup(s => s.Value).Returns("true");
+        _mockConfiguration.Setup(c => c.GetSection("Discord:SendInvites")).Returns(mockConfigSection.Object);
     }
 
     [TestMethod]
@@ -38,7 +45,7 @@ public class InviteAllTests
         var request = new GameIdRequest(gameId);
         _mockDiscordTownService.Setup(o => o.InviteAll(request.GameId, true)).ReturnsAsync(error);
 
-        var result = await InviteAll.Handle(request, _mockDiscordTownService.Object);
+        var result = await InviteAll.Handle(request, _mockDiscordTownService.Object, _mockConfiguration.Object);
 
         _mockDiscordTownService.Verify(o => o.InviteAll(request.GameId, true), Times.Once);
 
@@ -54,7 +61,7 @@ public class InviteAllTests
         var request = new GameIdRequest(gameId);
         _mockDiscordTownService.Setup(o => o.InviteAll(request.GameId, true)).ReturnsAsync(error);
 
-        var result = await InviteAll.Handle(request, _mockDiscordTownService.Object);
+        var result = await InviteAll.Handle(request, _mockDiscordTownService.Object, _mockConfiguration.Object);
 
         _mockDiscordTownService.Verify(o => o.InviteAll(request.GameId, true), Times.Once);
 
@@ -65,14 +72,14 @@ public class InviteAllTests
     [TestMethod]
     public async Task Handle_ReturnsOk_WhenServiceSendsInvite()
     {
-        const string gameId = "test";
+        const string gameId = "game-id";
         var request = new GameIdRequest(gameId);
         var success = Result.Ok("response message");
-        _mockDiscordTownService.Setup(o => o.InviteAll(request.GameId, false)).ReturnsAsync(success);
+        _mockDiscordTownService.Setup(o => o.InviteAll(request.GameId, true)).ReturnsAsync(success);
 
-        var result = await InviteAll.Handle(request, _mockDiscordTownService.Object);
+        var result = await InviteAll.Handle(request, _mockDiscordTownService.Object, _mockConfiguration.Object);
 
-        _mockDiscordTownService.Verify(o => o.InviteAll(request.GameId, false), Times.Once);
+        _mockDiscordTownService.Verify(o => o.InviteAll(request.GameId, true), Times.Once);
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.Value.Should().Be(success.Value);
     }
