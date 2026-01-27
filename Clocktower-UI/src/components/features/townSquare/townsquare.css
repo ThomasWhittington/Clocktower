@@ -23,12 +23,14 @@
     }
 
     .player-action-menu {
-        @apply absolute z-50 bg-neutral-900 border border-neutral-700 rounded-lg shadow-2xl overflow-hidden;
+        @apply absolute z-100 bg-neutral-900 border border-neutral-700 rounded-lg shadow-2xl overflow-hidden ;
         min-width: 10vmin;
         max-height: 30vmin;
         overflow-y: auto;
         border-width: 0.1vmin;
         border-radius: 0.8vmin;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
     .player-name-container:has(+ .avatar-container) .player-action-menu {
@@ -39,6 +41,16 @@
     .player-name-container:not(:has(+ .avatar-container)) .player-action-menu {
         bottom: 100%;
         margin-bottom: 0.5vmin;
+    }
+
+    .player-name-container:has(+ .avatar-container) {
+        bottom: 100%;
+        margin-bottom: 0.5vmin;
+    }
+
+    .player-name-container:not(:has(+ .avatar-container)) {
+        top: 100%;
+        margin-top: 0.5vmin;
     }
 
     .player-action-menu-header {
@@ -72,11 +84,11 @@
     }
 
     .player-name-container {
-        @apply flex flex-col items-center select-none;
+        @apply flex flex-col absolute items-center select-none left-1/2 -translate-x-1/2;
 
         > button {
             @apply rounded-md text-center transition-colors cursor-pointer border border-transparent active:border-white/20 bg-neutral-800/70;
-            font-size: 1.5vmin;
+            font-size: 2vmin;
             padding: 0.8vmin 1.5vmin;
             border-width: 0.1vmin;
 
@@ -86,6 +98,10 @@
         }
     }
 
+    .player-name-container:has(.player-action-menu) {
+        z-index: 100;
+    }
+
     .player-icon {
         --player-x: 0px;
         --player-y: 0px;
@@ -93,6 +109,11 @@
         @apply absolute top-1/2 left-1/2 flex flex-col items-center gap-1.5 transition-transform duration-700 ease-out;
         transform: translate(-50%, -50%) translate(var(--player-x), var(--player-y));
     }
+
+    .player-icon.has-tooltip {
+        z-index: 30;
+    }
+
 
     .clickable-portrait {
         @apply absolute inset-0 flex items-center justify-center bg-black/60 rounded-full cursor-pointer hover:bg-black/40 transition-colors z-10 select-none;
@@ -208,4 +229,36 @@
         background: #999;
     }
 
+    .role-description-tooltip {
+        @apply absolute pointer-events-none;
+        z-index: 30;
+        width: max-content;
+        max-width: min(400px, 90vw);
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .role-description-tooltip.top-half {
+        top: calc(100% + 1.5vmin);
+    }
+
+    .role-description-tooltip.bottom-half {
+        bottom: calc(100% + 1.5vmin);
+    }
+
+    .role-description-content {
+        @apply bg-neutral-900/80 text-white p-4 rounded-lg shadow-2xl border border-neutral-700;
+        min-width: 250px;
+        max-width: 400px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .role-description-content strong {
+        @apply block mb-2 text-lg font-bold;
+    }
+
+    .role-description-content p {
+        @apply text-sm text-neutral-200;
+    }
 }
