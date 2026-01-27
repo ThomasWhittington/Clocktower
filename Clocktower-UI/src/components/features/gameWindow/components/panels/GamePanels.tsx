@@ -1,5 +1,6 @@
 ﻿import {
     NightOrderPanel,
+    PaperPanel,
     RoleListPanel,
     RolePlannerPanel,
     ScriptManagerPanel,
@@ -38,6 +39,7 @@ export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, set
             <ScriptManagerPanel isOpen={isPanelOpen('script')} onClose={closePanel}/>
             <RoleListPanel isOpen={isPanelOpen('role')} onClose={closePanel}/>
             <NightOrderPanel isOpen={isPanelOpen('night')} onClose={closePanel}/>
+            <PaperPanel isOpen={isPanelOpen('paper')} onClose={closePanel}/>
             <RolePlannerPanel isOpen={isPanelOpen('rolePlanner')} onClose={closePanel} setIsDraftMode={setIsDraftMode} setSelectedRoles={setSelectedRoles} selectedRoles={selectedRoles}/>
 
             {tokenData && (

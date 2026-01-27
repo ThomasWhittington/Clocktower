@@ -61,8 +61,7 @@ export function useGameWindowShortcuts({
 
     useKeyboardShortcut({
         key: 'p',
-        onKeyPress: () => togglePanel('rolePlanner'),
-        enabled: isStoryTeller && hasScript
+        onKeyPress: () => togglePanel('paper')
     });
 
     useKeyboardShortcut({

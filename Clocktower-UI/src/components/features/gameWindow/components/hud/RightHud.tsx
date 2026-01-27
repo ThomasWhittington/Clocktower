@@ -9,12 +9,14 @@ import {useCurrentUserIsStoryteller} from "@/components/features/discordTownPane
 interface RightHudProps {
     onRoleListClick: () => void;
     onNightOrderClick: () => void;
+    onPaperClick: () => void;
     onForceUpdateClick: () => void;
 }
 
 export const RightHud = ({
                              onRoleListClick,
                              onNightOrderClick,
+                             onPaperClick,
                              onForceUpdateClick
                          }: RightHudProps) => {
     const {isOpen, toggle, close, dropdownRef} = useDropdown();
@@ -45,6 +47,13 @@ export const RightHud = ({
                         }}>
                             <span>Night Order</span>
                             <span>[N]</span>
+                        </button>
+                        <button type="button" onClick={() => {
+                            onPaperClick();
+                            close();
+                        }}>
+                            <span>Paper</span>
+                            <span>[P]</span>
                         </button>
                         {isStoryteller &&
                             <button type="button" className="text-discord-warning" onClick={() => {

@@ -7,12 +7,15 @@ interface AppState {
     gameId: string | null,
     joinedGameId: string | null,
     currentUser?: User,
+    paperNotes: Record<string, string>;
     jwt: string | null;
     setGuildId: (value: string) => void;
     setGameId: (value: string | null) => void;
     setJoinedGameId: (value: string | null) => void;
     setCurrentUser: (value: User) => void;
     setJwt: (value: string | undefined) => void;
+    setPaperNote: (gameId: string, content: string) => void;
+    getPaperNote: (gameId: string) => string;
     clearSession: () => void;
     reset: () => void;
 }
@@ -66,7 +69,14 @@ const setStoredJoinedGameId = (id: string | null) => {
     }
 };
 
+const getStoredPaperNotes = (): Record<string, string> => {
+    const stored = localStorage.getItem('paperNotes');
+    return stored ? JSON.parse(stored) : {};
+};
 
+const setStoredPaperNotes = (notes: Record<string, string>) => {
+    localStorage.setItem('paperNotes', JSON.stringify(notes));
+};
 const getStoredUser = (): User | undefined => {
     const stored = localStorage.getItem('currentUser');
     return stored ? JSON.parse(stored) : undefined;
@@ -85,16 +95,18 @@ const getInitialState = () => ({
     gameId: '',
     currentUser: undefined,
     jwt: undefined,
+    paperNotes: {}
 });
 
 export const useAppStore = create<AppState>(
-    (set) => ({
+    (set, get) => ({
         guildId: getStoredGuildId(),
         gameId: getStoredGameId(),
         joinedGameId: getStoredJoinedGameId(),
         jwt: getStoredJwt(),
         currentUser: getStoredUser(),
         loggedIn: getLoggedIn(),
+        paperNotes: getStoredPaperNotes(),
         setGuildId: (id) => {
             setStoredGuildId(id);
             set(() => ({guildId: id}));
@@ -114,6 +126,14 @@ export const useAppStore = create<AppState>(
         setJwt: (jwt) => {
             setStoredJwt(jwt);
             set(() => ({jwt}));
+        },
+        setPaperNote: (gameId, content) => {
+            const notes = {...get().paperNotes, [gameId]: content};
+            setStoredPaperNotes(notes);
+            set({paperNotes: notes});
+        },
+        getPaperNote: (gameId) => {
+            return get().paperNotes[gameId] || '';
         },
         clearSession: () => {
             clearStoredSession();

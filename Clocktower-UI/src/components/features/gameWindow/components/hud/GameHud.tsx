@@ -53,6 +53,7 @@ export function GameHud({
             <RightHud
                 onRoleListClick={() => script && togglePanel('role')}
                 onNightOrderClick={() => script && togglePanel('night')}
+                onPaperClick={() => togglePanel('paper')}
                 onForceUpdateClick={forceUpdateGame}
             />
             <BottomHud scriptName={script?.name} storyTellers={discordTown?.storyTellers ?? []}/>
