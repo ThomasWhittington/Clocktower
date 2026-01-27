@@ -12,7 +12,7 @@ public class ForceUpdateTests
     [TestInitialize]
     public void SetUp()
     {
-        _mockAdminService = new Mock<IAdminService>();
+        _mockAdminService = StrictMockFactory.Create<IAdminService>();
     }
 
     [TestMethod]

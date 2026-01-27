@@ -29,7 +29,11 @@ export function GameHud({
                         }: Readonly<GameHudProps>) {
     const {discordTown} = useDiscordTown();
     const {forceUpdate} = adminService;
-    const forceUpdateGame = () => forceUpdate(discordTown?.gameId!);
+    const forceUpdateGame = () => {
+        if (discordTown?.gameId) {
+            void forceUpdate(discordTown.gameId);
+        }
+    };
     return (
         <>
             {isStoryteller && (

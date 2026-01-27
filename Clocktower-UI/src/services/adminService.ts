@@ -14,7 +14,7 @@ async function health() {
 
     if (error) {
         console.error('Failed to verify health of server:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     return {
@@ -36,7 +36,7 @@ async function forceUpdate(gameId: string) {
 
     if (error) {
         console.error('Failed to force game update:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     return data;
