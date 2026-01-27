@@ -409,5 +409,12 @@
         }
     }
 
+    .paper-textarea {
+        @apply w-full h-full p-2 text-lg overflow-y-auto outline-none bg-white/10 border-2 border-white/20 rounded-lg resize-none;
 
+        &:focus,
+        &:focus-visible {
+            @apply outline-none border-white/40 bg-white/15;
+        }
+    }
 }
