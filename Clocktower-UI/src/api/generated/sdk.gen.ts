@@ -896,7 +896,7 @@ export const startGameApi = <ThrowOnError extends boolean = false>(options: Opti
                 type: 'http'
             }
         ],
-        url: '/api/games/{gameId}/start/{guildId}/{userId}',
+        url: '/api/games/start/{guildId}/{userId}',
         ...options
     });
 };

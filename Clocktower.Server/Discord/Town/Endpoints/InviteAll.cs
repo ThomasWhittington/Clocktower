@@ -14,9 +14,11 @@ public class InviteAll : IEndpoint
 
     internal static async Task<Results<Ok<string>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle(
         [AsParameters] GameIdRequest request,
-        [FromServices] IDiscordTownService discordTownService)
+        [FromServices] IDiscordTownService discordTownService,
+        [FromServices] IConfiguration configuration
+    )
     {
-        bool sendInvite = !request.GameId.StartsWith("test");
+        bool sendInvite = configuration.GetValue("Discord:SendInvites", false);
         var result = await discordTownService.InviteAll(request.GameId, sendInvite);
         return result.ToHttpResult();
     }

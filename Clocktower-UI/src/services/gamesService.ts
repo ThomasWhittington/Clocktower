@@ -42,7 +42,7 @@ async function getGames(): Promise<GamePerspective[]> {
     return data?.map(mapToGamePerspective) ?? [];
 }
 
-async function startGame(gameId: string, guildId: string, userId: string): Promise<GamePerspective | null> {
+async function startGame(guildId: string, userId: string): Promise<GamePerspective | null> {
     const {
         data,
         error
@@ -50,7 +50,6 @@ async function startGame(gameId: string, guildId: string, userId: string): Promi
         client: apiClient,
         path: {
             guildId: guildId,
-            gameId: gameId,
             userId: userId
         }
     });
@@ -273,7 +272,7 @@ async function setRole(gameId: string, targetUserId: string, roleId: string | un
         path: {
             gameId: gameId,
             targetUserId: targetUserId,
-            roleId: roleId ?? '' 
+            roleId: roleId ?? ''
         }
     });
 
@@ -361,6 +360,7 @@ async function setDraftRoles(gameId: string, playerRoles: Record<string, string>
 
     return data;
 }
+
 const scriptSelectToString = (scriptSelect: ScriptSelect): ClocktowerServerDataTypesEnumScriptSelect => {
     switch (scriptSelect) {
         case ScriptSelect.Unknown:
