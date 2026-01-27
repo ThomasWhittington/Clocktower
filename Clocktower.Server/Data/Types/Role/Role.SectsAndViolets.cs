@@ -27,7 +27,7 @@ public partial record Role
         .EachNight(20, 11, "The Snake Charmer selects a player. If that player is the Demon: swap the Demon and Snake Charmer character and alignments. Wake each player to inform them of their new role and alignment. The new Snake Charmer is poisoned.")
         .WithReminders("Poisoned");
 
-    public static Role Mathematician => SectsAndVioletsTownsfolk("Mathematician", "Each night, you learn how many players's abilities worked abnormally (since dawn) due to another character's ability.")
+    public static Role Mathematician => SectsAndVioletsTownsfolk("Mathematician", "Each night, you learn how many players' abilities worked abnormally (since dawn) due to another character's ability.")
         .EachNight(52, 71, "Give the Mathematician the number of players whose ability malfunctioned due to other abilities.")
         .WithReminders("Abnormal");
 
@@ -40,7 +40,7 @@ public partial record Role
         .WithReminders("Minion Nominated", "Minions Not Nominated");
 
     public static Role Oracle => SectsAndVioletsTownsfolk("Oracle", "Each night*, you learn how many dead players are evil.")
-        .OtherNight(59, "Give the Oracle the number players that are evil.");
+        .OtherNight(59, "Give the Oracle the number of players that are evil.");
 
     public static Role Savant => SectsAndVioletsTownsfolk("Savant", "Each day, you may visit the Storyteller to learn 2 things in private: 1 is true & 1 is false.");
 
@@ -49,14 +49,14 @@ public partial record Role
         .WithReminders("No Ability");
 
     public static Role Philosopher => SectsAndVioletsTownsfolk("Philosopher", "Once per game, at night, choose a good character: gain that ability. If this character is in play, they become drunk.")
-        .EachNight(2, 2, "As the Philosopher if they would like to use their ability. If yes, they pick a good character and gain that ability (they are still the philosopher). If the selected role is already in play, the existing player becomes drunk.")
+        .EachNight(2, 2, "Ask the Philosopher if they would like to use their ability. If yes, they pick a good character and gain that ability (they are still the philosopher). If the selected role is already in play, the existing player becomes drunk.")
         .WithReminders("Is the Philosopher", "Drunk");
 
     public static Role Artist => SectsAndVioletsTownsfolk("Artist", "Once per game, during the day, privately ask the Storyteller any yes/no question.")
         .WithReminders("No Ability");
 
     public static Role Juggler => SectsAndVioletsTownsfolk("Juggler", "On your 1st day, publicly guess up to 5 players' characters. That night, you learn how many you got correct.")
-        .OtherNight(61, "If today was the jugglers first day: Give them the number of correct guesses they made.")
+        .OtherNight(61, "If today was the Juggler's first day: Give them the number of correct guesses they made.")
         .WithReminders("Correct");
 
     public static Role Sage => SectsAndVioletsTownsfolk("Sage", "If the Demon kills you, you learn 2 players, one of which is the Demon.")
@@ -65,7 +65,7 @@ public partial record Role
     public static Role Mutant => SectsAndVioletsOutsider("Mutant", "If you are \"mad\" about being an Outsider, you might be EXECUTED");
 
     public static Role Barber => SectsAndVioletsOutsider("Barber", "If you died today or tonight, the Demon may choose 2 players (not another Demon) to swap characters.")
-        .OtherNight(40, "If the barber died today, tell the Demon the barber has died. As the demon if they wish to use the ability given by the barber. If yes, they choose 2 players (not another Demon) to swap characters. Wake them players and inform them of their new role. Their alignments are not affected.")
+        .OtherNight(40, "If the barber died today, tell the Demon the barber has died. As the demon if they wish to use the ability given by the barber. If yes, they choose 2 players (not another Demon) to swap characters. Wake those players and inform them of their new role. Their alignments are not affected.")
         .WithReminders("Haircuts tonight");
 
     public static Role Sweetheart => SectsAndVioletsOutsider("Sweetheart", "When you die, 1 player is drunk from now on.")
@@ -87,10 +87,10 @@ public partial record Role
         .OtherNight(16, "The pithag chooses a player and a character. If this character is not in play, wake the selected player and inform them of their new role. Their alignments are not affected.");
 
     public static Role EvilTwin => SectsAndVioletsMinion("Evil Twin", "You & an opposing player know each other. If the good player is executed, evil wins. Good can't win if you both live.")
-        .FirstNight(23, "Wake the evil twin and inform them of the good twin and the good twins role. Wake the good twin, inform them that they are the good twin and inform them who the evil twin is.")
+        .FirstNight(23, "Wake the evil twin and inform them of the good twin and the good twin's role. Wake the good twin, inform them that they are the good twin and inform them who the evil twin is.")
         .WithReminders("Twin");
 
-    public static Role FangGu => SectsAndVioletsDemon("Fang Gu", "Each night*, choose a player, they die. The 1st outsider this kills becomes and evil Fang Gu and you die instead. [+1 Outsider]")
+    public static Role FangGu => SectsAndVioletsDemon("Fang Gu", "Each night*, choose a player, they die. The 1st outsider this kills becomes an evil Fang Gu and you die instead. [+1 Outsider]")
         .OtherNight(29, "The Fang Gu chooses a player. If this player is not an outsider: they die. If this player is an outsider, the Fang Gu dies then wake them and inform them that they are now an evil Fang Gu.")
         .WithReminders("Dead", "Once")
         .AffectsSetup();
