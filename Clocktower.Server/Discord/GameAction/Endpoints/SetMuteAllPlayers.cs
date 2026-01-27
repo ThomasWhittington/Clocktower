@@ -7,7 +7,7 @@ public class SetMuteAllPlayers : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/set-mute-players/{gameId}/{muted:bool}", Handle)
-        .RequireAuthorization("StoryTellerForGame")
+        .RequireStorytellerForGame()
         .SetOpenApiOperationId<SetMuteAllPlayers>()
         .WithSummary("Sets muted status for players in game")
         .WithDescription("Sets muted status for players (not storytellers/ spectators) connected to voice for game");

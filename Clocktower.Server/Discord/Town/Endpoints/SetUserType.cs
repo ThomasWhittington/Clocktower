@@ -8,7 +8,7 @@ public class SetUserType : IEndpoint
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{gameId}/{userId}/set-type/{userType}", Handle)
         .SetOpenApiOperationId<SetUserType>()
-        .RequireAuthorization("StoryTellerForGame")
+        .RequireStorytellerForGame()
         .WithSummaryAndDescription("Sets the userType for a user")
         .WithRequestValidation<Request>();
 

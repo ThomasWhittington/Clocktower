@@ -7,7 +7,7 @@ public class CancelTimer : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapDelete("/{gameId}", Handle)
-        .RequireAuthorization("StoryTellerForGame")
+        .RequireStorytellerForGame()
         .SetOpenApiOperationId<CancelTimer>()
         .WithSummaryAndDescription("Cancels the timer for game");
 

@@ -8,6 +8,7 @@ import {
     TopHud
 } from "@/components/features/gameWindow/components";
 import {useDiscordTown} from "@/components/features/discordTownPanel/hooks";
+import {adminService} from "@/services";
 
 interface GameHudProps {
     script: Script | undefined;
@@ -27,7 +28,12 @@ export function GameHud({
                             isDraftMode
                         }: Readonly<GameHudProps>) {
     const {discordTown} = useDiscordTown();
-
+    const {forceUpdate} = adminService;
+    const forceUpdateGame = () => {
+        if (discordTown?.gameId) {
+            void forceUpdate(discordTown.gameId);
+        }
+    };
     return (
         <>
             {isStoryteller && (
@@ -47,6 +53,7 @@ export function GameHud({
             <RightHud
                 onRoleListClick={() => script && togglePanel('role')}
                 onNightOrderClick={() => script && togglePanel('night')}
+                onForceUpdateClick={forceUpdateGame}
             />
             <BottomHud storyTellers={discordTown?.storyTellers ?? []}/>
         </>

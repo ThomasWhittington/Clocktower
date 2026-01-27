@@ -1,10 +1,6 @@
-﻿export *
-    from './useDiscordTown.ts'
-export *
-    from './useUserPresenceStatus'
-export *
-    from './useUser.ts'
-export *
-    from './useDiscordActions.ts'
-export *
-    from './useTimeOfDay.ts'
+﻿export * from './useDiscordTown'
+export * from './useUserPresenceStatus'
+export * from './useUser'
+export * from './useDiscordActions'
+export * from './useTimeOfDay'
+export * from './useCurrentUserIsStoryteller'

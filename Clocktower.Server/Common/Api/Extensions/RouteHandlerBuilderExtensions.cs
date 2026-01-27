@@ -26,5 +26,10 @@ public static class RouteHandlerBuilderExtensions
                 .AddEndpointFilter<RequestValidationFilter<TRequest>>()
                 .ProducesValidationProblem();
         }
+
+        public RouteHandlerBuilder RequireStorytellerForGame()
+        {
+            return builder.RequireAuthorization("StoryTellerForGame");
+        }
     }
 }

@@ -4,9 +4,7 @@
 } from "@/components/ui/icons";
 import {DiscordUserVoiceStatus} from "@/components/ui";
 import type {User} from "@/types";
-import {UserUtils} from "@/utils";
-import {useAppStore} from "@/store";
-import {useUser} from "@/components/features/discordTownPanel/hooks";
+import {useCurrentUserIsStoryteller} from "@/components/features/discordTownPanel/hooks";
 import {usePlayerBadgeActions} from "@/components/features/townSquare/hooks";
 
 interface AvatarOverlaysProps {
@@ -14,9 +12,7 @@ interface AvatarOverlaysProps {
 }
 
 export function AvatarOverlays({player}: Readonly<AvatarOverlaysProps>) {
-    const {currentUser} = useAppStore();
-    const {thisUser} = useUser(currentUser?.id);
-    const isStoryteller = UserUtils.isStoryTeller(thisUser);
+    const isStoryteller = useCurrentUserIsStoryteller();
     const {handleShroudClick, handleVoteTokenClick} = usePlayerBadgeActions(player);
 
     return (

@@ -1,4 +1,9 @@
-﻿import {cancelTimerApi, healthApi, startOrEditTimerApi} from "@/api";
+﻿import {
+    cancelTimerApi,
+    forceUpdateApi,
+    healthApi,
+    startOrEditTimerApi
+} from "@/api";
 import {apiClient} from "@/api/api-client.ts";
 
 async function health() {
@@ -9,13 +14,32 @@ async function health() {
 
     if (error) {
         console.error('Failed to verify health of server:', error);
-        throw new Error(error.toString());
+        throw new Error(getMessage(error));
     }
 
     return {
         status: data?.status!,
         timeStamp: data?.timeStamp!
     };
+}
+
+async function forceUpdate(gameId: string) {
+    const {
+        data,
+        error
+    } = await forceUpdateApi({
+        client: apiClient,
+        path: {
+            gameId: gameId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to force game update:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
 }
 
 async function startOrEditTimer(gameId: string, durationSeconds: number, label?: string) {
@@ -72,5 +96,6 @@ const getMessage = (err: unknown): string => {
 export const adminService = {
     health,
     startOrEditTimer,
-    cancelTimer
+    cancelTimer,
+    forceUpdate
 }

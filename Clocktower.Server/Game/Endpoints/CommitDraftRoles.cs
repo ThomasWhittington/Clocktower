@@ -5,7 +5,7 @@ public class CommitDraftRoles : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{gameId}/commit-draft-roles", Handle)
-        .RequireAuthorization("StoryTellerForGame")
+        .RequireStorytellerForGame()
         .SetOpenApiOperationId<CommitDraftRoles>()
         .WithSummary("Commits draft roles")
         .WithDescription("Commits the draft roles for all users in a game, moving them to the role fields.")

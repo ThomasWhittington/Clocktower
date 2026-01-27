@@ -1,8 +1,12 @@
-﻿import {DiscordAdminPanel, DiscordTownCategory} from "./components";
+﻿import {
+    DiscordAdminPanel,
+    DiscordTownCategory
+} from "./components";
 import {Spinner} from "@/components/ui";
-import {useDiscordTown, useUser} from "./hooks";
-import {useAppStore} from "@/store";
-import {UserUtils} from "@/utils";
+import {
+    useCurrentUserIsStoryteller,
+    useDiscordTown
+} from "./hooks";
 
 function DiscordTownPanel() {
     const {
@@ -10,15 +14,14 @@ function DiscordTownPanel() {
         isLoading,
         error
     } = useDiscordTown();
-    const {currentUser} = useAppStore();
-    const {thisUser} = useUser(currentUser?.id);
+    const isStoryteller = useCurrentUserIsStoryteller();
 
     return (
         <div
             id="discord-town-panel"
             className="bg-discord h-full flex flex-col justify-between pr-4">
 
-            {UserUtils.isStoryTeller(thisUser) &&
+            {isStoryteller &&
                 <DiscordAdminPanel/>
             }
 

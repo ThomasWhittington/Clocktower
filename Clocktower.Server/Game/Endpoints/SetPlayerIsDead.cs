@@ -6,7 +6,7 @@ public class SetPlayerIsDead : IEndpoint
     public static void Map(IEndpointRouteBuilder app)
     {
         app.MapPost("/{gameId}/set-player-is-dead/{userId}/{isDead:bool}", Handle)
-            .RequireAuthorization("StoryTellerForGame")
+            .RequireStorytellerForGame()
             .SetOpenApiOperationId<SetPlayerIsDead>()
             .WithSummaryAndDescription("Sets a player's dead status in the game")
             .WithRequestValidation<Request>();

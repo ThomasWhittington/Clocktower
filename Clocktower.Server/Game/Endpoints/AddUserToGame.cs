@@ -6,7 +6,7 @@ public class AddUserToGame : IEndpoint
     public static void Map(IEndpointRouteBuilder app)
     {
         app.MapPost("/{gameId}/add-user/{userId}", Handle)
-            .RequireAuthorization("StoryTellerForGame")
+            .RequireStorytellerForGame()
             .SetOpenApiOperationId<AddUserToGame>()
             .WithSummaryAndDescription("Adds user to the game")
             .WithRequestValidation<GameAndUserRequest>();

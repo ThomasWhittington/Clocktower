@@ -7,7 +7,7 @@ public class GetTimer : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/{gameId}", Handle)
-        .RequireAuthorization("StoryTellerForGame")
+        .RequireStorytellerForGame()
         .SetOpenApiOperationId<GetTimer>()
         .WithSummaryAndDescription("Gets the timer state for game");
 

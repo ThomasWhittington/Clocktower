@@ -4,18 +4,21 @@
 } from "@/components/ui";
 import {HelpIcon} from "@/components/ui/icons";
 import {useDropdown} from "@/hooks";
+import {useCurrentUserIsStoryteller} from "@/components/features/discordTownPanel/hooks";
 
-interface StoryTellerHudProps {
+interface RightHudProps {
     onRoleListClick: () => void;
     onNightOrderClick: () => void;
+    onForceUpdateClick: () => void;
 }
 
 export const RightHud = ({
                              onRoleListClick,
-                             onNightOrderClick
-                         }: StoryTellerHudProps) => {
+                             onNightOrderClick,
+                             onForceUpdateClick
+                         }: RightHudProps) => {
     const {isOpen, toggle, close, dropdownRef} = useDropdown();
-
+    const isStoryteller = useCurrentUserIsStoryteller();
     return (
         <div className="controls-right">
             <DiscordUserStatus/>
@@ -43,6 +46,14 @@ export const RightHud = ({
                             <span>Night Order</span>
                             <span>[N]</span>
                         </button>
+                        {isStoryteller &&
+                            <button type="button" className="text-discord-warning" onClick={() => {
+                                onForceUpdateClick();
+                                close();
+                            }}>
+                                Force Update
+                            </button>
+                        }
                     </div>
                 )}
             </div>

@@ -18,7 +18,7 @@
             }
 
             > button {
-                @apply w-full px-4 py-2 text-white hover:bg-gray-700 rounded-t-lg transition-colors text-left flex justify-between items-center;
+                @apply w-full px-4 py-2 text-white hover:bg-gray-700 rounded-t-lg transition-colors text-left flex justify-between items-center cursor-pointer;
 
                 span:last-child {
                     @apply text-gray-400;

@@ -34,6 +34,9 @@ import type {
     DeleteTownApiData,
     DeleteTownApiErrors,
     DeleteTownApiResponses,
+    ForceUpdateApiData,
+    ForceUpdateApiErrors,
+    ForceUpdateApiResponses,
     GetAuthDataApiData,
     GetAuthDataApiErrors,
     GetAuthDataApiResponses,
@@ -149,6 +152,24 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      * used to access values that aren't defined as part of the SDK function.
      */
     meta?: Record<string, unknown>;
+};
+
+/**
+ * Forces a game update to be sent to all users
+ *
+ * Forces a game update to be sent to all users
+ */
+export const forceUpdateApi = <ThrowOnError extends boolean = false>(options: Options<ForceUpdateApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<ForceUpdateApiResponses, ForceUpdateApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/admin/force-update/{gameId}',
+        ...options
+    });
 };
 
 /**
