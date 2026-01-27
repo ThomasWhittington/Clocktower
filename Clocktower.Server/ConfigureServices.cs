@@ -63,7 +63,7 @@ public static class ConfigureServices
 
             builder.Services.Configure<Secrets>(builder.Configuration.GetSection(nameof(Secrets)));
 
-            builder.Services.AddSingleton<IIdGenerator, GuidIdGenerator>();
+            builder.Services.AddSingleton<IIdGenerator, IdGenerator>();
             builder.Services.AddSingleton<IUserService, UserService>();
             builder.Services.AddSingleton<IJwtWriter, JwtWriter>();
             builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();

@@ -15,7 +15,6 @@ public class StartGameTests
     private const string ResponseMessage = "Response";
 
     private static StartGame.Request GetRandomRequest() => new(
-        CommonMethods.GetRandomString(),
         CommonMethods.GetRandomSnowflakeStringId(),
         CommonMethods.GetRandomSnowflakeStringId()
     );
@@ -23,7 +22,7 @@ public class StartGameTests
     private void MockResponse(bool success, GamePerspective? gamePerspective, bool getTownSuccess)
     {
         _mockGameService.Setup(o =>
-                o.StartNewGame(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                o.StartNewGame(It.IsAny<string>(), It.IsAny<string>()))
             .Returns((success, gamePerspective, ResponseMessage));
         _mockDiscordTownService.Setup(o => o.GetDiscordTown(It.IsAny<string>())).ReturnsAsync((getTownSuccess, null, "message"));
     }
@@ -43,7 +42,7 @@ public class StartGameTests
         StartGame.Map(builder);
 
 
-        builder.GetEndpoint("/{gameId}/start/{guildId}/{userId}")
+        builder.GetEndpoint("/start/{guildId}/{userId}")
             .ShouldHaveMethod(HttpMethod.Post)
             .ShouldHaveOperationId("startGameApi")
             .ShouldHaveSummaryAndDescription("Starts new game perspective for id")
@@ -58,7 +57,7 @@ public class StartGameTests
 
         var result = await StartGame.Handle(request, _mockGameService.Object, _mockDiscordTownService.Object, _mockLogger.Object);
 
-        _mockGameService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), request.UserId), Times.Once);
+        _mockGameService.Verify(o => o.StartNewGame(request.GuildId, request.UserId), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
@@ -74,7 +73,7 @@ public class StartGameTests
 
         var result = await StartGame.Handle(request, _mockGameService.Object, _mockDiscordTownService.Object, _mockLogger.Object);
 
-        _mockGameService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), request.UserId), Times.Once);
+        _mockGameService.Verify(o => o.StartNewGame(request.GuildId, request.UserId), Times.Once);
         var response = result.Result.Should().BeOfType<Created<GamePerspective>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.Created);
         response.Location.Should().Be($"/games/{gamePerspective.Id}");
@@ -89,7 +88,7 @@ public class StartGameTests
         MockResponse(true, gamePerspective, false);
 
         var result = await StartGame.Handle(request, _mockGameService.Object, _mockDiscordTownService.Object, _mockLogger.Object);
-        _mockGameService.Verify(o => o.StartNewGame(request.GuildId, request.GameId.Trim(), request.UserId), Times.Once);
+        _mockGameService.Verify(o => o.StartNewGame(request.GuildId, request.UserId), Times.Once);
 
         _mockLogger.Verify(
             x => x.Log(

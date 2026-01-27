@@ -1395,12 +1395,11 @@ export type SetTimeApiResponse = SetTimeApiResponses[keyof SetTimeApiResponses];
 export type StartGameApiData = {
     body?: never;
     path: {
-        gameId: string;
         guildId: string;
         userId: string;
     };
     query?: never;
-    url: '/api/games/{gameId}/start/{guildId}/{userId}';
+    url: '/api/games/start/{guildId}/{userId}';
 };
 
 export type StartGameApiErrors = {

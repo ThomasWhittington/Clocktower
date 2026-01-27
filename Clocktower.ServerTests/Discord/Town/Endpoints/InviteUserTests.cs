@@ -2,6 +2,7 @@
 using Clocktower.Server.Discord.Town.Endpoints;
 using Clocktower.Server.Discord.Town.Endpoints.Validation;
 using Clocktower.Server.Discord.Town.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace Clocktower.ServerTests.Discord.Town.Endpoints;
 
@@ -9,11 +10,17 @@ namespace Clocktower.ServerTests.Discord.Town.Endpoints;
 public class InviteUserTests
 {
     private Mock<IDiscordTownService> _mockDiscordTownService = null!;
+    private Mock<IConfiguration> _mockConfiguration = null!;
 
     [TestInitialize]
     public void SetUp()
     {
         _mockDiscordTownService = new Mock<IDiscordTownService>();
+        _mockConfiguration = StrictMockFactory.Create<IConfiguration>();
+
+        var mockConfigSection = new Mock<IConfigurationSection>();
+        mockConfigSection.Setup(s => s.Value).Returns("true");
+        _mockConfiguration.Setup(c => c.GetSection("Discord:SendInvites")).Returns(mockConfigSection.Object);
     }
 
     [TestMethod]
@@ -41,7 +48,7 @@ public class InviteUserTests
         var request = new GameAndUserRequest(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId());
         _mockDiscordTownService.Setup(o => o.InviteUser(request.GameId.Trim(), request.UserId, true)).ReturnsAsync((inviteUserOutcome, responseMessage));
 
-        var result = await InviteUser.Handle(request, _mockDiscordTownService.Object);
+        var result = await InviteUser.Handle(request, _mockDiscordTownService.Object, _mockConfiguration.Object);
 
         _mockDiscordTownService.Verify(o => o.InviteUser(request.GameId.Trim(), request.UserId, true), Times.Once);
 
@@ -59,7 +66,7 @@ public class InviteUserTests
         var request = new GameAndUserRequest(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId());
         _mockDiscordTownService.Setup(o => o.InviteUser(request.GameId.Trim(), request.UserId, true)).ReturnsAsync((inviteUserOutcome, responseMessage));
 
-        var result = await InviteUser.Handle(request, _mockDiscordTownService.Object);
+        var result = await InviteUser.Handle(request, _mockDiscordTownService.Object, _mockConfiguration.Object);
 
         _mockDiscordTownService.Verify(o => o.InviteUser(request.GameId.Trim(), request.UserId, true), Times.Once);
 
@@ -72,12 +79,12 @@ public class InviteUserTests
     public async Task Handle_ReturnsOk_WhenServiceSendsInvite()
     {
         const string responseMessage = "response message";
-        var request = new GameAndUserRequest("test1", CommonMethods.GetRandomSnowflakeStringId());
-        _mockDiscordTownService.Setup(o => o.InviteUser(request.GameId.Trim(), request.UserId, false)).ReturnsAsync((InviteUserOutcome.InviteSent, responseMessage));
+        var request = new GameAndUserRequest(CommonMethods.GetRandomString(), CommonMethods.GetRandomSnowflakeStringId());
+        _mockDiscordTownService.Setup(o => o.InviteUser(request.GameId.Trim(), request.UserId, true)).ReturnsAsync((InviteUserOutcome.InviteSent, responseMessage));
 
-        var result = await InviteUser.Handle(request, _mockDiscordTownService.Object);
+        var result = await InviteUser.Handle(request, _mockDiscordTownService.Object, _mockConfiguration.Object);
 
-        _mockDiscordTownService.Verify(o => o.InviteUser(request.GameId.Trim(), request.UserId, false), Times.Once);
+        _mockDiscordTownService.Verify(o => o.InviteUser(request.GameId.Trim(), request.UserId, true), Times.Once);
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.OK);
         response.Value.Should().Be(responseMessage);
