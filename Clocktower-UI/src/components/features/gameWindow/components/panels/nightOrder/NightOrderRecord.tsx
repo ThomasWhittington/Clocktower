@@ -1,4 +1,8 @@
-﻿import {Role, RoleType, User} from "@/types";
+﻿import {
+    Role,
+    RoleType,
+    User
+} from "@/types";
 import {TokenRoleIcon} from "@/components/tokens";
 
 interface NightOrderRecordProps {
@@ -14,6 +18,8 @@ export const NightOrderRecord = ({night, role, players}: NightOrderRecordProps) 
         ? players.filter(player => player.role?.type === role.type)
         : players.filter(player => player.role?.id === role.id);
 
+    const reminder = night === "first" ? role.firstNightReminder : role.otherNightReminder;
+    
     return (
         <div className={`night-order-record ${night} ${RoleType[role.type].toLowerCase()}`}>
             {night === 'other' && <TokenRoleIcon role={role} className="role-icon"/>}
@@ -29,7 +35,7 @@ export const NightOrderRecord = ({night, role, players}: NightOrderRecordProps) 
                 </span>
             </span>
             {night === 'first' && <TokenRoleIcon role={role} className="role-icon"/>}
-            <span className="role-ability">{role.description}</span>
+            {reminder && <span className="role-ability">{reminder}</span>}
         </div>
     )
 };

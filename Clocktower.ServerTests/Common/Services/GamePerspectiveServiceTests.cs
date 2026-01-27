@@ -290,7 +290,7 @@ public class GamePerspectiveServiceTests
         var user = new GameUser(UserId1) { UserType = UserType.Player };
         _sut.InitializeGame(GameId1, GuildId, user);
 
-        var result = _sut.UpdatePrivateUser(GameId1, UserId2, new PrivateGameUserUpdate { Role = Role.Gunslinger() });
+        var result = _sut.UpdatePrivateUser(GameId1, UserId2, new PrivateGameUserUpdate { Role = Role.Gunslinger });
 
         result.Should().BeFalse();
     }
@@ -309,7 +309,7 @@ public class GamePerspectiveServiceTests
     [TestMethod]
     public void UpdatePrivateUser_ReturnsFalse_WhenRoleAlreadyMatches()
     {
-        var role = Role.Gunslinger();
+        var role = Role.Gunslinger;
         var user = new GameUser(UserId1) { UserType = UserType.Player, Role = role };
         _sut.InitializeGame(GameId1, GuildId, user);
 
@@ -323,7 +323,7 @@ public class GamePerspectiveServiceTests
     {
         var user = new GameUser(UserId1) { UserType = UserType.Player };
         _sut.InitializeGame(GameId1, GuildId, user);
-        var newRole = Role.Gunslinger();
+        var newRole = Role.Gunslinger;
 
         var result = _sut.UpdatePrivateUser(GameId1, UserId1, new PrivateGameUserUpdate { Role = newRole });
 
@@ -339,7 +339,7 @@ public class GamePerspectiveServiceTests
         var player = new GameUser(UserId2) { UserType = UserType.Player };
         _sut.InitializeGame(GameId1, GuildId, storyTeller);
         _sut.AddUserToGame(GameId1, player);
-        var newRole = Role.Gunslinger();
+        var newRole = Role.Gunslinger;
 
         _sut.UpdatePrivateUser(GameId1, UserId2, new PrivateGameUserUpdate { Role = newRole });
 
@@ -359,7 +359,7 @@ public class GamePerspectiveServiceTests
         _sut.InitializeGame(GameId1, GuildId, storyTeller);
         _sut.AddUserToGame(GameId1, player1);
         _sut.AddUserToGame(GameId1, player2);
-        var newRole = Role.Gunslinger();
+        var newRole = Role.Gunslinger;
 
         _sut.UpdatePrivateUser(GameId1, UserId2, new PrivateGameUserUpdate { Role = newRole });
 
@@ -381,7 +381,7 @@ public class GamePerspectiveServiceTests
         _sut.AddUserToGame(GameId1, player1);
         _sut.AddUserToGame(GameId1, player2);
 
-        var result = _sut.SetRoleOnPerspective(GameId1, UserId4, UserId2, Role.Gunslinger());
+        var result = _sut.SetRoleOnPerspective(GameId1, UserId4, UserId2, Role.Gunslinger);
 
         result.Should().BeFalse();
     }
@@ -405,14 +405,14 @@ public class GamePerspectiveServiceTests
     public void SetRoleOnPerspective_ReturnsFalse_WhenNoChangeRequired_SameRole()
     {
         var storyTeller = new GameUser(UserId1) { UserType = UserType.StoryTeller };
-        var player1 = new GameUser(UserId2) { UserType = UserType.Player, Role = Role.Gunslinger() };
+        var player1 = new GameUser(UserId2) { UserType = UserType.Player, Role = Role.Gunslinger };
         var player2 = new GameUser(UserId3) { UserType = UserType.Player };
         _sut.InitializeGame(GameId1, GuildId, storyTeller);
         _sut.AddUserToGame(GameId1, player1);
         _sut.AddUserToGame(GameId1, player2);
-        _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, Role.Gunslinger());
+        _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, Role.Gunslinger);
 
-        var result = _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, Role.Gunslinger());
+        var result = _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, Role.Gunslinger);
 
         result.Should().BeFalse();
     }
@@ -421,23 +421,23 @@ public class GamePerspectiveServiceTests
     public void SetRoleOnPerspective_ReturnsTrue_WhenChangesMade()
     {
         var storyTeller = new GameUser(UserId1) { UserType = UserType.StoryTeller };
-        var player1 = new GameUser(UserId2) { UserType = UserType.Player, Role = Role.Gunslinger() };
+        var player1 = new GameUser(UserId2) { UserType = UserType.Player, Role = Role.Gunslinger };
         var player2 = new GameUser(UserId3) { UserType = UserType.Player };
         _sut.InitializeGame(GameId1, GuildId, storyTeller);
         _sut.AddUserToGame(GameId1, player1);
         _sut.AddUserToGame(GameId1, player2);
-        _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, Role.Gunslinger());
+        _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, Role.Gunslinger);
 
-        var result = _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, Role.Baron());
+        var result = _sut.SetRoleOnPerspective(GameId1, UserId3, UserId2, Role.Baron);
 
         result.Should().BeTrue();
 
         var stPerspective = _sut.GetPerspective(GameId1, UserId1);
         stPerspective!.Users.First(u => u.Id == UserId1).Role.Should().BeNull();
         var player1Perspective = _sut.GetPerspective(GameId1, UserId2);
-        player1Perspective!.Users.First(u => u.Id == UserId2).Role.Should().Be(Role.Gunslinger());
+        player1Perspective!.Users.First(u => u.Id == UserId2).Role.Should().Be(Role.Gunslinger);
         var player2Perspective = _sut.GetPerspective(GameId1, UserId3);
-        player2Perspective!.Users.First(u => u.Id == UserId2).Role.Should().Be(Role.Baron());
+        player2Perspective!.Users.First(u => u.Id == UserId2).Role.Should().Be(Role.Baron);
     }
 
     #endregion
@@ -516,7 +516,7 @@ public class GamePerspectiveServiceTests
     public void AddUserToGame_PlayerSeesPublicUserDataOfOtherPlayers()
     {
         var storyTeller = new GameUser(UserId1) { UserType = UserType.StoryTeller };
-        var player1 = new GameUser(UserId2) { UserType = UserType.Player, Role = Role.Gunslinger() };
+        var player1 = new GameUser(UserId2) { UserType = UserType.Player, Role = Role.Gunslinger };
         var player2 = new GameUser(UserId3) { UserType = UserType.Player };
         _sut.InitializeGame(GameId1, GuildId, storyTeller);
         _sut.AddUserToGame(GameId1, player1);
@@ -1135,7 +1135,7 @@ public class GamePerspectiveServiceTests
         _sut.AddUserToGame(GameId1, player2);
         _sut.AddUserToGame(GameId1, player3);
 
-        var result = _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef());
+        var result = _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef);
 
         result.Should().BeTrue();
 
@@ -1143,14 +1143,14 @@ public class GamePerspectiveServiceTests
         {
             var playerPerspective = _sut.GetPerspective(GameId1, userId);
             playerPerspective.Should().NotBeNull();
-            playerPerspective.Players.First(o => o.Id == UserId1).DraftRole.Should().Be(Role.Chef());
+            playerPerspective.Players.First(o => o.Id == UserId1).DraftRole.Should().Be(Role.Chef);
         }
 
         foreach (var userId in new[] { UserId1, UserId2, UserId3 })
         {
             var playerPerspective = _sut.GetPerspective(GameId1, userId);
             playerPerspective.Should().NotBeNull();
-            playerPerspective.Players.First(o => o.Id == UserId1).DraftRole.Should().NotBe(Role.Chef());
+            playerPerspective.Players.First(o => o.Id == UserId1).DraftRole.Should().NotBe(Role.Chef);
         }
     }
 
@@ -1159,7 +1159,7 @@ public class GamePerspectiveServiceTests
     {
         var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
         var spectator = new GameUser("spectator") { UserType = UserType.Spectator };
-        var player1 = new GameUser(UserId1) { UserType = UserType.Player, DraftRole = Role.Chef() };
+        var player1 = new GameUser(UserId1) { UserType = UserType.Player, DraftRole = Role.Chef };
         var player2 = new GameUser(UserId2) { UserType = UserType.Player };
         var player3 = new GameUser(UserId3) { UserType = UserType.Player };
         _sut.InitializeGame(GameId1, GuildId, storyteller);
@@ -1168,7 +1168,7 @@ public class GamePerspectiveServiceTests
         _sut.AddUserToGame(GameId1, player2);
         _sut.AddUserToGame(GameId1, player3);
 
-        var result = _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef());
+        var result = _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef);
 
         result.Should().BeFalse();
     }
@@ -1190,9 +1190,9 @@ public class GamePerspectiveServiceTests
         _sut.AddUserToGame(GameId1, player1);
         _sut.AddUserToGame(GameId1, player2);
         _sut.AddUserToGame(GameId1, player3);
-        _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef());
-        _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp());
-        _sut.UpdateDraftRole(GameId1, UserId3, Role.FortuneTeller());
+        _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef);
+        _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp);
+        _sut.UpdateDraftRole(GameId1, UserId3, Role.FortuneTeller);
 
         _sut.CommitDraftRoles(GameId1);
 
@@ -1205,7 +1205,7 @@ public class GamePerspectiveServiceTests
             user1.DraftRole.Should().BeNull();
             if (playerPerspective.UserId is UserId1 or "omniscient")
             {
-                user1.Role.Should().BeEquivalentTo(Role.Chef());
+                user1.Role.Should().BeEquivalentTo(Role.Chef);
             }
             else
             {
@@ -1216,7 +1216,7 @@ public class GamePerspectiveServiceTests
             user2.DraftRole.Should().BeNull();
             if (playerPerspective.UserId is UserId2 or "omniscient")
             {
-                user2.Role.Should().BeEquivalentTo(Role.Imp());
+                user2.Role.Should().BeEquivalentTo(Role.Imp);
             }
             else
             {
@@ -1227,7 +1227,7 @@ public class GamePerspectiveServiceTests
             user3.DraftRole.Should().BeNull();
             if (playerPerspective.UserId is UserId3 or "omniscient")
             {
-                user3.Role.Should().BeEquivalentTo(Role.FortuneTeller());
+                user3.Role.Should().BeEquivalentTo(Role.FortuneTeller);
             }
             else
             {
@@ -1246,9 +1246,9 @@ public class GamePerspectiveServiceTests
         _sut.AddUserToGame(GameId1, player1);
         _sut.AddUserToGame(GameId1, player2);
         _sut.AddUserToGame(GameId1, player3);
-        _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef());
-        _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp());
-        _sut.UpdateDraftRole(GameId1, UserId3, Role.FortuneTeller());
+        _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef);
+        _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp);
+        _sut.UpdateDraftRole(GameId1, UserId3, Role.FortuneTeller);
 
         _sut.CommitDraftRoles(GameId1);
 
@@ -1282,9 +1282,9 @@ public class GamePerspectiveServiceTests
         _sut.AddUserToGame(GameId1, player1);
         _sut.AddUserToGame(GameId1, player2);
         _sut.AddUserToGame(GameId1, player3);
-        _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef());
-        _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp());
-        _sut.UpdateDraftRole(GameId1, UserId3, Role.Gunslinger());
+        _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef);
+        _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp);
+        _sut.UpdateDraftRole(GameId1, UserId3, Role.Gunslinger);
 
         _sut.CommitDraftRoles(GameId1);
 
@@ -1297,7 +1297,7 @@ public class GamePerspectiveServiceTests
             user1.DraftRole.Should().BeNull();
             if (playerPerspective.UserId is UserId1 or "omniscient")
             {
-                user1.Role.Should().BeEquivalentTo(Role.Chef());
+                user1.Role.Should().BeEquivalentTo(Role.Chef);
             }
             else
             {
@@ -1308,7 +1308,7 @@ public class GamePerspectiveServiceTests
             user2.DraftRole.Should().BeNull();
             if (playerPerspective.UserId is UserId2 or "omniscient")
             {
-                user2.Role.Should().BeEquivalentTo(Role.Imp());
+                user2.Role.Should().BeEquivalentTo(Role.Imp);
             }
             else
             {
@@ -1317,7 +1317,7 @@ public class GamePerspectiveServiceTests
 
             var user3 = playerPerspective.Players.First(o => o.Id == UserId3);
             user3.DraftRole.Should().BeNull();
-            user3.Role.Should().BeEquivalentTo(Role.Gunslinger());
+            user3.Role.Should().BeEquivalentTo(Role.Gunslinger);
         }
     }
 
@@ -1332,10 +1332,10 @@ public class GamePerspectiveServiceTests
         _sut.AddUserToGame(GameId1, player1);
         _sut.AddUserToGame(GameId1, player2);
         _sut.AddUserToGame(GameId1, player3);
-        _sut.SetRoleOnAllPerspectives(GameId1, UserId3, Role.Gunslinger());
-        _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef());
-        _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp());
-        _sut.UpdateDraftRole(GameId1, UserId3, Role.FortuneTeller());
+        _sut.SetRoleOnAllPerspectives(GameId1, UserId3, Role.Gunslinger);
+        _sut.UpdateDraftRole(GameId1, UserId1, Role.Chef);
+        _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp);
+        _sut.UpdateDraftRole(GameId1, UserId3, Role.FortuneTeller);
 
         _sut.CommitDraftRoles(GameId1);
 
@@ -1348,7 +1348,7 @@ public class GamePerspectiveServiceTests
             user1.DraftRole.Should().BeNull();
             if (playerPerspective.UserId is UserId1 or "omniscient")
             {
-                user1.Role.Should().BeEquivalentTo(Role.Chef());
+                user1.Role.Should().BeEquivalentTo(Role.Chef);
             }
             else
             {
@@ -1359,7 +1359,7 @@ public class GamePerspectiveServiceTests
             user2.DraftRole.Should().BeNull();
             if (playerPerspective.UserId is UserId2 or "omniscient")
             {
-                user2.Role.Should().BeEquivalentTo(Role.Imp());
+                user2.Role.Should().BeEquivalentTo(Role.Imp);
             }
             else
             {
@@ -1370,7 +1370,7 @@ public class GamePerspectiveServiceTests
             user3.DraftRole.Should().BeNull();
             if (playerPerspective.UserId is UserId3 or "omniscient")
             {
-                user3.Role.Should().BeEquivalentTo(Role.FortuneTeller());
+                user3.Role.Should().BeEquivalentTo(Role.FortuneTeller);
             }
             else
             {
@@ -1395,7 +1395,7 @@ public class GamePerspectiveServiceTests
         _sut.AddUserToGame(GameId1, player2);
         _sut.AddUserToGame(GameId1, player3);
 
-        var result = _sut.SetRoleOnAllPerspectives(GameId1, UserId2, Role.Imp());
+        var result = _sut.SetRoleOnAllPerspectives(GameId1, UserId2, Role.Imp);
 
         result.Should().BeTrue();
         foreach (var userId in new[] { "storyteller", UserId1, UserId2, UserId3 })
@@ -1403,7 +1403,7 @@ public class GamePerspectiveServiceTests
             var playerPerspective = _sut.GetPerspective(GameId1, userId);
             playerPerspective.Should().NotBeNull();
             playerPerspective.Players.First(o => o.Id == UserId1).Role.Should().BeNull();
-            playerPerspective.Players.First(o => o.Id == UserId2).Role.Should().BeEquivalentTo(Role.Imp());
+            playerPerspective.Players.First(o => o.Id == UserId2).Role.Should().BeEquivalentTo(Role.Imp);
             playerPerspective.Players.First(o => o.Id == UserId3).Role.Should().BeNull();
         }
     }
@@ -1419,9 +1419,9 @@ public class GamePerspectiveServiceTests
         _sut.AddUserToGame(GameId1, player1);
         _sut.AddUserToGame(GameId1, player2);
         _sut.AddUserToGame(GameId1, player3);
-        _sut.SetRoleOnAllPerspectives(GameId1, UserId2, Role.Imp());
+        _sut.SetRoleOnAllPerspectives(GameId1, UserId2, Role.Imp);
 
-        var result = _sut.SetRoleOnAllPerspectives(GameId1, UserId2, Role.Imp());
+        var result = _sut.SetRoleOnAllPerspectives(GameId1, UserId2, Role.Imp);
 
         result.Should().BeFalse();
     }

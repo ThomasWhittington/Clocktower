@@ -33,7 +33,7 @@ public static class RoleExtensions
             };
         }
 
-        public Role WithReminders(string[] reminders)
+        public Role WithReminders(params string[] reminders)
         {
             return role with
             {
@@ -41,19 +41,11 @@ public static class RoleExtensions
             };
         }
 
-        public Role WithReminder(string reminder)
+        public Role WithGlobalReminders(params string[] reminders)
         {
             return role with
             {
-                Reminders = [reminder]
-            };
-        }
-
-        public Role WithGlobalReminder(string reminder)
-        {
-            return role with
-            {
-                RemindersGlobal = [reminder]
+                RemindersGlobal = reminders
             };
         }
 

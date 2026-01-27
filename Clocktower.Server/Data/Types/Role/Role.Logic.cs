@@ -13,16 +13,14 @@ public partial record Role
         var roles = new List<Role>();
         var roleType = typeof(Role);
 
-        var roleMethods = roleType.GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .Where(m => m.ReturnType == roleType &&
-                        m.GetParameters().Length == 0 &&
-                        !m.Name.Equals("get_" + nameof(AllRoles)) &&
-                        !m.IsSpecialName)
+        var roleProperties = roleType.GetProperties(BindingFlags.Public | BindingFlags.Static)
+            .Where(p => p.PropertyType == roleType &&
+                        !p.Name.Equals(nameof(AllRoles)))
             .ToList();
 
-        foreach (var method in roleMethods)
+        foreach (var property in roleProperties)
         {
-            if (method.Invoke(null, null) is Role role)
+            if (property.GetValue(null) is Role role)
             {
                 roles.Add(role);
             }
