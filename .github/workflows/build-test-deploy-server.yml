@@ -80,8 +80,7 @@ jobs:
             Environment=Secrets__ServerUri=${{ vars.CLOCKTOWER_SERVER_URI }}
             Environment=Secrets__FeUri=${{ vars.FE_URI }}
             Environment=Secrets__Jwt__SigningKey=${{ secrets.JWT_SIGNING_KEY }}
-             Environment=Secrets__Jwt__Audience=clocktower-user
-            Environment=OpenTelemetry__BetterStackToken=${{ secrets.BETTERSTACK_TOKEN }}
+            Environment=Secrets__Jwt__Audience=clocktower-user
 
             [Install]
             WantedBy=multi-user.target
