@@ -17,6 +17,7 @@ interface GameHudProps {
     togglePanel: (panel: PanelType) => void;
     setIsDraftMode: (callback: (prev: boolean) => boolean) => void;
     isDraftMode: boolean;
+    circleDiameter: number;
 }
 
 export function GameHud({
@@ -25,7 +26,8 @@ export function GameHud({
                             isPanelOpen,
                             togglePanel,
                             setIsDraftMode,
-                            isDraftMode
+                            isDraftMode,
+                            circleDiameter
                         }: Readonly<GameHudProps>) {
     const {discordTown} = useDiscordTown();
     const {forceUpdate} = adminService;
@@ -48,7 +50,7 @@ export function GameHud({
                     onDraftToggle={() => setIsDraftMode(prev => !prev)}
                 />
             )}
-            <CenterHud/>
+            <CenterHud circleDiameter={circleDiameter}/>
             <TopHud/>
             <RightHud
                 onRoleListClick={() => script && togglePanel('role')}

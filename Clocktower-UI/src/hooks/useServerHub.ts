@@ -1,7 +1,18 @@
-﻿import {useEffect, useRef, useState} from 'react';
+﻿import {
+    useEffect,
+    useRef,
+    useState
+} from 'react';
 import * as signalR from '@microsoft/signalr';
 import {HubConnectionState} from '@microsoft/signalr';
-import {DiscordTown, GameTime, Script, type SessionSyncState, type TimerState, type VoiceState} from '@/types';
+import {
+    DiscordTown,
+    GameTime,
+    Script,
+    type SessionSyncState,
+    type TimerState,
+    type VoiceState
+} from '@/types';
 import {useAppStore} from "@/store";
 
 type UserPresenceStates = Record<string, boolean>;
@@ -15,6 +26,7 @@ type HubState = {
     gameTime: GameTime;
     timer?: TimerState;
     script?: Script;
+    targetLock?: number;
 };
 
 let globalConnection: signalR.HubConnection | null = null;
@@ -24,7 +36,8 @@ let globalState: HubState = {
     connectionState: signalR.HubConnectionState.Disconnected,
     gameTime: GameTime.Night,
     timer: undefined,
-    script: undefined
+    script: undefined,
+    targetLock: undefined
 };
 const globalListeners = new Set<(state: HubState) => void>();
 
@@ -123,6 +136,11 @@ const createConnection = async () => {
     globalConnection.on('PingUser', (message: string) => {
         const {joinedGameId} = useAppStore.getState();
         console.log(`🏓 Received ping for game ${joinedGameId ?? 'UNKNOWN'}: ${message}`);
+    });
+
+    globalConnection.on('VoteLockAdvanced', (newLock: number) => {
+        console.log(`🔒 Received VoteLockAdvanced: ${newLock}`);
+        setState({targetLock: newLock});
     });
 
     globalConnection.onclose(() => setState({connectionState: signalR.HubConnectionState.Disconnected}));

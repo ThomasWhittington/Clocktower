@@ -28,9 +28,10 @@ interface TownSquareProps {
     showDraftRoles?: boolean;
     onTokenClick?: (player: User) => void;
     onCommitDraftRoles?: () => void;
+    onCircleSizeChange?: (diameter: number) => void;
 }
 
-export default function TownSquare({showDraftRoles = false, onTokenClick, onCommitDraftRoles}: Readonly<TownSquareProps>) {
+export default function TownSquare({showDraftRoles = false, onTokenClick, onCommitDraftRoles, onCircleSizeChange}: Readonly<TownSquareProps>) {
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
     const {discordTown, isLoading, error} = useDiscordTown();
     const {currentUser, gameId} = useAppStore();
@@ -53,6 +54,11 @@ export default function TownSquare({showDraftRoles = false, onTokenClick, onComm
         containerWidth: parentSize.width,
         containerHeight: parentSize.height
     });
+
+    const circleDiameter = Math.min(parentSize.width, parentSize.height) - 2 * size;
+    if (onCircleSizeChange && circleDiameter > 0) {
+        onCircleSizeChange(circleDiameter);
+    }
 
     const actionContext: PlayerActionContext = {
         gameId: gameId ?? "",

@@ -31,6 +31,7 @@ export default function GameWindow() {
     const {discordTown} = useDiscordTown();
     const [isDraftMode, setIsDraftMode] = useState(false);
     const [selectedDraftRoles, setSelectedDraftRoles] = useState<Role[]>([]);
+    const [circleDiameter, setCircleDiameter] = useState(0);
     const {togglePanel, isPanelOpen, closePanel, openPanel, getPanelData} = useActivePanel();
     const isStoryteller = useCurrentUserIsStoryteller();
     const {setRole, commitDraftRoles} = useSetRoles(currentUser?.id ?? "", isStoryteller, isDraftMode);
@@ -73,6 +74,7 @@ export default function GameWindow() {
                 showDraftRoles={isDraftMode}
                 onTokenClick={handleTokenClick}
                 onCommitDraftRoles={isDraftMode ? handleCommitDraftRoles : undefined}
+                onCircleSizeChange={setCircleDiameter}
             />
 
             <GamePanels
@@ -93,6 +95,7 @@ export default function GameWindow() {
                 togglePanel={togglePanel}
                 setIsDraftMode={setIsDraftMode}
                 isDraftMode={isDraftMode}
+                circleDiameter={circleDiameter}
             />
         </div>
     );

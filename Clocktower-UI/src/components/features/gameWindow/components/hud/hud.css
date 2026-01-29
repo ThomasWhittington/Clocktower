@@ -50,4 +50,14 @@
             @apply inline-block w-4 h-4;
         }
     }
+
+    .clock-big {
+        @apply object-contain;
+        transform: rotate(var(--clock-rotation, 0deg));
+        transition-duration: var(--clock-transition-duration, 2000ms);
+        transition-property: transform;
+        transition-timing-function: ease-in-out;
+        width: var(--clock-size, 75vmin);
+        height: var(--clock-size, 75vmin);
+    }
 } 
