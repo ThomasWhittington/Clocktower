@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Socket;
 
-public sealed class DiscordNotificationHub(IHubStateManager hubStateManager) : Hub<IDiscordNotificationClient>
+public sealed class NotificationHub(IHubStateManager hubStateManager) : Hub<INotificationClient>, INotificationHub
 {
     [UsedImplicitly]
     public async Task<SessionSyncState?> JoinGameGroup(string gameId, string userId, string? oldGameId = null)
@@ -21,6 +21,7 @@ public sealed class DiscordNotificationHub(IHubStateManager hubStateManager) : H
 
     [UsedImplicitly]
     public Task LeaveGameGroup(string gameId) => Groups.RemoveFromGroupAsync(Context.ConnectionId, GetGameGroupName(gameId));
+
 
     private static string GetGameGroupName(string gameId) => $"game:{gameId}";
 }

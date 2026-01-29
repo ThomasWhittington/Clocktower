@@ -9,22 +9,22 @@ namespace Clocktower.ServerTests.Socket;
 [TestClass]
 public class NotificationServiceTests
 {
-    private Mock<IHubContext<DiscordNotificationHub, IDiscordNotificationClient>> _mockHubContext = null!;
-    private Mock<IHubCallerClients<IDiscordNotificationClient>> _mockClients = null!;
-    private Mock<IDiscordNotificationClient> _mockClientProxy1 = null!;
-    private Mock<IDiscordNotificationClient> _mockClientProxy2 = null!;
-    private Mock<IDiscordNotificationClient> _mockClientProxy3 = null!;
+    private Mock<IHubContext<NotificationHub, INotificationClient>> _mockHubContext = null!;
+    private Mock<IHubCallerClients<INotificationClient>> _mockClients = null!;
+    private Mock<INotificationClient> _mockClientProxy1 = null!;
+    private Mock<INotificationClient> _mockClientProxy2 = null!;
+    private Mock<INotificationClient> _mockClientProxy3 = null!;
     private Mock<IGroupManager> _mockGroups = null!;
     private INotificationService _sut = null!;
 
     [TestInitialize]
     public void Setup()
     {
-        _mockHubContext = new Mock<IHubContext<DiscordNotificationHub, IDiscordNotificationClient>>();
-        _mockClients = new Mock<IHubCallerClients<IDiscordNotificationClient>>();
-        _mockClientProxy1 = new Mock<IDiscordNotificationClient>();
-        _mockClientProxy2 = new Mock<IDiscordNotificationClient>();
-        _mockClientProxy3 = new Mock<IDiscordNotificationClient>();
+        _mockHubContext = new Mock<IHubContext<NotificationHub, INotificationClient>>();
+        _mockClients = new Mock<IHubCallerClients<INotificationClient>>();
+        _mockClientProxy1 = new Mock<INotificationClient>();
+        _mockClientProxy2 = new Mock<INotificationClient>();
+        _mockClientProxy3 = new Mock<INotificationClient>();
         _mockGroups = new Mock<IGroupManager>();
 
         _sut = new NotificationService(_mockHubContext.Object);

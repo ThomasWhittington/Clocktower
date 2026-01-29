@@ -24,6 +24,6 @@ public static class ConfigureApp
         app.MapEndpoints();
 
         app.UseWebSockets();
-        app.MapHub<DiscordNotificationHub>("/serverHub");
+        app.MapHub<NotificationHub>("/serverHub");
     }
 }

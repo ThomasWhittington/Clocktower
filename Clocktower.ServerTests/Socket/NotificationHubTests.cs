@@ -8,14 +8,14 @@ using Microsoft.AspNetCore.SignalR;
 namespace Clocktower.ServerTests.Socket;
 
 [TestClass]
-public class DiscordNotificationHubTests
+public class NotificationHubTests
 {
     private const string GameId = "game-id";
     private Mock<IGroupManager> _mockGroups = null!;
     private Mock<HubCallerContext> _mockContext = null!;
     private Mock<IHubStateManager> _mockHubStateManager = null!;
 
-    private DiscordNotificationHub _sut = null!;
+    private NotificationHub _sut = null!;
 
     [TestInitialize]
     public void Setup()
@@ -23,11 +23,11 @@ public class DiscordNotificationHubTests
         _mockGroups = new Mock<IGroupManager>();
         _mockContext = new Mock<HubCallerContext>();
         _mockHubStateManager = new Mock<IHubStateManager>();
-        _sut = new DiscordNotificationHub(_mockHubStateManager.Object);
+        _sut = new NotificationHub(_mockHubStateManager.Object);
         _sut.Context = _mockContext.Object;
         _sut.Groups = _mockGroups.Object;
 
-        var hubContextMock = new Mock<IHubContext<DiscordNotificationHub>>();
+        var hubContextMock = new Mock<IHubContext<NotificationHub>>();
         hubContextMock.Setup(h => h.Groups).Returns(_mockGroups.Object);
     }
 

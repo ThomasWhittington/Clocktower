@@ -1,6 +1,6 @@
 ﻿namespace Clocktower.Server.Socket;
 
-public interface IDiscordNotificationClient
+public interface INotificationClient
 {
     Task DiscordTownUpdated(DiscordTownDto discordTown);
     Task UserVoiceStateChanged(string userId, bool isInVoice, VoiceState voiceState);

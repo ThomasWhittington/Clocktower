@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Socket;
 
-public class NotificationService(IHubContext<DiscordNotificationHub, IDiscordNotificationClient> hub) : INotificationService
+public class NotificationService(IHubContext<NotificationHub, INotificationClient> hub) : INotificationService
 {
     public Task SendBulkDiscordTownUpdates(IEnumerable<UserNotification> notifications) => Task.WhenAll(notifications.Select(n => hub.Clients.User(n.UserId).DiscordTownUpdated(n.Town)));
     public Task SendUserVoiceStateToGroup(string gameId, string userId, bool inVoice, VoiceState voiceState) => hub.Clients.Group(GetGameGroupName(gameId)).UserVoiceStateChanged(userId, inVoice, voiceState);
