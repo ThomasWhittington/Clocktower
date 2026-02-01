@@ -1,22 +1,69 @@
-﻿import {useServerHub} from "@/hooks";
-import {useDiscordTown} from "@/components/features/discordTownPanel/hooks";
+﻿import {
+    useEffect,
+    useRef,
+    useState
+} from 'react';
+import {useServerHub} from "@/hooks";
+import {useNominationState} from "@/components/features/gameWindow/hooks/useNominationState.ts";
 
 export const useVoteClock = (circleDiameter: number) => {
-    const {targetLock} = useServerHub();
-    const {discordTown} = useDiscordTown();
-    const voteActive = true;
+    const {nominationSession} = useServerHub();
+    const {
+        nominationsEnabled,
+        isActiveNomination,
+        voteUnderway,
+        toggleNominations
+    } = useNominationState();
+
+    const nominator = nominationSession?.nominator ?? 0;
+    const target = nominationSession?.currentTarget ?? 0;
+
+    const lastTargetRef = useRef<number | undefined>(undefined);
+    const rotationCountRef = useRef(0);
+    const [bigHandRotation, setBigHandRotation] = useState(0);
+    const [smallHandRotation, setSmallHandRotation] = useState(0);
 
     const bigHandMultiplier = 0.85;
-    const votingSpeed = 2000;
-    const rotation = 360;
-    const playerCount = discordTown?.players.length ?? 0;
-    const clockRotation = Math.round((rotation * (targetLock ?? 0)) / playerCount);
+    const votingSpeed = nominationSession?.votingSpeed ?? 0;
+    const playerCount = nominationSession?.playerCount ?? 0;
+    useEffect(() => {
+        console.log(`useVoteClock: target=${target}, nominator=${nominator}, playerCount=${playerCount}`);
+        if (target !== undefined && playerCount > 0) {
+            const lastTarget = lastTargetRef.current;
+
+            if (lastTarget !== undefined && lastTarget > target) {
+                rotationCountRef.current++;
+            }
+
+            lastTargetRef.current = target;
+
+            const degreesPerPlayer = 360 / playerCount;
+            const baseRotation = Math.round(degreesPerPlayer * target);
+
+            const totalRotation = baseRotation + (rotationCountRef.current * 360);
+            setBigHandRotation(totalRotation);
+            const nominatorRotation = Math.round(degreesPerPlayer * nominator);
+            setSmallHandRotation(nominatorRotation);
+        } else {
+            lastTargetRef.current = undefined;
+            rotationCountRef.current = 0;
+            setBigHandRotation(0);
+            setSmallHandRotation(0);
+        }
+    }, [nominationSession, target, nominator]);
+
     const clockSize = circleDiameter > 0 ? `${circleDiameter * bigHandMultiplier}px` : '75vmin';
+    const countdown = nominationSession?.countDownString;
 
     return {
-        voteActive,
-        clockRotation,
+        nominationsEnabled,
+        voteUnderway,
+        bigHandRotation,
+        smallHandRotation,
         clockSize,
-        votingSpeed
+        votingSpeed,
+        countdown,
+        isActiveNomination,
+        toggleNominations
     }
 }

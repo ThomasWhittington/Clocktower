@@ -11,6 +11,7 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
     [UsedImplicitly] public bool HasVoteToken { get; set; }
     [UsedImplicitly] public bool IsDead { get; set; }
     [UsedImplicitly] public bool IsMarked { get; set; }
+    [UsedImplicitly] public bool HandUp { get; set; }
     [UsedImplicitly] public Role? Role { get; set; }
     [UsedImplicitly] public Role? DraftRole { get; set; }
 
@@ -25,6 +26,7 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
             HasVoteToken = gameUser?.HasVoteToken ?? false,
             IsDead = gameUser?.IsDead ?? false,
             IsMarked = gameUser?.IsMarked ?? false,
+            HandUp = gameUser?.HandUp ?? false,
             Role = gameUser?.Role ?? null,
             DraftRole = gameUser?.DraftRole ?? null
         };
@@ -41,6 +43,7 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
             HasVoteToken = gameUser.HasVoteToken,
             IsDead = gameUser.IsDead,
             IsMarked = gameUser.IsMarked,
+            HandUp = gameUser.HandUp,
             Role = gameUser.Role,
             DraftRole = gameUser.DraftRole
         };

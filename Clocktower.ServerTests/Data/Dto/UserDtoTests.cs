@@ -21,6 +21,7 @@ public class UserDtoTests
         HasVoteToken = true,
         IsDead = true,
         IsMarked = true,
+        HandUp = true,
         Role = Role.Empath,
         DraftRole = Role.Baron
     };
@@ -40,6 +41,7 @@ public class UserDtoTests
         result.HasVoteToken.Should().BeFalse();
         result.IsDead.Should().BeFalse();
         result.IsMarked.Should().BeFalse();
+        result.HandUp.Should().BeFalse();
         result.Role.Should().BeNull();
         result.DraftRole.Should().BeNull();
     }
@@ -59,6 +61,7 @@ public class UserDtoTests
         result.HasVoteToken.Should().Be(_gameUser.HasVoteToken);
         result.IsDead.Should().Be(_gameUser.IsDead);
         result.IsMarked.Should().Be(_gameUser.IsMarked);
+        result.HandUp.Should().Be(_gameUser.HandUp);
         result.Role.Should().Be(_gameUser.Role);
         result.DraftRole.Should().Be(_gameUser.DraftRole);
     }
@@ -78,6 +81,7 @@ public class UserDtoTests
         result.HasVoteToken.Should().Be(_gameUser.HasVoteToken);
         result.IsDead.Should().Be(_gameUser.IsDead);
         result.IsMarked.Should().Be(_gameUser.IsMarked);
+        result.HandUp.Should().Be(_gameUser.HandUp);
         result.Role.Should().Be(_gameUser.Role);
         result.DraftRole.Should().Be(_gameUser.DraftRole);
     }
@@ -97,6 +101,7 @@ public class UserDtoTests
         result.HasVoteToken.Should().Be(_gameUser.HasVoteToken);
         result.IsDead.Should().Be(_gameUser.IsDead);
         result.IsMarked.Should().Be(_gameUser.IsMarked);
+        result.HandUp.Should().Be(_gameUser.HandUp);
         result.Role.Should().Be(_gameUser.Role);
         result.DraftRole.Should().Be(_gameUser.DraftRole);
     }

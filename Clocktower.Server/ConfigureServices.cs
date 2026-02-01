@@ -81,6 +81,7 @@ public static class ConfigureServices
             builder.Services.AddSingleton<IDiscordAuthApiService, DiscordAuthApiService>();
             builder.Services.AddSingleton<IDiscordConstantsService, DiscordConstantsService>();
             builder.Services.AddSingleton<IGamePerspectiveService, GamePerspectiveService>();
+            builder.Services.AddSingleton<IVotingService, VotingService>();
 
             builder.Services.AddScoped<IScriptProvider, ScriptProvider>();
             builder.Services.AddScoped<IAdminService, AdminService>();
@@ -93,6 +94,7 @@ public static class ConfigureServices
             builder.Services.AddScoped<ITimerService, TimerService>();
 
             builder.Services.AddHostedService(provider => provider.GetRequiredService<IDiscordBot>());
+            builder.Services.AddHostedService(provider => provider.GetRequiredService<IVotingService>());
         }
 
         private void ConfigureJson()

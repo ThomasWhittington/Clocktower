@@ -28,11 +28,11 @@
     }
 
     .controls-center {
-        @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10;
+        @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none;
     }
 
     .controls-top {
-        @apply absolute top-2 left-20 pointer-events-none;
+        @apply absolute top-2 left-20;
     }
 
     .controls-bottom {
@@ -51,13 +51,36 @@
         }
     }
 
-    .clock-big {
+    .clock-container {
+        position: relative;
+        width: var(--clock-size, 75vmin);
+        height: var(--clock-size, 75vmin);
+
+        .countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            font-size: 8em;
+            font-weight: bold;
+        }
+    }
+
+    .clock-big,
+    .clock-small {
         @apply object-contain;
-        transform: rotate(var(--clock-rotation, 0deg));
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(var(--clock-rotation, 0deg));
+        transform-origin: center center;
         transition-duration: var(--clock-transition-duration, 2000ms);
         transition-property: transform;
         transition-timing-function: ease-in-out;
         width: var(--clock-size, 75vmin);
         height: var(--clock-size, 75vmin);
     }
-} 
+}

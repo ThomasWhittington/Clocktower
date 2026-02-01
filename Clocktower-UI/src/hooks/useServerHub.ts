@@ -8,12 +8,14 @@ import {HubConnectionState} from '@microsoft/signalr';
 import {
     DiscordTown,
     GameTime,
+    NominationSession,
     Script,
     type SessionSyncState,
     type TimerState,
     type VoiceState
 } from '@/types';
 import {useAppStore} from "@/store";
+import {registerSignalHandlers} from "@/hooks/registerSignalHandlers.ts";
 
 type UserPresenceStates = Record<string, boolean>;
 type UserVoiceStates = Record<string, VoiceState>;
@@ -26,7 +28,7 @@ type HubState = {
     gameTime: GameTime;
     timer?: TimerState;
     script?: Script;
-    targetLock?: number;
+    nominationSession?: NominationSession;
 };
 
 let globalConnection: signalR.HubConnection | null = null;
@@ -37,7 +39,7 @@ let globalState: HubState = {
     gameTime: GameTime.Night,
     timer: undefined,
     script: undefined,
-    targetLock: undefined
+    nominationSession: undefined
 };
 const globalListeners = new Set<(state: HubState) => void>();
 
@@ -106,42 +108,7 @@ const createConnection = async () => {
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
-    globalConnection.on('DiscordTownUpdated', (discordTown: DiscordTown) => {
-        const {joinedGameId} = useAppStore.getState();
-        if (discordTown.gameId !== joinedGameId) return;
-        console.log(`🏪 Received DiscordTownUpdated for game ${discordTown.gameId}:`, discordTown);
-        setState({discordTown: new DiscordTown(discordTown)});
-    });
-
-    globalConnection.on('TownTimeChanged', (gameId: string, gameTime: number) => {
-        const {joinedGameId} = useAppStore.getState();
-        if (gameId !== joinedGameId) return;
-        console.log(`⏰ Received TownTimeChanged for game ${gameId}: ${gameTime}`);
-        setState({gameTime: gameTime as GameTime});
-    });
-
-    globalConnection.on('TimerUpdated', (timer: TimerState) => {
-        const {joinedGameId} = useAppStore.getState();
-        if (timer.gameId !== joinedGameId) return;
-        console.log(`⏱️ Received TimerUpdated for game ${timer.gameId}:`, timer);
-        setState({timer});
-    });
-    globalConnection.on('ScriptUpdated', (gameId: string, script: Script) => {
-        const {joinedGameId} = useAppStore.getState();
-        if (gameId !== joinedGameId) return;
-        console.log(`📜 Received ScriptUpdated for game ${gameId}:`, script);
-        setState({script: new Script(script)});
-    });
-
-    globalConnection.on('PingUser', (message: string) => {
-        const {joinedGameId} = useAppStore.getState();
-        console.log(`🏓 Received ping for game ${joinedGameId ?? 'UNKNOWN'}: ${message}`);
-    });
-
-    globalConnection.on('VoteLockAdvanced', (newLock: number) => {
-        console.log(`🔒 Received VoteLockAdvanced: ${newLock}`);
-        setState({targetLock: newLock});
-    });
+    registerSignalHandlers(globalConnection, setState);
 
     globalConnection.onclose(() => setState({connectionState: signalR.HubConnectionState.Disconnected}));
     globalConnection.onreconnecting(() => setState({connectionState: signalR.HubConnectionState.Reconnecting}));
@@ -241,6 +208,35 @@ export const useServerHub = () => {
 
 let joinPromise: Promise<void> | null = null;
 
+
+const openNominations = async (gameId: string): Promise<void> => {
+    if (!isConnected(globalConnection)) {
+        return;
+    }
+
+    await globalConnection.invoke('OpenNominations', gameId);
+}
+const closeNominations = async (gameId: string): Promise<void> => {
+    if (!isConnected(globalConnection)) {
+        return;
+    }
+
+    await globalConnection.invoke('CloseNominations', gameId);
+}
+const startVote = async (gameId: string, votingSpeed: number): Promise<void> => {
+    if (!isConnected(globalConnection)) {
+        return;
+    }
+
+    await globalConnection.invoke('StartVote', gameId, votingSpeed);
+}
+
+const makeNomination = async (gameId: string, nominatorId: string, nomineeId: string) => {
+    if (!isConnected(globalConnection)) {
+        return;
+    }
+    return await globalConnection.invoke<boolean | null>('MakeNomination', gameId, nominatorId, nomineeId);
+}
 export const joinGameGroup = async (gameId: string, isReconnecting: boolean = false, isInitialMount: boolean = false): Promise<void> => {
     const {setJoinedGameId, currentUser} = useAppStore.getState();
 
@@ -308,4 +304,10 @@ export const joinGameGroup = async (gameId: string, isReconnecting: boolean = fa
     } finally {
         joinPromise = null;
     }
+};
+export {
+    openNominations,
+    closeNominations,
+    startVote,
+    makeNomination
 };

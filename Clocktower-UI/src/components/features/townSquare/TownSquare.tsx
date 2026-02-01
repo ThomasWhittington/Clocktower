@@ -4,7 +4,10 @@ import {
     PlayerActionMenu,
     PlayerIcon
 } from "@/components/features/townSquare/components";
-import {SwapIcon} from "@/components/ui/icons";
+import {
+    PointIcon,
+    SwapIcon
+} from "@/components/ui/icons";
 import {
     getPlayerGlowColor,
     useCircleLayout,
@@ -34,7 +37,7 @@ interface TownSquareProps {
 export default function TownSquare({showDraftRoles = false, onTokenClick, onCommitDraftRoles, onCircleSizeChange}: Readonly<TownSquareProps>) {
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
     const {discordTown, isLoading, error} = useDiscordTown();
-    const {currentUser, gameId} = useAppStore();
+    const {currentUser} = useAppStore();
     const {thisUser} = useUser(currentUser?.id);
     const [showToken, setShowToken] = useState<boolean>(true);
     useKeyboardShortcut({key: 'g', onKeyPress: () => setShowToken(prev => !prev)});
@@ -47,6 +50,12 @@ export default function TownSquare({showDraftRoles = false, onTokenClick, onComm
         initiateSwap,
         confirmSwap,
         cancelSwap,
+        startVote,
+        nominatingPlayer,
+        initiateNomination,
+        confirmNomination,
+        cancelNomination,
+        playerNominatesPlayer
     } = useTownSquareActions();
 
     const {positions, size} = useCircleLayout({
@@ -61,16 +70,22 @@ export default function TownSquare({showDraftRoles = false, onTokenClick, onComm
     }
 
     const actionContext: PlayerActionContext = {
-        gameId: gameId ?? "",
-        currentUser: thisUser,
-        initiateSwap
+        initiateSwap,
+        startVote,
+        initiateNomination,
+        playerNominatesPlayer
     };
+
     return (
         <div ref={containerRef} className="townsquare" onClick={closeMenu}>
             {isLoading && <Spinner/>}
             {error && <p className="error-text">{error}</p>}
             {swappingPlayer && (
                 <ActionBanner onCancel={cancelSwap} message={<div>Swapping <span>{swappingPlayer.name}</span>...</div>}/>
+            )}
+
+            {nominatingPlayer && (
+                <ActionBanner onCancel={cancelNomination} message={<div><span>{nominatingPlayer.name}</span> Nominating...</div>}/>
             )}
             {showDraftRoles && (
                 <div className="draft-mode-indicator">
@@ -88,6 +103,7 @@ export default function TownSquare({showDraftRoles = false, onTokenClick, onComm
                 if (!pos) return null;
 
                 const isSwappingTarget = swappingPlayer !== null && swappingPlayer.id !== player.id;
+                const isNominatingTarget = nominatingPlayer !== null;
 
                 const glowColor = getPlayerGlowColor({
                     player,
@@ -107,11 +123,21 @@ export default function TownSquare({showDraftRoles = false, onTokenClick, onComm
                         showDraftRoles={showDraftRoles}
                         onNameClick={(e) => toggleMenu(player.id, e)}
                         onTokenClick={onTokenClick}
-                        avatarOverlay={isSwappingTarget && (
-                            <button className="clickable-portrait" onClick={() => confirmSwap(player)}>
-                                <SwapIcon className="portrait-icon"/>
-                            </button>
-                        )}
+                        avatarOverlay={
+                            <>
+                                {isSwappingTarget &&
+                                    <button className="clickable-portrait" onClick={() => confirmSwap(player)}>
+                                        <SwapIcon className="portrait-icon"/>
+                                    </button>
+                                }
+                                {isNominatingTarget &&
+                                    <button className="clickable-portrait" onClick={() => confirmNomination(player)}>
+                                        <PointIcon className="portrait-icon"/>
+                                    </button>
+                                }
+
+                            </>
+                        }
                     >
                         {activeMenuPlayerId === player.id && (
                             <PlayerActionMenu

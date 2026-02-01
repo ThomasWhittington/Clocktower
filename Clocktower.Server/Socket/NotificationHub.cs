@@ -1,9 +1,10 @@
-﻿using Clocktower.Server.Socket.Services;
+﻿using Clocktower.Server.Common.Services;
+using Clocktower.Server.Socket.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Socket;
 
-public sealed class NotificationHub(IHubStateManager hubStateManager) : Hub<INotificationClient>, INotificationHub
+public sealed class NotificationHub(IHubStateManager hubStateManager, IVotingService votingService) : Hub<INotificationClient>, INotificationHub
 {
     [UsedImplicitly]
     public async Task<SessionSyncState?> JoinGameGroup(string gameId, string userId, string? oldGameId = null)
@@ -21,6 +22,18 @@ public sealed class NotificationHub(IHubStateManager hubStateManager) : Hub<INot
 
     [UsedImplicitly]
     public Task LeaveGameGroup(string gameId) => Groups.RemoveFromGroupAsync(Context.ConnectionId, GetGameGroupName(gameId));
+
+    public async Task OpenNominations(string gameId)
+        => await votingService.OpenNominations(gameId);
+
+    public async Task CloseNominations(string gameId)
+        => await votingService.CloseNominations(gameId);
+
+    public async Task StartVote(string gameId, int votingSpeed)
+        => await votingService.StartVote(gameId, votingSpeed);
+
+    public async Task<bool> MakeNomination(string gameId, string nominatorId, string nomineeId)
+        => await votingService.MakeNomination(gameId, nominatorId, nomineeId);
 
 
     private static string GetGameGroupName(string gameId) => $"game:{gameId}";

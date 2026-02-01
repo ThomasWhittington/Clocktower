@@ -10,6 +10,7 @@ public class NotificationService(IHubContext<NotificationHub, INotificationClien
     public Task PingUser(string targetUserId, string message) => hub.Clients.User(targetUserId).PingUser(message);
     public Task SendTimerUpdateToGroup(string gameId, TimerState timer) => hub.Clients.Group(GetGameGroupName(gameId)).TimerUpdated(timer);
     public Task SendScriptToGroup(string gameId, Script? script) => hub.Clients.Group(GetGameGroupName(gameId)).ScriptUpdated(gameId, script);
+    public Task SendNominationUpdateToGroup(string gameId, NominationSession? session) => hub.Clients.Group(GetGameGroupName(gameId)).NominationUpdate(gameId, session);
 
     private static string GetGameGroupName(string gameId) => $"game:{gameId}";
 }

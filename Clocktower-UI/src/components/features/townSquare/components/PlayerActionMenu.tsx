@@ -1,5 +1,12 @@
-﻿import {type PlayerActionContext, playerActions} from '../config';
+﻿import {
+    type PlayerActionContext,
+    playerActions
+} from '../config';
 import type {User} from "@/types";
+import {useNominationState} from "@/components/features/gameWindow/hooks";
+import {useAppStore} from "@/store";
+import {useServerHub} from "@/hooks";
+import {useCurrentUserIsStoryteller} from "@/components/features/discordTownPanel/hooks";
 
 interface PlayerActionMenuProps {
     player: User;
@@ -7,12 +14,16 @@ interface PlayerActionMenuProps {
 }
 
 export function PlayerActionMenu({player, context}: Readonly<PlayerActionMenuProps>) {
+    const {discordTown} = useServerHub();
+    const currentUserIsStoryTeller = useCurrentUserIsStoryteller();
+    const {currentUser} = useAppStore();
+    const {nominationsEnabled} = useNominationState();
+    if (!discordTown || !currentUser) return null;
     const visibleActions = playerActions.filter((action) =>
-        action.isVisible(player, context.currentUser)
+        action.isVisible(player, {nominationsEnabled, currentUserIsStoryTeller})
     );
 
     if (visibleActions.length === 0) return null;
-
 
     return (
         <div className="player-action-menu" role="menu" aria-label={`Actions for ${player.name}`} onPointerDown={(e) => e.stopPropagation()}>

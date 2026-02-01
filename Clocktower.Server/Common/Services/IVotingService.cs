@@ -1,12 +1,10 @@
-﻿namespace Clocktower.Server.Socket;
+namespace Clocktower.Server.Common.Services;
 
-public interface INotificationHub
+public interface IVotingService : IHostedService
 {
-    Task<SessionSyncState?> JoinGameGroup(string gameId, string userId, string? oldGameId = null);
-    Task LeaveGameGroup(string gameId);
-
     Task OpenNominations(string gameId);
     Task CloseNominations(string gameId);
     Task StartVote(string gameId, int votingSpeed);
     Task<bool> MakeNomination(string gameId, string nominatorId, string nomineeId);
+    NominationSession? GetSession(string gameId);
 }

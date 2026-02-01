@@ -8,4 +8,5 @@ public interface INotificationClient
     Task PingUser(string message);
     Task TimerUpdated(TimerState timer);
     Task ScriptUpdated(string gameId, Script? script);
+    Task NominationUpdate(string gameId, NominationSession? session);
 }
