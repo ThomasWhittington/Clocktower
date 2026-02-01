@@ -52,7 +52,9 @@ export const playerActions: PlayerAction[] = [
             id: "player-nomination",
             label: "Nominate",
             icon: "🗳️",
-            isVisible: (_player, state) => !state.currentUserIsStoryTeller && state.nominationsEnabled,
+            isVisible: (player, state) => {
+                return !state.currentUserIsStoryTeller && state.nominationsEnabled && !player.isDead;
+            },
             execute: (player, {playerNominatesPlayer}) => {
                 void playerNominatesPlayer(player);
             },

@@ -29,6 +29,7 @@ export function useTownSquareActions() {
     }, []);
 
     const initiateSwap = useCallback((player: User) => {
+        setNominatingPlayer(null);
         setSwappingPlayer(player);
         setActiveMenuPlayerId(null);
     }, []);
@@ -51,6 +52,7 @@ export function useTownSquareActions() {
 
 
     const initiateNomination = useCallback((player: User) => {
+        setSwappingPlayer(null);
         setNominatingPlayer(player);
         setActiveMenuPlayerId(null);
     }, []);
@@ -73,6 +75,7 @@ export function useTownSquareActions() {
 
     const playerNominatesPlayer = useCallback(async (target: User) => {
         if (gameId && currentUser) {
+            setSwappingPlayer(null);
             await runAction(async () => {
                 return await makeNomination(gameId, currentUser.id, target.id);
             });
