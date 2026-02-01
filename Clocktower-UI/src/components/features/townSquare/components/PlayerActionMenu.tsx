@@ -4,8 +4,6 @@
 } from '../config';
 import type {User} from "@/types";
 import {useNominationState} from "@/components/features/gameWindow/hooks";
-import {useAppStore} from "@/store";
-import {useServerHub} from "@/hooks";
 import {useCurrentUserIsStoryteller} from "@/components/features/discordTownPanel/hooks";
 
 interface PlayerActionMenuProps {
@@ -14,11 +12,8 @@ interface PlayerActionMenuProps {
 }
 
 export function PlayerActionMenu({player, context}: Readonly<PlayerActionMenuProps>) {
-    const {discordTown} = useServerHub();
     const currentUserIsStoryTeller = useCurrentUserIsStoryteller();
-    const {currentUser} = useAppStore();
     const {nominationsEnabled} = useNominationState();
-    if (!discordTown || !currentUser) return null;
     const visibleActions = playerActions.filter((action) =>
         action.isVisible(player, {nominationsEnabled, currentUserIsStoryTeller})
     );
