@@ -114,9 +114,12 @@
         z-index: 30;
     }
 
+    .portrait-overlay {
+        @apply absolute inset-0 flex items-center justify-center rounded-full  z-10 select-none;
+    }
 
     .clickable-portrait {
-        @apply absolute inset-0 flex items-center justify-center bg-black/60 rounded-full cursor-pointer hover:bg-black/40 transition-colors z-10 select-none;
+        @apply bg-black/60 cursor-pointer hover:bg-black/40 transition-colors;
     }
 
     .portrait-icon {
@@ -260,5 +263,14 @@
 
     .role-description-content p {
         @apply text-sm text-neutral-200;
+    }
+
+    .hand-up {
+        @apply text-demon stroke-white drop-shadow-2xl;
+
+
+        &.unlocked {
+            @apply opacity-50;
+        }
     }
 }

@@ -5,6 +5,7 @@ import {
     PlayerIcon
 } from "@/components/features/townSquare/components";
 import {
+    HandIcon,
     PointIcon,
     SwapIcon
 } from "@/components/ui/icons";
@@ -121,6 +122,8 @@ export default function TownSquare({
                     discordTown
                 });
 
+                const voteLocked = true;
+
                 return (
                     <PlayerIcon
                         key={player.id}
@@ -136,16 +139,20 @@ export default function TownSquare({
                         avatarOverlay={
                             <>
                                 {isSwappingTarget &&
-                                    <button className="clickable-portrait" onClick={() => confirmSwap(player)}>
+                                    <button className="portrait-overlay clickable-portrait" onClick={() => confirmSwap(player)}>
                                         <SwapIcon className="portrait-icon"/>
                                     </button>
                                 }
                                 {isNominatingTarget &&
-                                    <button className="clickable-portrait" onClick={() => confirmNomination(player)}>
+                                    <button className="portrait-overlay clickable-portrait" onClick={() => confirmNomination(player)}>
                                         <PointIcon className="portrait-icon"/>
                                     </button>
                                 }
-
+                                {player.handUp &&
+                                    <div className="portrait-overlay">
+                                        <HandIcon className={`portrait-icon hand-up${voteLocked ? '' : ' unlocked'}`}/>
+                                    </div>
+                                }
                             </>
                         }
                     >
