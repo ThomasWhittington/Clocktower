@@ -8,16 +8,10 @@ import {
     motion
 } from "framer-motion";
 import {VoteClock} from "@/components/features/gameWindow/components/hud/components";
+import {animations} from "@/constants";
 
 interface CenterHudProps {
     circleDiameter: number;
-}
-
-const fadeAnimation = {
-    initial: {opacity: 0},
-    animate: {opacity: 1},
-    exit: {opacity: 0},
-    transition: {duration: 0.8}
 }
 export const CenterHud = ({circleDiameter}: CenterHudProps) => {
     const {
@@ -28,12 +22,12 @@ export const CenterHud = ({circleDiameter}: CenterHudProps) => {
         countdown,
         isActiveNomination
     } = useVoteClock(circleDiameter);
-  
+
     return (
         <div className="controls-center">
             <AnimatePresence mode="wait">
                 {isActiveNomination ? (
-                    <motion.div key="nominations" {...fadeAnimation}>
+                    <motion.div key="nominations" {...animations.zoomIn}>
                         <VoteClock
                             bigHandRotation={bigHandRotation}
                             smallHandRotation={smallHandRotation}
@@ -43,7 +37,7 @@ export const CenterHud = ({circleDiameter}: CenterHudProps) => {
                         />
                     </motion.div>
                 ) : (
-                    <motion.div key="default" {...fadeAnimation}>
+                    <motion.div key="default" {...animations.zoomIn}>
                         <Timer/>
                         <RoleDistributionWidget/>
                     </motion.div>

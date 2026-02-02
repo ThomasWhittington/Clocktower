@@ -9,7 +9,8 @@ import {useAppStore} from "@/store";
 import {
     makeNomination,
     startVote as startVoting,
-    useAction
+    toggleVote,
+    useAction,
 } from "@/hooks";
 
 export function useTownSquareActions() {
@@ -88,6 +89,13 @@ export function useTownSquareActions() {
         }
     }, [gameId, runAction]);
 
+
+    const togglePlayerVote = useCallback((player: User) => {
+        if (gameId) {
+            void toggleVote(gameId, player.id);
+        }
+    }, []);
+
     return {
         activeMenuPlayerId,
         swappingPlayer,
@@ -101,6 +109,7 @@ export function useTownSquareActions() {
         initiateNomination,
         confirmNomination,
         cancelNomination,
-        playerNominatesPlayer
+        playerNominatesPlayer,
+        togglePlayerVote
     };
 }

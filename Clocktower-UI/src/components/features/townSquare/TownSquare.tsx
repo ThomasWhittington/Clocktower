@@ -6,6 +6,7 @@ import {
 } from "@/components/features/townSquare/components";
 import {
     HandIcon,
+    NoVoteIcon,
     PointIcon,
     SwapIcon
 } from "@/components/ui/icons";
@@ -28,7 +29,11 @@ import {
     useState
 } from "react";
 import {User} from "@/types";
-
+import {
+    AnimatePresence,
+    motion
+} from "framer-motion";
+import {animations} from "@/constants";
 
 interface TownSquareProps {
     showDraftRoles?: boolean;
@@ -122,8 +127,6 @@ export default function TownSquare({
                     discordTown
                 });
 
-                const voteLocked = true;
-
                 return (
                     <PlayerIcon
                         key={player.id}
@@ -148,11 +151,18 @@ export default function TownSquare({
                                         <PointIcon className="portrait-icon"/>
                                     </button>
                                 }
-                                {player.handUp &&
-                                    <div className="portrait-overlay">
-                                        <HandIcon className={`portrait-icon hand-up${voteLocked ? '' : ' unlocked'}`}/>
-                                    </div>
-                                }
+                                <AnimatePresence>
+                                    {player.handUp &&
+                                        <motion.div key="handup" {...animations.zoomInSpring} className="portrait-overlay">
+                                            <HandIcon className={`portrait-icon hand-up${player.voteLocked ? '' : ' unlocked'}`}/>
+                                        </motion.div>
+                                    }
+                                    {!player.handUp && player.voteLocked &&
+                                        <motion.div key="noVote" {...animations.zoomInSpring} className="portrait-overlay">
+                                            <NoVoteIcon className="portrait-icon no-vote"/>
+                                        </motion.div>
+                                    }
+                                </AnimatePresence>
                             </>
                         }
                     >

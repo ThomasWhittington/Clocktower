@@ -1,9 +1,10 @@
 ﻿using System.Collections.Concurrent;
-using Clocktower.Server.Socket;
+using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.Server.Common.Services;
 
-public class VotingService(IGamePerspectiveService gamePerspectiveService, INotificationService notificationService) : BackgroundService, IVotingService
+//TODO check that cases are valid before changing things, no nominations if nominations not enabled etc
+public class VotingService(IGamePerspectiveService gamePerspectiveService, IGameBroadcastService gameBroadcastService) : BackgroundService, IVotingService
 {
     private readonly ConcurrentDictionary<string, NominationSession> _sessions = new();
 
@@ -28,9 +29,11 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, INoti
         {
             session.CountDown--;
             session.NextTick = DateTime.UtcNow.AddSeconds(1);
-            await notificationService.SendNominationUpdateToGroup(session.GameId, session);
+            await gameBroadcastService.BroadcastNominationSessionUpdate(session.GameId, session);
             return;
         }
+
+        if (session.CountDown != 0) await LockVote(session);
 
         session.CountDown = null;
         session.CurrentTarget++;
@@ -38,13 +41,30 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, INoti
 
         session.NextTick = DateTime.UtcNow.AddMilliseconds(session.VotingSpeed);
 
-        await notificationService.SendNominationUpdateToGroup(session.GameId, session);
+        await gameBroadcastService.BroadcastNominationSessionUpdate(session.GameId, session);
 
         if (session.CurrentTarget != session.Nominee) return;
         await Task.Delay(session.VotingSpeed + 100);
 
+        await LockVote(session);
         session.VoteUnderway = false;
-        await notificationService.SendNominationUpdateToGroup(session.GameId, session);
+        await gameBroadcastService.BroadcastNominationSessionUpdate(session.GameId, session);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(session.GameId);
+    }
+
+    public async Task<bool> ToggleVote(string gameId, string playerId)
+    {
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return false;
+        var user = gamePerspective.Users.FirstOrDefault(o => o.Id == playerId);
+        if (user is null) return false;
+
+        var updated = gamePerspectiveService.UpdatePublicUser(gameId, playerId, new PublicGameUserUpdate
+        {
+            HandUp = !user.HandUp
+        });
+        if (updated) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+        return updated;
     }
 
     public async Task<bool> MakeNomination(string gameId, string nominatorId, string nomineeId)
@@ -66,7 +86,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, INoti
 
         _sessions[gameId] = session;
 
-        await notificationService.SendNominationUpdateToGroup(gameId, session);
+        await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, session);
         return true;
     }
 
@@ -83,7 +103,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, INoti
 
         _sessions[gameId] = session;
 
-        await notificationService.SendNominationUpdateToGroup(gameId, session);
+        await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, session);
     }
 
     public async Task CloseNominations(string gameId)
@@ -92,7 +112,11 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, INoti
         if (session is null) return;
 
         _sessions.Remove(gameId, out _);
-        await notificationService.SendNominationUpdateToGroup(gameId, null);
+
+        gamePerspectiveService.ResetNominationSession(gameId);
+
+        await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, null);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(session.GameId);
     }
 
     public async Task StartVote(string gameId, int votingSpeed)
@@ -109,11 +133,21 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, INoti
 
         _sessions[gameId] = newSession;
 
-        await notificationService.SendNominationUpdateToGroup(gameId, newSession);
+        await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, newSession);
     }
 
     public NominationSession? GetSession(string gameId)
     {
         return _sessions.TryGetValue(gameId, out var session) ? session : null;
+    }
+
+    private async Task LockVote(NominationSession session)
+    {
+        var game = gamePerspectiveService.GetFirstPerspective(session.GameId);
+        if (game is null) return;
+        var user = game.Players.FirstOrDefault(o => o.SeatingPosition == session.CurrentTarget);
+        if (user is null) return;
+        gamePerspectiveService.UpdatePublicUser(session.GameId, user.Id, new PublicGameUserUpdate { VoteLocked = true });
+        await gameBroadcastService.BroadcastDiscordTownUpdate(session.GameId);
     }
 }

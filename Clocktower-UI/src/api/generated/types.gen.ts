@@ -59,6 +59,7 @@ export type ClocktowerServerDataDtoUserDto = {
     isDead?: boolean;
     isMarked?: boolean;
     handUp?: boolean;
+    voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRole;
     draftRole?: ClocktowerServerDataTypesRoleRole;
 };
@@ -86,6 +87,7 @@ export type ClocktowerServerDataGameUser = {
     isDead?: boolean;
     isMarked?: boolean;
     handUp?: boolean;
+    voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRole;
     draftRole?: ClocktowerServerDataTypesRoleRole;
 };
@@ -250,6 +252,7 @@ export type ClocktowerServerDataDtoUserDtoWritable = {
     isDead?: boolean;
     isMarked?: boolean;
     handUp?: boolean;
+    voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
     draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
 };
@@ -274,6 +277,7 @@ export type ClocktowerServerDataGameUserWritable = {
     isDead?: boolean;
     isMarked?: boolean;
     handUp?: boolean;
+    voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
     draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
 };

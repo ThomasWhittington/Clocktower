@@ -35,6 +35,8 @@ public sealed class NotificationHub(IHubStateManager hubStateManager, IVotingSer
     public async Task<bool> MakeNomination(string gameId, string nominatorId, string nomineeId)
         => await votingService.MakeNomination(gameId, nominatorId, nomineeId);
 
+    public async Task<bool> ToggleVote(string gameId, string playerId)
+        => await votingService.ToggleVote(gameId, playerId);
 
     private static string GetGameGroupName(string gameId) => $"game:{gameId}";
 }

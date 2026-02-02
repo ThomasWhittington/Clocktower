@@ -22,6 +22,8 @@ interface GameHudProps {
     isDraftMode: boolean;
     circleDiameter: number;
     onNominateClick: (player: User) => void;
+    onVoteClick: (player: User) => void;
+    onCancelNomination: () => void;
 }
 
 export function GameHud({
@@ -32,7 +34,9 @@ export function GameHud({
                             setIsDraftMode,
                             isDraftMode,
                             circleDiameter,
-                            onNominateClick
+                            onNominateClick,
+                            onVoteClick,
+                            onCancelNomination
                         }: Readonly<GameHudProps>) {
     const {discordTown} = useDiscordTown();
     const {forceUpdate} = adminService;
@@ -64,6 +68,8 @@ export function GameHud({
                 onPaperClick={() => togglePanel('paper')}
                 onForceUpdateClick={forceUpdateGame}
                 onNominateClick={onNominateClick}
+                onVoteClick={onVoteClick}
+                onCancelNomination={onCancelNomination}
             />
             <BottomHud scriptName={script?.name} storyTellers={discordTown?.storyTellers ?? []}/>
         </>

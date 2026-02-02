@@ -8,5 +8,5 @@ public interface INotificationService
     Task PingUser(string targetUserId, string message);
     Task SendTimerUpdateToGroup(string gameId, TimerState timer);
     Task SendScriptToGroup(string gameId, Script? script);
-    Task SendNominationUpdateToGroup(string gameId, NominationSession? session);
+    Task SendNominationSessionUpdateToGroup(string gameId, NominationSession? session);
 }

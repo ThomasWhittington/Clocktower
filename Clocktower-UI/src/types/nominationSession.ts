@@ -20,7 +20,7 @@
     }
 
     get countDownString(): string | undefined {
-        if (!this.countDown) return undefined;
+        if (this.countDown == undefined) return undefined;
         return this.countDown.toString() === "0" ? "GO" : this.countDown.toString();
     }
 

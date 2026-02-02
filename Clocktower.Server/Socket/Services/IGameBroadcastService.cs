@@ -7,5 +7,6 @@ public interface IGameBroadcastService
     Task BroadcastScriptUpdate(string gameId, Script script);
     Task BroadcastUserVoiceStateChanged(string gameId, string userId, bool inVoice, VoiceState voiceState);
     Task BroadcastTimerUpdate(string gameId, TimerState timer);
+    Task BroadcastNominationSessionUpdate(string gameId, NominationSession? nominationSession);
     Task PingUser(string userId, string message);
 }

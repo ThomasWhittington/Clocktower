@@ -115,11 +115,11 @@
     }
 
     .portrait-overlay {
-        @apply absolute inset-0 flex items-center justify-center rounded-full  z-10 select-none;
+        @apply absolute inset-0 flex items-center justify-center rounded-full z-10 select-none pointer-events-none;
     }
 
     .clickable-portrait {
-        @apply bg-black/60 cursor-pointer hover:bg-black/40 transition-colors;
+        @apply bg-black/60 cursor-pointer hover:bg-black/40 transition-colors pointer-events-auto;
     }
 
     .portrait-icon {
@@ -268,9 +268,12 @@
     .hand-up {
         @apply text-demon stroke-white drop-shadow-2xl;
 
-
         &.unlocked {
             @apply opacity-50;
         }
+    }
+
+    .no-vote {
+        @apply text-townsfolk;
     }
 }

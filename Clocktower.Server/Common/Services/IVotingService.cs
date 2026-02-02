@@ -5,6 +5,7 @@ public interface IVotingService : IHostedService
     Task OpenNominations(string gameId);
     Task CloseNominations(string gameId);
     Task StartVote(string gameId, int votingSpeed);
+    Task<bool> ToggleVote(string gameId, string playerId);
     Task<bool> MakeNomination(string gameId, string nominatorId, string nomineeId);
     NominationSession? GetSession(string gameId);
 }

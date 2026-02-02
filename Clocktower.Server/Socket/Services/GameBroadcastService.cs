@@ -29,6 +29,9 @@ public class GameBroadcastService(
     public Task BroadcastTimerUpdate(string gameId, TimerState timer)
         => notificationService.SendTimerUpdateToGroup(gameId, timer);
 
+    public Task BroadcastNominationSessionUpdate(string gameId, NominationSession? nominationSession)
+        => notificationService.SendNominationSessionUpdateToGroup(gameId, nominationSession);
+
     public Task PingUser(string userId, string message) => notificationService.PingUser(userId, message);
 
     private IEnumerable<UserNotification> BuildNotifications(string gameId, string guildId, List<GamePerspective> perspectives)

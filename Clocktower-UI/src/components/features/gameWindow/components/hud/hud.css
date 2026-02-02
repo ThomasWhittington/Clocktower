@@ -52,7 +52,7 @@
     }
 
     .clock-container {
-        position: relative;
+        @apply relative select-none;
         width: var(--clock-size, 75vmin);
         height: var(--clock-size, 75vmin);
 

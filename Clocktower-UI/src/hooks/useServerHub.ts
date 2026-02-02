@@ -274,6 +274,13 @@ const makeNomination = async (gameId: string, nominatorId: string, nomineeId: st
     }
     return await globalConnection.invoke<boolean | null>('MakeNomination', gameId, nominatorId, nomineeId);
 }
+
+const toggleVote = async (gameId: string, playerId: string) => {
+    if (!isConnected(globalConnection)) {
+        return;
+    }
+    return await globalConnection.invoke<boolean | null>('ToggleVote', gameId, playerId);
+}
 export const joinGameGroup = async (gameId: string, isReconnecting: boolean = false, isInitialMount: boolean = false): Promise<void> => {
     const {setJoinedGameId, currentUser} = useAppStore.getState();
 
@@ -346,5 +353,6 @@ export {
     openNominations,
     closeNominations,
     startVote,
-    makeNomination
+    makeNomination,
+    toggleVote
 };

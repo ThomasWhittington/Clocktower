@@ -102,6 +102,8 @@ export default function GameWindow() {
                 isDraftMode={isDraftMode}
                 circleDiameter={circleDiameter}
                 onNominateClick={townSquareActions.initiateNomination}
+                onVoteClick={townSquareActions.togglePlayerVote}
+                onCancelNomination={townSquareActions.cancelNomination}
             />
         </div>
     );

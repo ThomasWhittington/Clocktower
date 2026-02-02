@@ -21,6 +21,7 @@ export class User {
     readonly isDead: boolean;
     readonly isMarked: boolean;
     readonly handUp: boolean;
+    readonly voteLocked: boolean;
     readonly role: Role | undefined;
     readonly draftRole: Role | undefined;
 
@@ -36,6 +37,7 @@ export class User {
         this.isDead = data.isDead ?? false;
         this.isMarked = data.isMarked ?? false;
         this.handUp = data.handUp ?? false;
+        this.voteLocked = data.voteLocked ?? false;
         this.role = data.role instanceof Role ? data.role : (data.role ? mapToRole(data.role as any) : undefined);
         this.draftRole = data.draftRole instanceof Role ? data.draftRole : (data.draftRole ? mapToRole(data.draftRole as any) : undefined);
     }
@@ -54,6 +56,7 @@ export function mapToUser(userDto: ClocktowerServerDataDtoUserDto): User {
         isDead: userDto.isDead ?? false,
         isMarked: userDto.isMarked ?? false,
         handUp: userDto.handUp ?? false,
+        voteLocked: userDto.voteLocked ?? false,
         role: userDto.role ? mapToRole(userDto.role) : undefined,
         draftRole: userDto.draftRole ? mapToRole(userDto.draftRole) : undefined
     });
