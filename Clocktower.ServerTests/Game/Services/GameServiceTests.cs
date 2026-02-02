@@ -167,7 +167,7 @@ public class GameServiceTests
         var guildId = CommonMethods.GetRandomSnowflakeStringId();
         var gameId = CommonMethods.GetRandomString();
         var userId = CommonMethods.GetRandomSnowflakeStringId();
-        _mockIdGenerator.Setup(o => o.GenerateGameId()).Returns(gameId);
+        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(gameId);
 
         _mockBot.Setup(o => o.GetGuild(guildId)).Returns((IDiscordGuild)null!);
 
@@ -185,7 +185,7 @@ public class GameServiceTests
         var gameId = CommonMethods.GetRandomString();
         var userId = CommonMethods.GetRandomSnowflakeStringId();
         var guild = StrictMockFactory.Create<IDiscordGuild>();
-        _mockIdGenerator.Setup(o => o.GenerateGameId()).Returns(gameId);
+        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(gameId);
 
         _mockBot.Setup(o => o.GetGuild(guildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(userId)).Returns((IDiscordGuildUser)null!);
@@ -206,7 +206,7 @@ public class GameServiceTests
         var expectedGameUser = new GameUser(userId) { UserType = UserType.StoryTeller };
         var expectedGamePerspective = CommonMethods.GetGamePerspective(gameId, userId: IGamePerspectiveStore.OmniscientKey, guildId, createdBy: expectedGameUser) with { Users = [expectedGameUser] };
         var guild = StrictMockFactory.Create<IDiscordGuild>();
-        _mockIdGenerator.Setup(o => o.GenerateGameId()).Returns(gameId);
+        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(gameId);
 
         _mockBot.Setup(o => o.GetGuild(guildId)).Returns(guild.Object);
         var mockedUser = MockMaker.CreateMockDiscordGuildUser(userId, "name", "avatar");
@@ -233,7 +233,7 @@ public class GameServiceTests
         var userId = CommonMethods.GetRandomSnowflakeStringId();
         var mockedUser = MockMaker.CreateMockDiscordGuildUser(userId, "name", "avatar");
         var guild = StrictMockFactory.Create<IDiscordGuild>();
-        _mockIdGenerator.Setup(o => o.GenerateGameId()).Returns(gameId);
+        _mockIdGenerator.Setup(o => o.GenerateId()).Returns(gameId);
         _mockBot.Setup(o => o.GetGuild(guildId)).Returns(guild.Object);
         guild.Setup(o => o.GetUser(userId)).Returns(mockedUser);
         _mockGamePerspectiveService.Setup(o => o.InitializeGame(gameId, guildId, It.IsAny<GameUser>())).Returns((GamePerspective?)null);

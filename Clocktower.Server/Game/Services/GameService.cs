@@ -38,7 +38,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
 
     public (bool success, GamePerspective? gamePerspective, string message) StartNewGame(string guildId, string userId)
     {
-        var gameId = idGenerator.GenerateGameId();
+        var gameId = idGenerator.GenerateId();
         var guild = bot.GetGuild(guildId);
         if (guild is null) return (false, null, "Couldn't find guild");
         var user = guild.GetUser(userId);
@@ -117,7 +117,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         var gameUser = user.AsGameUser(gamePerspective);
         gameUser.UserType = UserType.Player;
         gameUser.SeatingPosition = gamePerspectiveService.GetNextAvailableSeatingPosition(gameId);
-
+        
         gamePerspectiveService.AddUserToGame(gameId, gameUser);
 
         await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);

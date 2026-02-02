@@ -1,4 +1,5 @@
-﻿using Clocktower.Server.Data;
+﻿using Clocktower.Server.Common.Services;
+using Clocktower.Server.Data;
 using Clocktower.Server.Data.Dto;
 using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Socket;
@@ -14,6 +15,7 @@ public class NotificationHubTests
     private Mock<IGroupManager> _mockGroups = null!;
     private Mock<HubCallerContext> _mockContext = null!;
     private Mock<IHubStateManager> _mockHubStateManager = null!;
+    private Mock<IVotingService> _mockVotingService = null!;
 
     private NotificationHub _sut = null!;
 
@@ -23,7 +25,9 @@ public class NotificationHubTests
         _mockGroups = new Mock<IGroupManager>();
         _mockContext = new Mock<HubCallerContext>();
         _mockHubStateManager = new Mock<IHubStateManager>();
-        _sut = new NotificationHub(_mockHubStateManager.Object);
+        _mockVotingService = new Mock<IVotingService>();
+
+        _sut = new NotificationHub(_mockHubStateManager.Object, _mockVotingService.Object);
         _sut.Context = _mockContext.Object;
         _sut.Groups = _mockGroups.Object;
 
@@ -46,7 +50,8 @@ public class NotificationHubTests
                 ServerNowUtc = DateTime.UtcNow,
                 EndUtc = DateTime.UtcNow.AddSeconds(30)
             },
-            Script = new Script("Name", "Author", [])
+            Script = new Script("Name", "Author", []),
+            NominationSession = new NominationSession(GameId)
         };
         return result;
     }

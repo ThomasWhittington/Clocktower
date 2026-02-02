@@ -13,6 +13,8 @@ public class HubStateManagerTests
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private Mock<IJwtWriter> _mockJwtWriter = null!;
     private Mock<ITimerCoordinator> _mockTimerCoordinator = null!;
+    private Mock<IVotingService> _mockVotingService = null!;
+
     private IHubStateManager _sut = null!;
 
     [TestInitialize]
@@ -22,11 +24,13 @@ public class HubStateManagerTests
         _mockDiscordTownManager = StrictMockFactory.Create<IDiscordTownManager>();
         _mockJwtWriter = StrictMockFactory.Create<IJwtWriter>();
         _mockTimerCoordinator = StrictMockFactory.Create<ITimerCoordinator>();
+        _mockVotingService = StrictMockFactory.Create<IVotingService>();
 
         _sut = new HubStateManager(_mockGamePerspectiveService.Object,
             _mockDiscordTownManager.Object,
             _mockJwtWriter.Object,
-            _mockTimerCoordinator.Object
+            _mockTimerCoordinator.Object,
+            _mockVotingService.Object
         );
     }
 
@@ -74,6 +78,8 @@ public class HubStateManagerTests
             ServerNowUtc = DateTime.UtcNow,
             EndUtc = DateTime.UtcNow.AddSeconds(30)
         };
+        var nominationSession = new NominationSession(gameId);
+
         var discordTownDto = new DiscordTownDto(gameId, [new MiniCategoryDto(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
         const string expectedJwt = "jwt-token-123";
         _mockGamePerspectiveService.Setup(s => s.GetPerspective(gameId, userId)).Returns(gamePerspective);
@@ -81,6 +87,7 @@ public class HubStateManagerTests
         _mockDiscordTownManager.Setup(o => o.RedactTownDto(It.IsAny<DiscordTownDto>(), userId)).Returns(new DiscordTownDto(gameId, []));
         _mockJwtWriter.Setup(j => j.GetJwtToken(gameUser)).Returns(expectedJwt);
         _mockTimerCoordinator.Setup(t => t.Get(gameId)).Returns(timer);
+        _mockVotingService.Setup(o => o.GetSession(gameId)).Returns(nominationSession);
 
         var result = _sut.GetState(gameId, userId);
 
@@ -94,6 +101,7 @@ public class HubStateManagerTests
         result.DiscordTown.Should().NotBeNull();
         result.DiscordTown.GameId.Should().Be(gameId);
         result.Timer.Should().Be(timer);
+        result.NominationSession.Should().Be(nominationSession);
     }
 
 
@@ -113,12 +121,15 @@ public class HubStateManagerTests
             ServerNowUtc = DateTime.UtcNow,
             EndUtc = DateTime.UtcNow.AddSeconds(30)
         };
+        var nominationSession = new NominationSession(gameId);
+
         var discordTownDto = new DiscordTownDto(gameId, [new MiniCategoryDto(CommonMethods.GetRandomSnowflakeStringId(), CommonMethods.GetRandomString(), [])]);
         const string expectedJwt = "jwt-token-123";
         _mockGamePerspectiveService.Setup(s => s.GetPerspective(gameId, userId)).Returns(gamePerspective);
         _mockDiscordTownManager.Setup(s => s.GetDiscordTownDto(guildId, gameId, new List<GameUser> { gameUser })).Returns(discordTownDto);
         _mockJwtWriter.Setup(j => j.GetJwtToken(gameUser)).Returns(expectedJwt);
         _mockTimerCoordinator.Setup(t => t.Get(gameId)).Returns(timer);
+        _mockVotingService.Setup(o => o.GetSession(gameId)).Returns(nominationSession);
 
         var result = _sut.GetState(gameId, userId);
 
@@ -131,5 +142,6 @@ public class HubStateManagerTests
         result.DiscordTown.Should().NotBeNull();
         result.DiscordTown.GameId.Should().Be(gameId);
         result.Timer.Should().Be(timer);
+        result.NominationSession.Should().Be(nominationSession);
     }
 }

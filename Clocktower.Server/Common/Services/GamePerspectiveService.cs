@@ -386,7 +386,8 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
             SeatingPosition = user.SeatingPosition,
             IsDead = user.IsDead,
             IsMarked = user.IsMarked,
-            HasVoteToken = user.HasVoteToken
+            HasVoteToken = user.HasVoteToken,
+            HandUp = user.HandUp
         };
 
     private static GameUser ToPersonalUser(GameUser user) => user with { DraftRole = null };
