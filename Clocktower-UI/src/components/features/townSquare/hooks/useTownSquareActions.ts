@@ -79,7 +79,6 @@ export function useTownSquareActions() {
             await runAction(async () => {
                 return await makeNomination(gameId, currentUser.id, target.id);
             });
-
         }
     }, [gameId, runAction]);
 

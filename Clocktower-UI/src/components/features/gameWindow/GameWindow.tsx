@@ -24,6 +24,7 @@ import {
     RoleType,
     User
 } from "@/types";
+import {useTownSquareActions} from "@/components/features/townSquare/hooks";
 
 export default function GameWindow() {
     const {currentUser} = useAppStore();
@@ -55,6 +56,9 @@ export default function GameWindow() {
         assignToDraft,
         selectedDraftRoles
     });
+
+    const townSquareActions = useTownSquareActions();
+
     const handleTokenClick = (player: User) => {
         const canOpenToken = script && (isStoryteller || player.role?.type !== RoleType.Traveller);
         if (canOpenToken) {
@@ -75,6 +79,7 @@ export default function GameWindow() {
                 onTokenClick={handleTokenClick}
                 onCommitDraftRoles={isDraftMode ? handleCommitDraftRoles : undefined}
                 onCircleSizeChange={setCircleDiameter}
+                townSquareActions={townSquareActions}
             />
 
             <GamePanels
@@ -96,6 +101,7 @@ export default function GameWindow() {
                 setIsDraftMode={setIsDraftMode}
                 isDraftMode={isDraftMode}
                 circleDiameter={circleDiameter}
+                onNominateClick={townSquareActions.initiateNomination}
             />
         </div>
     );

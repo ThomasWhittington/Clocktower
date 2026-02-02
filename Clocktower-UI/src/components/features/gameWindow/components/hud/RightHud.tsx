@@ -1,71 +1,54 @@
 ﻿import {
     DiscordUserStatus,
-    IconButton
+    IconButton,
 } from "@/components/ui";
-import {HelpIcon} from "@/components/ui/icons";
-import {useDropdown} from "@/hooks";
-import {useCurrentUserIsStoryteller} from "@/components/features/discordTownPanel/hooks";
+import {HelpMenu} from "@/components/features/gameWindow/components/hud/components";
+import {VoteIcon} from "@/components/ui/icons";
+import {useUser} from "@/components/features/discordTownPanel/hooks";
+import {useNominationState} from "@/components/features/gameWindow/hooks";
+import {useAppStore} from "@/store";
+import {
+    User,
+    UserType
+} from "@/types";
 
 interface RightHudProps {
     onRoleListClick: () => void;
     onNightOrderClick: () => void;
     onPaperClick: () => void;
     onForceUpdateClick: () => void;
+    onNominateClick: (player: User) => void;
 }
 
 export const RightHud = ({
                              onRoleListClick,
                              onNightOrderClick,
                              onPaperClick,
-                             onForceUpdateClick
+                             onForceUpdateClick,
+                             onNominateClick
                          }: RightHudProps) => {
-    const {isOpen, toggle, close, dropdownRef} = useDropdown();
-    const isStoryteller = useCurrentUserIsStoryteller();
+    const {nominationsEnabled, isActiveNomination} = useNominationState();
+    const {currentUser} = useAppStore();
+    const {thisUser} = useUser(currentUser?.id);
+    const canNominate = thisUser ?
+        nominationsEnabled &&
+        !isActiveNomination &&
+        thisUser.userType === UserType.Player &&
+        !thisUser.isDead
+        : false;
+
     return (
         <div className="controls-right">
             <DiscordUserStatus/>
-            <div className="relative" ref={dropdownRef}>
-                <IconButton
-                    icon={<HelpIcon/>}
-                    isActive={isOpen}
-                    onClick={toggle}
-                    tooltip="Help Menu"
-                />
-                {isOpen && (
-                    <div className="help-menu">
-                        <h2>Help</h2>
-                        <button type="button" onClick={() => {
-                            onRoleListClick();
-                            close();
-                        }}>
-                            <span>Role List</span>
-                            <span>[R]</span>
-                        </button>
-                        <button type="button" onClick={() => {
-                            onNightOrderClick();
-                            close();
-                        }}>
-                            <span>Night Order</span>
-                            <span>[N]</span>
-                        </button>
-                        <button type="button" onClick={() => {
-                            onPaperClick();
-                            close();
-                        }}>
-                            <span>Paper</span>
-                            <span>[P]</span>
-                        </button>
-                        {isStoryteller &&
-                            <button type="button" className="text-discord-warning" onClick={() => {
-                                onForceUpdateClick();
-                                close();
-                            }}>
-                                Force Update
-                            </button>
-                        }
-                    </div>
-                )}
-            </div>
+            <HelpMenu
+                onRoleListClick={onRoleListClick}
+                onNightOrderClick={onNightOrderClick}
+                onPaperClick={onPaperClick}
+                onForceUpdateClick={onForceUpdateClick}
+            />
+            {canNominate && thisUser &&
+                <IconButton icon={<VoteIcon/>} variant="danger" tooltip="Nominate" onClick={() => onNominateClick(thisUser)}/>
+            }
         </div>
     );
 }

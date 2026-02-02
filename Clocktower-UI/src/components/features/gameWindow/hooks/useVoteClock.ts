@@ -27,7 +27,6 @@ export const useVoteClock = (circleDiameter: number) => {
     const votingSpeed = nominationSession?.votingSpeed ?? 0;
     const playerCount = nominationSession?.playerCount ?? 0;
     useEffect(() => {
-        console.log(`useVoteClock: target=${target}, nominator=${nominator}, playerCount=${playerCount}`);
         if (target !== undefined && playerCount > 0) {
             const lastTarget = lastTargetRef.current;
 

@@ -47,17 +47,6 @@ export const playerActions: PlayerAction[] = [
             execute: (player, {initiateNomination}) => {
                 initiateNomination(player);
             },
-        },
-        {
-            id: "player-nomination",
-            label: "Nominate",
-            icon: "🗳️",
-            isVisible: (player, state) => {
-                return !state.currentUserIsStoryTeller && state.nominationsEnabled && !player.isDead;
-            },
-            execute: (player, {playerNominatesPlayer}) => {
-                void playerNominatesPlayer(player);
-            },
         }
     ]
 ;

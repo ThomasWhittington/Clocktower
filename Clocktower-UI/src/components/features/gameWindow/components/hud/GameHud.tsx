@@ -1,5 +1,8 @@
 ﻿import type {PanelType} from "@/components/features/gameWindow/hooks";
-import {Script} from "@/types";
+import {
+    Script,
+    User
+} from "@/types";
 import {
     BottomHud,
     CenterHud,
@@ -18,6 +21,7 @@ interface GameHudProps {
     setIsDraftMode: (callback: (prev: boolean) => boolean) => void;
     isDraftMode: boolean;
     circleDiameter: number;
+    onNominateClick: (player: User) => void;
 }
 
 export function GameHud({
@@ -27,7 +31,8 @@ export function GameHud({
                             togglePanel,
                             setIsDraftMode,
                             isDraftMode,
-                            circleDiameter
+                            circleDiameter,
+                            onNominateClick
                         }: Readonly<GameHudProps>) {
     const {discordTown} = useDiscordTown();
     const {forceUpdate} = adminService;
@@ -36,6 +41,7 @@ export function GameHud({
             void forceUpdate(discordTown.gameId);
         }
     };
+
     return (
         <>
             {isStoryteller && (
@@ -57,6 +63,7 @@ export function GameHud({
                 onNightOrderClick={() => script && togglePanel('night')}
                 onPaperClick={() => togglePanel('paper')}
                 onForceUpdateClick={forceUpdateGame}
+                onNominateClick={onNominateClick}
             />
             <BottomHud scriptName={script?.name} storyTellers={discordTown?.storyTellers ?? []}/>
         </>

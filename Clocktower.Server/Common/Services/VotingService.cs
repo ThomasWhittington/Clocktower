@@ -98,11 +98,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, INoti
     public async Task StartVote(string gameId, int votingSpeed)
     {
         var session = GetSession(gameId);
-        if (session is null) return;
-
-        var game = gamePerspectiveService.GetFirstPerspective(gameId);
-        if (game is null) return;
-
+        if (session?.Nominator == null || session.Nominee == null) return;
         var newSession = session with
         {
             VoteUnderway = true,

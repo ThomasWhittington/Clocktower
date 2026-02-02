@@ -10,8 +10,7 @@ import {
 } from "@/components/ui/icons";
 import {
     getPlayerGlowColor,
-    useCircleLayout,
-    useTownSquareActions
+    useCircleLayout
 } from "@/components/features/townSquare/hooks";
 import {
     useDiscordTown,
@@ -23,7 +22,10 @@ import {
 } from "@/hooks";
 import {Spinner} from "@/components/ui";
 import {useAppStore} from "@/store";
-import {useState} from "react";
+import {
+    useEffect,
+    useState
+} from "react";
 import {User} from "@/types";
 
 
@@ -32,16 +34,22 @@ interface TownSquareProps {
     onTokenClick?: (player: User) => void;
     onCommitDraftRoles?: () => void;
     onCircleSizeChange?: (diameter: number) => void;
+    townSquareActions: ReturnType<typeof import('@/components/features/townSquare/hooks').useTownSquareActions>;
 }
 
-export default function TownSquare({showDraftRoles = false, onTokenClick, onCommitDraftRoles, onCircleSizeChange}: Readonly<TownSquareProps>) {
+export default function TownSquare({
+                                       showDraftRoles = false,
+                                       onTokenClick,
+                                       onCommitDraftRoles,
+                                       onCircleSizeChange,
+                                       townSquareActions
+                                   }: Readonly<TownSquareProps>) {
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
     const {discordTown, isLoading, error} = useDiscordTown();
     const {currentUser} = useAppStore();
     const {thisUser} = useUser(currentUser?.id);
     const [showToken, setShowToken] = useState<boolean>(true);
     useKeyboardShortcut({key: 'g', onKeyPress: () => setShowToken(prev => !prev)});
-
     const {
         activeMenuPlayerId,
         swappingPlayer,
@@ -56,7 +64,7 @@ export default function TownSquare({showDraftRoles = false, onTokenClick, onComm
         confirmNomination,
         cancelNomination,
         playerNominatesPlayer
-    } = useTownSquareActions();
+    } = townSquareActions;
 
     const {positions, size} = useCircleLayout({
         count: discordTown?.players?.length ?? 0,
@@ -65,9 +73,11 @@ export default function TownSquare({showDraftRoles = false, onTokenClick, onComm
     });
 
     const circleDiameter = Math.min(parentSize.width, parentSize.height) - 2 * size;
-    if (onCircleSizeChange && circleDiameter > 0) {
-        onCircleSizeChange(circleDiameter);
-    }
+    useEffect(() => {
+        if (onCircleSizeChange && circleDiameter > 0) {
+            onCircleSizeChange(circleDiameter);
+        }
+    }, [circleDiameter, onCircleSizeChange]);
 
     const actionContext: PlayerActionContext = {
         initiateSwap,

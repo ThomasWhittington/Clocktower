@@ -105,7 +105,7 @@ const createConnection = async () => {
             }
         })
         .withAutomaticReconnect()
-        .configureLogging(signalR.LogLevel.Information)
+        .configureLogging(signalR.LogLevel.Warning)
         .build();
 
     registerSignalHandlers(globalConnection, setState);
