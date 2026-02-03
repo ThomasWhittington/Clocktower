@@ -1,19 +1,13 @@
 ﻿import type {CSSProperties} from "react";
-import {
-    AnimatePresence,
-    motion
-} from "framer-motion";
-import {animations} from "@/constants";
 
 interface VoteClockProps {
     bigHandRotation: number,
     smallHandRotation: number,
     clockSize: string,
     votingSpeed: number,
-    countdown?: string
 }
 
-export const VoteClock = ({bigHandRotation, smallHandRotation, clockSize, votingSpeed, countdown}: VoteClockProps) => {
+export const VoteClock = ({bigHandRotation, smallHandRotation, clockSize, votingSpeed}: VoteClockProps) => {
     return (
         <div className="clock-container">
             <img
@@ -36,14 +30,6 @@ export const VoteClock = ({bigHandRotation, smallHandRotation, clockSize, voting
                 } as CSSProperties}
                 alt="Nominator clock hand"
             />
-
-            <AnimatePresence mode="wait">
-                {countdown !== undefined && (
-                    <motion.p key={countdown} className="countdown" {...animations.fade}>
-                        {countdown}
-                    </motion.p>
-                )}
-            </AnimatePresence>
         </div>
     );
 }

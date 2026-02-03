@@ -7,7 +7,7 @@ import {
     AnimatePresence,
     motion
 } from "framer-motion";
-import {VoteClock} from "@/components/features/gameWindow/components/hud/components";
+import {Nomination} from "@/components/features/gameWindow/components/hud/components";
 import {animations} from "@/constants";
 
 interface CenterHudProps {
@@ -28,7 +28,7 @@ export const CenterHud = ({circleDiameter}: CenterHudProps) => {
             <AnimatePresence mode="wait">
                 {isActiveNomination ? (
                     <motion.div key="nominations" {...animations.zoomIn}>
-                        <VoteClock
+                        <Nomination
                             bigHandRotation={bigHandRotation}
                             smallHandRotation={smallHandRotation}
                             clockSize={clockSize}
