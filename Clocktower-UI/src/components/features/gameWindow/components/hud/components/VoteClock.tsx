@@ -3,6 +3,7 @@ import {
     AnimatePresence,
     motion
 } from "framer-motion";
+import {animations} from "@/constants";
 
 interface VoteClockProps {
     bigHandRotation: number,
@@ -33,19 +34,12 @@ export const VoteClock = ({bigHandRotation, smallHandRotation, clockSize, voting
                     '--clock-transition-duration': `${votingSpeed - 100}ms`,
                     '--clock-size': clockSize
                 } as CSSProperties}
-                alt="Nominee clock hand"
+                alt="Nominator clock hand"
             />
 
             <AnimatePresence mode="wait">
                 {countdown !== undefined && (
-                    <motion.p
-                        key={countdown}
-                        className="countdown"
-                        initial={{opacity: 0, filter: "blur(10px)"}}
-                        animate={{opacity: 1, filter: "blur(0px)"}}
-                        exit={{opacity: 0, filter: "blur(10px)"}}
-                        transition={{duration: 0.3}}
-                    >
+                    <motion.p key={countdown} className="countdown" {...animations.fade}>
                         {countdown}
                     </motion.p>
                 )}
