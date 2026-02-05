@@ -12,6 +12,7 @@ export const useNominationState = () => {
     const nominationsEnabled = nominationSession !== undefined;
     const isActiveNomination = nominationSession?.isActiveNomination ?? false;
     const voteUnderway = nominationSession?.voteUnderway ?? false;
+    const voteEnded = nominationSession?.voteEnded ?? false;
     const toggleNominations = () => {
         if (!gameId) return;
         if (nominationsEnabled) {
@@ -24,6 +25,10 @@ export const useNominationState = () => {
         nominationsEnabled,
         isActiveNomination,
         voteUnderway,
-        toggleNominations
+        voteEnded,
+        toggleNominations,
+        nominee: nominationSession?.nominee,
+        nominator: nominationSession?.nominator,
+        requiredMajority: nominationSession?.requiredMajority ?? 0
     };
 };

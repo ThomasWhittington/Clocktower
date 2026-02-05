@@ -8,6 +8,7 @@ import {
     HandIcon,
     NoVoteIcon,
     PointIcon,
+    SkullIcon,
     SwapIcon
 } from "@/components/ui/icons";
 import {
@@ -19,8 +20,9 @@ import {
     useUser
 } from "@/components/features/discordTownPanel/hooks";
 import {
+    toggleMarkPlayer,
     useElementSize,
-    useKeyboardShortcut
+    useKeyboardShortcut,
 } from "@/hooks";
 import {Spinner} from "@/components/ui";
 import {useAppStore} from "@/store";
@@ -51,6 +53,7 @@ export default function TownSquare({
                                        townSquareActions
                                    }: Readonly<TownSquareProps>) {
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
+    const {gameId} = useAppStore();
     const {discordTown, isLoading, error} = useDiscordTown();
     const {currentUser} = useAppStore();
     const {thisUser} = useUser(currentUser?.id);
@@ -64,7 +67,6 @@ export default function TownSquare({
         initiateSwap,
         confirmSwap,
         cancelSwap,
-        startVote,
         nominatingPlayer,
         initiateNomination,
         confirmNomination,
@@ -85,9 +87,10 @@ export default function TownSquare({
         }
     }, [circleDiameter, onCircleSizeChange]);
 
+    if (!gameId) return;
     const actionContext: PlayerActionContext = {
         initiateSwap,
-        startVote,
+        toggleMarkPlayer: player => void toggleMarkPlayer(gameId, player.id),
         initiateNomination,
         playerNominatesPlayer
     };
@@ -152,9 +155,14 @@ export default function TownSquare({
                                     </button>
                                 }
                                 <AnimatePresence>
+                                    {player.isMarked &&
+                                        <motion.div key="marked" {...animations.zoomInSpring} className="portrait-overlay">
+                                            <SkullIcon className="portrait-icon marked"/>
+                                        </motion.div>
+                                    }
                                     {player.handUp &&
                                         <motion.div key="handup" {...animations.zoomInSpring} className="portrait-overlay">
-                                            <HandIcon className={`portrait-icon hand-up${player.voteLocked ? '' : ' unlocked'}`}/>
+                                            <HandIcon className={`portrait-icon hand-up${player.voteLocked ? '' : ' unlocked'}`} gradientId="shared-hand"/>
                                         </motion.div>
                                     }
                                     {!player.handUp && player.voteLocked &&

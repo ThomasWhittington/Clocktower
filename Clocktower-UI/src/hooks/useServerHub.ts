@@ -74,7 +74,8 @@ const handleJoinSnapshot = async (snapshot: SessionSyncState, isReconnecting: bo
         gameTime: snapshot.gameTime,
         discordTown: snapshot.discordTown ? new DiscordTown(snapshot.discordTown) : undefined,
         timer: snapshot.timer,
-        script: snapshot.script ? new Script(snapshot.script) : undefined
+        script: snapshot.script ? new Script(snapshot.script) : undefined,
+        nominationSession: snapshot.nominationSession ? new NominationSession(snapshot.nominationSession) : undefined
     });
 
     const currentJwt = useAppStore.getState().jwt;
@@ -260,12 +261,27 @@ const closeNominations = async (gameId: string): Promise<void> => {
 
     await globalConnection.invoke('CloseNominations', gameId);
 }
+
+const nextNomination = async (gameId: string): Promise<void> => {
+    if (!isConnected(globalConnection)) {
+        return;
+    }
+
+    await globalConnection.invoke('NextNomination', gameId);
+}
 const startVote = async (gameId: string, votingSpeed: number): Promise<void> => {
     if (!isConnected(globalConnection)) {
         return;
     }
 
     await globalConnection.invoke('StartVote', gameId, votingSpeed);
+}
+const cancelVote = async (gameId: string): Promise<void> => {
+    if (!isConnected(globalConnection)) {
+        return;
+    }
+
+    await globalConnection.invoke('CancelVote', gameId);
 }
 
 const makeNomination = async (gameId: string, nominatorId: string, nomineeId: string) => {
@@ -281,6 +297,20 @@ const toggleVote = async (gameId: string, playerId: string) => {
     }
     return await globalConnection.invoke<boolean | null>('ToggleVote', gameId, playerId);
 }
+const toggleMarkPlayer = async (gameId: string, playerId: string) => {
+    if (!isConnected(globalConnection)) {
+        return;
+    }
+    return await globalConnection.invoke<boolean | null>('ToggleMarkPlayer', gameId, playerId);
+}
+
+const removeAllMarks = async (gameId: string) => {
+    if (!isConnected(globalConnection)) {
+        return;
+    }
+    return await globalConnection.invoke<boolean | null>('RemoveAllMarks', gameId);
+}
+
 export const joinGameGroup = async (gameId: string, isReconnecting: boolean = false, isInitialMount: boolean = false): Promise<void> => {
     const {setJoinedGameId, currentUser} = useAppStore.getState();
 
@@ -353,6 +383,10 @@ export {
     openNominations,
     closeNominations,
     startVote,
+    cancelVote,
+    nextNomination,
     makeNomination,
-    toggleVote
+    toggleVote,
+    toggleMarkPlayer,
+    removeAllMarks
 };

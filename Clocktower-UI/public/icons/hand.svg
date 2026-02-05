@@ -13,7 +13,7 @@
             <stop offset="0%"
                   stop-color="currentColor"/>
             <stop offset="100%"
-                  stop-color="#000000"/>
+                  stop-color="var(--gradient-end, #000000)"/>
         </linearGradient>
     </defs>
     <path fill="url(#handGradient)"

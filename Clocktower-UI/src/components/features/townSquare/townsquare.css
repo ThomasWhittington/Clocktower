@@ -276,4 +276,11 @@
     .no-vote {
         @apply text-townsfolk;
     }
+
+    .marked {
+        @apply text-black;
+        backdrop-filter: blur(2px);
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+    }
 }

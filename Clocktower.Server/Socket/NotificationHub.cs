@@ -32,8 +32,20 @@ public sealed class NotificationHub(IHubStateManager hubStateManager, IVotingSer
     public async Task StartVote(string gameId, int votingSpeed)
         => await votingService.StartVote(gameId, votingSpeed);
 
+    public async Task CancelVote(string gameId)
+        => await votingService.CancelVote(gameId);
+
+    public async Task NextNomination(string gameId)
+        => await votingService.NextNomination(gameId);
+
+    public async Task RemoveAllMarks(string gameId)
+        => await votingService.RemoveAllMarks(gameId);
+
     public async Task<bool> MakeNomination(string gameId, string nominatorId, string nomineeId)
         => await votingService.MakeNomination(gameId, nominatorId, nomineeId);
+
+    public async Task<bool> ToggleMarkPlayer(string gameId, string playerId)
+        => await votingService.ToggleMarkPlayer(gameId, playerId);
 
     public async Task<bool> ToggleVote(string gameId, string playerId)
         => await votingService.ToggleVote(gameId, playerId);

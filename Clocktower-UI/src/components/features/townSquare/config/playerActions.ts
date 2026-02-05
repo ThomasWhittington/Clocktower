@@ -15,7 +15,7 @@ export interface PlayerActionState {
 
 export interface PlayerActionContext {
     initiateSwap: (player: User) => void;
-    startVote: (player: User) => void;
+    toggleMarkPlayer: (player: User) => void;
     initiateNomination: (player: User) => void;
     playerNominatesPlayer: (target: User) => Promise<void>;
 }
@@ -31,12 +31,12 @@ export const playerActions: PlayerAction[] = [
             },
         },
         {
-            id: "start-vote",
-            label: "Start Vote",
-            icon: "🗳️",
-            isVisible: (_, state) => state.currentUserIsStoryTeller && state.nominationsEnabled,
-            execute: (player, {startVote}) => {
-                startVote(player);
+            id: "toggle-mark",
+            label: "Toggle Mark",
+            icon: "💀️",
+            isVisible: (_, state) => state.currentUserIsStoryTeller,
+            execute: (player, {toggleMarkPlayer}) => {
+                toggleMarkPlayer(player);
             },
         },
         {

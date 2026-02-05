@@ -57,7 +57,96 @@
         --clock-transition-duration: 2000ms;
 
         .countdown {
-            @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center content-center pointer-events-none select-none text-9xl font-bold;
+            @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center content-center pointer-events-none select-none font-bold z-10;
+            font-size: 20vmin;
+        }
+
+        .vote-overlay {
+            @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center content-center rounded-lg bg-black/50 flex flex-col w-fit;
+            padding: 1.5vmin;
+            font-size: 1.2vmin;
+
+            .vote-text {
+                @apply flex flex-row select-none items-center;
+
+                svg {
+                    margin-left: 1.5vmin;
+                    margin-right: 1.5vmin;
+                    width: 2.5vmin;
+                    height: 2.5vmin;
+                }
+
+                span {
+                    @apply text-white;
+                    font-weight: bold;
+                    font-size: 2vmin;
+                }
+
+                span:first-child {
+                    @apply text-townsfolk;
+                }
+
+                span:last-child {
+                    @apply text-demon;
+                }
+            }
+
+            .majority {
+                @apply text-minion select-none;
+                font-size: 1.8vmin;
+            }
+
+            .speed-control {
+                @apply flex flex-row items-center justify-center;
+            }
+
+            .speed-button {
+                @apply pointer-events-auto;
+            }
+
+            .vote-control {
+                @apply flex;
+                gap: 1vmin;
+
+                .current-count {
+                    @apply flex flex-row items-center justify-center select-none;
+                    gap: 0.5vmin;
+
+                    .hand {
+                        @apply flex-1 text-transparent stroke-demon;
+                        width: 4vmin;
+                        height: 4vmin;
+                    }
+
+                    .majority {
+                        @apply stroke-forestgreen
+                    }
+
+                    span {
+                        @apply text-white;
+                        font-weight: bold;
+                        font-size: 2vmin;
+                    }
+                }
+
+
+                .close-nominations,
+                .next-nomination,
+                .reset-nominations,
+                .toggle-mark,
+                .start-vote,
+                .toggle-vote {
+                    @apply flex-2 pointer-events-auto;
+                    min-width: 10vmin;
+
+                    &.btn-icon {
+                        width: 12vmin;
+                        height: 4vmin;
+                        padding: 0.5vmin;
+                        font-size: 1.5vmin;
+                    }
+                }
+            }
         }
 
         .clock-container {

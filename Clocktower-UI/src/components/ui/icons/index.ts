@@ -29,5 +29,9 @@ export {default as HeartIcon} from "#/icons/heart.svg?react";
 export {default as BookIcon} from "#/icons/book.svg?react";
 export {default as AssignIcon} from "#/icons/assign.svg?react";
 export {default as PointIcon} from "#/icons/point.svg?react";
-export {default as HandIcon} from "#/icons/hand.svg?react";
 export {default as NoVoteIcon} from "#/icons/noVote.svg?react";
+export {default as SkullIcon} from "#/icons/skull.svg?react";
+export {default as PlusIcon} from "#/icons/plus.svg?react";
+export {default as MinusIcon} from "#/icons/minus.svg?react";
+
+export * from './HandIcon'

@@ -61,5 +61,10 @@
     --color-minion: #ff6900;
     --color-demon: #ce0100;
     --color-traveller: #cc04ff;
+
+    --color-player: #fff;
+    --color-spectator: #916E99;
+    --color-storyteller: #ffcc00;
+    --color-unknown: #6a7282;
 }
 

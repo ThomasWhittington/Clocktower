@@ -1,6 +1,6 @@
 ﻿import {
     type User,
-    UserType
+    UserType,
 } from "@/types";
 import {
     DiscordUserVoiceStatus,
@@ -10,18 +10,25 @@ import {
 function DiscordTownUser({user}: Readonly<{
     user: User
 }>) {
-    const userType = user.userType ? UserType[user.userType] : UserType.Unknown;
+
+    const typeColorMap: Record<UserType, string> = {
+        [UserType.Player]: 'text-player',
+        [UserType.Spectator]: 'text-spectator',
+        [UserType.StoryTeller]: 'text-storyteller',
+        [UserType.Unknown]: 'text-unknown'
+    };
+    const colorClass = typeColorMap[user.userType ?? UserType.Unknown];
+    const iconSize = 20;
+
     return (
-        <div
-            className="town-user-status">
+        <div className="town-user-status">
             {user.avatarUrl &&
-                <UserAvatar user={user} size={32} className="discord-user-avatar"/>
+                <UserAvatar user={user} size={32} className="discord-user-avatar shrink-0"/>
             }
-            <p>({userType}) {user.name}</p>
-            {
-                user.voiceState &&
-                <DiscordUserVoiceStatus voiceState={user.voiceState}/>
-            }
+            <p className={`${colorClass} truncate min-w-0`}>{user.name}</p>
+            {user.voiceState && (
+                <DiscordUserVoiceStatus voiceState={user.voiceState} iconSize={iconSize}/>
+            )}
         </div>
     );
 }

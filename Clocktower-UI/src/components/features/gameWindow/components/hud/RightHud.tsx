@@ -70,7 +70,7 @@ export const RightHud = ({
                 <IconButton icon={<VoteIcon/>} variant="danger" tooltip="Nominate" onClick={() => onNominateClick(thisUser)}/>
             }
             {canVote && thisUser &&
-                <IconButton icon={<HandIcon/>} variant={thisUser.handUp ? "danger" : "primary"} tooltip="Vote" onClick={() => onVoteClick(thisUser)}/>
+                <IconButton icon={<HandIcon gradientId="shared-hand"/>} variant={thisUser.handUp ? "danger" : "primary"} tooltip="Vote" onClick={() => onVoteClick(thisUser)}/>
             }
         </div>
     );

@@ -3,7 +3,7 @@ using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.Server.Common.Services;
 
-//TODO check that cases are valid before changing things, no nominations if nominations not enabled etc
+//TODO check that cases are valid before changing things, no nominations if nominations not enabled etc. Also verify calling user can do the current action (probably do this in the hub)
 public class VotingService(IGamePerspectiveService gamePerspectiveService, IGameBroadcastService gameBroadcastService) : BackgroundService, IVotingService
 {
     private readonly ConcurrentDictionary<string, NominationSession> _sessions = new();
@@ -48,8 +48,41 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
 
         await LockVote(session);
         session.VoteUnderway = false;
+        session.VoteEnded = true;
         await gameBroadcastService.BroadcastNominationSessionUpdate(session.GameId, session);
         await gameBroadcastService.BroadcastDiscordTownUpdate(session.GameId);
+    }
+
+    public async Task CancelVote(string gameId)
+    {
+        var session = GetSession(gameId);
+        if (session is null) return;
+
+        var game = gamePerspectiveService.GetFirstPerspective(gameId);
+        if (game is not null)
+        {
+            foreach (var player in game.Players)
+            {
+                gamePerspectiveService.UpdatePublicUser(gameId, player.Id, new PublicGameUserUpdate
+                {
+                    VoteLocked = false
+                });
+            }
+        }
+
+        var updatedSession = session with
+        {
+            VoteUnderway = false,
+            VoteEnded = false,
+            CurrentTarget = session.Nominee,
+            CountDown = null,
+            NextTick = default
+        };
+
+        _sessions[gameId] = updatedSession;
+
+        await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, updatedSession);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
     }
 
     public async Task<bool> ToggleVote(string gameId, string playerId)
@@ -98,12 +131,35 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         var session = new NominationSession(gameId)
         {
             VoteUnderway = false,
-            PlayerCount = game.Players.Count()
+            VoteEnded = false,
+            PlayerCount = game.Players.Count(),
+            RequiredMajority = GetRequiredMajority(game.Players)
         };
 
         _sessions[gameId] = session;
 
         await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, session);
+    }
+
+    private int GetRequiredMajority(IEnumerable<GameUser> players)
+    {
+        var applicablePlayers = players.Where(o => !o.IsDead);
+        return (int)Math.Ceiling(applicablePlayers.Count() / 2.0);
+    }
+
+    public async Task<bool> ToggleMarkPlayer(string gameId, string playerId)
+    {
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return false;
+        var user = gamePerspective.Users.FirstOrDefault(o => o.Id == playerId);
+        if (user is null) return false;
+
+        var updated = gamePerspectiveService.UpdatePublicUser(gameId, playerId, new PublicGameUserUpdate
+        {
+            IsMarked = !user.IsMarked
+        });
+        if (updated) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+        return updated;
     }
 
     public async Task CloseNominations(string gameId)
@@ -116,6 +172,28 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         gamePerspectiveService.ResetNominationSession(gameId);
 
         await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, null);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(session.GameId);
+    }
+
+    public async Task NextNomination(string gameId)
+    {
+        var session = GetSession(gameId);
+        if (session is null) return;
+
+        var newSession = session with
+        {
+            VoteUnderway = false,
+            VoteEnded = false,
+            Nominator = null,
+            Nominee = null,
+            CurrentTarget = null
+        };
+
+        _sessions[gameId] = newSession;
+
+        gamePerspectiveService.ResetNominationSession(gameId);
+
+        await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, newSession);
         await gameBroadcastService.BroadcastDiscordTownUpdate(session.GameId);
     }
 
@@ -139,6 +217,26 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
     public NominationSession? GetSession(string gameId)
     {
         return _sessions.TryGetValue(gameId, out var session) ? session : null;
+    }
+
+    public async Task RemoveAllMarks(string gameId)
+    {
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return;
+        var users = gamePerspective.Users.Where(o => o.IsMarked).ToList();
+        if (!users.Any()) return;
+
+        bool updated = false;
+        foreach (var user in users)
+        {
+            var thisUpdate = gamePerspectiveService.UpdatePublicUser(gameId, user.Id, new PublicGameUserUpdate
+            {
+                IsMarked = !user.IsMarked
+            });
+            if (thisUpdate) updated = true;
+        }
+
+        if (updated) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
     }
 
     private async Task LockVote(NominationSession session)
