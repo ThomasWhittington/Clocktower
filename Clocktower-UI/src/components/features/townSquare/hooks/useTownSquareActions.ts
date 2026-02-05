@@ -81,7 +81,7 @@ export function useTownSquareActions() {
                 return await makeNomination(gameId, currentUser.id, target.id);
             });
         }
-    }, [gameId, runAction]);
+    }, [gameId, currentUser, runAction]);
 
     const startVote = useCallback(() => {
         if (gameId) {
@@ -94,7 +94,7 @@ export function useTownSquareActions() {
         if (gameId) {
             void toggleVote(gameId, player.id);
         }
-    }, []);
+    }, [gameId]);
 
     return {
         activeMenuPlayerId,

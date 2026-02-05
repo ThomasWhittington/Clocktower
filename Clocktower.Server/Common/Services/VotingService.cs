@@ -15,12 +15,12 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
 
             foreach (var session in _sessions.Values.Where(s => s.VoteUnderway))
             {
-                await ProcessSession(session);
+                await ProcessSession(session, stoppingToken);
             }
         }
     }
 
-    private async Task ProcessSession(NominationSession session)
+    private async Task ProcessSession(NominationSession session, CancellationToken stoppingToken)
     {
         if (DateTime.UtcNow < session.NextTick) return;
 
@@ -43,7 +43,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         await gameBroadcastService.BroadcastNominationSessionUpdate(session.GameId, session);
 
         if (session.CurrentTarget != session.Nominee) return;
-        await Task.Delay(session.VotingSpeed + 100);
+        await Task.Delay(session.VotingSpeed + 100, stoppingToken);
 
         await LockVote(session);
         session.VoteUnderway = false;
@@ -198,6 +198,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
 
     public async Task StartVote(string gameId, int votingSpeed)
     {
+        if (votingSpeed <= 0) return;
         var session = GetSession(gameId);
         if (session?.Nominator == null || session.Nominee == null) return;
         var newSession = session with

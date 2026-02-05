@@ -29,6 +29,6 @@
     }
 
     get isActiveNomination(): boolean {
-        return this.nominee !== null && this.nominator !== null;
+        return this.nominee != null && this.nominator != null;
     }
 }

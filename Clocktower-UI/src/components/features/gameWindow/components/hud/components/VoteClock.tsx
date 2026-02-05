@@ -8,6 +8,7 @@ interface VoteClockProps {
 }
 
 export const VoteClock = ({bigHandRotation, smallHandRotation, clockSize, votingSpeed}: VoteClockProps) => {
+    const transitionMs = Math.max(0, votingSpeed - 100);
     return (
         <div className="clock-container">
             <img
@@ -15,7 +16,7 @@ export const VoteClock = ({bigHandRotation, smallHandRotation, clockSize, voting
                 className="clock-big"
                 style={{
                     '--clock-rotation': `${bigHandRotation}deg`,
-                    '--clock-transition-duration': `${votingSpeed - 100}ms`,
+                    '--clock-transition-duration': `${transitionMs}ms`,
                     '--clock-size': clockSize
                 } as CSSProperties}
                 alt="Nominee clock hand"
@@ -25,7 +26,7 @@ export const VoteClock = ({bigHandRotation, smallHandRotation, clockSize, voting
                 className="clock-small"
                 style={{
                     '--clock-rotation': `${smallHandRotation}deg`,
-                    '--clock-transition-duration': `${votingSpeed - 100}ms`,
+                    '--clock-transition-duration': `${transitionMs}ms`,
                     '--clock-size': clockSize
                 } as CSSProperties}
                 alt="Nominator clock hand"

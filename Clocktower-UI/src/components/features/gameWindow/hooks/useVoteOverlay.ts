@@ -66,7 +66,7 @@ export const useVoteOverlay = () => {
     }
 
     const canVote = isPlayerEligibleToVote(thisUser);
-    const canRun = gameId != null && player1 != null && player2 != null && thisUser;
+    const canRun = Boolean(gameId != null && player1 != null && player2 != null && thisUser);
 
     const currentVoteCount = DiscordTownUtils.getTotalHandsUp(discordTown);
     return {

@@ -3,7 +3,7 @@ import {resetAllApplicationState} from "@/utils";
 
 export const DiscordUserStatus = () => {
     const {currentUser} = useAppStore();
-    if (!currentUser) return;
+    if (!currentUser) return null;
     const handleLogout = async () => {
         if (globalThis.confirm("Continue log out?")) {
             resetAllApplicationState();

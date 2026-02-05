@@ -40,11 +40,11 @@ export const VoteOverlay = () => {
     });
 
 
-    if (!canRun) return;
+    if (!canRun) return null;
 
     const toggleStartVoteText = voteUnderway ? "Cancel" : "Start";
     const toggleVoteText = userHandUp ? "Lower [V]" : "Raise [V]";
-    const toggleMarkedText = userMarked ? "Un Mark" : "Mark";
+    const toggleMarkedText = userMarked ? "Unmark" : "Mark";
     const buttonVariant = (toggle: boolean): "danger" | "primary" | "secondary" | "outline" | undefined => toggle ? "danger" : "primary";
 
     return (

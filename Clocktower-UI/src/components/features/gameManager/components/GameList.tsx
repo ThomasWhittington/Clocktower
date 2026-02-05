@@ -12,6 +12,14 @@ interface GameListProps {
 export const GameList: FC<GameListProps> = ({games}) => {
     const setGameId = useAppStore((state) => state.setGameId);
     const navigate = useNavigate();
+    const setGame = async (gameId: string) => {
+        setGameId(gameId);
+        try {
+            await joinGameGroup(gameId);
+            navigate('/game');
+        } catch {
+        }
+    };
     return (
         <div className="mt-4">
             <h3 className="text-xl font-semibold text-gray-200 mb-4">Games List</h3>
@@ -27,12 +35,7 @@ export const GameList: FC<GameListProps> = ({games}) => {
                             {game.createdDate && <h5 className="sm text-gray-600">{new Date(game.createdDate).toDateString()}</h5>}
                             <h5 className="sm text-gray-600">{game.createdBy.id}</h5>
 
-                            <button className="btn-outline" onClick={() => {
-                                setGameId(game.id);
-                                navigate('/game');
-                                void joinGameGroup(game.id);
-                            }}>
-                                Select
+                            <button className="btn-outline" onClick={() => setGame(game.id)}> Select
                             </button>
                         </div>
                     ))
