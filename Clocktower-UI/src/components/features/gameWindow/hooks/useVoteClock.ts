@@ -49,7 +49,7 @@ export const useVoteClock = (circleDiameter: number) => {
             setBigHandRotation(0);
             setSmallHandRotation(0);
         }
-    }, [nominationSession, target, nominator]);
+    }, [nominationSession, target, nominator, playerCount]);
 
     const clockSize = circleDiameter > 0 ? `${circleDiameter * bigHandMultiplier}px` : '75vmin';
     const countdown = nominationSession?.countDownString;

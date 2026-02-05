@@ -12,5 +12,5 @@ export type SessionSyncState = {
     discordTown?: DiscordTown;
     timer?: TimerState;
     script?: Script;
-    nominationSession?: NominationSession
+    nominationSession?: NominationSession | null;
 };

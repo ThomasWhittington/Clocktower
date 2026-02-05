@@ -87,7 +87,7 @@ export default function TownSquare({
         }
     }, [circleDiameter, onCircleSizeChange]);
 
-    if (!gameId) return;
+    if (!gameId) return null;
     const actionContext: PlayerActionContext = {
         initiateSwap,
         toggleMarkPlayer: player => void toggleMarkPlayer(gameId, player.id),
