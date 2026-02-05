@@ -1,6 +1,7 @@
 ﻿import {
     DiscordUserStatus,
     IconButton,
+    ServerStatus,
 } from "@/components/ui";
 import {HelpMenu} from "@/components/features/gameWindow/components/hud/components";
 import {
@@ -57,15 +58,23 @@ export const RightHud = ({
             onCancelNomination();
         }
     }, [canNominate, onCancelNomination]);
+
     return (
         <div className="controls-right">
-            <DiscordUserStatus/>
-            <HelpMenu
-                onRoleListClick={onRoleListClick}
-                onNightOrderClick={onNightOrderClick}
-                onPaperClick={onPaperClick}
-                onForceUpdateClick={onForceUpdateClick}
-            />
+            <div className="top-row">
+                <ServerStatus/>
+                <div className="right-column">
+                    {currentUser?.avatarUrl &&
+                        <DiscordUserStatus/>
+                    }
+                    <HelpMenu
+                        onRoleListClick={onRoleListClick}
+                        onNightOrderClick={onNightOrderClick}
+                        onPaperClick={onPaperClick}
+                        onForceUpdateClick={onForceUpdateClick}
+                    />
+                </div>
+            </div>
             {canNominate && thisUser &&
                 <IconButton icon={<VoteIcon/>} variant="danger" tooltip="Nominate" onClick={() => onNominateClick(thisUser)}/>
             }

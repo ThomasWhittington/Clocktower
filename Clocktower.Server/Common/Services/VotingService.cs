@@ -3,7 +3,6 @@ using Clocktower.Server.Socket.Services;
 
 namespace Clocktower.Server.Common.Services;
 
-//TODO check that cases are valid before changing things, no nominations if nominations not enabled etc. Also verify calling user can do the current action (probably do this in the hub)
 public class VotingService(IGamePerspectiveService gamePerspectiveService, IGameBroadcastService gameBroadcastService) : BackgroundService, IVotingService
 {
     private readonly ConcurrentDictionary<string, NominationSession> _sessions = new();
@@ -56,7 +55,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
     public async Task CancelVote(string gameId)
     {
         var session = GetSession(gameId);
-        if (session is null) return;
+        if (session is null || !session.VoteUnderway) return;
 
         var game = gamePerspectiveService.GetFirstPerspective(gameId);
         if (game is not null)
@@ -141,7 +140,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, session);
     }
 
-    private int GetRequiredMajority(IEnumerable<GameUser> players)
+    private static int GetRequiredMajority(IEnumerable<GameUser> players)
     {
         var applicablePlayers = players.Where(o => !o.IsDead);
         return (int)Math.Ceiling(applicablePlayers.Count() / 2.0);

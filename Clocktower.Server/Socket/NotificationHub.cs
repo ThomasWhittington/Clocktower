@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Clocktower.Server.Socket;
 
-public sealed class NotificationHub(IHubStateManager hubStateManager, IVotingService votingService) : Hub<INotificationClient>, INotificationHub
+public sealed class NotificationHub(IHubStateManager hubStateManager, IGamePerspectiveService gamePerspectiveService, IVotingService votingService) : Hub<INotificationClient>, INotificationHub
 {
     [UsedImplicitly]
     public async Task<SessionSyncState?> JoinGameGroup(string gameId, string userId, string? oldGameId = null)
@@ -14,8 +14,9 @@ public sealed class NotificationHub(IHubStateManager hubStateManager, IVotingSer
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetGameGroupName(oldGameId));
         }
 
-        await Groups.AddToGroupAsync(Context.ConnectionId, GetGameGroupName(gameId));
+        if (!gamePerspectiveService.GameExists(gameId)) return null;
 
+        await Groups.AddToGroupAsync(Context.ConnectionId, GetGameGroupName(gameId));
         var currentState = hubStateManager.GetState(gameId, userId);
         return currentState;
     }
