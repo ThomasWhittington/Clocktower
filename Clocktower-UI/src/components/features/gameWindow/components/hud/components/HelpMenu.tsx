@@ -6,11 +6,12 @@ import {HelpIcon} from "@/components/ui/icons";
 interface HelpMenuProps {
     onRoleListClick: () => void;
     onNightOrderClick: () => void;
+    onVoteHistoryClick: () => void;
     onPaperClick: () => void;
     onForceUpdateClick: () => void;
 }
 
-export const HelpMenu = ({onRoleListClick, onNightOrderClick, onPaperClick, onForceUpdateClick}: HelpMenuProps) => {
+export const HelpMenu = ({onRoleListClick, onNightOrderClick, onVoteHistoryClick, onPaperClick, onForceUpdateClick}: HelpMenuProps) => {
     const {isOpen, toggle, close, dropdownRef} = useDropdown();
     const isStoryteller = useCurrentUserIsStoryteller();
     return (
@@ -37,6 +38,13 @@ export const HelpMenu = ({onRoleListClick, onNightOrderClick, onPaperClick, onFo
                     }}>
                         <span>Night Order</span>
                         <span>[N]</span>
+                    </button>
+                    <button type="button" onClick={() => {
+                        onVoteHistoryClick();
+                        close();
+                    }}>
+                        <span>Vote History</span>
+                        <span>[V]</span>
                     </button>
                     <button type="button" onClick={() => {
                         onPaperClick();

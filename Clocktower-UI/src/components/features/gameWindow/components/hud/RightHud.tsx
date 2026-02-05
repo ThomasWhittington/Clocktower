@@ -20,6 +20,7 @@ import {useEffect} from "react";
 interface RightHudProps {
     onRoleListClick: () => void;
     onNightOrderClick: () => void;
+    onVoteHistoryClick: () => void;
     onPaperClick: () => void;
     onForceUpdateClick: () => void;
     onNominateClick: (player: User) => void;
@@ -30,6 +31,7 @@ interface RightHudProps {
 export const RightHud = ({
                              onRoleListClick,
                              onNightOrderClick,
+                             onVoteHistoryClick,
                              onPaperClick,
                              onForceUpdateClick,
                              onNominateClick,
@@ -70,6 +72,7 @@ export const RightHud = ({
                     <HelpMenu
                         onRoleListClick={onRoleListClick}
                         onNightOrderClick={onNightOrderClick}
+                        onVoteHistoryClick={onVoteHistoryClick}
                         onPaperClick={onPaperClick}
                         onForceUpdateClick={onForceUpdateClick}
                     />

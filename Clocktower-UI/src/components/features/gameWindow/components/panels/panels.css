@@ -417,4 +417,70 @@
             @apply outline-none border-white/40 bg-white/15;
         }
     }
+
+
+    .vote-history-panel {
+        @apply flex flex-col gap-2 p-4 overflow-y-auto w-full;
+
+        table {
+            @apply w-full border-collapse;
+        }
+
+        thead th {
+            @apply text-left p-3 text-white/70 font-semibold border-b-2 border-white/20;
+        }
+
+        tbody tr.vote-history-line {
+            @apply transition-all duration-200;
+
+            &.passed {
+                @apply bg-green-500/10 hover:bg-green-500/15;
+
+                td {
+                    @apply border-l-4 border-green-500/40;
+                }
+
+                td:first-child {
+                    @apply border-l-4 border-green-500/40;
+                }
+            }
+
+            &.failed {
+                @apply bg-red-500/10 hover:bg-red-500/15;
+
+                td {
+                    @apply border-l-4 border-red-500/40;
+                }
+
+                td:first-child {
+                    @apply border-l-4 border-red-500/40;
+                }
+            }
+
+            td {
+                @apply p-3;
+            }
+
+            .time {
+                @apply text-gray-400 text-sm font-mono;
+            }
+
+            .nominator,
+            .nominee {
+                @apply font-semibold text-white/90;
+            }
+
+            .votes {
+                @apply font-bold text-lg;
+            }
+
+            .result {
+                @apply text-2xl text-center;
+            }
+
+            .voters {
+                @apply text-sm text-gray-400 italic;
+            }
+        }
+    }
 }

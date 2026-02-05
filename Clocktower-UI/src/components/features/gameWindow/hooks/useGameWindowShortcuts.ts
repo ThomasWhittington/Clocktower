@@ -54,6 +54,11 @@ export function useGameWindowShortcuts({
     });
 
     useKeyboardShortcut({
+        key: 'v',
+        onKeyPress: () => togglePanel('voteHistory')
+    });
+
+    useKeyboardShortcut({
         key: 'd',
         onKeyPress: () => setIsDraftMode(prev => !prev),
         enabled: isStoryTeller
