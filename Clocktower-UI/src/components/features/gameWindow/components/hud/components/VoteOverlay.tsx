@@ -9,6 +9,7 @@
 import {IconButton} from "@/components/ui";
 import type {CSSProperties} from "react";
 import {useVoteOverlay} from "@/components/features/gameWindow/hooks";
+import {useKeyboardShortcut} from "@/hooks";
 
 export const VoteOverlay = () => {
     const {
@@ -32,10 +33,17 @@ export const VoteOverlay = () => {
         voteSpeed
     } = useVoteOverlay();
 
+    useKeyboardShortcut({
+        key: 'v',
+        onKeyPress: toggleHandUp,
+        enabled: canVote
+    });
+
+
     if (!canRun) return;
 
     const toggleStartVoteText = voteUnderway ? "Cancel" : "Start";
-    const toggleVoteText = userHandUp ? "Lower" : "Raise";
+    const toggleVoteText = userHandUp ? "Lower [V]" : "Raise [V]";
     const toggleMarkedText = userMarked ? "Un Mark" : "Mark";
     const buttonVariant = (toggle: boolean): "danger" | "primary" | "secondary" | "outline" | undefined => toggle ? "danger" : "primary";
 
