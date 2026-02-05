@@ -34,7 +34,7 @@ export const VoteOverlay = () => {
     } = useVoteOverlay();
 
     useKeyboardShortcut({
-        key: 'v',
+        key: 'h',
         onKeyPress: toggleHandUp,
         enabled: canVote
     });
@@ -43,7 +43,7 @@ export const VoteOverlay = () => {
     if (!canRun) return null;
 
     const toggleStartVoteText = voteUnderway ? "Cancel" : "Start";
-    const toggleVoteText = userHandUp ? "Lower [V]" : "Raise [V]";
+    const toggleVoteText = userHandUp ? "Lower [H]" : "Raise [H]";
     const toggleMarkedText = userMarked ? "Unmark" : "Mark";
     const buttonVariant = (toggle: boolean): "danger" | "primary" | "secondary" | "outline" | undefined => toggle ? "danger" : "primary";
 
