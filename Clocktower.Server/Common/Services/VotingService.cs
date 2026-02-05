@@ -6,6 +6,7 @@ namespace Clocktower.Server.Common.Services;
 public class VotingService(IGamePerspectiveService gamePerspectiveService, IGameBroadcastService gameBroadcastService) : BackgroundService, IVotingService
 {
     private readonly ConcurrentDictionary<string, NominationSession> _sessions = new();
+    private readonly ConcurrentDictionary<string, VoteHistoryRecord[]> _voteHistory = new();
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -46,10 +47,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         await Task.Delay(session.VotingSpeed + 100, stoppingToken);
 
         await LockVote(session);
-        session.VoteUnderway = false;
-        session.VoteEnded = true;
-        await gameBroadcastService.BroadcastNominationSessionUpdate(session.GameId, session);
-        await gameBroadcastService.BroadcastDiscordTownUpdate(session.GameId);
+        await EndVote(session);
     }
 
     public async Task CancelVote(string gameId)
@@ -239,6 +237,11 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         if (updated) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
     }
 
+    public IEnumerable<VoteHistoryRecord> GetVoteHistory(string gameId)
+    {
+        return _voteHistory.TryGetValue(gameId, out var voteHistory) ? voteHistory : [];
+    }
+
     private async Task LockVote(NominationSession session)
     {
         var game = gamePerspectiveService.GetFirstPerspective(session.GameId);
@@ -247,5 +250,36 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         if (user is null) return;
         gamePerspectiveService.UpdatePublicUser(session.GameId, user.Id, new PublicGameUserUpdate { VoteLocked = true });
         await gameBroadcastService.BroadcastDiscordTownUpdate(session.GameId);
+    }
+
+    private async Task EndVote(NominationSession session)
+    {
+        session.VoteUnderway = false;
+        session.VoteEnded = true;
+        await gameBroadcastService.BroadcastNominationSessionUpdate(session.GameId, session);
+        await gameBroadcastService.BroadcastDiscordTownUpdate(session.GameId);
+
+        var game = gamePerspectiveService.GetFirstPerspective(session.GameId);
+        if (game is null) return;
+
+        var nominator = game.Players.FirstOrDefault(o => o.SeatingPosition == session.Nominator);
+        var nominee = game.Players.FirstOrDefault(o => o.SeatingPosition == session.Nominee);
+        var voters = game.Players.Where(o => o.HandUp).Select(o => o.Id).ToArray();
+
+        var voteHistory = new VoteHistoryRecord
+        {
+            Time = DateTime.UtcNow,
+            NominatorId = nominator?.Id ?? string.Empty,
+            NomineeId = nominee?.Id ?? string.Empty,
+            VoteCount = voters.Length,
+            RequiredMajority = session.RequiredMajority,
+            Voters = voters
+        };
+
+        _voteHistory.AddOrUpdate(
+            session.GameId,
+            [voteHistory],
+            (_, existingHistory) => [..existingHistory, voteHistory]
+        );
     }
 }

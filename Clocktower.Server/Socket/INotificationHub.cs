@@ -14,4 +14,5 @@ public interface INotificationHub
     Task<bool> ToggleVote(string gameId, string playerId);
     Task<bool> MakeNomination(string gameId, string nominatorId, string nomineeId);
     Task<bool> ToggleMarkPlayer(string gameId, string playerId);
+    IEnumerable<VoteHistoryRecord> GetVoteHistory(string gameId);
 }

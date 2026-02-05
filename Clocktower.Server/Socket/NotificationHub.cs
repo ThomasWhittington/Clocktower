@@ -48,6 +48,9 @@ public sealed class NotificationHub(IHubStateManager hubStateManager, IGamePersp
     public async Task<bool> ToggleMarkPlayer(string gameId, string playerId)
         => await votingService.ToggleMarkPlayer(gameId, playerId);
 
+    public IEnumerable<VoteHistoryRecord> GetVoteHistory(string gameId)
+        => votingService.GetVoteHistory(gameId);
+
     public async Task<bool> ToggleVote(string gameId, string playerId)
         => await votingService.ToggleVote(gameId, playerId);
 
