@@ -1,6 +1,7 @@
 ﻿import type {MouseEvent} from "react";
 import {
     useCallback,
+    useMemo,
     useState
 } from "react";
 import type {User} from "@/types";
@@ -34,6 +35,7 @@ export function useTownSquareActions() {
         setSwappingPlayer(player);
         setActiveMenuPlayerId(null);
     }, []);
+
     const confirmSwap = useCallback(async (target: User) => {
         if (swappingPlayer && gameId) {
             const result = await runAction(async () => {
@@ -57,6 +59,7 @@ export function useTownSquareActions() {
         setNominatingPlayer(player);
         setActiveMenuPlayerId(null);
     }, []);
+
     const confirmNomination = useCallback(async (target: User) => {
         if (nominatingPlayer && gameId) {
             const result = await runAction(async () => {
@@ -87,7 +90,7 @@ export function useTownSquareActions() {
         if (gameId) {
             void startVoting(gameId, 1000);
         }
-    }, [gameId, runAction]);
+    }, [gameId]);
 
 
     const togglePlayerVote = useCallback((player: User) => {
@@ -96,7 +99,7 @@ export function useTownSquareActions() {
         }
     }, [gameId]);
 
-    return {
+    return useMemo(() => ({
         activeMenuPlayerId,
         swappingPlayer,
         toggleMenu,
@@ -111,5 +114,20 @@ export function useTownSquareActions() {
         cancelNomination,
         playerNominatesPlayer,
         togglePlayerVote
-    };
+    }), [
+        activeMenuPlayerId,
+        swappingPlayer,
+        toggleMenu,
+        closeMenu,
+        initiateSwap,
+        confirmSwap,
+        cancelSwap,
+        startVote,
+        nominatingPlayer,
+        initiateNomination,
+        confirmNomination,
+        cancelNomination,
+        playerNominatesPlayer,
+        togglePlayerVote
+    ]);
 }

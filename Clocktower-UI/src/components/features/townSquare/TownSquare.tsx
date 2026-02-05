@@ -27,7 +27,10 @@ import {
 import {Spinner} from "@/components/ui";
 import {useAppStore} from "@/store";
 import {
+    memo,
+    useCallback,
     useEffect,
+    useMemo,
     useState
 } from "react";
 import {User} from "@/types";
@@ -45,6 +48,116 @@ interface TownSquareProps {
     townSquareActions: ReturnType<typeof import('@/components/features/townSquare/hooks').useTownSquareActions>;
 }
 
+const TownSquarePlayer = memo(function TownSquarePlayer({
+                                                            player,
+                                                            pos,
+                                                            size,
+                                                            showToken,
+                                                            showDraftRoles,
+                                                            thisUser,
+                                                            discordTown,
+                                                            swappingPlayer,
+                                                            nominatingPlayer,
+                                                            activeMenuPlayerId,
+                                                            toggleMenu,
+                                                            confirmSwap,
+                                                            confirmNomination,
+                                                            onTokenClick,
+                                                            actionContext
+                                                        }: {
+    player: User;
+    pos: { idx: number; x: number; y: number };
+    size: number;
+    showToken: boolean;
+    showDraftRoles: boolean;
+    thisUser: User | undefined;
+    discordTown: ReturnType<typeof useDiscordTown>['discordTown'];
+    swappingPlayer: User | null;
+    nominatingPlayer: User | null;
+    activeMenuPlayerId: string | null;
+    toggleMenu: (playerId: string, e: React.MouseEvent) => void;
+    confirmSwap: (player: User) => void;
+    confirmNomination: (player: User) => void;
+    onTokenClick?: (player: User) => void;
+    actionContext: PlayerActionContext;
+}) {
+    const isSwappingTarget = swappingPlayer !== null && swappingPlayer.id !== player.id;
+    const isNominatingTarget = nominatingPlayer !== null;
+
+    const glowColor = useMemo(
+        () => getPlayerGlowColor({
+            player,
+            currentUser: thisUser,
+            discordTown
+        }),
+        [player, thisUser, discordTown]
+    );
+
+    return (
+        <PlayerIcon
+            x={pos.x}
+            y={pos.y}
+            size={size}
+            player={player}
+            glowColor={glowColor}
+            showToken={showToken}
+            showDraftRoles={showDraftRoles}
+            onNameClick={(e) => toggleMenu(player.id, e)}
+            onTokenClick={onTokenClick}
+            avatarOverlay={
+                <>
+                    {isSwappingTarget &&
+                        <button className="portrait-overlay clickable-portrait" onClick={() => confirmSwap(player)}>
+                            <SwapIcon className="portrait-icon"/>
+                        </button>
+                    }
+                    {isNominatingTarget &&
+                        <button className="portrait-overlay clickable-portrait" onClick={() => confirmNomination(player)}>
+                            <PointIcon className="portrait-icon"/>
+                        </button>
+                    }
+                    <AnimatePresence mode="wait">
+                        {player.isMarked && (
+                            <motion.div
+                                key="marked"
+                                {...animations.zoomInSpring}
+                                className="portrait-overlay"
+                            >
+                                <SkullIcon className="portrait-icon marked"/>
+                            </motion.div>
+                        )}
+                        {player.handUp && (
+                            <motion.div
+                                key="handup"
+                                {...animations.zoomInSpring}
+                                className="portrait-overlay"
+                            >
+                                <HandIcon className={`portrait-icon hand-up${player.voteLocked ? '' : ' unlocked'}`} gradientId="shared-hand"/>
+                            </motion.div>
+                        )}
+                        {!player.handUp && player.voteLocked && (
+                            <motion.div
+                                key="noVote"
+                                {...animations.zoomInSpring}
+                                className="portrait-overlay"
+                            >
+                                <NoVoteIcon className="portrait-icon no-vote"/>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </>
+            }
+        >
+            {activeMenuPlayerId === player.id && (
+                <PlayerActionMenu
+                    player={player}
+                    context={actionContext}
+                />
+            )}
+        </PlayerIcon>
+    );
+});
+
 export default function TownSquare({
                                        showDraftRoles = false,
                                        onTokenClick,
@@ -53,6 +166,7 @@ export default function TownSquare({
                                        townSquareActions
                                    }: Readonly<TownSquareProps>) {
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
+    const [debouncedSize, setDebouncedSize] = useState(parentSize);
     const {gameId} = useAppStore();
     const {discordTown, isLoading, error} = useDiscordTown();
     const {currentUser} = useAppStore();
@@ -74,26 +188,47 @@ export default function TownSquare({
         playerNominatesPlayer
     } = townSquareActions;
 
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setDebouncedSize(parentSize);
+        }, 50);
+
+        return () => clearTimeout(timeoutId);
+    }, [parentSize.width, parentSize.height]);
+
     const {positions, size} = useCircleLayout({
         count: discordTown?.players?.length ?? 0,
-        containerWidth: parentSize.width,
-        containerHeight: parentSize.height
+        containerWidth: debouncedSize.width,
+        containerHeight: debouncedSize.height
     });
 
-    const circleDiameter = Math.min(parentSize.width, parentSize.height) - 2 * size;
-    useEffect(() => {
-        if (onCircleSizeChange && circleDiameter > 0) {
-            onCircleSizeChange(circleDiameter);
-        }
-    }, [circleDiameter, onCircleSizeChange]);
+    const circleDiameter = useMemo(
+        () => Math.min(debouncedSize.width, debouncedSize.height) - 2 * size,
+        [debouncedSize.width, debouncedSize.height, size]
+    );
 
-    if (!gameId) return null;
-    const actionContext: PlayerActionContext = {
+    useEffect(() => {
+        if (!onCircleSizeChange || circleDiameter <= 0) return;
+
+        const timeoutId = setTimeout(() => {
+            onCircleSizeChange(circleDiameter);
+        }, 100);
+
+        return () => clearTimeout(timeoutId);
+    }, [circleDiameter, onCircleSizeChange]);
+    const handleToggleMarkPlayer = useCallback((player: User) => {
+        if (gameId) {
+            void toggleMarkPlayer(gameId, player.id);
+        }
+    }, [gameId]);
+    const actionContext = useMemo<PlayerActionContext>(() => ({
         initiateSwap,
-        toggleMarkPlayer: player => void toggleMarkPlayer(gameId, player.id),
+        toggleMarkPlayer: handleToggleMarkPlayer,
         initiateNomination,
         playerNominatesPlayer
-    };
+    }), [initiateSwap, handleToggleMarkPlayer, initiateNomination, playerNominatesPlayer]);
+
+    if (!gameId) return null;
 
     return (
         <div ref={containerRef} className="townsquare" onClick={closeMenu}>
@@ -121,66 +256,25 @@ export default function TownSquare({
                 const pos = positions[index];
                 if (!pos) return null;
 
-                const isSwappingTarget = swappingPlayer !== null && swappingPlayer.id !== player.id;
-                const isNominatingTarget = nominatingPlayer !== null;
-
-                const glowColor = getPlayerGlowColor({
-                    player,
-                    currentUser: thisUser,
-                    discordTown
-                });
-
                 return (
-                    <PlayerIcon
+                    <TownSquarePlayer
                         key={player.id}
-                        x={pos.x}
-                        y={pos.y}
-                        size={size}
                         player={player}
-                        glowColor={glowColor}
+                        pos={pos}
+                        size={size}
                         showToken={showToken}
                         showDraftRoles={showDraftRoles}
-                        onNameClick={(e) => toggleMenu(player.id, e)}
+                        thisUser={thisUser}
+                        discordTown={discordTown}
+                        swappingPlayer={swappingPlayer}
+                        nominatingPlayer={nominatingPlayer}
+                        activeMenuPlayerId={activeMenuPlayerId}
+                        toggleMenu={toggleMenu}
+                        confirmSwap={confirmSwap}
+                        confirmNomination={confirmNomination}
                         onTokenClick={onTokenClick}
-                        avatarOverlay={
-                            <>
-                                {isSwappingTarget &&
-                                    <button className="portrait-overlay clickable-portrait" onClick={() => confirmSwap(player)}>
-                                        <SwapIcon className="portrait-icon"/>
-                                    </button>
-                                }
-                                {isNominatingTarget &&
-                                    <button className="portrait-overlay clickable-portrait" onClick={() => confirmNomination(player)}>
-                                        <PointIcon className="portrait-icon"/>
-                                    </button>
-                                }
-                                <AnimatePresence>
-                                    {player.isMarked &&
-                                        <motion.div key="marked" {...animations.zoomInSpring} className="portrait-overlay">
-                                            <SkullIcon className="portrait-icon marked"/>
-                                        </motion.div>
-                                    }
-                                    {player.handUp &&
-                                        <motion.div key="handup" {...animations.zoomInSpring} className="portrait-overlay">
-                                            <HandIcon className={`portrait-icon hand-up${player.voteLocked ? '' : ' unlocked'}`} gradientId="shared-hand"/>
-                                        </motion.div>
-                                    }
-                                    {!player.handUp && player.voteLocked &&
-                                        <motion.div key="noVote" {...animations.zoomInSpring} className="portrait-overlay">
-                                            <NoVoteIcon className="portrait-icon no-vote"/>
-                                        </motion.div>
-                                    }
-                                </AnimatePresence>
-                            </>
-                        }
-                    >
-                        {activeMenuPlayerId === player.id && (
-                            <PlayerActionMenu
-                                player={player}
-                                context={actionContext}
-                            />
-                        )}
-                    </PlayerIcon>
+                        actionContext={actionContext}
+                    />
                 );
             })}
         </div>
