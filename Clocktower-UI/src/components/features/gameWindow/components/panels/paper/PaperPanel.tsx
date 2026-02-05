@@ -41,6 +41,11 @@ export const PaperPanel = ({isOpen, onClose}: PaperPanelProps) => {
                 value={editorContent}
                 onChange={handleChange}
                 placeholder="Start typing your notes..."
+                autoFocus
+                onFocus={(e) => {
+                    const length = e.target.value.length;
+                    e.target.setSelectionRange(length, length);
+                }}
             />
         </BasePanel>
     );
