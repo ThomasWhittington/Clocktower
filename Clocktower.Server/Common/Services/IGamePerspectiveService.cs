@@ -22,4 +22,5 @@ public interface IGamePerspectiveService
     void SetScript(string gameId, Script script);
     bool UpdateDraftRole(string gameId, string userId, Role? draftRole);
     void CommitDraftRoles(string gameId);
+    void ResetNominationSession(string gameId);
 }

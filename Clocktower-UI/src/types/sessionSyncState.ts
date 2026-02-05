@@ -1,4 +1,10 @@
-﻿import {DiscordTown, type GameTime, Script, type TimerState} from "@/types";
+﻿import {
+    DiscordTown,
+    type GameTime,
+    NominationSession,
+    Script,
+    type TimerState
+} from "@/types";
 
 export type SessionSyncState = {
     gameTime: GameTime,
@@ -6,4 +12,5 @@ export type SessionSyncState = {
     discordTown?: DiscordTown;
     timer?: TimerState;
     script?: Script;
+    nominationSession?: NominationSession | null;
 };

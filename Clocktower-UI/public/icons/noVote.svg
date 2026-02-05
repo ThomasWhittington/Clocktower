@@ -1,0 +1,26 @@
+<svg viewBox="0 0 24 24"
+     xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient
+                id="noVoteGradient"
+                x1="0%"
+                y1="0%"
+                x2="0%"
+                y2="100%">
+            <stop offset="0%"
+                  stop-color="currentColor"/>
+            <stop offset="100%"
+                  stop-color="#000000"/>
+        </linearGradient>
+    </defs>
+    <path d="M19 5L4.99998 19M5.00001 5L19 19"
+          stroke="white"
+          stroke-width="4"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+    <path d="M19 5L4.99998 19M5.00001 5L19 19"
+          stroke="url(#noVoteGradient)"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+</svg>

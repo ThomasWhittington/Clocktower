@@ -1,6 +1,6 @@
 ﻿namespace Clocktower.Server.Socket;
 
-public interface IDiscordNotificationClient
+public interface INotificationClient
 {
     Task DiscordTownUpdated(DiscordTownDto discordTown);
     Task UserVoiceStateChanged(string userId, bool isInVoice, VoiceState voiceState);
@@ -8,4 +8,5 @@ public interface IDiscordNotificationClient
     Task PingUser(string message);
     Task TimerUpdated(TimerState timer);
     Task ScriptUpdated(string gameId, Script? script);
+    Task NominationUpdate(string gameId, NominationSession? session);
 }

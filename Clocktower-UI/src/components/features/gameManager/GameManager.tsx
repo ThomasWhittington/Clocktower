@@ -5,6 +5,7 @@ import type {GamePerspective} from "@/types";
 import {useAppStore} from "@/store";
 import {GameList} from "@/components/features/gameManager/components";
 import {useNavigate} from "react-router-dom";
+import {joinGameGroup} from "@/hooks";
 
 function GameManager() {
     const navigate = useNavigate();
@@ -49,6 +50,7 @@ function GameManager() {
         gamesService.startGame(guildId, currentUser.id).then(data => {
             if (data?.id) {
                 setGameId(data.id);
+                joinGameGroup(data.id);
                 navigate('/game');
             } else {
                 handleError({message: 'Failed to start game: No game ID returned'});

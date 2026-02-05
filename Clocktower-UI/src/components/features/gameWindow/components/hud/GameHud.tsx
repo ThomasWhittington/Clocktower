@@ -1,5 +1,8 @@
 ﻿import type {PanelType} from "@/components/features/gameWindow/hooks";
-import {Script} from "@/types";
+import {
+    Script,
+    User
+} from "@/types";
 import {
     BottomHud,
     CenterHud,
@@ -17,6 +20,10 @@ interface GameHudProps {
     togglePanel: (panel: PanelType) => void;
     setIsDraftMode: (callback: (prev: boolean) => boolean) => void;
     isDraftMode: boolean;
+    circleDiameter: number;
+    onNominateClick: (player: User) => void;
+    onVoteClick: (player: User) => void;
+    onCancelNomination: () => void;
 }
 
 export function GameHud({
@@ -25,7 +32,11 @@ export function GameHud({
                             isPanelOpen,
                             togglePanel,
                             setIsDraftMode,
-                            isDraftMode
+                            isDraftMode,
+                            circleDiameter,
+                            onNominateClick,
+                            onVoteClick,
+                            onCancelNomination
                         }: Readonly<GameHudProps>) {
     const {discordTown} = useDiscordTown();
     const {forceUpdate} = adminService;
@@ -34,6 +45,7 @@ export function GameHud({
             void forceUpdate(discordTown.gameId);
         }
     };
+
     return (
         <>
             {isStoryteller && (
@@ -48,13 +60,16 @@ export function GameHud({
                     onDraftToggle={() => setIsDraftMode(prev => !prev)}
                 />
             )}
-            <CenterHud/>
+            <CenterHud circleDiameter={circleDiameter}/>
             <TopHud/>
             <RightHud
                 onRoleListClick={() => script && togglePanel('role')}
                 onNightOrderClick={() => script && togglePanel('night')}
                 onPaperClick={() => togglePanel('paper')}
                 onForceUpdateClick={forceUpdateGame}
+                onNominateClick={onNominateClick}
+                onVoteClick={onVoteClick}
+                onCancelNomination={onCancelNomination}
             />
             <BottomHud scriptName={script?.name} storyTellers={discordTown?.storyTellers ?? []}/>
         </>

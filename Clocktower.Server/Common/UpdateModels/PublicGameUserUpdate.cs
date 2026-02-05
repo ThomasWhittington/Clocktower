@@ -8,4 +8,6 @@ public record PublicGameUserUpdate
     public bool? HasVoteToken { get; init; }
     public bool? IsDead { get; init; }
     public bool? IsMarked { get; init; }
+    public bool? HandUp { get; init; }
+    public bool? VoteLocked { get; init; }
 }

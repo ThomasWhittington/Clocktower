@@ -10,6 +10,14 @@
     .controls-right {
         @apply absolute right-0 top-2 h-screen z-50 flex flex-col items-center;
 
+        .top-row {
+            @apply flex items-start gap-2;
+        }
+
+        .right-column {
+            @apply flex flex-col items-center;
+        }
+
         .help-menu {
             @apply absolute right-0 mr-2 py-2 w-40 bg-discord rounded-lg shadow-lg z-50 select-none;
 
@@ -28,11 +36,11 @@
     }
 
     .controls-center {
-        @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10;
+        @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none;
     }
 
     .controls-top {
-        @apply absolute top-2 left-20 pointer-events-none;
+        @apply absolute top-2 left-20;
     }
 
     .controls-bottom {
@@ -50,4 +58,124 @@
             @apply inline-block w-4 h-4;
         }
     }
-} 
+
+    .nomination-container {
+        --clock-size: 75vmin;
+        --clock-rotation: 0deg;
+        --clock-transition-duration: 2000ms;
+
+        .countdown {
+            @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center content-center pointer-events-none select-none font-bold z-10;
+            font-size: 20vmin;
+        }
+
+        .vote-overlay {
+            @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center content-center rounded-lg bg-black/50 flex flex-col w-fit;
+            padding: 1.5vmin;
+            font-size: 1.2vmin;
+
+            .vote-text {
+                @apply flex flex-row select-none items-center;
+
+                svg {
+                    margin-left: 1.5vmin;
+                    margin-right: 1.5vmin;
+                    width: 2.5vmin;
+                    height: 2.5vmin;
+                }
+
+                span {
+                    @apply text-white;
+                    font-weight: bold;
+                    font-size: 2vmin;
+                }
+
+                span:first-child {
+                    @apply text-townsfolk;
+                }
+
+                span:last-child {
+                    @apply text-demon;
+                }
+            }
+
+            .majority {
+                @apply text-minion select-none;
+                font-size: 1.8vmin;
+            }
+
+            .speed-control {
+                @apply flex flex-row items-center justify-center;
+            }
+
+            .speed-button {
+                @apply pointer-events-auto;
+            }
+
+            .vote-control {
+                @apply flex;
+                gap: 1vmin;
+
+                .current-count {
+                    @apply flex flex-row items-center justify-center select-none;
+                    gap: 0.5vmin;
+
+                    .hand {
+                        @apply flex-1 text-transparent stroke-demon;
+                        width: 4vmin;
+                        height: 4vmin;
+                    }
+
+                    .majority {
+                        @apply stroke-forestgreen
+                    }
+
+                    span {
+                        @apply text-white;
+                        font-weight: bold;
+                        font-size: 2vmin;
+                    }
+                }
+
+
+                .close-nominations,
+                .next-nomination,
+                .reset-nominations,
+                .toggle-mark,
+                .start-vote,
+                .toggle-vote {
+                    @apply flex-2 pointer-events-auto;
+                    min-width: 10vmin;
+
+                    &.btn-icon {
+                        width: 12vmin;
+                        height: 4vmin;
+                        padding: 0.5vmin;
+                        font-size: 1.5vmin;
+                    }
+                }
+            }
+        }
+
+        .clock-container {
+            @apply relative select-none;
+            width: var(--clock-size, 75vmin);
+            height: var(--clock-size, 75vmin);
+        }
+
+        .clock-big,
+        .clock-small {
+            @apply object-contain;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(var(--clock-rotation, 0deg));
+            transform-origin: center center;
+            transition-duration: var(--clock-transition-duration, 2000ms);
+            transition-property: transform;
+            transition-timing-function: ease-in-out;
+            width: var(--clock-size, 75vmin);
+            height: var(--clock-size, 75vmin);
+        }
+    }
+}

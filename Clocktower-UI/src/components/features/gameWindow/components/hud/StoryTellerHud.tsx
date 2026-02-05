@@ -8,13 +8,15 @@ import {
     EveningIcon,
     NightIcon,
     ScriptIcon,
-    TownsquareIcon
+    TownsquareIcon,
+    VoteIcon
 } from "@/components/ui/icons";
 import {
     useDiscordActions,
     useTimeOfDay
 } from "@/components/features/discordTownPanel/hooks";
 import {GameTime} from "@/types";
+import {useNominationState} from "@/components/features/gameWindow/hooks";
 
 interface StoryTellerHudProps {
     usersIsOpen: boolean;
@@ -39,6 +41,11 @@ export const StoryTellerHud = (
         onDraftToggle
     }: StoryTellerHudProps) => {
     const setTime = useTimeOfDay();
+
+    const {nominationsEnabled, toggleNominations} = useNominationState();
+
+    const nominationsButtonText = nominationsEnabled ? 'Close Nominations' : 'Open Nominations';
+    const nominationsButtonVariant = nominationsEnabled ? 'danger' : 'secondary';
     const {
         sendToCottages,
         sendToTownSquare,
@@ -104,6 +111,14 @@ export const StoryTellerHud = (
                     icon={<NightIcon/>}
                     onClick={() => setTime(GameTime.Night)}
                     tooltip="Set Time to Night"
+                />
+            </div>
+
+            <div>
+                <IconButton icon={<VoteIcon/>}
+                            tooltip={nominationsButtonText}
+                            variant={nominationsButtonVariant}
+                            onClick={toggleNominations}
                 />
             </div>
         </div>

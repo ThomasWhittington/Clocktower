@@ -24,6 +24,7 @@ import {
     RoleType,
     User
 } from "@/types";
+import {useTownSquareActions} from "@/components/features/townSquare/hooks";
 
 export default function GameWindow() {
     const {currentUser} = useAppStore();
@@ -31,6 +32,7 @@ export default function GameWindow() {
     const {discordTown} = useDiscordTown();
     const [isDraftMode, setIsDraftMode] = useState(false);
     const [selectedDraftRoles, setSelectedDraftRoles] = useState<Role[]>([]);
+    const [circleDiameter, setCircleDiameter] = useState(0);
     const {togglePanel, isPanelOpen, closePanel, openPanel, getPanelData} = useActivePanel();
     const isStoryteller = useCurrentUserIsStoryteller();
     const {setRole, commitDraftRoles} = useSetRoles(currentUser?.id ?? "", isStoryteller, isDraftMode);
@@ -54,6 +56,9 @@ export default function GameWindow() {
         assignToDraft,
         selectedDraftRoles
     });
+
+    const townSquareActions = useTownSquareActions();
+
     const handleTokenClick = (player: User) => {
         const canOpenToken = script && (isStoryteller || player.role?.type !== RoleType.Traveller);
         if (canOpenToken) {
@@ -73,6 +78,8 @@ export default function GameWindow() {
                 showDraftRoles={isDraftMode}
                 onTokenClick={handleTokenClick}
                 onCommitDraftRoles={isDraftMode ? handleCommitDraftRoles : undefined}
+                onCircleSizeChange={setCircleDiameter}
+                townSquareActions={townSquareActions}
             />
 
             <GamePanels
@@ -93,6 +100,10 @@ export default function GameWindow() {
                 togglePanel={togglePanel}
                 setIsDraftMode={setIsDraftMode}
                 isDraftMode={isDraftMode}
+                circleDiameter={circleDiameter}
+                onNominateClick={townSquareActions.initiateNomination}
+                onVoteClick={townSquareActions.togglePlayerVote}
+                onCancelNomination={townSquareActions.cancelNomination}
             />
         </div>
     );

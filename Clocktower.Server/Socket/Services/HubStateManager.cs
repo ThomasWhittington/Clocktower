@@ -2,7 +2,13 @@
 
 namespace Clocktower.Server.Socket.Services;
 
-public class HubStateManager(IGamePerspectiveService gamePerspectiveService, IDiscordTownManager discordTownManager, IJwtWriter jwtWriter, ITimerCoordinator timerCoordinator) : IHubStateManager
+public class HubStateManager(
+    IGamePerspectiveService gamePerspectiveService,
+    IDiscordTownManager discordTownManager,
+    IJwtWriter jwtWriter,
+    ITimerCoordinator timerCoordinator,
+    IVotingService votingService
+) : IHubStateManager
 {
     public SessionSyncState? GetState(string gameId, string userId)
     {
@@ -15,6 +21,7 @@ public class HubStateManager(IGamePerspectiveService gamePerspectiveService, IDi
             discordTown = discordTownManager.RedactTownDto(discordTown, userId);
 
         var timer = timerCoordinator.Get(gameId);
+        var nominationSession = votingService.GetSession(gameId);
 
         var jwtToken = jwtWriter.GetJwtToken(gameUser);
 
@@ -24,7 +31,8 @@ public class HubStateManager(IGamePerspectiveService gamePerspectiveService, IDi
             Script = currentPerspective.Script,
             Jwt = jwtToken,
             DiscordTown = discordTown,
-            Timer = timer
+            Timer = timer,
+            NominationSession = nominationSession
         };
         return currentState;
     }

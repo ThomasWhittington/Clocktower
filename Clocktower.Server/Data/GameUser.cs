@@ -8,6 +8,8 @@ public record GameUser(string Id) : IGameUser
     [UsedImplicitly] public bool HasVoteToken { get; set; }
     [UsedImplicitly] public bool IsDead { get; set; }
     [UsedImplicitly] public bool IsMarked { get; set; }
+    [UsedImplicitly] public bool HandUp { get; set; }
+    [UsedImplicitly] public bool VoteLocked { get; set; }
     [UsedImplicitly] public Role? Role { get; set; }
     [UsedImplicitly] public Role? DraftRole { get; set; }
 }
@@ -20,6 +22,8 @@ public interface IGameUser : IIdentifiable
     [UsedImplicitly] bool HasVoteToken { get; set; }
     [UsedImplicitly] bool IsDead { get; set; }
     [UsedImplicitly] bool IsMarked { get; set; }
+    [UsedImplicitly] bool HandUp { get; set; }
+    [UsedImplicitly] bool VoteLocked { get; set; }
     [UsedImplicitly] Role? Role { get; set; }
     [UsedImplicitly] Role? DraftRole { get; set; }
 }

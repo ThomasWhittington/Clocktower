@@ -114,13 +114,16 @@
         z-index: 30;
     }
 
+    .portrait-overlay {
+        @apply absolute inset-0 flex items-center justify-center rounded-full z-10 select-none pointer-events-none;
+    }
 
     .clickable-portrait {
-        @apply absolute inset-0 flex items-center justify-center bg-black/60 rounded-full cursor-pointer hover:bg-black/40 transition-colors z-10 select-none;
+        @apply bg-black/60 cursor-pointer hover:bg-black/40 transition-colors pointer-events-auto;
     }
 
     .portrait-icon {
-        @apply rounded-full;
+        @apply w-3/5 h-3/5;
     }
 
     .avatar-container {
@@ -260,5 +263,24 @@
 
     .role-description-content p {
         @apply text-sm text-neutral-200;
+    }
+
+    .hand-up {
+        @apply text-demon stroke-white drop-shadow-2xl;
+
+        &.unlocked {
+            @apply opacity-50;
+        }
+    }
+
+    .no-vote {
+        @apply text-townsfolk;
+    }
+
+    .marked {
+        @apply text-black;
+        backdrop-filter: blur(2px);
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
     }
 }

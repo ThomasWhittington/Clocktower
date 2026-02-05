@@ -3,22 +3,14 @@ import {authService} from "@/services";
 import {GameManager} from "@/components/features";
 import {GuildsList} from "@/components/ui";
 import {useGuildsWithUser} from "@/pages/hooks";
-import type {MiniGuild} from "@/types";
-import {useNavigate} from "react-router-dom";
 
 function Home() {
-    const navigate = useNavigate();
-    const {loggedIn, setGuildId} = useAppStore();
+    const {loggedIn, setGuildId, guildId} = useAppStore();
     const {
         guilds,
         loading,
         error
     } = useGuildsWithUser(loggedIn);
-
-    const handleGuildClick = (guild: MiniGuild) => {
-        setGuildId(guild.id);
-        navigate('/game');
-    };
 
     return (
         <div className="p-8">
@@ -28,9 +20,11 @@ function Home() {
                             guilds={guilds}
                             loading={loading}
                             error={error}
-                            onGuildClick={handleGuildClick}
+                            onGuildClick={(guild) => setGuildId(guild.id)}
                         />
-                        <GameManager/>
+                        {guildId &&
+                            <GameManager/>
+                        }
                     </>
                 ) : (
                     <button onClick={() => authService.initiateDiscordLogin()}>

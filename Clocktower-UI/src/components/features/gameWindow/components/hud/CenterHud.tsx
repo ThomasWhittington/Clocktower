@@ -1,13 +1,36 @@
-﻿import {
+﻿import {useNominationState} from "@/components/features/gameWindow/hooks";
+import {
     RoleDistributionWidget,
     Timer
 } from "@/components/ui";
+import {
+    AnimatePresence,
+    motion
+} from "framer-motion";
+import {Nomination} from "@/components/features/gameWindow/components/hud/components";
+import {animations} from "@/constants";
 
-export const CenterHud = () => {
+interface CenterHudProps {
+    circleDiameter: number;
+}
+
+export const CenterHud = ({circleDiameter}: CenterHudProps) => {
+    const {isActiveNomination} = useNominationState();
+
     return (
         <div className="controls-center">
-            <Timer/>
-            <RoleDistributionWidget/>
+            <AnimatePresence mode="wait">
+                {isActiveNomination ? (
+                    <motion.div key="nominations" {...animations.zoomIn}>
+                        <Nomination circleDiameter={circleDiameter}/>
+                    </motion.div>
+                ) : (
+                    <motion.div key="default" {...animations.zoomIn}>
+                        <Timer/>
+                        <RoleDistributionWidget/>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

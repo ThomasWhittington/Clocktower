@@ -1,36 +1,30 @@
-﻿import {Panel, PanelGroup, PanelResizeHandle} from "react-resizable-panels";
-import {DiscordTownPanel, GameWindow} from "../components/features";
+﻿import {
+    Panel,
+    PanelGroup,
+    PanelResizeHandle
+} from "react-resizable-panels";
+import {
+    DiscordTownPanel,
+    GameWindow
+} from "../components/features";
 import {useServerHub} from "@/hooks";
-import {HubConnectionState} from "@microsoft/signalr";
-import {BackgroundImage, Spinner} from "@/components/ui";
+import {BackgroundImage} from "@/components/ui";
 
 function Game() {
-    const {connectionState, gameTime} = useServerHub();
+    const {gameTime} = useServerHub();
 
     return (
-        <>
-            {
-                connectionState === HubConnectionState.Connected ?
-                    (
-                        <PanelGroup autoSaveId="game-panel-layout" direction="horizontal">
-                            <Panel defaultSize={20} collapsible={true} minSize={20}>
-                                <DiscordTownPanel/>
-                            </Panel>
-                            <PanelResizeHandle className="w-2 bg-gray-400 hover:bg-gray-600 cursor-col-resize"/>
-                            <Panel className="flex justify-center align-center">
-                                <BackgroundImage gameTime={gameTime}>
-                                    <GameWindow/>
-                                </BackgroundImage>
-                            </Panel>
-                        </PanelGroup>
-                    ) : (
-                        <>
-                            <div className="text-yellow-500">{connectionState}</div>
-                            <Spinner/>
-                        </>
-                    )
-            }
-        </>
+        <PanelGroup autoSaveId="game-panel-layout" direction="horizontal">
+            <Panel defaultSize={20} collapsible={true} minSize={20}>
+                <DiscordTownPanel/>
+            </Panel>
+            <PanelResizeHandle className="w-2 bg-gray-400 hover:bg-gray-600 cursor-col-resize"/>
+            <Panel className="flex justify-center align-center">
+                <BackgroundImage gameTime={gameTime}>
+                    <GameWindow/>
+                </BackgroundImage>
+            </Panel>
+        </PanelGroup>
     );
 }
 

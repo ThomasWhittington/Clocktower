@@ -70,7 +70,9 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
                 SeatingPosition = update.SeatingPosition ?? user.SeatingPosition,
                 IsDead = update.IsDead ?? user.IsDead,
                 IsMarked = update.IsMarked ?? user.IsMarked,
-                HasVoteToken = update.HasVoteToken ?? user.HasVoteToken
+                HasVoteToken = update.HasVoteToken ?? user.HasVoteToken,
+                HandUp = update.HandUp ?? user.HandUp,
+                VoteLocked = update.VoteLocked ?? user.VoteLocked
             };
 
             return state with { Users = state.Users.Select(u => u.Id == userId ? updatedUser : u).ToList() };
@@ -276,6 +278,20 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         );
     }
 
+    public void ResetNominationSession(string gameId)
+    {
+        store.UpdateAllPerspectives(gameId, state =>
+            state with
+            {
+                Users = state.Users.Select(u => u with
+                {
+                    VoteLocked = false,
+                    HandUp = false
+                }).ToList()
+            }
+        );
+    }
+
     private static bool IsOmniscient(UserType? userType)
     {
         if (userType is null) return false;
@@ -288,7 +304,9 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         (update.SeatingPosition != null && user.SeatingPosition != update.SeatingPosition) ||
         (update.HasVoteToken != null && user.HasVoteToken != update.HasVoteToken) ||
         (update.IsDead != null && user.IsDead != update.IsDead) ||
-        (update.IsMarked != null && user.IsMarked != update.IsMarked);
+        (update.IsMarked != null && user.IsMarked != update.IsMarked) ||
+        (update.HandUp != null && user.HandUp != update.HandUp) ||
+        (update.VoteLocked != null && user.VoteLocked != update.VoteLocked);
 
     private static bool UserHasPrivateChanges(GameUser user, PrivateGameUserUpdate update) =>
         (update.RemoveRole && user.Role != null) || (update.Role != null && user.Role != update.Role);
@@ -386,7 +404,9 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
             SeatingPosition = user.SeatingPosition,
             IsDead = user.IsDead,
             IsMarked = user.IsMarked,
-            HasVoteToken = user.HasVoteToken
+            HasVoteToken = user.HasVoteToken,
+            HandUp = user.HandUp,
+            VoteLocked = user.VoteLocked
         };
 
     private static GameUser ToPersonalUser(GameUser user) => user with { DraftRole = null };

@@ -3,7 +3,7 @@
     HeartIcon,
     UserIcon,
     UsersIcon,
-    VoteToken
+    VoteIcon
 } from "@/components/ui/icons";
 import {useDiscordTown} from "@/components/features/discordTownPanel/hooks";
 import {RoleType} from "@/types";
@@ -27,7 +27,7 @@ export const RoleDistributionWidget = () => {
                 <div>
                     <span className="players" title="Number of Players">{playerCount}{<GroupIcon/>}</span>
                     <span className="alive" title="Number of Alive Players">{aliveCount}{<HeartIcon/>}</span>
-                    <span className="votes" title="Number of available votes">{voteCount}{<VoteToken/>}</span>
+                    <span className="votes" title="Number of available votes">{voteCount}{<VoteIcon/>}</span>
                 </div>
             }
 

@@ -1,6 +1,6 @@
 ﻿import {
     Shroud,
-    VoteToken
+    VoteIcon
 } from "@/components/ui/icons";
 import {DiscordUserVoiceStatus} from "@/components/ui";
 import type {User} from "@/types";
@@ -32,7 +32,7 @@ export function AvatarOverlays({player}: Readonly<AvatarOverlaysProps>) {
                     disabled={!isStoryteller}
                     aria-label={`Vote token - ${player.name}`}
                 >
-                    <VoteToken/>
+                    <VoteIcon/>
                 </button>
             )}
 

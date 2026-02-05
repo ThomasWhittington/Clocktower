@@ -950,7 +950,9 @@ public class GamePerspectiveServiceTests
         {
             IsDead = true,
             IsMarked = true,
-            HasVoteToken = false
+            HasVoteToken = false,
+            HandUp = true,
+            VoteLocked = true
         });
 
         result.Should().BeTrue();
@@ -959,6 +961,8 @@ public class GamePerspectiveServiceTests
         updatedUser.IsDead.Should().BeTrue();
         updatedUser.IsMarked.Should().BeTrue();
         updatedUser.HasVoteToken.Should().BeFalse();
+        updatedUser.HandUp.Should().BeTrue();
+        updatedUser.VoteLocked.Should().BeTrue();
     }
 
     [TestMethod]

@@ -13,3 +13,4 @@ export {BasePanel} from './BasePanel';
 export {UserAvatar} from './UserAvatar';
 export {StatusIndicator} from './StatusIndicator';
 export {RoleDistributionWidget} from './RoleDistributionWidget';
+export {ServerStatus} from './ServerStatus';

@@ -1,8 +1,12 @@
-﻿import {useCallback, useState} from "react";
+﻿import {
+    useCallback,
+    useState
+} from "react";
 import {useAppStore} from "@/store";
 import {discordService} from "@/services";
 import {useTimeOfDay} from "@/components/features/discordTownPanel/hooks/useTimeOfDay.ts";
 import {GameTime} from "@/types";
+import {removeAllMarks} from "@/hooks";
 
 type DiscordActionsState = {
     isLoading: boolean;
@@ -56,6 +60,7 @@ export const useDiscordActions = () => {
 
         await run(async () => {
             await setTime(GameTime.Night);
+            await removeAllMarks(gameId);
             return await discordService.sendToCottages(gameId);
         });
     }, [gameId, run]);

@@ -19,6 +19,7 @@ import {
     AnimatePresence,
     motion
 } from "framer-motion";
+import {animations} from "@/constants";
 
 interface PlayerIconProps {
     x: number;
@@ -65,16 +66,7 @@ export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, glow
 
             <AnimatePresence>
                 {role?.description && showTooltip && (
-                    <motion.div
-                        className={`role-description-tooltip ${isTopHalf ? 'top-half' : 'bottom-half'}`}
-                        initial={{opacity: 0, scale: 0.95}}
-                        animate={{opacity: 1, scale: 1}}
-                        exit={{opacity: 0, scale: 0.95}}
-                        transition={{duration: 0.2, ease: "easeOut"}}
-                        style={{
-                            x: "-50%",
-                        }}
-                    >
+                    <motion.div className={`role-description-tooltip ${isTopHalf ? 'top-half' : 'bottom-half'}`} {...animations.fade}>
                         <div className="role-description-content">
                             <strong>{role.name}</strong>
                             <p>{role.description}</p>

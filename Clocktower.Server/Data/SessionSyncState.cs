@@ -7,4 +7,5 @@ public class SessionSyncState
     public required DiscordTownDto? DiscordTown { get; init; }
     public required TimerState Timer { get; init; }
     public required Script? Script { get; init; }
+    public required NominationSession? NominationSession { get; init; }
 }
