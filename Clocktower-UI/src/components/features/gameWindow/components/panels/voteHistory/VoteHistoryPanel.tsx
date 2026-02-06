@@ -33,7 +33,7 @@ export const VoteHistoryPanel = ({isOpen, onClose}: VoteHistoryPanelProps) => {
                 });
         }
     }, [isOpen, gameId]);
-    console.log(voteHistory)
+
     return (
         <BasePanel title="Vote History" isOpen={isOpen} onClose={onClose}>
             <div className="vote-history-panel">
@@ -53,8 +53,8 @@ export const VoteHistoryPanel = ({isOpen, onClose}: VoteHistoryPanelProps) => {
                             </tr>
                             </thead>
                             <tbody>
-                            {voteHistory.sort((a, b) => b.dateTime.getTime() - a.dateTime.getTime()).map((record) => (
-                                <VoteHistoryLine voteHistory={record} key={`${record.nominatorId}-${record.nomineeId}}`}/>
+                            {[...voteHistory].sort((a, b) => b.dateTime.getTime() - a.dateTime.getTime()).map((record) => (
+                                <VoteHistoryLine voteHistory={record} key={`${record.nominatorId}-${record.nomineeId}-${record.time}`}/>
                             ))}
                             </tbody>
                         </table>
