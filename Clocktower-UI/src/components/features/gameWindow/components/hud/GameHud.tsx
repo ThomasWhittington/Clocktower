@@ -65,6 +65,7 @@ export function GameHud({
             <RightHud
                 onRoleListClick={() => script && togglePanel('role')}
                 onNightOrderClick={() => script && togglePanel('night')}
+                onVoteHistoryClick={() => togglePanel('voteHistory')}
                 onPaperClick={() => togglePanel('paper')}
                 onForceUpdateClick={forceUpdateGame}
                 onNominateClick={onNominateClick}

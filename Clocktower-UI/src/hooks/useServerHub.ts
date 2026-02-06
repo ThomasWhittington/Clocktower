@@ -16,6 +16,7 @@ import {
 } from '@/types';
 import {useAppStore} from "@/store";
 import {registerSignalHandlers} from "@/hooks/registerSignalHandlers.ts";
+import {VoteHistoryRecord} from "@/types/voteHistoryRecord.ts";
 
 type UserPresenceStates = Record<string, boolean>;
 type UserVoiceStates = Record<string, VoiceState>;
@@ -311,6 +312,13 @@ const removeAllMarks = async (gameId: string) => {
     return await globalConnection.invoke<boolean | null>('RemoveAllMarks', gameId);
 }
 
+const getVoteHistory = async (gameId: string) => {
+    if (!isConnected(globalConnection)) {
+        return;
+    }
+    const records = await globalConnection.invoke<VoteHistoryRecord[] | null>('GetVoteHistory', gameId);
+    return records?.map(record => new VoteHistoryRecord(record)) ?? null;
+}
 export const joinGameGroup = async (gameId: string, isReconnecting: boolean = false, isInitialMount: boolean = false): Promise<void> => {
     const {setJoinedGameId, currentUser} = useAppStore.getState();
 
@@ -388,5 +396,6 @@ export {
     makeNomination,
     toggleVote,
     toggleMarkPlayer,
+    getVoteHistory,
     removeAllMarks
 };

@@ -12,4 +12,5 @@ public interface IVotingService : IHostedService
     Task<bool> ToggleMarkPlayer(string gameId, string playerId);
     NominationSession? GetSession(string gameId);
     Task RemoveAllMarks(string gameId);
+    IEnumerable<VoteHistoryRecord> GetVoteHistory(string gameId);
 }

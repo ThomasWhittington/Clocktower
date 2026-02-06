@@ -19,3 +19,5 @@ export * from './script'
 export * from './scriptSelect'
 export * from './roleDistribution'
 export * from './nominationSession'
+export * from './voteHistoryRecord'
+

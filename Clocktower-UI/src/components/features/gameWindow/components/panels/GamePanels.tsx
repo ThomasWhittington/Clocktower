@@ -5,7 +5,8 @@
     RolePlannerPanel,
     ScriptManagerPanel,
     TokenPanel,
-    UserManagerPanel
+    UserManagerPanel,
+    VoteHistoryPanel
 } from "./index";
 import type {PanelType} from "@/components/features/gameWindow/hooks";
 import {
@@ -39,9 +40,9 @@ export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, set
             <ScriptManagerPanel isOpen={isPanelOpen('script')} onClose={closePanel}/>
             <RoleListPanel isOpen={isPanelOpen('role')} onClose={closePanel}/>
             <NightOrderPanel isOpen={isPanelOpen('night')} onClose={closePanel}/>
+            <VoteHistoryPanel isOpen={isPanelOpen('voteHistory')} onClose={closePanel}/>
             <PaperPanel isOpen={isPanelOpen('paper')} onClose={closePanel}/>
             <RolePlannerPanel isOpen={isPanelOpen('rolePlanner')} onClose={closePanel} setIsDraftMode={setIsDraftMode} setSelectedRoles={setSelectedRoles} selectedRoles={selectedRoles}/>
-
             {tokenData && (
                 <TokenPanel
                     isOpen={isPanelOpen('token')}
