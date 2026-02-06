@@ -4,6 +4,7 @@ import {
     GameTime,
     NominationSession,
     Script,
+    TalkRequest,
     type TimerState
 } from '@/types';
 import {useAppStore} from '@/store';
@@ -17,6 +18,7 @@ type StateUpdater = (updates: Partial<{
     timer?: TimerState;
     script?: Script;
     nominationSession?: NominationSession;
+    talkRequests: TalkRequest[];
 }>) => void;
 
 export const registerSignalHandlers = (
@@ -57,5 +59,11 @@ export const registerSignalHandlers = (
         if (gameId !== joinedGameId) return;
         console.log(`🔒 Received NominationUpdate for game ${gameId}:`, session);
         setState({nominationSession: session ? new NominationSession(session) : undefined});
+    });
+    connection.on('TalkRequestsUpdate', (gameId: string, talkRequests: TalkRequest[]) => {
+        const {joinedGameId} = useAppStore.getState();
+        if (gameId !== joinedGameId) return;
+        console.log(`💬 Received TalkRequestsUpdate for game ${gameId}:`, talkRequests);
+        setState({talkRequests: talkRequests ? talkRequests.map(t => new TalkRequest(t)) : []});
     });
 };

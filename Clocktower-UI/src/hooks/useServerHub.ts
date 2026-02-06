@@ -11,6 +11,7 @@ import {
     NominationSession,
     Script,
     type SessionSyncState,
+    TalkRequest,
     type TimerState,
     type VoiceState
 } from '@/types';
@@ -30,6 +31,7 @@ type HubState = {
     timer?: TimerState;
     script?: Script;
     nominationSession?: NominationSession;
+    talkRequests: TalkRequest[];
 };
 
 let globalConnection: signalR.HubConnection | null = null;
@@ -40,7 +42,8 @@ let globalState: HubState = {
     gameTime: GameTime.Night,
     timer: undefined,
     script: undefined,
-    nominationSession: undefined
+    nominationSession: undefined,
+    talkRequests: []
 };
 const globalListeners = new Set<(state: HubState) => void>();
 
@@ -60,7 +63,8 @@ export const resetHubState = () => {
         userPresenceStates: {},
         userVoiceStates: {},
         connectionState: HubConnectionState.Disconnected,
-        gameTime: GameTime.Night
+        gameTime: GameTime.Night,
+        talkRequests: []
     };
     notifyListeners();
 };
@@ -76,7 +80,8 @@ const handleJoinSnapshot = async (snapshot: SessionSyncState, isReconnecting: bo
         discordTown: snapshot.discordTown ? new DiscordTown(snapshot.discordTown) : undefined,
         timer: snapshot.timer,
         script: snapshot.script ? new Script(snapshot.script) : undefined,
-        nominationSession: snapshot.nominationSession ? new NominationSession(snapshot.nominationSession) : undefined
+        nominationSession: snapshot.nominationSession ? new NominationSession(snapshot.nominationSession) : undefined,
+        talkRequests: snapshot.talkRequests ? snapshot.talkRequests.map((req) => new TalkRequest(req)) : [],
     });
 
     const currentJwt = useAppStore.getState().jwt;
@@ -319,6 +324,14 @@ const getVoteHistory = async (gameId: string) => {
     const records = await globalConnection.invoke<VoteHistoryRecord[] | null>('GetVoteHistory', gameId);
     return records?.map(record => new VoteHistoryRecord(record)) ?? null;
 }
+
+const requestToTalk = async (gameId: string, requesterId: string, targetId: string) => {
+    if (!isConnected(globalConnection)) {
+        return;
+    }
+
+    await globalConnection.invoke('RequestToTalk', gameId, requesterId, targetId);
+};
 export const joinGameGroup = async (gameId: string, isReconnecting: boolean = false, isInitialMount: boolean = false): Promise<void> => {
     const {setJoinedGameId, currentUser} = useAppStore.getState();
 
@@ -397,5 +410,6 @@ export {
     toggleVote,
     toggleMarkPlayer,
     getVoteHistory,
+    requestToTalk,
     removeAllMarks
 };

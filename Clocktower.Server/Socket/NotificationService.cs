@@ -11,6 +11,7 @@ public class NotificationService(IHubContext<NotificationHub, INotificationClien
     public Task SendTimerUpdateToGroup(string gameId, TimerState timer) => hub.Clients.Group(GetGameGroupName(gameId)).TimerUpdated(timer);
     public Task SendScriptToGroup(string gameId, Script? script) => hub.Clients.Group(GetGameGroupName(gameId)).ScriptUpdated(gameId, script);
     public Task SendNominationSessionUpdateToGroup(string gameId, NominationSession? session) => hub.Clients.Group(GetGameGroupName(gameId)).NominationUpdate(gameId, session);
+    public Task SendTalkRequestsUpdateToGroup(string gameId, IEnumerable<TalkRequest>? talkRequests) => hub.Clients.Group(GetGameGroupName(gameId)).TalkRequestsUpdate(gameId, talkRequests);
 
     private static string GetGameGroupName(string gameId) => $"game:{gameId}";
 }

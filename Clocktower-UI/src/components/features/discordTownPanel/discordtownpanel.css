@@ -26,7 +26,7 @@
     }
 
     .channel-occupants {
-        @apply mt-2 p-2 pl-4;
+        @apply flex flex-col mt-2 p-2 pl-4 gap-1;
     }
 
     #discord-town-panel {

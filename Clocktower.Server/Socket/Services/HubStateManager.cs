@@ -7,7 +7,8 @@ public class HubStateManager(
     IDiscordTownManager discordTownManager,
     IJwtWriter jwtWriter,
     ITimerCoordinator timerCoordinator,
-    IVotingService votingService
+    IVotingService votingService,
+    ITalkRequestManager talkRequestManager
 ) : IHubStateManager
 {
     public SessionSyncState? GetState(string gameId, string userId)
@@ -22,7 +23,7 @@ public class HubStateManager(
 
         var timer = timerCoordinator.Get(gameId);
         var nominationSession = votingService.GetSession(gameId);
-
+        var talkRequests = talkRequestManager.GetTalkRequests(gameId);
         var jwtToken = jwtWriter.GetJwtToken(gameUser);
 
         var currentState = new SessionSyncState
@@ -32,7 +33,8 @@ public class HubStateManager(
             Jwt = jwtToken,
             DiscordTown = discordTown,
             Timer = timer,
-            NominationSession = nominationSession
+            NominationSession = nominationSession,
+            TalkRequests = talkRequests
         };
         return currentState;
     }

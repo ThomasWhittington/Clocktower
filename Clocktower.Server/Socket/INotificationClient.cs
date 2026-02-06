@@ -9,4 +9,5 @@ public interface INotificationClient
     Task TimerUpdated(TimerState timer);
     Task ScriptUpdated(string gameId, Script? script);
     Task NominationUpdate(string gameId, NominationSession? session);
+    Task TalkRequestsUpdate(string gameId, IEnumerable<TalkRequest>? talkRequests);
 }

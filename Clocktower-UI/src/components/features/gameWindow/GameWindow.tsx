@@ -25,6 +25,7 @@ import {
     User
 } from "@/types";
 import {useTownSquareActions} from "@/components/features/townSquare/hooks";
+import TalkRequestsBox from "@/components/features/gameWindow/components/hud/TalkRequestBox.tsx";
 
 export default function GameWindow() {
     const {currentUser} = useAppStore();
@@ -105,6 +106,8 @@ export default function GameWindow() {
                 onVoteClick={townSquareActions.togglePlayerVote}
                 onCancelNomination={townSquareActions.cancelNomination}
             />
+
+            <TalkRequestsBox/>
         </div>
     );
 };

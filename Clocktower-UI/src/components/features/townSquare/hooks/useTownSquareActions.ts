@@ -9,6 +9,7 @@ import {gamesService} from "@/services";
 import {useAppStore} from "@/store";
 import {
     makeNomination,
+    requestToTalk as requestToTalkCall,
     startVote as startVoting,
     toggleVote,
     useAction,
@@ -86,6 +87,14 @@ export function useTownSquareActions() {
         }
     }, [gameId, currentUser, runAction]);
 
+    const requestToTalk = useCallback(async (target: User) => {
+        if (gameId && currentUser) {
+            await runAction(async () => {
+                return await requestToTalkCall(gameId, currentUser.id, target.id);
+            });
+        }
+    }, [gameId, currentUser, runAction]);
+
     const startVote = useCallback(() => {
         if (gameId) {
             void startVoting(gameId, 1000);
@@ -113,7 +122,8 @@ export function useTownSquareActions() {
         confirmNomination,
         cancelNomination,
         playerNominatesPlayer,
-        togglePlayerVote
+        togglePlayerVote,
+        requestToTalk
     }), [
         activeMenuPlayerId,
         swappingPlayer,
@@ -128,6 +138,7 @@ export function useTownSquareActions() {
         confirmNomination,
         cancelNomination,
         playerNominatesPlayer,
-        togglePlayerVote
+        togglePlayerVote,
+        requestToTalk
     ]);
 }
