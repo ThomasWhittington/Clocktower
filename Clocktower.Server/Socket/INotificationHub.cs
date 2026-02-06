@@ -11,6 +11,7 @@ public interface INotificationHub
     Task CancelVote(string gameId);
     Task NextNomination(string gameId);
     Task RemoveAllMarks(string gameId);
+    void RequestToTalk(string gameId, string requesterId, string targetId);
     Task<bool> ToggleVote(string gameId, string playerId);
     Task<bool> MakeNomination(string gameId, string nominatorId, string nomineeId);
     Task<bool> ToggleMarkPlayer(string gameId, string playerId);

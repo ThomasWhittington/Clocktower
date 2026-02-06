@@ -62,6 +62,7 @@ public static class ConfigureServices
 
             builder.Services.AddSingleton<IIdGenerator, IdGenerator>();
             builder.Services.AddSingleton<IUserService, UserService>();
+            builder.Services.AddSingleton<ITalkRequestManager, TalkRequestManager>();
             builder.Services.AddSingleton<IJwtWriter, JwtWriter>();
             builder.Services.AddSingleton<IUserIdProvider, UserIdProvider>();
             builder.Services.AddSingleton<ITimerCoordinator, TimerCoordinator>();

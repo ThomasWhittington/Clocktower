@@ -16,6 +16,7 @@ public class NotificationHubTests
     private Mock<HubCallerContext> _mockContext = null!;
     private Mock<IHubStateManager> _mockHubStateManager = null!;
     private Mock<IGamePerspectiveService> _mockGamePerspectiveService = null!;
+    private Mock<ITalkRequestManager> _mockTalkRequestManager = null!;
     private Mock<IVotingService> _mockVotingService = null!;
 
     private NotificationHub _sut = null!;
@@ -27,10 +28,11 @@ public class NotificationHubTests
         _mockContext = new Mock<HubCallerContext>();
         _mockHubStateManager = new Mock<IHubStateManager>();
         _mockGamePerspectiveService = new Mock<IGamePerspectiveService>();
+        _mockTalkRequestManager = new Mock<ITalkRequestManager>();
 
         _mockVotingService = new Mock<IVotingService>();
 
-        _sut = new NotificationHub(_mockHubStateManager.Object, _mockGamePerspectiveService.Object, _mockVotingService.Object);
+        _sut = new NotificationHub(_mockHubStateManager.Object, _mockGamePerspectiveService.Object, _mockVotingService.Object, _mockTalkRequestManager.Object);
         _sut.Context = _mockContext.Object;
         _sut.Groups = _mockGroups.Object;
 

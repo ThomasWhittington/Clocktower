@@ -9,6 +9,7 @@ public class DiscordBotHandler(
     IDiscordTownManager discordDiscordTownManager,
     IUserService userService,
     IGameBroadcastService gameBroadcastService,
+    ITalkRequestManager talkRequestManager,
     IServiceScopeFactory serviceScopeFactory
 ) : IDiscordBotHandler
 {
@@ -37,6 +38,7 @@ public class DiscordBotHandler(
         foreach (var gameId in guildGameIds)
         {
             await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+            await RemoveTalkRequestsForUsersInSameChannel(gameId, guildId);
         }
     }
 
@@ -47,5 +49,26 @@ public class DiscordBotHandler(
         var (success, discordTown, _) = await townService.GetDiscordTown(guildId);
         if (!success || discordTown is null) return;
         discordDiscordTownManager.MoveUser(discordTown, user, after.VoiceChannel, voiceState);
+    }
+
+    private async Task RemoveTalkRequestsForUsersInSameChannel(string gameId, string guildId)
+    {
+        var discordTown = discordDiscordTownManager.GetDiscordTown(guildId);
+        if (discordTown is null) return;
+
+        var talkRequests = talkRequestManager.GetTalkRequests(gameId);
+
+        foreach (var request in talkRequests)
+        {
+            var requesterChannel = discordDiscordTownManager.FindUserChannel(discordTown, request.RequesterId);
+            var targetChannel = discordDiscordTownManager.FindUserChannel(discordTown, request.TargetId);
+
+            if (requesterChannel is not null &&
+                targetChannel is not null &&
+                requesterChannel.Channel.Id == targetChannel.Channel.Id)
+            {
+                await talkRequestManager.RemoveTalkRequest(gameId, request.RequesterId, request.TargetId);
+            }
+        }
     }
 }

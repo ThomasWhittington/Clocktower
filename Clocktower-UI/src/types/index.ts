@@ -20,4 +20,4 @@ export * from './scriptSelect'
 export * from './roleDistribution'
 export * from './nominationSession'
 export * from './voteHistoryRecord'
-
+export * from './talkRequest'

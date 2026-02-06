@@ -22,6 +22,7 @@ public class DiscordBotHandlerTests
     private Mock<IDiscordTownManager> _mockDiscordTownManager = null!;
     private Mock<IUserService> _mockUserService = null!;
     private Mock<IGameBroadcastService> _mockGameBroadcastService = null!;
+    private Mock<ITalkRequestManager> _mockTalkRequestManager = null!;
     private Mock<IServiceScopeFactory> _mockServiceScopeFactory = null!;
     private Mock<IServiceScope> _mockScope = null!;
     private Mock<IServiceProvider> _mockServiceProvider = null!;
@@ -41,6 +42,7 @@ public class DiscordBotHandlerTests
         _mockDiscordTownManager = new Mock<IDiscordTownManager>();
         _mockUserService = new Mock<IUserService>();
         _mockGameBroadcastService = new Mock<IGameBroadcastService>();
+        _mockTalkRequestManager = new Mock<ITalkRequestManager>();
         _mockServiceScopeFactory = new Mock<IServiceScopeFactory>();
         _mockScope = new Mock<IServiceScope>();
         _mockServiceProvider = new Mock<IServiceProvider>();
@@ -66,6 +68,7 @@ public class DiscordBotHandlerTests
             _mockDiscordTownManager.Object,
             _mockUserService.Object,
             _mockGameBroadcastService.Object,
+            _mockTalkRequestManager.Object,
             _mockServiceScopeFactory.Object)
         {
             CallBase = true

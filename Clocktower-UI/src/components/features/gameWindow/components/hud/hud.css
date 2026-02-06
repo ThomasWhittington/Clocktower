@@ -178,4 +178,39 @@
             height: var(--clock-size, 75vmin);
         }
     }
+
+    .talk-requests-box {
+        @apply absolute bottom-[1vmin] left-[1vmin] flex flex-col overflow-hidden z-1000 select-none;
+        @apply w-[35vmin] max-h-[37.5vmin] rounded-[0.94vmin];
+        @apply bg-[rgba(20,20,30,0.95)] border-[0.25vmin] border-amber-500/50;
+        @apply shadow-[0_0.5vmin_2.5vmin_rgba(0,0,0,0.4)] backdrop-blur-[1.25vmin];
+    }
+
+    .talk-requests-header {
+        @apply text-center font-semibold text-amber-500 bg-amber-500/20 border-b border-amber-500/30;
+        padding: 0.94vmin 1.25vmin;
+        border-bottom-width: 0.13vmin;
+        font-size: 1.19vmin;
+    }
+
+    .talk-requests-list {
+        @apply flex-1 overflow-y-auto;
+        padding: 0.63vmin;
+    }
+
+    .talk-request-item {
+        @apply flex items-center bg-white/5 border border-white/10 rounded-[0.63vmin] mb-[0.63vmin] last:mb-0 text-white;
+        gap: 0.63vmin;
+        padding: 0.94vmin;
+        font-size: 1.13vmin;
+    }
+
+    .talk-request-item .you {
+        @apply font-bold text-amber-500;
+    }
+
+    .talk-request-item .arrow {
+        @apply text-gray-400;
+        font-size: 1.25vmin;
+    }
 }

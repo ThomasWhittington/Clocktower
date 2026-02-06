@@ -185,7 +185,7 @@ export default function TownSquare({
         initiateNomination,
         confirmNomination,
         cancelNomination,
-        playerNominatesPlayer
+        requestToTalk,
     } = townSquareActions;
 
     useEffect(() => {
@@ -225,8 +225,8 @@ export default function TownSquare({
         initiateSwap,
         toggleMarkPlayer: handleToggleMarkPlayer,
         initiateNomination,
-        playerNominatesPlayer
-    }), [initiateSwap, handleToggleMarkPlayer, initiateNomination, playerNominatesPlayer]);
+        requestToTalk,
+    }), [initiateSwap, handleToggleMarkPlayer, initiateNomination, requestToTalk]);
 
     if (!gameId) return null;
 

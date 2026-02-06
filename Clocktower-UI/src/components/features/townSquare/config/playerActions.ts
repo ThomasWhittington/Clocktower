@@ -11,13 +11,14 @@ export interface PlayerAction {
 export interface PlayerActionState {
     nominationsEnabled: boolean;
     currentUserIsStoryTeller: boolean;
+    currentUserId?: string;
 }
 
 export interface PlayerActionContext {
     initiateSwap: (player: User) => void;
     toggleMarkPlayer: (player: User) => void;
     initiateNomination: (player: User) => void;
-    playerNominatesPlayer: (target: User) => Promise<void>;
+    requestToTalk: (player: User) => Promise<void>;
 }
 
 export const playerActions: PlayerAction[] = [
@@ -47,6 +48,15 @@ export const playerActions: PlayerAction[] = [
             execute: (player, {initiateNomination}) => {
                 initiateNomination(player);
             },
+        },
+    {
+        id: "request-to-talk",
+        label: "Request to Talk",
+        icon: "💬",
+        isVisible: (user, state) => state.currentUserId != user.id,
+        execute: (player, {requestToTalk}) => {
+            void requestToTalk(player);
+        },
         }
     ]
 ;

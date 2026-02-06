@@ -14,6 +14,7 @@ public class HubStateManagerTests
     private Mock<IJwtWriter> _mockJwtWriter = null!;
     private Mock<ITimerCoordinator> _mockTimerCoordinator = null!;
     private Mock<IVotingService> _mockVotingService = null!;
+    private Mock<ITalkRequestManager> _mockTalkRequestManager = null!;
 
     private IHubStateManager _sut = null!;
 
@@ -25,12 +26,14 @@ public class HubStateManagerTests
         _mockJwtWriter = StrictMockFactory.Create<IJwtWriter>();
         _mockTimerCoordinator = StrictMockFactory.Create<ITimerCoordinator>();
         _mockVotingService = StrictMockFactory.Create<IVotingService>();
+        _mockTalkRequestManager = StrictMockFactory.Create<ITalkRequestManager>();
 
         _sut = new HubStateManager(_mockGamePerspectiveService.Object,
             _mockDiscordTownManager.Object,
             _mockJwtWriter.Object,
             _mockTimerCoordinator.Object,
-            _mockVotingService.Object
+            _mockVotingService.Object,
+            _mockTalkRequestManager.Object
         );
     }
 
@@ -88,6 +91,7 @@ public class HubStateManagerTests
         _mockJwtWriter.Setup(j => j.GetJwtToken(gameUser)).Returns(expectedJwt);
         _mockTimerCoordinator.Setup(t => t.Get(gameId)).Returns(timer);
         _mockVotingService.Setup(o => o.GetSession(gameId)).Returns(nominationSession);
+        _mockTalkRequestManager.Setup(o => o.GetTalkRequests(gameId)).Returns([]);
 
         var result = _sut.GetState(gameId, userId);
 
@@ -102,6 +106,7 @@ public class HubStateManagerTests
         result.DiscordTown.GameId.Should().Be(gameId);
         result.Timer.Should().Be(timer);
         result.NominationSession.Should().Be(nominationSession);
+        result.TalkRequests.Should().BeEmpty();
     }
 
 
@@ -130,6 +135,7 @@ public class HubStateManagerTests
         _mockJwtWriter.Setup(j => j.GetJwtToken(gameUser)).Returns(expectedJwt);
         _mockTimerCoordinator.Setup(t => t.Get(gameId)).Returns(timer);
         _mockVotingService.Setup(o => o.GetSession(gameId)).Returns(nominationSession);
+        _mockTalkRequestManager.Setup(o => o.GetTalkRequests(gameId)).Returns([]);
 
         var result = _sut.GetState(gameId, userId);
 
@@ -143,5 +149,6 @@ public class HubStateManagerTests
         result.DiscordTown.GameId.Should().Be(gameId);
         result.Timer.Should().Be(timer);
         result.NominationSession.Should().Be(nominationSession);
+        result.TalkRequests.Should().BeEmpty();
     }
 }
