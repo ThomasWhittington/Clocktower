@@ -53,7 +53,7 @@ export const playerActions: PlayerAction[] = [
         id: "request-to-talk",
         label: "Request to Talk",
         icon: "💬",
-        isVisible: (user, state) => state.currentUserId != user.id,
+        isVisible: (user, state) => state.currentUserId !== undefined && state.currentUserId !== user.id,
         execute: (player, {requestToTalk}) => {
             void requestToTalk(player);
         },

@@ -8,5 +8,5 @@ public class SessionSyncState
     public required TimerState Timer { get; init; }
     public required Script? Script { get; init; }
     public required NominationSession? NominationSession { get; init; }
-    public IEnumerable<TalkRequest> TalkRequests { get; set; } = [];
+    public required IEnumerable<TalkRequest> TalkRequests { get; set; }
 }

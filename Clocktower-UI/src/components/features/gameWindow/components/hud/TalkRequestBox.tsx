@@ -31,34 +31,29 @@ export default function TalkRequestsBox() {
     return (
         <div className="talk-requests-box">
             <div className="talk-requests-header">
-                💬 Talk
-                Requests({displayRequests.length})
+                💬 Talk Requests ({displayRequests.length})
             </div>
-            <div
-                className="talk-requests-list">
-                {
-                    displayRequests.map((req, idx) => (
-                        <div key={idx} className="talk-request-item">
-                            {
-                                req.isOutgoing ? (
-                                        <>
-                                            <span className="you"> You </span>
-                                            < span className="arrow">→</span>
-                                            < span> {req.targetName} </span>
-                                        </>
-                                    ) :
-                                    (
-                                        <>
-                                            <span>{req.requesterName} </span>
-                                            < span
-                                                className="arrow">→</span>
-                                            < span
-                                                className="you"> You </span>
-                                        </>
-                                    )
-                            }
-                        </div>
-                    ))
+            <div className="talk-requests-list">
+                {displayRequests.map((req) => (
+                    <div key={`${req.requesterName}-${req.targetName}`} className="talk-request-item">
+                        {
+                            req.isOutgoing ? (
+                                    <>
+                                        <span className="you"> You </span>
+                                        <span className="arrow">→</span>
+                                        <span> {req.targetName} </span>
+                                    </>
+                                ) :
+                                (
+                                    <>
+                                        <span>{req.requesterName} </span>
+                                        <span className="arrow">→</span>
+                                        <span className="you"> You </span>
+                                    </>
+                                )
+                        }
+                    </div>
+                ))
                 }
             </div>
         </div>

@@ -12,7 +12,11 @@ export const BottomHud = ({scriptName, storyTellers}: BottomHudProps) => {
     const {gameId, currentUser} = useAppStore();
     if (!gameId || !currentUser) return null;
     const handleRequestToTalk = async (storyTellerId: string) => {
-        await requestToTalk(gameId, currentUser.id, storyTellerId);
+        try {
+            await requestToTalk(gameId, currentUser.id, storyTellerId);
+        } catch (e) {
+            console.error("Failed to request to talk", e);
+        }
     };
 
     return (

@@ -56,7 +56,7 @@ public class DiscordBotHandler(
         var discordTown = discordDiscordTownManager.GetDiscordTown(guildId);
         if (discordTown is null) return;
 
-        var talkRequests = talkRequestManager.GetTalkRequests(gameId);
+        var talkRequests = talkRequestManager.GetTalkRequests(gameId).ToList();
 
         foreach (var request in talkRequests)
         {

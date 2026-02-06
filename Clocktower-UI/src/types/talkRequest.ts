@@ -3,10 +3,10 @@
     readonly targetId: string;
     readonly timestamp: string;
 
-    constructor(state: TalkRequest) {
-        this.requesterId = state.requesterId;
-        this.targetId = state.targetId;
-        this.timestamp = state.timestamp;
+    constructor(state: Partial<TalkRequest>) {
+        this.requesterId = state.requesterId ?? '';
+        this.targetId = state.targetId ?? '';
+        this.timestamp = state.timestamp ?? '';
     }
 
     public get dateTime(): Date {

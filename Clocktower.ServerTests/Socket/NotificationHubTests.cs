@@ -56,7 +56,8 @@ public class NotificationHubTests
                 EndUtc = DateTime.UtcNow.AddSeconds(30)
             },
             Script = new Script("Name", "Author", []),
-            NominationSession = new NominationSession(GameId)
+            NominationSession = new NominationSession(GameId),
+            TalkRequests = []
         };
         return result;
     }

@@ -54,8 +54,8 @@ public sealed class NotificationHub(IHubStateManager hubStateManager, IGamePersp
     public async Task<bool> ToggleVote(string gameId, string playerId)
         => await votingService.ToggleVote(gameId, playerId);
 
-    public void RequestToTalk(string gameId, string requesterId, string targetId)
-        => talkRequestManager.AddTalkRequest(gameId, requesterId, targetId);
+    public async Task RequestToTalk(string gameId, string requesterId, string targetId)
+        => await talkRequestManager.AddTalkRequest(gameId, requesterId, targetId);
 
     private static string GetGameGroupName(string gameId) => $"game:{gameId}";
 }
