@@ -72,6 +72,14 @@ export const TownSquarePlayer = memo(
             [player, thisUser, discordTown]
         );
 
+        const angleToCenter = useMemo(() => {
+            return Math.atan2(-pos.y, -pos.x) * (180 / Math.PI);
+        }, [pos.x, pos.y]);
+
+        const distanceToCenter = useMemo(() => {
+            return Math.hypot(pos.x, pos.y);
+        }, [pos.x, pos.y]);
+
         return (
             <PlayerIcon
                 x={pos.x}
@@ -124,6 +132,17 @@ export const TownSquarePlayer = memo(
                                 </motion.div>
                             )}
                         </AnimatePresence>
+
+
+                        <div
+                            className="reminders-block"
+                            style={{
+                                ['--reminders-height' as string]: `${size}px`,
+                                transform: `rotate(${angleToCenter}deg) translateX(${size / 2}px)`,
+                                width: `${distanceToCenter / 2}px`,
+                                height: `${size}px`,
+                            }}
+                        ></div>
                     </>
                 }
             >

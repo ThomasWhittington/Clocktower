@@ -283,4 +283,21 @@
         background: rgba(0, 0, 0, 0.1);
         border-radius: 50%;
     }
+
+    .reminders-block {
+        --reminders-height: 0px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform-origin: left center;
+        margin-top: calc(var(--reminders-height) / -2);
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 5px;
+        padding-left: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        pointer-events: none;
+    }
 }
