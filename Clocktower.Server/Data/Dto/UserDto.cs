@@ -15,6 +15,7 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
     [UsedImplicitly] public bool VoteLocked { get; set; }
     [UsedImplicitly] public Role? Role { get; set; }
     [UsedImplicitly] public Role? DraftRole { get; set; }
+    [UsedImplicitly] public IEnumerable<ReminderToken> ReminderTokens { get; set; } = [];
 
     public static UserDto FromTownUser(TownUser townUser, GameUser? gameUser = null)
     {
@@ -30,7 +31,8 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
             HandUp = gameUser?.HandUp ?? false,
             VoteLocked = gameUser?.VoteLocked ?? false,
             Role = gameUser?.Role ?? null,
-            DraftRole = gameUser?.DraftRole ?? null
+            DraftRole = gameUser?.DraftRole ?? null,
+            ReminderTokens = gameUser?.ReminderTokens ?? []
         };
     }
 
@@ -48,7 +50,8 @@ public record UserDto(string Id, string Name, string AvatarUrl) : IGameUser, ITo
             HandUp = gameUser.HandUp,
             VoteLocked = gameUser.VoteLocked,
             Role = gameUser.Role,
-            DraftRole = gameUser.DraftRole
+            DraftRole = gameUser.DraftRole,
+            ReminderTokens = gameUser.ReminderTokens
         };
     }
 }

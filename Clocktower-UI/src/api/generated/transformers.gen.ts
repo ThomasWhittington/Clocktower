@@ -126,6 +126,11 @@ const clocktowerServerDataDtoUserDtoSchemaResponseTransformer = (data: any) => {
     if (data.draftRole) {
         data.draftRole = clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(data.draftRole);
     }
+    if (data.reminderTokens) {
+        data.reminderTokens = data.reminderTokens.map((item: any) => {
+            return clocktowerServerDataTypesReminderTokenSchemaResponseTransformer(item);
+        });
+    }
     return data;
 };
 
@@ -160,6 +165,11 @@ const clocktowerServerDataGameUserSchemaResponseTransformer = (data: any) => {
     }
     if (data.draftRole) {
         data.draftRole = clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(data.draftRole);
+    }
+    if (data.reminderTokens) {
+        data.reminderTokens = data.reminderTokens.map((item: any) => {
+            return clocktowerServerDataTypesReminderTokenSchemaResponseTransformer(item);
+        });
     }
     return data;
 };

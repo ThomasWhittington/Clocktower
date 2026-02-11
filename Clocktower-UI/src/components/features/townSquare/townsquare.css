@@ -286,18 +286,11 @@
 
     .reminders-block {
         --reminders-height: 0px;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform-origin: left center;
+        @apply absolute left-1/2 top-1/2 origin-left grid grid-flow-col grid-rows-2 auto-cols-min gap-[5px] pl-2.5 pointer-events-none;
         margin-top: calc(var(--reminders-height) / -2);
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-start;
-        align-items: center;
-        gap: 5px;
-        padding-left: 10px;
-        background-color: rgba(0, 0, 0, 0.5);
-        pointer-events: none;
+    }
+
+    .reminders-block:has(:only-child) {
+        @apply grid-rows-1 items-center;
     }
 }

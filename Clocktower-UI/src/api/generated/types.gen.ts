@@ -62,6 +62,7 @@ export type ClocktowerServerDataDtoUserDto = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRole;
     draftRole?: ClocktowerServerDataTypesRoleRole;
+    reminderTokens?: Array<ClocktowerServerDataTypesReminderToken> | null;
 };
 
 export type ClocktowerServerDataGamePerspective = {
@@ -90,6 +91,7 @@ export type ClocktowerServerDataGameUser = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRole;
     draftRole?: ClocktowerServerDataTypesRoleRole;
+    reminderTokens?: Array<ClocktowerServerDataTypesReminderToken> | null;
 };
 
 export type ClocktowerServerDataMiniChannel = {
@@ -143,6 +145,12 @@ export type ClocktowerServerDataTypesJoinData = {
     user?: ClocktowerServerDataGameUser;
     gameId?: string | null;
     jwt?: string | null;
+};
+
+export type ClocktowerServerDataTypesReminderToken = {
+    roleId?: string | null;
+    reminderText?: string | null;
+    id?: string | null;
 };
 
 export type ClocktowerServerDataTypesRoleRole = {
@@ -255,6 +263,7 @@ export type ClocktowerServerDataDtoUserDtoWritable = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
     draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
+    reminderTokens?: Array<ClocktowerServerDataTypesReminderToken> | null;
 };
 
 export type ClocktowerServerDataGamePerspectiveWritable = {
@@ -280,6 +289,7 @@ export type ClocktowerServerDataGameUserWritable = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
     draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
+    reminderTokens?: Array<ClocktowerServerDataTypesReminderToken> | null;
 };
 
 export type ClocktowerServerDataMiniGamePerspectiveWritable = {

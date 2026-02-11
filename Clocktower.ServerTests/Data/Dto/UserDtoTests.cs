@@ -1,5 +1,6 @@
 ﻿using Clocktower.Server.Data;
 using Clocktower.Server.Data.Dto;
+using Clocktower.Server.Data.Types;
 using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Data.Types.Role;
 
@@ -24,7 +25,12 @@ public class UserDtoTests
         HandUp = true,
         VoteLocked = true,
         Role = Role.Empath,
-        DraftRole = Role.Baron
+        DraftRole = Role.Baron,
+        ReminderTokens =
+        [
+            new ReminderToken("123", "Reminder 1"),
+            new ReminderToken("456", "Reminder 2")
+        ]
     };
 
     [TestMethod]
@@ -46,6 +52,7 @@ public class UserDtoTests
         result.VoteLocked.Should().BeFalse();
         result.Role.Should().BeNull();
         result.DraftRole.Should().BeNull();
+        result.ReminderTokens.Should().BeEmpty();
     }
 
     [TestMethod]
@@ -67,6 +74,7 @@ public class UserDtoTests
         result.VoteLocked.Should().Be(_gameUser.VoteLocked);
         result.Role.Should().Be(_gameUser.Role);
         result.DraftRole.Should().Be(_gameUser.DraftRole);
+        result.ReminderTokens.Should().BeEquivalentTo(_gameUser.ReminderTokens);
     }
 
     [TestMethod]
@@ -88,6 +96,7 @@ public class UserDtoTests
         result.VoteLocked.Should().Be(_gameUser.VoteLocked);
         result.Role.Should().Be(_gameUser.Role);
         result.DraftRole.Should().Be(_gameUser.DraftRole);
+        result.ReminderTokens.Should().BeEquivalentTo(_gameUser.ReminderTokens);
     }
 
     [TestMethod]
@@ -109,5 +118,6 @@ public class UserDtoTests
         result.VoteLocked.Should().Be(_gameUser.VoteLocked);
         result.Role.Should().Be(_gameUser.Role);
         result.DraftRole.Should().Be(_gameUser.DraftRole);
+        result.ReminderTokens.Should().BeEquivalentTo(_gameUser.ReminderTokens);
     }
 }

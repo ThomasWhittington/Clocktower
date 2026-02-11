@@ -21,3 +21,5 @@ export * from './roleDistribution'
 export * from './nominationSession'
 export * from './voteHistoryRecord'
 export * from './talkRequest'
+export * from './reminder.ts'
+
