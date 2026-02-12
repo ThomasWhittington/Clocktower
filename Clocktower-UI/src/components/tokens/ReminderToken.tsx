@@ -8,13 +8,14 @@ interface ReminderTokenProps {
     size: number;
     className?: string;
     onClick?: () => void;
+    disableXOverlay?: boolean;
 }
 
-export const ReminderToken = ({reminder, angleToCenter, size, className, onClick}: ReminderTokenProps) => {
+export const ReminderToken = ({reminder, angleToCenter, size, className, onClick, disableXOverlay}: ReminderTokenProps) => {
     return (
         <span
             key={reminder.id}
-            className={`reminder-token ${className}`}
+            className={`reminder-token ${className} ${disableXOverlay ? 'no-x-overlay' : ''}`}
             style={{
                 transform: `rotate(${-angleToCenter}deg)`,
                 width: `${size}px`,

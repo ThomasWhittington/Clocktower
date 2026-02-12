@@ -34,7 +34,7 @@
         }
 
         .reminder-text {
-            @apply mt-[50%] font-bold text-black mx-2 leading-tight;
+            @apply mt-[50%] font-bold text-black mx-2 leading-tight select-none;
         }
     }
 }

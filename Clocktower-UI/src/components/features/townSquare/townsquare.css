@@ -250,7 +250,7 @@
     }
 
     .role-description-content {
-        @apply bg-neutral-900/80 text-white p-4 rounded-lg shadow-2xl border border-neutral-700;
+        @apply bg-neutral-900/80 text-white p-4 rounded-lg shadow-2xl border border-neutral-700 select-none;
         min-width: 250px;
         max-width: 400px;
         font-size: 14px;
@@ -315,6 +315,10 @@
         @apply opacity-100;
     }
 
+    .reminder-token.no-x-overlay::before {
+        @apply hidden;
+    }
+    
     .reminder-token.add-reminder::before {
         @apply hidden;
     }

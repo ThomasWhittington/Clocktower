@@ -2,5 +2,5 @@
 
 public record ReminderToken(string RoleId, string ReminderText)
 {
-    [UsedImplicitly] public string Id { get; init; } = Guid.NewGuid().ToString();
+    [UsedImplicitly] public string Id => RoleId + "-" + ReminderText;
 }
