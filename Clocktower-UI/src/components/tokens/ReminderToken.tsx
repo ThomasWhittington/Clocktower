@@ -6,13 +6,14 @@ interface ReminderTokenProps {
     reminder: Reminder;
     angleToCenter: number;
     size: number;
+    className?: string;
 }
 
-export const ReminderToken = ({reminder, angleToCenter, size}: ReminderTokenProps) => {
+export const ReminderToken = ({reminder, angleToCenter, size, className}: ReminderTokenProps) => {
     return (
         <span
             key={reminder.id}
-            className="reminder-token"
+            className={`reminder-token ${className}`}
             style={{
                 transform: `rotate(${-angleToCenter}deg)`,
                 width: `${size}px`,

@@ -16,7 +16,8 @@ import {useDiscordTown} from "@/components/features/discordTownPanel/hooks";
 import {
     memo,
     type MouseEvent,
-    useMemo
+    useMemo,
+    useState
 } from "react";
 import {User} from "@/types";
 import {
@@ -61,6 +62,7 @@ export const TownSquarePlayer = memo(
                                   onTokenClick,
                                   actionContext
                               }: TownSquarePlayerProps) {
+        const [isHovered, setIsHovered] = useState(false);
         const isSwappingTarget = swappingPlayer !== null && swappingPlayer.id !== player.id;
         const isNominatingTarget = nominatingPlayer !== null;
 
@@ -92,6 +94,8 @@ export const TownSquarePlayer = memo(
                 showDraftRoles={showDraftRoles}
                 onNameClick={(e) => toggleMenu(player.id, e)}
                 onTokenClick={onTokenClick}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
                 avatarOverlay={
                     <>
                         {isSwappingTarget &&
@@ -140,6 +144,7 @@ export const TownSquarePlayer = memo(
                                 distanceToCenter={distanceToCenter}
                                 angleToCenter={angleToCenter}
                                 size={size}
+                                isParentHovered={isHovered}
                             />
                         }
                     </>
