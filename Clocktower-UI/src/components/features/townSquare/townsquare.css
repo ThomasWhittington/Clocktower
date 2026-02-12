@@ -297,4 +297,30 @@
     .reminders-block:has(:only-child) {
         @apply grid-rows-1 items-center;
     }
+
+    .reminder-token {
+        @apply relative flex flex-col items-center justify-center bg-cover bg-center cursor-pointer;
+        transform: translateZ(0);
+        will-change: transform;
+    }
+
+    .reminder-token::before {
+        @apply absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-200 ease-in-out pointer-events-none z-100;
+        content: '';
+        background-image: url('/tokenParts/roles/x.png');
+        transform: translateZ(0);
+    }
+
+    .reminder-token:hover::before {
+        @apply opacity-100;
+    }
+
+    .reminder-token.add-reminder::before {
+        @apply hidden;
+    }
+
+    .reminder-token-icon,
+    .reminder-text {
+        transform: translateZ(0);
+    }
 }

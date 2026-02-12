@@ -27,21 +27,23 @@ import {
 import {animations} from "@/constants";
 
 interface TownSquarePlayerProps {
-    player: User;
-    pos: { idx: number; x: number; y: number };
-    size: number;
-    showToken: boolean;
-    showDraftRoles: boolean;
-    thisUser: User | undefined;
-    discordTown: ReturnType<typeof useDiscordTown>['discordTown'];
-    swappingPlayer: User | null;
-    nominatingPlayer: User | null;
-    activeMenuPlayerId: string | null;
-    toggleMenu: (playerId: string, e: MouseEvent) => void;
-    confirmSwap: (player: User) => void;
-    confirmNomination: (player: User) => void;
-    onTokenClick?: (player: User) => void;
-    actionContext: PlayerActionContext;
+    player: User,
+    pos: { idx: number; x: number; y: number },
+    size: number,
+    showToken: boolean,
+    showDraftRoles: boolean,
+    thisUser: User | undefined,
+    discordTown: ReturnType<typeof useDiscordTown>['discordTown'],
+    swappingPlayer: User | null,
+    nominatingPlayer: User | null,
+    activeMenuPlayerId: string | null,
+    toggleMenu: (playerId: string, e: MouseEvent) => void,
+    confirmSwap: (player: User) => void,
+    confirmNomination: (player: User) => void,
+    onTokenClick?: (player: User) => void,
+    actionContext: PlayerActionContext,
+    onManageRemindersClicked?: () => void,
+    removeReminderClicked?: (reminderId: string) => void
 }
 
 export const TownSquarePlayer = memo(
@@ -60,7 +62,9 @@ export const TownSquarePlayer = memo(
                                   confirmSwap,
                                   confirmNomination,
                                   onTokenClick,
-                                  actionContext
+                                  actionContext,
+                                  onManageRemindersClicked,
+                                  removeReminderClicked
                               }: TownSquarePlayerProps) {
         const [isHovered, setIsHovered] = useState(false);
         const isSwappingTarget = swappingPlayer !== null && swappingPlayer.id !== player.id;
@@ -145,6 +149,8 @@ export const TownSquarePlayer = memo(
                                 angleToCenter={angleToCenter}
                                 size={size}
                                 isParentHovered={isHovered}
+                                onManageRemindersClicked={onManageRemindersClicked}
+                                removeReminderClicked={removeReminderClicked}
                             />
                         }
                     </>

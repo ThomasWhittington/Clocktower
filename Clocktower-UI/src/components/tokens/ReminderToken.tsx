@@ -7,9 +7,10 @@ interface ReminderTokenProps {
     angleToCenter: number;
     size: number;
     className?: string;
+    onClick?: () => void;
 }
 
-export const ReminderToken = ({reminder, angleToCenter, size, className}: ReminderTokenProps) => {
+export const ReminderToken = ({reminder, angleToCenter, size, className, onClick}: ReminderTokenProps) => {
     return (
         <span
             key={reminder.id}
@@ -21,6 +22,7 @@ export const ReminderToken = ({reminder, angleToCenter, size, className}: Remind
                 backgroundImage: `url(${reminderBase})`,
                 fontSize: `${size * 0.18}px`
             }}
+            onClick={onClick}
         >
             <TokenRoleIcon roleId={reminder.roleId} className="reminder-token-icon"/>
             <span className="reminder-text">{reminder.reminderText}</span>

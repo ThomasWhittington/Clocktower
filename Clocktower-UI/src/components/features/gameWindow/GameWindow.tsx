@@ -67,6 +67,16 @@ export default function GameWindow() {
         }
     };
 
+    const handleManageRemindersClicked = (player: User) => {
+        if (script) {
+            console.log('Manage reminders clicked');
+            openPanel('reminder', {player});
+        }
+    }
+    const removeReminderClicked = (playerId: string, reminderId: string) => {
+        console.log('Remove reminder clicked', playerId, reminderId);
+    }
+
     const handleCommitDraftRoles = async () => {
         await commitDraftRoles();
         setIsDraftMode(false);
@@ -81,6 +91,8 @@ export default function GameWindow() {
                 onCommitDraftRoles={isDraftMode ? handleCommitDraftRoles : undefined}
                 onCircleSizeChange={setCircleDiameter}
                 townSquareActions={townSquareActions}
+                onManageRemindersClicked={handleManageRemindersClicked}
+                removeReminderClicked={removeReminderClicked}
             />
 
             <GamePanels

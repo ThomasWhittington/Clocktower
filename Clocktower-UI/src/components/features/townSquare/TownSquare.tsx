@@ -24,11 +24,13 @@ import {
 import {User} from "@/types";
 
 interface TownSquareProps {
-    showDraftRoles?: boolean;
-    onTokenClick?: (player: User) => void;
-    onCommitDraftRoles?: () => void;
-    onCircleSizeChange?: (diameter: number) => void;
-    townSquareActions: ReturnType<typeof import('@/components/features/townSquare/hooks').useTownSquareActions>;
+    showDraftRoles?: boolean,
+    onTokenClick?: (player: User) => void,
+    onCommitDraftRoles?: () => void,
+    onCircleSizeChange?: (diameter: number) => void,
+    townSquareActions: ReturnType<typeof import('@/components/features/townSquare/hooks').useTownSquareActions>,
+    onManageRemindersClicked?: (player: User) => void,
+    removeReminderClicked?: (playerId: string, reminderId: string) => void
 }
 
 export default function TownSquare({
@@ -36,7 +38,9 @@ export default function TownSquare({
                                        onTokenClick,
                                        onCommitDraftRoles,
                                        onCircleSizeChange,
-                                       townSquareActions
+                                       townSquareActions,
+                                       onManageRemindersClicked,
+                                       removeReminderClicked
                                    }: Readonly<TownSquareProps>) {
     const {ref: containerRef, size: parentSize} = useElementSize<HTMLDivElement>();
     const [debouncedSize, setDebouncedSize] = useState(parentSize);
@@ -147,6 +151,8 @@ export default function TownSquare({
                         confirmNomination={confirmNomination}
                         onTokenClick={onTokenClick}
                         actionContext={actionContext}
+                        onManageRemindersClicked={() => onManageRemindersClicked?.(player)}
+                        removeReminderClicked={(reminderId: string) => removeReminderClicked?.(player.id, reminderId)}
                     />
                 );
             })}

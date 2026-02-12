@@ -4,7 +4,7 @@
 } from 'react';
 import {User} from "@/types";
 
-export type PanelType = "script" | "user" | "role" | "night" | "token" | "rolePlanner" | "paper" | "voteHistory";
+export type PanelType = "script" | "user" | "role" | "night" | "token" | "rolePlanner" | "paper" | "voteHistory" | "reminder";
 
 export type PanelDataMap = {
     script: undefined;
@@ -15,6 +15,7 @@ export type PanelDataMap = {
     token: { player: User };
     rolePlanner: undefined;
     paper: undefined;
+    reminder: { player: User };
 };
 
 interface UseActivePanelReturn {
