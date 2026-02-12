@@ -43,7 +43,7 @@ export const UserRow = ({user, controlsLoading, controlsCanRun, removeUser, invi
                 <p>{user.name}</p>
             </div>
             <div className="user-row-section">
-                {user?.role && <TokenRoleIcon role={user.role} className="role-icon"/>}
+                {user?.role && <TokenRoleIcon roleId={user.role.id} className="role-icon"/>}
                 <UserTypeChange user={user} isLoading={controlsLoading} canRun={controlsCanRun} changeUserType={changeUserType}/>
                 <IconButton
                     className={isStoryteller ? "invisible" : "visible"}

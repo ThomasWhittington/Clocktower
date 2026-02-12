@@ -1,7 +1,8 @@
 ﻿import type {PlayerActionContext} from "@/components/features/townSquare/config";
 import {
     PlayerActionMenu,
-    PlayerIcon
+    PlayerIcon,
+    ReminderBlock
 } from "@/components/features/townSquare/components";
 import {
     HandIcon,
@@ -23,7 +24,6 @@ import {
     motion
 } from "framer-motion";
 import {animations} from "@/constants";
-import {ReminderToken} from "@/components/tokens";
 
 interface TownSquarePlayerProps {
     player: User;
@@ -104,51 +104,44 @@ export const TownSquarePlayer = memo(
                                 <PointIcon className="portrait-icon"/>
                             </button>
                         }
-                            <AnimatePresence mode="wait">
-                                {player.isMarked && (
-                                    <motion.div
-                                        key="marked"
-                                        {...animations.zoomInSpring}
-                                        className="portrait-overlay"
-                                    >
-                                        <SkullIcon className="portrait-icon marked"/>
-                                    </motion.div>
-                                )}
-                                {player.handUp && (
-                                    <motion.div
-                                        key="handup"
-                                        {...animations.zoomInSpring}
-                                        className="portrait-overlay"
-                                    >
-                                        <HandIcon className={`portrait-icon hand-up${player.voteLocked ? '' : ' unlocked'}`} gradientId="shared-hand"/>
-                                    </motion.div>
-                                )}
-                                {!player.handUp && player.voteLocked && (
-                                    <motion.div
-                                        key="noVote"
-                                        {...animations.zoomInSpring}
-                                        className="portrait-overlay"
-                                    >
-                                        <NoVoteIcon className="portrait-icon no-vote"/>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-
-                            {player.reminderTokens.length > 0 &&
-                                <div
-                                    className="reminders-block"
-                                    style={{
-                                        ['--reminders-height' as string]: `${size}px`,
-                                        transform: `rotate(${angleToCenter}deg) translateX(${size / 2}px)`,
-                                        width: `${distanceToCenter / 2}px`,
-                                        height: `${size}px`,
-                                    }}
+                        <AnimatePresence mode="wait">
+                            {player.isMarked && (
+                                <motion.div
+                                    key="marked"
+                                    {...animations.zoomInSpring}
+                                    className="portrait-overlay"
                                 >
-                                    {player.reminderTokens.map((reminder) =>
-                                        <ReminderToken key={reminder.id} reminder={reminder} angleToCenter={angleToCenter} size={size / 2}/>
-                                    )}
-                                </div>
-                            }
+                                    <SkullIcon className="portrait-icon marked"/>
+                                </motion.div>
+                            )}
+                            {player.handUp && (
+                                <motion.div
+                                    key="handup"
+                                    {...animations.zoomInSpring}
+                                    className="portrait-overlay"
+                                >
+                                    <HandIcon className={`portrait-icon hand-up${player.voteLocked ? '' : ' unlocked'}`} gradientId="shared-hand"/>
+                                </motion.div>
+                            )}
+                            {!player.handUp && player.voteLocked && (
+                                <motion.div
+                                    key="noVote"
+                                    {...animations.zoomInSpring}
+                                    className="portrait-overlay"
+                                >
+                                    <NoVoteIcon className="portrait-icon no-vote"/>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
+                        {player.reminderTokens.length > 0 &&
+                            <ReminderBlock
+                                reminderTokens={player.reminderTokens}
+                                distanceToCenter={distanceToCenter}
+                                angleToCenter={angleToCenter}
+                                size={size}
+                            />
+                        }
                     </>
                 }
             >

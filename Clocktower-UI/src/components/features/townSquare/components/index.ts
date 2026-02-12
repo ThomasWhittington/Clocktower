@@ -6,3 +6,5 @@ export {ActionBanner} from './ActionBanner';
 export {AvatarOverlays} from './AvatarOverlays';
 export {FlippableAvatar} from './FlippableAvatar';
 export {TownSquarePlayer} from './TownSquarePlayer';
+export {ReminderBlock} from './ReminderBlock';
+
