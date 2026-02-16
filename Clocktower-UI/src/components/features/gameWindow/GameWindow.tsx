@@ -7,12 +7,14 @@ import {
 import {
     useCurrentUserIsStoryteller,
     useDiscordTown,
+    useUser,
 } from "@/components/features/discordTownPanel/hooks";
 import {useServerHub} from "@/hooks";
 import {
     useActivePanel,
     useAssignToDraft,
     useGameWindowShortcuts,
+    useReminders,
     useSetRoles
 } from "@/components/features/gameWindow/hooks";
 import {
@@ -29,6 +31,7 @@ import TalkRequestsBox from "@/components/features/gameWindow/components/hud/Tal
 
 export default function GameWindow() {
     const {currentUser} = useAppStore();
+    const {thisUser} = useUser(currentUser?.id);
     const {script} = useServerHub();
     const {discordTown} = useDiscordTown();
     const [isDraftMode, setIsDraftMode] = useState(false);
@@ -58,6 +61,7 @@ export default function GameWindow() {
         selectedDraftRoles
     });
 
+    const {removeReminder} = useReminders(thisUser);
     const townSquareActions = useTownSquareActions();
 
     const handleTokenClick = (player: User) => {
@@ -68,12 +72,11 @@ export default function GameWindow() {
     };
     const handleManageRemindersClicked = (player: User) => {
         if (script) {
-            console.log('Manage reminders clicked');
             openPanel('reminder', {player});
         }
     }
     const removeReminderClicked = (playerId: string, reminderId: string) => {
-        console.log('Remove reminder clicked', playerId, reminderId);
+        removeReminder(playerId, reminderId);
     }
 
     const handleCommitDraftRoles = async () => {

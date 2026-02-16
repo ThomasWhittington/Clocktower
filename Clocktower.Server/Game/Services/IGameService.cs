@@ -22,4 +22,5 @@ public interface IGameService
     Task<Result<string>> CommitDraftRoles(string gameId);
     Task<Result<string>> SetDraftRoles(string gameId, Dictionary<string, string> playerRoles);
     Task<Result<string>> SetReminder(string gameId, string userId, string targetUserId, string reminderId);
+    Task<Result<string>> RemoveReminder(string gameId, string userId, string targetUserId, string reminderId);
 }

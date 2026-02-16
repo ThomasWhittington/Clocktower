@@ -15,6 +15,7 @@ import {
     getAvailableGameUsersApi,
     getGamesApi,
     randomiseSeatingPositionsApi,
+    removeReminderApi,
     removeUserFromGameApi,
     setDraftRoleApi,
     setDraftRolesApi,
@@ -384,6 +385,27 @@ async function setReminder(gameId: string, userId: string, targetUserId: string,
     return data;
 }
 
+async function removeReminder(gameId: string, userId: string, targetUserId: string, reminderId: string) {
+    const {
+        data,
+        error
+    } = await removeReminderApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId,
+            targetUserId: targetUserId,
+            reminderId: reminderId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to remove reminder for user:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
 const scriptSelectToString = (scriptSelect: ScriptSelect): ClocktowerServerDataTypesEnumScriptSelect => {
     switch (scriptSelect) {
         case ScriptSelect.Unknown:
@@ -426,5 +448,6 @@ export const gamesService = {
     setDraftRoles,
     setPerspectiveRole,
     commitDraftRoles,
-    setReminder
+    setReminder,
+    removeReminder
 }

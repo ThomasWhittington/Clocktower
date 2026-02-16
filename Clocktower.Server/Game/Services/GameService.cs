@@ -329,7 +329,58 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
 
     public async Task<Result<string>> SetReminder(string gameId, string userId, string targetUserId, string reminderId)
     {
-        throw new NotImplementedException();
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var user = guild.GetUser(userId);
+        if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
+        var targetUser = guild.GetUser(targetUserId);
+        if (targetUser is null) return Result.Fail<string>(Errors.UserNotFound(targetUserId));
+        var gameUser = gamePerspective.Users.FirstOrDefault(o => o.Id == userId);
+        if (gameUser is null) return Result.Fail<string>(Errors.UserNotFound(userId));
+
+        if (gameUser.UserType == UserType.StoryTeller) userId = IGamePerspectiveStore.OmniscientKey;
+
+        var parts = reminderId.Split('-', 2);
+        if (parts.Length != 2) return Result.Fail<string>(ErrorKind.Invalid, "reminder.invalid", "Invalid reminder ID format");
+
+        var reminderToken = new ReminderToken(parts[0], parts[1]);
+
+        var updateOccurred = gamePerspectiveService.AddReminderForUserOnPerspective(gameId, userId, targetUserId, reminderToken);
+
+        if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+
+        string updateOccurredString = updateOccurred ? "Reminders updated" : "No reminder change made";
+        return Result.Ok($"{targetUser.DisplayName} {updateOccurredString}");
+    }
+
+    public async Task<Result<string>> RemoveReminder(string gameId, string userId, string targetUserId, string reminderId)
+    {
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var user = guild.GetUser(userId);
+        if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
+        var targetUser = guild.GetUser(targetUserId);
+        if (targetUser is null) return Result.Fail<string>(Errors.UserNotFound(targetUserId));
+        var gameUser = gamePerspective.Users.FirstOrDefault(o => o.Id == userId);
+        if (gameUser is null) return Result.Fail<string>(Errors.UserNotFound(userId));
+
+        if (gameUser.UserType == UserType.StoryTeller) userId = IGamePerspectiveStore.OmniscientKey;
+
+        var parts = reminderId.Split('-', 2);
+        if (parts.Length != 2) return Result.Fail<string>(ErrorKind.Invalid, "reminder.invalid", "Invalid reminder ID format");
+
+        var reminderToken = new ReminderToken(parts[0], parts[1]);
+
+        var updateOccurred = gamePerspectiveService.RemoveReminderForUserOnPerspective(gameId, userId, targetUserId, reminderToken);
+
+        if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+
+        string updateOccurredString = updateOccurred ? "Reminders updated" : "No reminder change made";
+        return Result.Ok($"{targetUser.DisplayName} {updateOccurredString}");
     }
 
     public async Task<Result<string>> CommitDraftRoles(string gameId)

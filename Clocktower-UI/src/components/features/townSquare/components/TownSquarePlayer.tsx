@@ -142,17 +142,15 @@ export const TownSquarePlayer = memo(
                             )}
                         </AnimatePresence>
 
-                        {player.reminderTokens.length > 0 &&
-                            <ReminderBlock
-                                reminderTokens={player.reminderTokens}
-                                distanceToCenter={distanceToCenter}
-                                angleToCenter={angleToCenter}
-                                size={size}
-                                isParentHovered={isHovered}
-                                onManageRemindersClicked={onManageRemindersClicked}
-                                removeReminderClicked={removeReminderClicked}
-                            />
-                        }
+                        <ReminderBlock
+                            reminderTokens={player.reminderTokens}
+                            distanceToCenter={distanceToCenter}
+                            angleToCenter={angleToCenter}
+                            size={size}
+                            isParentHovered={isHovered}
+                            onManageRemindersClicked={onManageRemindersClicked}
+                            removeReminderClicked={removeReminderClicked}
+                        />
                     </>
                 }
             >

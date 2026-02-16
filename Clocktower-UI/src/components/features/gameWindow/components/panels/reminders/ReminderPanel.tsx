@@ -3,7 +3,7 @@ import {
     Reminder,
     type User
 } from "@/types";
-import {useReminderPanel} from "@/components/features/gameWindow/hooks";
+import {useReminders} from "@/components/features/gameWindow/hooks";
 import {
     ReminderToken,
     Token
@@ -20,7 +20,7 @@ export const ReminderPanel = ({isOpen, onClose, player}: ReminderPanelProps) => 
     const {
         availableReminders,
         setReminder
-    } = useReminderPanel(player);
+    } = useReminders(player);
     useEffect(() => {
         if (isOpen && availableReminders.length <= 0) {
             onClose();

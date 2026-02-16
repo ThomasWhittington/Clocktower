@@ -1154,6 +1154,40 @@ export type RandomiseSeatingPositionsApiResponses = {
 
 export type RandomiseSeatingPositionsApiResponse = RandomiseSeatingPositionsApiResponses[keyof RandomiseSeatingPositionsApiResponses];
 
+export type RemoveReminderApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+        targetUserId: string;
+        reminderId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/remove-reminder/{userId}/{targetUserId}/{reminderId}';
+};
+
+export type RemoveReminderApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type RemoveReminderApiError = RemoveReminderApiErrors[keyof RemoveReminderApiErrors];
+
+export type RemoveReminderApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type RemoveReminderApiResponse = RemoveReminderApiResponses[keyof RemoveReminderApiResponses];
+
 export type RemoveUserFromGameApiData = {
     body?: never;
     path: {
