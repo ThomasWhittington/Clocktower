@@ -2,12 +2,20 @@
     Reminder,
     User
 } from "@/types";
-import {useServerHub} from "@/hooks";
+import {
+    useAction,
+    useServerHub
+} from "@/hooks";
 import {useDiscordTown} from "@/components/features/discordTownPanel/hooks";
+import {useAppStore} from "@/store";
+import {useCallback} from "react";
+import {gamesService} from "@/services";
 
 export const useReminderPanel = (player: User) => {
     const {script} = useServerHub();
     const {discordTown} = useDiscordTown();
+    const {runAction} = useAction();
+    const {gameId, currentUser} = useAppStore();
     const availableReminders = (): Reminder[] => {
         if (!script) return [];
         const reminders: Reminder[] = [];
@@ -28,7 +36,15 @@ export const useReminderPanel = (player: User) => {
         );
     };
 
+    const setReminder = useCallback(async (targetUserId: string, reminderId: string) => {
+        if (!gameId || !currentUser?.id) return;
+        await runAction(async () => {
+            return await gamesService.setReminder(gameId, currentUser.id, targetUserId, reminderId);
+        });
+    }, [gameId, runAction, currentUser?.id]);
+
     return {
-        availableReminders: availableReminders()
+        availableReminders: availableReminders(),
+        setReminder
     };
 }

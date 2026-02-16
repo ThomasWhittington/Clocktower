@@ -117,6 +117,9 @@ import type {
     SetPlayerIsDeadApiData,
     SetPlayerIsDeadApiErrors,
     SetPlayerIsDeadApiResponses,
+    SetReminderApiData,
+    SetReminderApiErrors,
+    SetReminderApiResponses,
     SetRoleApiData,
     SetRoleApiErrors,
     SetRoleApiResponses,
@@ -846,6 +849,24 @@ export const setPlayerIsDeadApi = <ThrowOnError extends boolean = false>(options
             }
         ],
         url: '/api/games/{gameId}/set-player-is-dead/{userId}/{isDead}',
+        ...options
+    });
+};
+
+/**
+ * Set a reminder for a player in a game
+ *
+ * Set a reminder for a player in a game
+ */
+export const setReminderApi = <ThrowOnError extends boolean = false>(options: Options<SetReminderApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetReminderApiResponses, SetReminderApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/set-reminder/{userId}/{targetUserId}/{reminderId}',
         ...options
     });
 };

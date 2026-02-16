@@ -117,7 +117,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         var gameUser = user.AsGameUser(gamePerspective);
         gameUser.UserType = UserType.Player;
         gameUser.SeatingPosition = gamePerspectiveService.GetNextAvailableSeatingPosition(gameId);
-        
+
         gamePerspectiveService.AddUserToGame(gameId, gameUser);
 
         await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
@@ -325,6 +325,11 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         if (updateCount > 0) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
 
         return Result.Ok($"{updateCount}/{updateQueue.Count} draft roles set for players");
+    }
+
+    public async Task<Result<string>> SetReminder(string gameId, string userId, string targetUserId, string reminderId)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<Result<string>> CommitDraftRoles(string gameId)

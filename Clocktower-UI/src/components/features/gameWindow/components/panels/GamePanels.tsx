@@ -32,11 +32,10 @@ interface GamePanelsProps {
     setIsDraftMode: (callback: (prev: boolean) => boolean) => void,
     selectedRoles: Role[],
     setSelectedRoles: Dispatch<SetStateAction<Role[]>>,
-    addReminderClicked?: (playerId: string, reminderId: string) => void,
     reminderData?: { player: User } | null
 }
 
-export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, setRole, setIsDraftMode, setSelectedRoles, selectedRoles, addReminderClicked, reminderData}: Readonly<GamePanelsProps>) {
+export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, setRole, setIsDraftMode, setSelectedRoles, selectedRoles, reminderData}: Readonly<GamePanelsProps>) {
     return (
         <>
             <UserManagerPanel isOpen={isPanelOpen('user')} onClose={closePanel}/>
@@ -52,7 +51,6 @@ export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, set
                     isOpen={isPanelOpen('reminder')}
                     onClose={closePanel}
                     player={reminderData.player}
-                    addReminderClicked={(reminderId: string) => addReminderClicked?.(reminderData.player.id, reminderId)}
                 />
             }
             {tokenData && (

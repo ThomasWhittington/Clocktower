@@ -75,9 +75,6 @@ export default function GameWindow() {
     const removeReminderClicked = (playerId: string, reminderId: string) => {
         console.log('Remove reminder clicked', playerId, reminderId);
     }
-    const addReminderClicked = (playerId: string, reminderId: string) => {
-        console.log('Add reminder clicked', playerId, reminderId);
-    }
 
     const handleCommitDraftRoles = async () => {
         await commitDraftRoles();
@@ -108,7 +105,6 @@ export default function GameWindow() {
                 setRole={setRole}
                 selectedRoles={selectedDraftRoles}
                 setSelectedRoles={setSelectedDraftRoles}
-                addReminderClicked={addReminderClicked}
             />
 
             <GameHud

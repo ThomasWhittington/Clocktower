@@ -150,7 +150,7 @@ export type ClocktowerServerDataTypesJoinData = {
 export type ClocktowerServerDataTypesReminderToken = {
     roleId?: string | null;
     reminderText?: string | null;
-    id?: string | null;
+    readonly id?: string | null;
 };
 
 export type ClocktowerServerDataTypesRoleRole = {
@@ -263,7 +263,7 @@ export type ClocktowerServerDataDtoUserDtoWritable = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
     draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
-    reminderTokens?: Array<ClocktowerServerDataTypesReminderToken> | null;
+    reminderTokens?: Array<ClocktowerServerDataTypesReminderTokenWritable> | null;
 };
 
 export type ClocktowerServerDataGamePerspectiveWritable = {
@@ -289,7 +289,7 @@ export type ClocktowerServerDataGameUserWritable = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
     draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
-    reminderTokens?: Array<ClocktowerServerDataTypesReminderToken> | null;
+    reminderTokens?: Array<ClocktowerServerDataTypesReminderTokenWritable> | null;
 };
 
 export type ClocktowerServerDataMiniGamePerspectiveWritable = {
@@ -309,6 +309,11 @@ export type ClocktowerServerDataTypesJoinDataWritable = {
     user?: ClocktowerServerDataGameUserWritable;
     gameId?: string | null;
     jwt?: string | null;
+};
+
+export type ClocktowerServerDataTypesReminderTokenWritable = {
+    roleId?: string | null;
+    reminderText?: string | null;
 };
 
 export type ClocktowerServerDataTypesRoleRoleWritable = {
@@ -1344,6 +1349,40 @@ export type SetPlayerIsDeadApiResponses = {
 };
 
 export type SetPlayerIsDeadApiResponse = SetPlayerIsDeadApiResponses[keyof SetPlayerIsDeadApiResponses];
+
+export type SetReminderApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+        targetUserId: string;
+        reminderId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/set-reminder/{userId}/{targetUserId}/{reminderId}';
+};
+
+export type SetReminderApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetReminderApiError = SetReminderApiErrors[keyof SetReminderApiErrors];
+
+export type SetReminderApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetReminderApiResponse = SetReminderApiResponses[keyof SetReminderApiResponses];
 
 export type SetRoleApiData = {
     body?: never;

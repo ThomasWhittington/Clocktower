@@ -13,12 +13,14 @@ import {useEffect} from "react";
 interface ReminderPanelProps {
     isOpen: boolean,
     onClose: () => void,
-    player: User,
-    addReminderClicked?: (reminderId: string) => void,
+    player: User
 }
 
-export const ReminderPanel = ({isOpen, onClose, player, addReminderClicked}: ReminderPanelProps) => {
-    const {availableReminders} = useReminderPanel(player);
+export const ReminderPanel = ({isOpen, onClose, player}: ReminderPanelProps) => {
+    const {
+        availableReminders,
+        setReminder
+    } = useReminderPanel(player);
     useEffect(() => {
         if (isOpen && availableReminders.length <= 0) {
             onClose();
@@ -26,7 +28,7 @@ export const ReminderPanel = ({isOpen, onClose, player, addReminderClicked}: Rem
     }, [isOpen, availableReminders.length, onClose]);
 
     const addReminder = (reminder: Reminder) => {
-        addReminderClicked?.(reminder.id);
+        void setReminder(player.id, reminder.id);
         onClose();
     }
 
