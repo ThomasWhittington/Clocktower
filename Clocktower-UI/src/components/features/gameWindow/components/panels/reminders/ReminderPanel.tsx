@@ -44,6 +44,7 @@ export const ReminderPanel = ({isOpen, onClose, player}: ReminderPanelProps) => 
                         size={100}
                         onClick={() => addReminder(reminder)}
                         disableXOverlay={true}
+                        className=""
                     />
                 )}
 

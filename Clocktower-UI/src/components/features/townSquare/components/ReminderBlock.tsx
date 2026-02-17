@@ -51,7 +51,7 @@ export const ReminderBlock = (
                 reminder={add}
                 angleToCenter={angleToCenter}
                 size={size / 2}
-                className={`add-reminder ${showAddButton ? 'opacity-100' : 'opacity-0'}`}
+                className={`add-reminder ${showAddButton ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 onClick={onManageRemindersClicked}
             />
         </div>

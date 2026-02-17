@@ -19,18 +19,29 @@ export const useReminders = (player?: User) => {
     const availableReminders = (): Reminder[] => {
         if (!script) return [];
         const reminders: Reminder[] = [];
+        const seenIds = new Set<string>();
+
         const globalReminderRoles = script?.roles.filter(o => o.remindersGlobal.length > 0);
         for (const role of globalReminderRoles) {
             role.remindersGlobal.forEach((reminder: string) => {
-                reminders.push({id: role.id + "-" + reminder, roleId: role.id, reminderText: reminder});
+                const id = role.id + "-" + reminder;
+                if (!seenIds.has(id)) {
+                    seenIds.add(id);
+                    reminders.push({id, roleId: role.id, reminderText: reminder});
+                }
             });
         }
 
-        discordTown?.players?.forEach(player => {
-            player.role?.reminders.forEach(reminder => {
-                reminders.push({id: player.role!.id + "-" + reminder, roleId: player.role!.id, reminderText: reminder});
+        discordTown?.players?.forEach(townPlayer => {
+            townPlayer.role?.reminders.forEach(reminder => {
+                const id = townPlayer.role!.id + "-" + reminder;
+                if (!seenIds.has(id)) {
+                    seenIds.add(id);
+                    reminders.push({id, roleId: townPlayer.role!.id, reminderText: reminder});
+                }
             });
         });
+
         return reminders.filter(reminder =>
             !player?.reminderTokens.some(token => token.id === reminder.id)
         );

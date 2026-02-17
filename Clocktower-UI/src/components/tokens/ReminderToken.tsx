@@ -15,7 +15,7 @@ export const ReminderToken = ({reminder, angleToCenter, size, className, onClick
     return (
         <span
             key={reminder.id}
-            className={`reminder-token ${className} ${disableXOverlay ? 'no-x-overlay' : ''}`}
+            className={`reminder-token ${className ?? ''} ${disableXOverlay ? 'no-x-overlay' : ''}`.trim()}
             style={{
                 transform: `rotate(${-angleToCenter}deg)`,
                 width: `${size}px`,
