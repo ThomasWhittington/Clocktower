@@ -27,8 +27,8 @@ export const ReminderPanel = ({isOpen, onClose, player}: ReminderPanelProps) => 
         }
     }, [isOpen, availableReminders.length, onClose]);
 
-    const addReminder = (reminder: Reminder) => {
-        void setReminder(player.id, reminder.id);
+    const addReminder = async (reminder: Reminder) => {
+        await setReminder(player.id, reminder.id);
         onClose();
     }
 
