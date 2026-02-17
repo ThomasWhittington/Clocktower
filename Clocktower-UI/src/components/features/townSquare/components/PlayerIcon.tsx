@@ -33,9 +33,11 @@ interface PlayerIconProps {
     children?: ReactNode;
     showDraftRoles: boolean;
     onTokenClick?: (player: User) => void;
+    onMouseEnter?: () => void;
+    onMouseLeave?: () => void;
 }
 
-export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, glowColor, showToken, children, showDraftRoles, onTokenClick}: Readonly<PlayerIconProps>) {
+export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, glowColor, showToken, children, showDraftRoles, onTokenClick, onMouseLeave, onMouseEnter}: Readonly<PlayerIconProps>) {
     const isTopHalf = y < 0;
     const playerIconStyle = {'--player-x': `${x}px`, '--player-y': `${y}px`} as CSSProperties;
     const glowColorStyle = glowColor ? {'--glow-color': colors[glowColor]} as CSSProperties : undefined;
@@ -52,17 +54,29 @@ export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, glow
                 ref={avatarRef}
                 className="avatar-container"
                 style={glowColorStyle}
-                onMouseEnter={() => setShowTooltip(true)}
-                onMouseLeave={() => setShowTooltip(false)}
+                onMouseEnter={() => {
+                    setShowTooltip(true);
+                    if (onMouseEnter) {
+                        onMouseEnter();
+                    }
+                }}
+                onMouseLeave={() => {
+                    setShowTooltip(false);
+                    if (onMouseLeave) {
+                        onMouseLeave();
+                    }
+                }}
             >
                 <FlippableAvatar player={player} size={size} showToken={showToken} showDraftRoles={showDraftRoles} onTokenClick={onTokenClick}/>
                 {avatarOverlay}
                 <AvatarOverlays player={player}/>
             </div>
 
-            {!isTopHalf && (
-                <PlayerNameLabel player={player} onClick={onNameClick}>{children}</PlayerNameLabel>
-            )}
+            {
+                !isTopHalf && (
+                    <PlayerNameLabel player={player} onClick={onNameClick}>{children}</PlayerNameLabel>
+                )
+            }
 
             <AnimatePresence>
                 {role?.description && showTooltip && (
@@ -75,5 +89,6 @@ export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, glow
                 )}
             </AnimatePresence>
         </div>
-    );
+    )
+        ;
 }

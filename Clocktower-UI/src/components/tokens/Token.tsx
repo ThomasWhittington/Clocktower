@@ -1,5 +1,12 @@
 ﻿import aliveTokenBase from '#/tokenParts/base/aliveToken.png';
-import {LeftLeaf, OrangeLeaf, RightLeaf, RoleName, TokenRoleIcon, TopLeaf} from "./";
+import {
+    LeftLeaf,
+    OrangeLeaf,
+    RightLeaf,
+    RoleName,
+    TokenRoleIcon,
+    TopLeaf
+} from "./";
 import {Role} from "@/types";
 import {memo} from "react";
 
@@ -22,7 +29,7 @@ export const Token = memo(({role, size = 40, isDead, onClick, customName, classN
             style={{backgroundImage: `url(${aliveTokenBase})`, width: size, height: size}}
             onClick={onClick}
         >
-            {role && <TokenRoleIcon role={role} className="token-icon"/>}
+            {role && <TokenRoleIcon roleId={role.id} className="token-icon"/>}
             {(Boolean(role?.firstNight) || role?.firstNightReminder) && <LeftLeaf/>}
             {(Boolean(role?.otherNight) || role?.otherNightReminder) && <RightLeaf/>}
             {reminderLeaves > 0 && <TopLeaf leafCount={reminderLeaves}/>}

@@ -23,4 +23,6 @@ public interface IGamePerspectiveService
     bool UpdateDraftRole(string gameId, string userId, Role? draftRole);
     void CommitDraftRoles(string gameId);
     void ResetNominationSession(string gameId);
+    bool AddReminderForUserOnPerspective(string gameId, string userId, string targetUserId, ReminderToken reminder);
+    bool RemoveReminderForUserOnPerspective(string gameId, string userId, string targetUserId, ReminderToken reminder);
 }

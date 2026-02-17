@@ -19,10 +19,10 @@ export const NightOrderRecord = ({night, role, players}: NightOrderRecordProps) 
         : players.filter(player => player.role?.id === role.id);
 
     const reminder = night === "first" ? role.firstNightReminder : role.otherNightReminder;
-    
+
     return (
         <div className={`night-order-record ${night} ${RoleType[role.type].toLowerCase()}`}>
-            {night === 'other' && <TokenRoleIcon role={role} className="role-icon"/>}
+            {night === 'other' && <TokenRoleIcon roleId={role.id} className="role-icon"/>}
             <span className={`role-name ${playersWithRole.length === 0 ? 'no-players' : ''}`}>
                 {role.name}
                 <br/>
@@ -34,7 +34,7 @@ export const NightOrderRecord = ({night, role, players}: NightOrderRecordProps) 
                     )}
                 </span>
             </span>
-            {night === 'first' && <TokenRoleIcon role={role} className="role-icon"/>}
+            {night === 'first' && <TokenRoleIcon roleId={role.id} className="role-icon"/>}
             {reminder && <span className="role-ability">{reminder}</span>}
         </div>
     )

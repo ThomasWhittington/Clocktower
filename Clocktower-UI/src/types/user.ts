@@ -4,7 +4,9 @@ import {
     type VoiceState
 } from "@/types/voiceState.ts";
 import {
+    mapToReminderToken,
     mapToRole,
+    Reminder,
     Role,
     UserType
 } from "@/types";
@@ -24,6 +26,7 @@ export class User {
     readonly voteLocked: boolean;
     readonly role: Role | undefined;
     readonly draftRole: Role | undefined;
+    readonly reminderTokens: Reminder[];
 
     constructor(data: Partial<User>) {
         this.id = data.id ?? '';
@@ -40,6 +43,7 @@ export class User {
         this.voteLocked = data.voteLocked ?? false;
         this.role = data.role instanceof Role ? data.role : (data.role ? mapToRole(data.role as any) : undefined);
         this.draftRole = data.draftRole instanceof Role ? data.draftRole : (data.draftRole ? mapToRole(data.draftRole as any) : undefined);
+        this.reminderTokens = data.reminderTokens ?? [];
     }
 }
 
@@ -58,6 +62,7 @@ export function mapToUser(userDto: ClocktowerServerDataDtoUserDto): User {
         handUp: userDto.handUp ?? false,
         voteLocked: userDto.voteLocked ?? false,
         role: userDto.role ? mapToRole(userDto.role) : undefined,
-        draftRole: userDto.draftRole ? mapToRole(userDto.draftRole) : undefined
+        draftRole: userDto.draftRole ? mapToRole(userDto.draftRole) : undefined,
+        reminderTokens: userDto.reminderTokens ? userDto.reminderTokens.map(token => mapToReminderToken(token)) : [],
     });
 }

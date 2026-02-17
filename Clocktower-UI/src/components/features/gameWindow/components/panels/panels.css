@@ -483,4 +483,12 @@
             }
         }
     }
+
+    .reminder-panel {
+        @apply flex flex-wrap justify-center items-center content-center gap-4 p-4 w-full;
+
+        .current-role {
+            @apply fixed bottom-0 left-2;
+        }
+    }
 }

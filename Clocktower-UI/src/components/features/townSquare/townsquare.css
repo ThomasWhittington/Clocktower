@@ -250,7 +250,7 @@
     }
 
     .role-description-content {
-        @apply bg-neutral-900/80 text-white p-4 rounded-lg shadow-2xl border border-neutral-700;
+        @apply bg-neutral-900/80 text-white p-4 rounded-lg shadow-2xl border border-neutral-700 select-none;
         min-width: 250px;
         max-width: 400px;
         font-size: 14px;
@@ -282,5 +282,49 @@
         backdrop-filter: blur(2px);
         background: rgba(0, 0, 0, 0.1);
         border-radius: 50%;
+    }
+
+    .reminders-block {
+        --reminders-height: 0px;
+        @apply absolute left-1/2 top-1/2 origin-left grid grid-flow-col grid-rows-2 auto-cols-min gap-[5px] pl-2.5;
+        margin-top: calc(var(--reminders-height) / -2);
+
+        .add-reminder {
+            @apply brightness-50 transition-opacity duration-200;
+        }
+    }
+
+    .reminders-block:has(:only-child) {
+        @apply grid-rows-1 items-center;
+    }
+
+    .reminder-token {
+        @apply relative flex flex-col items-center justify-center bg-cover bg-center cursor-pointer;
+        transform: translateZ(0);
+        will-change: transform;
+    }
+
+    .reminder-token::before {
+        @apply absolute inset-0 bg-cover bg-center opacity-0 transition-opacity duration-200 ease-in-out pointer-events-none z-100;
+        content: '';
+        background-image: url('/tokenParts/roles/x.png');
+        transform: translateZ(0);
+    }
+
+    .reminder-token:hover::before {
+        @apply opacity-100;
+    }
+
+    .reminder-token.no-x-overlay::before {
+        @apply hidden;
+    }
+    
+    .reminder-token.add-reminder::before {
+        @apply hidden;
+    }
+
+    .reminder-token-icon,
+    .reminder-text {
+        transform: translateZ(0);
     }
 }

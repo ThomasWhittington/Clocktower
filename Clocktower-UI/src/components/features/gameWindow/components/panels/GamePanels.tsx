@@ -1,6 +1,7 @@
 ﻿import {
     NightOrderPanel,
     PaperPanel,
+    ReminderPanel,
     RoleListPanel,
     RolePlannerPanel,
     ScriptManagerPanel,
@@ -23,17 +24,18 @@ interface TokenData {
 }
 
 interface GamePanelsProps {
-    isPanelOpen: (panel: PanelType) => boolean;
-    closePanel: () => void;
-    tokenData: TokenData | null;
-    isDraftMode: boolean;
-    setRole: (role: Role | undefined, playerId: string) => Promise<void>;
-    setIsDraftMode: (callback: (prev: boolean) => boolean) => void;
-    selectedRoles: Role[];
-    setSelectedRoles: Dispatch<SetStateAction<Role[]>>;
+    isPanelOpen: (panel: PanelType) => boolean,
+    closePanel: () => void,
+    tokenData: TokenData | null,
+    isDraftMode: boolean,
+    setRole: (role: Role | undefined, playerId: string) => Promise<void>,
+    setIsDraftMode: (callback: (prev: boolean) => boolean) => void,
+    selectedRoles: Role[],
+    setSelectedRoles: Dispatch<SetStateAction<Role[]>>,
+    reminderData?: { player: User } | null
 }
 
-export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, setRole, setIsDraftMode, setSelectedRoles, selectedRoles}: Readonly<GamePanelsProps>) {
+export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, setRole, setIsDraftMode, setSelectedRoles, selectedRoles, reminderData}: Readonly<GamePanelsProps>) {
     return (
         <>
             <UserManagerPanel isOpen={isPanelOpen('user')} onClose={closePanel}/>
@@ -43,6 +45,14 @@ export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, set
             <VoteHistoryPanel isOpen={isPanelOpen('voteHistory')} onClose={closePanel}/>
             <PaperPanel isOpen={isPanelOpen('paper')} onClose={closePanel}/>
             <RolePlannerPanel isOpen={isPanelOpen('rolePlanner')} onClose={closePanel} setIsDraftMode={setIsDraftMode} setSelectedRoles={setSelectedRoles} selectedRoles={selectedRoles}/>
+
+            {reminderData?.player &&
+                <ReminderPanel
+                    isOpen={isPanelOpen('reminder')}
+                    onClose={closePanel}
+                    player={reminderData.player}
+                />
+            }
             {tokenData && (
                 <TokenPanel
                     isOpen={isPanelOpen('token')}

@@ -292,6 +292,46 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         );
     }
 
+    public bool AddReminderForUserOnPerspective(string gameId, string userId, string targetUserId, ReminderToken reminder)
+    {
+        bool updated = false;
+        store.UpdateUserInOwnPerspective(gameId, userId, state =>
+        {
+            var user = state.Users.FirstOrDefault(o => o.Id == targetUserId);
+            if (user is null || reminder is null || user.ReminderTokens.Contains(reminder)) return state;
+            updated = true;
+
+            var updatedUser = user with
+            {
+                ReminderTokens = [.. user.ReminderTokens, reminder]
+            };
+
+            return state with { Users = state.Users.Select(u => u.Id == targetUserId ? updatedUser : u).ToList() };
+        });
+
+        return updated;
+    }
+
+    public bool RemoveReminderForUserOnPerspective(string gameId, string userId, string targetUserId, ReminderToken reminder)
+    {
+        bool updated = false;
+        store.UpdateUserInOwnPerspective(gameId, userId, state =>
+        {
+            var user = state.Users.FirstOrDefault(o => o.Id == targetUserId);
+            if (user is null || reminder is null || !user.ReminderTokens.Contains(reminder)) return state;
+            updated = true;
+
+            var updatedUser = user with
+            {
+                ReminderTokens = user.ReminderTokens.Where(r => r != reminder).ToList()
+            };
+
+            return state with { Users = state.Users.Select(u => u.Id == targetUserId ? updatedUser : u).ToList() };
+        });
+
+        return updated;
+    }
+
     private static bool IsOmniscient(UserType? userType)
     {
         if (userType is null) return false;

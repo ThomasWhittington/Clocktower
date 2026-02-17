@@ -15,12 +15,14 @@ import {
     getAvailableGameUsersApi,
     getGamesApi,
     randomiseSeatingPositionsApi,
+    removeReminderApi,
     removeUserFromGameApi,
     setDraftRoleApi,
     setDraftRolesApi,
     setPerspectiveRoleApi,
     setPlayerHasVoteTokenApi,
     setPlayerIsDeadApi,
+    setReminderApi,
     setRoleApi,
     setScriptApi,
     setTimeApi,
@@ -361,6 +363,49 @@ async function setDraftRoles(gameId: string, playerRoles: Record<string, string>
     return data;
 }
 
+async function setReminder(gameId: string, userId: string, targetUserId: string, reminderId: string) {
+    const {
+        data,
+        error
+    } = await setReminderApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId,
+            targetUserId: targetUserId,
+            reminderId: reminderId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set reminder for user:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
+
+async function removeReminder(gameId: string, userId: string, targetUserId: string, reminderId: string) {
+    const {
+        data,
+        error
+    } = await removeReminderApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId,
+            targetUserId: targetUserId,
+            reminderId: reminderId
+        }
+    });
+
+    if (error) {
+        console.error('Failed to remove reminder for user:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
 const scriptSelectToString = (scriptSelect: ScriptSelect): ClocktowerServerDataTypesEnumScriptSelect => {
     switch (scriptSelect) {
         case ScriptSelect.Unknown:
@@ -402,5 +447,7 @@ export const gamesService = {
     setDraftRole,
     setDraftRoles,
     setPerspectiveRole,
-    commitDraftRoles
+    commitDraftRoles,
+    setReminder,
+    removeReminder
 }

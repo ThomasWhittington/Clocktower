@@ -87,6 +87,9 @@ import type {
     RandomiseSeatingPositionsApiData,
     RandomiseSeatingPositionsApiErrors,
     RandomiseSeatingPositionsApiResponses,
+    RemoveReminderApiData,
+    RemoveReminderApiErrors,
+    RemoveReminderApiResponses,
     RemoveUserFromGameApiData,
     RemoveUserFromGameApiErrors,
     RemoveUserFromGameApiResponses,
@@ -117,6 +120,9 @@ import type {
     SetPlayerIsDeadApiData,
     SetPlayerIsDeadApiErrors,
     SetPlayerIsDeadApiResponses,
+    SetReminderApiData,
+    SetReminderApiErrors,
+    SetReminderApiResponses,
     SetRoleApiData,
     SetRoleApiErrors,
     SetRoleApiResponses,
@@ -739,6 +745,24 @@ export const randomiseSeatingPositionsApi = <ThrowOnError extends boolean = fals
 };
 
 /**
+ * Removes a reminder for a player in a game
+ *
+ * Removes a reminder for a player in a game
+ */
+export const removeReminderApi = <ThrowOnError extends boolean = false>(options: Options<RemoveReminderApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<RemoveReminderApiResponses, RemoveReminderApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/remove-reminder/{userId}/{targetUserId}/{reminderId}',
+        ...options
+    });
+};
+
+/**
  * Removes user from the game
  *
  * Removes user from the game
@@ -846,6 +870,24 @@ export const setPlayerIsDeadApi = <ThrowOnError extends boolean = false>(options
             }
         ],
         url: '/api/games/{gameId}/set-player-is-dead/{userId}/{isDead}',
+        ...options
+    });
+};
+
+/**
+ * Set a reminder for a player in a game
+ *
+ * Set a reminder for a player in a game
+ */
+export const setReminderApi = <ThrowOnError extends boolean = false>(options: Options<SetReminderApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetReminderApiResponses, SetReminderApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/set-reminder/{userId}/{targetUserId}/{reminderId}',
         ...options
     });
 };

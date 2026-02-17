@@ -62,6 +62,7 @@ export type ClocktowerServerDataDtoUserDto = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRole;
     draftRole?: ClocktowerServerDataTypesRoleRole;
+    reminderTokens?: Array<ClocktowerServerDataTypesReminderToken> | null;
 };
 
 export type ClocktowerServerDataGamePerspective = {
@@ -90,6 +91,7 @@ export type ClocktowerServerDataGameUser = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRole;
     draftRole?: ClocktowerServerDataTypesRoleRole;
+    reminderTokens?: Array<ClocktowerServerDataTypesReminderToken> | null;
 };
 
 export type ClocktowerServerDataMiniChannel = {
@@ -143,6 +145,12 @@ export type ClocktowerServerDataTypesJoinData = {
     user?: ClocktowerServerDataGameUser;
     gameId?: string | null;
     jwt?: string | null;
+};
+
+export type ClocktowerServerDataTypesReminderToken = {
+    roleId?: string | null;
+    reminderText?: string | null;
+    readonly id?: string | null;
 };
 
 export type ClocktowerServerDataTypesRoleRole = {
@@ -255,6 +263,7 @@ export type ClocktowerServerDataDtoUserDtoWritable = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
     draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
+    reminderTokens?: Array<ClocktowerServerDataTypesReminderTokenWritable> | null;
 };
 
 export type ClocktowerServerDataGamePerspectiveWritable = {
@@ -280,6 +289,7 @@ export type ClocktowerServerDataGameUserWritable = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
     draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
+    reminderTokens?: Array<ClocktowerServerDataTypesReminderTokenWritable> | null;
 };
 
 export type ClocktowerServerDataMiniGamePerspectiveWritable = {
@@ -299,6 +309,11 @@ export type ClocktowerServerDataTypesJoinDataWritable = {
     user?: ClocktowerServerDataGameUserWritable;
     gameId?: string | null;
     jwt?: string | null;
+};
+
+export type ClocktowerServerDataTypesReminderTokenWritable = {
+    roleId?: string | null;
+    reminderText?: string | null;
 };
 
 export type ClocktowerServerDataTypesRoleRoleWritable = {
@@ -1139,6 +1154,40 @@ export type RandomiseSeatingPositionsApiResponses = {
 
 export type RandomiseSeatingPositionsApiResponse = RandomiseSeatingPositionsApiResponses[keyof RandomiseSeatingPositionsApiResponses];
 
+export type RemoveReminderApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+        targetUserId: string;
+        reminderId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/remove-reminder/{userId}/{targetUserId}/{reminderId}';
+};
+
+export type RemoveReminderApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type RemoveReminderApiError = RemoveReminderApiErrors[keyof RemoveReminderApiErrors];
+
+export type RemoveReminderApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type RemoveReminderApiResponse = RemoveReminderApiResponses[keyof RemoveReminderApiResponses];
+
 export type RemoveUserFromGameApiData = {
     body?: never;
     path: {
@@ -1334,6 +1383,40 @@ export type SetPlayerIsDeadApiResponses = {
 };
 
 export type SetPlayerIsDeadApiResponse = SetPlayerIsDeadApiResponses[keyof SetPlayerIsDeadApiResponses];
+
+export type SetReminderApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+        targetUserId: string;
+        reminderId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/set-reminder/{userId}/{targetUserId}/{reminderId}';
+};
+
+export type SetReminderApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetReminderApiError = SetReminderApiErrors[keyof SetReminderApiErrors];
+
+export type SetReminderApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetReminderApiResponse = SetReminderApiResponses[keyof SetReminderApiResponses];
 
 export type SetRoleApiData = {
     body?: never;

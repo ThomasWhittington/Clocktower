@@ -10,7 +10,7 @@ export const RoleName = ({roleName}: { roleName: string }) => {
                 id={curveId}
                 fill="transparent"
             />
-            <text width="150" x="66.6%" text-anchor="middle" className="label" fontSize={fontSize}>
+            <text width="150" x="66.6%" textAnchor="middle" className="label" fontSize={fontSize}>
                 <textPath href={`#${curveId}`}>
                     {roleName}
                 </textPath>

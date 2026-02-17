@@ -7,12 +7,14 @@ import {
 import {
     useCurrentUserIsStoryteller,
     useDiscordTown,
+    useUser,
 } from "@/components/features/discordTownPanel/hooks";
 import {useServerHub} from "@/hooks";
 import {
     useActivePanel,
     useAssignToDraft,
     useGameWindowShortcuts,
+    useReminders,
     useSetRoles
 } from "@/components/features/gameWindow/hooks";
 import {
@@ -29,6 +31,7 @@ import TalkRequestsBox from "@/components/features/gameWindow/components/hud/Tal
 
 export default function GameWindow() {
     const {currentUser} = useAppStore();
+    const {thisUser} = useUser(currentUser?.id);
     const {script} = useServerHub();
     const {discordTown} = useDiscordTown();
     const [isDraftMode, setIsDraftMode] = useState(false);
@@ -58,6 +61,7 @@ export default function GameWindow() {
         selectedDraftRoles
     });
 
+    const {removeReminder} = useReminders(thisUser);
     const townSquareActions = useTownSquareActions();
 
     const handleTokenClick = (player: User) => {
@@ -66,6 +70,14 @@ export default function GameWindow() {
             openPanel('token', {player});
         }
     };
+    const handleManageRemindersClicked = (player: User) => {
+        if (script) {
+            openPanel('reminder', {player});
+        }
+    }
+    const removeReminderClicked = (playerId: string, reminderId: string) => {
+        removeReminder(playerId, reminderId);
+    }
 
     const handleCommitDraftRoles = async () => {
         await commitDraftRoles();
@@ -73,6 +85,7 @@ export default function GameWindow() {
     };
 
     const tokenData = getPanelData('token');
+    const reminderData = getPanelData('reminder');
     return (
         <div className="game-window-controls">
             <TownSquare
@@ -81,12 +94,15 @@ export default function GameWindow() {
                 onCommitDraftRoles={isDraftMode ? handleCommitDraftRoles : undefined}
                 onCircleSizeChange={setCircleDiameter}
                 townSquareActions={townSquareActions}
+                onManageRemindersClicked={handleManageRemindersClicked}
+                removeReminderClicked={removeReminderClicked}
             />
 
             <GamePanels
                 isPanelOpen={isPanelOpen}
                 closePanel={closePanel}
                 tokenData={tokenData}
+                reminderData={reminderData}
                 isDraftMode={isDraftMode}
                 setIsDraftMode={setIsDraftMode}
                 setRole={setRole}

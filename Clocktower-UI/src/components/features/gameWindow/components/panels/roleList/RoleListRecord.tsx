@@ -1,4 +1,7 @@
-﻿import {Role, User} from "@/types";
+﻿import {
+    Role,
+    User
+} from "@/types";
 import {TokenRoleIcon} from "@/components/tokens";
 
 interface RoleListRecordProps {
@@ -12,7 +15,7 @@ export const RoleListRecord = ({role, players}: RoleListRecordProps) => {
 
         return (
             <li className="role-record">
-                <TokenRoleIcon role={role} className="role-icon"/>
+                <TokenRoleIcon roleId={role.id} className="role-icon"/>
                 <div className="role">
                     <span className="role-player">
                         {playersWithRole.map((player, index) =>
