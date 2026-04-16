@@ -66,7 +66,6 @@ public partial record Role
     public static Role Fool => BadMoonRisingTownsfolk("Fool", "The first time you die, you don't.")
         .WithReminders("No Ability");
 
-
     public static Role Tinker => BadMoonRisingOutsider("Tinker", "You might die at any time.")
         .OtherNight(49, "The Tinker might die.")
         .WithReminders("Dead");
@@ -82,4 +81,52 @@ public partial record Role
         .FirstNight(8, "If 7 or more players: Show the Lunatic a number of arbitrary 'Minions', players equal to the number of Minions in play. Show 3 character tokens of arbitrary good characters. If the token received by the Lunatic is a Demon that would wake tonight: Allow the Lunatic to do the Demon actions. Place their 'chosen' markers. Wake the Demon. Show the Demon's real character token. Show them the Lunatic player. If the Lunatic attacked players: Show the real demon each marked player. Remove any Lunatic 'chosen' markers.")
         .OtherNight(20, "Allow the Lunatic to do the actions of the Demon. Place their 'attack' markers. If the Lunatic selected players: Wake the Demon. Show the 'chosen' marker, then point to each marked player. Remove any Lunatic 'chosen' markers.")
         .WithReminders("Chosen");
+
+    public static Role Godfather => BadMoonRisingMinion("Godfather", "You start knowing which Outsiders are in play. If 1 died today, choose a player tonight: they die. [-1 or +1 Outsider]")
+        .FirstNight(21, "Show the Godfather the tokens of all Outsiders in play.")
+        .OtherNight(37, "If an Outsider died today: The Godfather selects a player. That player dies.")
+        .WithReminders("Died Today", "Dead")
+        .AffectsSetup();
+
+    public static Role DevilsAdvocate => BadMoonRisingMinion("Devil's Advocate", "Each night, choose a living player (different to last night): if exectuted tomorrow, they don't die.")
+        .FirstNight(22, "The Devil's Advocate selects to a living player. That player survives execution tomorrow.")
+        .OtherNight(13, "The Devil's Advocate selects to a living player, different from the previous night. That player survives execution tomorrow.")
+        .WithReminders("Survives Execution");
+
+    public static Role Assassin => BadMoonRisingMinion("Assassin", "Once per game, at night*, choose a player: they die, even if for some reason they could not.")
+        .OtherNight(36, "If the Assassin has not yet used their ability: The Assassin is asked if they want to use their ability, if yes,they select a player. That player dies.")
+        .WithReminders("Dead", "No Ability");
+
+    public static Role Mastermind => BadMoonRisingMinion("Mastermind", "If the demon dies by execution (ending the game), play for 1 more day. If a player is then executed, their team loses.");
+
+    public static Role Pukka => BadMoonRisingDemon("Pukka", "Each night, choose a player: they are poisoned. The previously poisoned player dies then becomes healthy.")
+        .FirstNight(28, "The Pukka selects a player. That player is poisoned.")
+        .OtherNight(26, "The Pukka selects a player. That player is poisoned. The previously poisoned player dies.")
+        .WithReminders("Poisoned", "Dead");
+
+    public static Role Shabaloth => BadMoonRisingDemon("Shabaloth", "Each night*, choose 2 players: they die. A dead player you chose last night might be regurgitated.")
+        .OtherNight(27, "One player that the Shabaloth chose the previous night might be resurrected. The Shabaloth selects two players. Those players die.")
+        .WithReminders("Dead", "Alive");
+
+    public static Role Po => BadMoonRisingDemon("Po", "Each night*, you may choose a player: they die. If you last choice was no-one, choose 3 players tonight.")
+        .OtherNight(28, "If the Po chose no-one the previous night: The Po selects three players. Otherwise: The Po either selects a player or declines to use ability. Chosen players die")
+        .WithReminders("Dead", "3 Attacks");
+
+    public static Role Zombuul => BadMoonRisingDemon("Zombuul", "Each night*, if no-one died today, choose a player: they die. The 1st time you die, you live but register as dead.")
+        .OtherNight(25, "If no-one died during the day: The Zombuul selects a player. That player dies.")
+        .WithReminders("Dead", "Died Today");
+
+    public static Role Matron => BadMoonRisingTraveller("Matron", "Each day, you may choose up to 3 sets of 2 players to swap seats. Players may not leave their seats to talk in private.");
+
+    public static Role Judge => BadMoonRisingTraveller("Judge", "Once per game, if another player nominated, you may choose to force the current execution to pass or fail.")
+        .WithReminders("No Ability");
+
+    public static Role Apprentice => BadMoonRisingTraveller("Apprentice", "On your 1st night, you gain a Townsfolk ability (if good), or a Minion ability (if evil).")
+        .FirstNight(1, "Assign and show the Apprentice a Townsfolk or Minion role (where appropriate). From now on they wake at night if their ability would.")
+        .WithReminders("Is the Apprentice");
+
+    public static Role Bishop => BadMoonRisingTraveller("Bishop", "Only the Storyteller can nominate. At least 1 opposing player must be nominated each day.")
+        .WithReminders("Nominate Good", "Nominate Evil");
+
+    public static Role Voudon => BadMoonRisingTraveller("Voudon", "Only you & the dead can vote. They don't need a vote token to do so. A 50% majority isn't required.");
 }
