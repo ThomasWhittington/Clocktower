@@ -2,3 +2,4 @@
 export * from './HelpMenu'
 export * from './Nomination'
 export * from './VoteOverlay'
+export * from './AudioOptions'

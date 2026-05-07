@@ -213,4 +213,20 @@
         @apply text-gray-400;
         font-size: 1.25vmin;
     }
+
+    .audio-options {
+        @apply flex relative items-center;
+
+        .slider {
+            @apply relative;
+        }
+
+        input {
+            @apply w-24 h-2 bg-linear-to-r from-gray-300 to-discord-primary rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-discord-primary [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-discord-primary [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer;
+        }
+
+        .tooltip {
+            @apply absolute top-full mb-2 px-2 py-1 bg-discord text-white text-xs rounded whitespace-nowrap pointer-events-none;
+        }
+    }
 }
