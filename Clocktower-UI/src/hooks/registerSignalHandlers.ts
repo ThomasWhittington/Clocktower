@@ -60,7 +60,6 @@ export const registerSignalHandlers = (
     connection.on('PlayAudio', (gameId: string, audioId: number) => {
         const {joinedGameId} = useAppStore.getState();
         if (gameId !== joinedGameId) return;
-        console.log(`🔊 Received PlayAudio for game ${gameId}: ${audioId}`);
         setState({audioEvent: {id: crypto.randomUUID(), audioId}});
     });
 };
