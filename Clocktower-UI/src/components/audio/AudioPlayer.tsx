@@ -26,8 +26,8 @@ const audioSources: Record<AudioId, string | null> = {
     [AudioId.PlayerRevive]: 'audio/player-revive.mp3',
     [AudioId.HandPassUp]: 'audio/hand-pass-up.mp3',
     [AudioId.HandPassDown]: 'audio/hand-pass-down.mp3',
-    [AudioId.TalkRequest]: 'audio/talk-request.mp3',
     [AudioId.NominationsOpen]: 'audio/nominations-open.mp3',
+    [AudioId.PlayerMarked]: 'audio/player-marked.mp3',
 };
 const AudioPlayer = ({audioEvent}: AudioPlayerProps) => {
     const {volume} = useAppStore();

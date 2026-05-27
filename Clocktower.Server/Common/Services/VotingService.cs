@@ -154,11 +154,29 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         var user = gamePerspective.Users.FirstOrDefault(o => o.Id == playerId);
         if (user is null) return false;
 
+        var userNowMarked = !user.IsMarked;
         var updated = gamePerspectiveService.UpdatePublicUser(gameId, playerId, new PublicGameUserUpdate
         {
-            IsMarked = !user.IsMarked
+            IsMarked = userNowMarked
         });
-        if (updated) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+
+        if (!updated) return updated;
+
+        if (userNowMarked)
+        {
+            var otherUsers = gamePerspective.Users.Where(o => o.Id != playerId && o.IsMarked).ToList();
+            foreach (var otherUser in otherUsers)
+            {
+                gamePerspectiveService.UpdatePublicUser(gameId, otherUser.Id, new PublicGameUserUpdate
+                {
+                    IsMarked = false
+                });
+            }
+
+            await gameBroadcastService.BroadcastPlayAudio(gameId, AudioEvent.PlayerMarked);
+        }
+
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         return updated;
     }
 

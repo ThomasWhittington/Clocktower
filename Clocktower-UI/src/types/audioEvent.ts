@@ -12,8 +12,8 @@
     PlayerRevive = 10,
     HandPassUp = 11,
     HandPassDown = 12,
-    TalkRequest = 13,
-    NominationsOpen = 14
+    NominationsOpen = 13,
+    PlayerMarked = 14
 }
 
 export type AudioEvent = {
