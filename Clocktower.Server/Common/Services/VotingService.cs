@@ -254,6 +254,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         if (user is null) return;
         gamePerspectiveService.UpdatePublicUser(session.GameId, user.Id, new PublicGameUserUpdate { VoteLocked = true });
         await gameBroadcastService.BroadcastDiscordTownUpdate(session.GameId);
+        await gameBroadcastService.BroadcastPlayAudio(session.GameId, user.HandUp ? AudioEvent.HandPassUp : AudioEvent.HandPassDown);
     }
 
     private async Task EndVote(NominationSession session)

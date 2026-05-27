@@ -125,7 +125,6 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         var gameUser = user.AsGameUser(gamePerspective);
         gameUser.UserType = UserType.Player;
         gameUser.SeatingPosition = gamePerspectiveService.GetNextAvailableSeatingPosition(gameId);
-
         gamePerspectiveService.AddUserToGame(gameId, gameUser);
 
         await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
@@ -210,7 +209,12 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
             HasVoteToken = isDead ? true : null
         });
 
-        if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+        if (updateOccurred)
+        {
+            await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+            await gameBroadcastService.BroadcastPlayAudio(gameId, isDead ? AudioEvent.PlayerDead : AudioEvent.PlayerRevive);
+        }
+
         string updateOccurredString = updateOccurred ? Now : Already;
         string expectedTokenStatus = isDead ? "dead" : "alive";
         return Result.Ok($"{user.DisplayName} is {updateOccurredString} {expectedTokenStatus}");
