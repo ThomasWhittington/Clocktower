@@ -248,18 +248,6 @@ public class DiscordTownServiceTests
 
     #endregion
 
-    #region PingUser
-
-    [TestMethod]
-    public async Task PingUser_PingsUser()
-    {
-        await _sut.PingUser(UserId);
-
-        _mockGameBroadcastService.Verify(o => o.PingUser(UserId, "Ping!"), Times.Once);
-    }
-
-    #endregion
-
     #region DeleteTown
 
     private void Setup_DeleteTown(bool hasGuild = false)

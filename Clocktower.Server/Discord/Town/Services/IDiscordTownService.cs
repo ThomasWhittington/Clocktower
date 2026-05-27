@@ -1,6 +1,4 @@
-﻿using Clocktower.Server.Data.Dto;
-
-namespace Clocktower.Server.Discord.Town.Services;
+﻿namespace Clocktower.Server.Discord.Town.Services;
 
 public interface IDiscordTownService
 {
@@ -14,5 +12,4 @@ public interface IDiscordTownService
     Task<(bool success, DiscordTown? discordTown, string message)> GetDiscordTown(string guildId);
     Task<(bool success, DiscordTownDto? discordTown, string message)> GetDiscordTownDto(string gameId);
     Task<JoinData?> GetJoinData(string key);
-    Task PingUser(string userId);
 }

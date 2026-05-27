@@ -402,17 +402,6 @@ public class GameBroadcastServiceTests
     }
 
     [TestMethod]
-    public async Task PingUser_CallsNotificationService()
-    {
-        const string message = "Test ping message";
-        _mockNotificationService.Setup(c => c.PingUser(UserId, message)).Returns(Task.CompletedTask);
-
-        await _sut.PingUser(UserId, message);
-
-        _mockNotificationService.Verify(c => c.PingUser(UserId, message), Times.Once);
-    }
-
-    [TestMethod]
     public async Task BroadcastTimeUpdate_CallsNotificationService()
     {
         const GameTime gameTime = GameTime.Day;

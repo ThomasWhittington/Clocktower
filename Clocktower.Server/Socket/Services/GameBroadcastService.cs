@@ -32,8 +32,6 @@ public class GameBroadcastService(
     public Task BroadcastNominationSessionUpdate(string gameId, NominationSession? nominationSession)
         => notificationService.SendNominationSessionUpdateToGroup(gameId, nominationSession);
 
-    public Task PingUser(string userId, string message) => notificationService.PingUser(userId, message);
-
     public Task BroadcastTalkRequestsUpdate(string gameId, IEnumerable<TalkRequest>? talkRequests)
         => notificationService.SendTalkRequestsUpdateToGroup(gameId, talkRequests);
 

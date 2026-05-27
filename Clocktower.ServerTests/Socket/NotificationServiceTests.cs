@@ -100,19 +100,6 @@ public class NotificationServiceTests
     }
 
     [TestMethod]
-    public async Task PingUser_CallsSpecificUser()
-    {
-        const string targetUserId = "target-user-789";
-        const string message = "Test ping message";
-        _mockClients.Setup(c => c.User(targetUserId)).Returns(_mockClientProxy1.Object);
-
-        await _sut.PingUser(targetUserId, message);
-
-        _mockClients.Verify(c => c.User(targetUserId), Times.Once);
-        _mockClientProxy1.Verify(cp => cp.PingUser(message), Times.Once);
-    }
-
-    [TestMethod]
     public async Task SendTownTimeToGroup_WithGameId_CallsCorrectGroup()
     {
         const string gameId = "test-game-789";
