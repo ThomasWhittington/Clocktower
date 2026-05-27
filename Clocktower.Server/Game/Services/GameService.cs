@@ -63,6 +63,14 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
 
             gamePerspectiveService.SetTime(gameId, gameTime);
             await gameBroadcastService.BroadcastTimeUpdate(gameId, gameTime);
+            var audioEvent = gameTime switch
+            {
+                GameTime.Day => AudioEvent.TimeToDay,
+                GameTime.Evening => AudioEvent.TimeToEvening,
+                GameTime.Night => AudioEvent.TimeToNight,
+                _ => AudioEvent.Stop
+            };
+            await gameBroadcastService.BroadcastPlayAudio(gameId, audioEvent);
             return (true, $"Time set to {gameTime}");
         }
         catch (Exception ex)
