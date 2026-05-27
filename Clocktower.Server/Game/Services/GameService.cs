@@ -399,6 +399,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         gamePerspectiveService.CommitDraftRoles(gameId);
 
         await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+        await gameBroadcastService.BroadcastPlayAudio(gameId, AudioEvent.RoleAssigned);
         return Result.Ok($"Draft roles committed for game {gameId}");
     }
 

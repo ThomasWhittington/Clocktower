@@ -118,6 +118,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         _sessions[gameId] = session;
 
         await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, session);
+        await gameBroadcastService.BroadcastPlayAudio(gameId, AudioEvent.Nomination);
         return true;
     }
 
@@ -137,6 +138,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         _sessions[gameId] = session;
 
         await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, session);
+        await gameBroadcastService.BroadcastPlayAudio(gameId, AudioEvent.NominationsOpen);
     }
 
     private static int GetRequiredMajority(IEnumerable<GameUser> players)
