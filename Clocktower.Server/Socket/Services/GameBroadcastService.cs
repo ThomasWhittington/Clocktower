@@ -37,6 +37,8 @@ public class GameBroadcastService(
     public Task BroadcastTalkRequestsUpdate(string gameId, IEnumerable<TalkRequest>? talkRequests)
         => notificationService.SendTalkRequestsUpdateToGroup(gameId, talkRequests);
 
+    public Task BroadcastPlayAudio(string gameId, AudioEvent audio) => notificationService.PlayAudio(gameId, audio);
+
     private IEnumerable<UserNotification> BuildNotifications(string gameId, string guildId, List<GamePerspective> perspectives)
     {
         foreach (var perspective in perspectives.Where(p => p.UserId != IGamePerspectiveStore.OmniscientKey))

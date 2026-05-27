@@ -9,12 +9,14 @@ import {
 } from "../components/features";
 import {useServerHub} from "@/hooks";
 import {BackgroundImage} from "@/components/ui";
+import AudioPlayer from "@/components/audio/AudioPlayer.tsx";
 
 function Game() {
-    const {gameTime} = useServerHub();
+    const {gameTime, audioEvent} = useServerHub();
 
     return (
         <PanelGroup autoSaveId="game-panel-layout" direction="horizontal">
+            <AudioPlayer audioEvent={audioEvent}/>
             <Panel defaultSize={20} collapsible={true} minSize={20}>
                 <DiscordTownPanel/>
             </Panel>

@@ -6,6 +6,7 @@
 import * as signalR from '@microsoft/signalr';
 import {HubConnectionState} from '@microsoft/signalr';
 import {
+    type AudioEvent,
     DiscordTown,
     GameTime,
     NominationSession,
@@ -28,6 +29,7 @@ type HubState = {
     userVoiceStates: UserVoiceStates;
     connectionState: signalR.HubConnectionState;
     gameTime: GameTime;
+    audioEvent?: AudioEvent;
     timer?: TimerState;
     script?: Script;
     nominationSession?: NominationSession;
@@ -64,6 +66,7 @@ export const resetHubState = () => {
         userVoiceStates: {},
         connectionState: HubConnectionState.Disconnected,
         gameTime: GameTime.Night,
+        audioEvent: undefined,  
         talkRequests: []
     };
     notifyListeners();

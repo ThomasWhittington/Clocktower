@@ -1,5 +1,6 @@
 ﻿import type * as signalR from '@microsoft/signalr';
 import {
+    type AudioEvent,
     DiscordTown,
     GameTime,
     NominationSession,
@@ -15,6 +16,7 @@ type StateUpdater = (updates: Partial<{
     userVoiceStates: Record<string, any>;
     connectionState: signalR.HubConnectionState;
     gameTime: GameTime;
+    audioEvent?: AudioEvent;
     timer?: TimerState;
     script?: Script;
     nominationSession?: NominationSession;
@@ -65,5 +67,11 @@ export const registerSignalHandlers = (
         if (gameId !== joinedGameId) return;
         console.log(`💬 Received TalkRequestsUpdate for game ${gameId}:`, talkRequests);
         setState({talkRequests: talkRequests ? talkRequests.map(t => new TalkRequest(t)) : []});
+    });
+    connection.on('PlayAudio', (gameId: string, audioId: number) => {
+        const {joinedGameId} = useAppStore.getState();
+        if (gameId !== joinedGameId) return;
+        console.log(`🔊 Received PlayAudio for game ${gameId}: ${audioId}`);
+        setState({audioEvent: {id: crypto.randomUUID(), audioId}});
     });
 };

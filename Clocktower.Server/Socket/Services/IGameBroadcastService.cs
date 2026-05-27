@@ -10,4 +10,5 @@ public interface IGameBroadcastService
     Task BroadcastNominationSessionUpdate(string gameId, NominationSession? nominationSession);
     Task PingUser(string userId, string message);
     Task BroadcastTalkRequestsUpdate(string gameId, IEnumerable<TalkRequest>? talkRequests);
+    Task BroadcastPlayAudio(string gameId, AudioEvent audio);
 }

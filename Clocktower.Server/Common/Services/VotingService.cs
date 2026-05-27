@@ -79,6 +79,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         _sessions[gameId] = updatedSession;
 
         await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, updatedSession);
+        await gameBroadcastService.BroadcastPlayAudio(gameId, AudioEvent.Stop);
         await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
     }
 
@@ -210,6 +211,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         _sessions[gameId] = newSession;
 
         await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, newSession);
+        await gameBroadcastService.BroadcastPlayAudio(session.GameId, AudioEvent.Countdown);
     }
 
     public NominationSession? GetSession(string gameId)

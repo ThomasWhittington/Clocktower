@@ -10,4 +10,5 @@ public interface INotificationClient
     Task ScriptUpdated(string gameId, Script? script);
     Task NominationUpdate(string gameId, NominationSession? session);
     Task TalkRequestsUpdate(string gameId, IEnumerable<TalkRequest>? talkRequests);
+    Task PlayAudio(string gameId, int audio);
 }
