@@ -37,7 +37,11 @@ export const AudioOptions = () => {
                     max="1"
                     step="0.01"
                     value={volume}
-                    onChange={(e) => setVolume(Number.parseFloat(e.target.value))}
+                    onChange={(e) => {
+                        const next = Number.parseFloat(e.target.value);
+                        if (next > 0) setPreviousVolume(next);
+                        setVolume(next);
+                    }}
                     onMouseEnter={() => setIsSliderHovered(true)}
                     onMouseLeave={() => setIsSliderHovered(false)}
                 />

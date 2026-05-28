@@ -15,19 +15,19 @@ type AudioPlayerProps = {
 const audioSources: Record<AudioId, string | null> = {
     [AudioId.Stop]: null,
     [AudioId.Countdown]: '/audio/countdown.mp3',
-    [AudioId.Timer10Seconds]: 'audio/timer-10-seconds.mp3',
-    [AudioId.TimerUp]: 'audio/timer-up.mp3',
+    [AudioId.Timer10Seconds]: '/audio/timer-10-seconds.mp3',
+    [AudioId.TimerUp]: '/audio/timer-up.mp3',
     [AudioId.TimeToDay]: '/audio/time-to-day.mp3',
-    [AudioId.TimeToEvening]: 'audio/time-to-evening.mp3',
-    [AudioId.TimeToNight]: 'audio/time-to-night.mp3',
-    [AudioId.RoleAssigned]: 'audio/role-assigned.mp3',
-    [AudioId.Nomination]: 'audio/nomination.mp3',
-    [AudioId.PlayerDead]: 'audio/player-dead.mp3',
-    [AudioId.PlayerRevive]: 'audio/player-revive.mp3',
-    [AudioId.HandPassUp]: 'audio/hand-pass-up.mp3',
-    [AudioId.HandPassDown]: 'audio/hand-pass-down.mp3',
-    [AudioId.NominationsOpen]: 'audio/nominations-open.mp3',
-    [AudioId.PlayerMarked]: 'audio/player-marked.mp3',
+    [AudioId.TimeToEvening]: '/audio/time-to-evening.mp3',
+    [AudioId.TimeToNight]: '/audio/time-to-night.mp3',
+    [AudioId.RoleAssigned]: '/audio/role-assigned.mp3',
+    [AudioId.Nomination]: '/audio/nomination.mp3',
+    [AudioId.PlayerDead]: '/audio/player-dead.mp3',
+    [AudioId.PlayerRevive]: '/audio/player-revive.mp3',
+    [AudioId.HandPassUp]: '/audio/hand-pass-up.mp3',
+    [AudioId.HandPassDown]: '/audio/hand-pass-down.mp3',
+    [AudioId.NominationsOpen]: '/audio/nominations-open.mp3',
+    [AudioId.PlayerMarked]: '/audio/player-marked.mp3'
 };
 const AudioPlayer = ({audioEvent}: AudioPlayerProps) => {
     const {volume} = useAppStore();
@@ -41,8 +41,6 @@ const AudioPlayer = ({audioEvent}: AudioPlayerProps) => {
     }, [volume]);
 
     useEffect(() => {
-        console.log('AudioPlayer useEffect triggered with audioEvent:', audioEvent?.audioId ? AudioId[audioEvent.audioId] : undefined);
-
         if (!audioEvent || !audioRef.current) return;
 
         const audio = audioRef.current;
@@ -57,7 +55,7 @@ const AudioPlayer = ({audioEvent}: AudioPlayerProps) => {
 
         const audioSource = audioSources[audioEvent.audioId];
 
-        if (audioSource === null) {
+        if (audioSource == null) {
             console.warn(`Audio id '${AudioId[audioEvent.audioId]}' has no playable source.`);
             return;
         }

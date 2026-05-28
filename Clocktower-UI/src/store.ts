@@ -92,8 +92,15 @@ const setStoredVolume = (volume: number) => {
 };
 const getVolume = (): number => {
     const stored = localStorage.getItem('volume');
-    const parsedVolume = stored ? JSON.parse(stored) : .5;
-    return Math.max(0, Math.min(1, parsedVolume));
+    if (!stored) return 0.5;
+    try {
+        const parsed = JSON.parse(stored);
+        const numeric = typeof parsed === 'number' ? parsed : 0.5;
+        return Number.isFinite(numeric) ? Math.max(0, Math.min(1, numeric)) : 0.5;
+    } catch {
+        localStorage.removeItem('volume');
+        return 0.5;
+    }
 }
 const getStoredUser = (): User | undefined => {
     const stored = localStorage.getItem('currentUser');
@@ -155,8 +162,9 @@ export const useAppStore = create<AppState>(
             return get().paperNotes[gameId] || '';
         },
         setVolume: (volume: number) => {
-            setStoredVolume(volume);
-            set(() => ({volume}));
+            const clampedVolume = Math.max(0, Math.min(1, volume));
+            setStoredVolume(clampedVolume);
+            set(() => ({volume: clampedVolume}));
         },
         clearSession: () => {
             clearStoredSession();

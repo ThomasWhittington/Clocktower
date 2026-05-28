@@ -15,18 +15,20 @@ function Game() {
     const {gameTime, audioEvent} = useServerHub();
 
     return (
-        <PanelGroup autoSaveId="game-panel-layout" direction="horizontal">
+        <>
             <AudioPlayer audioEvent={audioEvent}/>
-            <Panel defaultSize={20} collapsible={true} minSize={20}>
-                <DiscordTownPanel/>
-            </Panel>
-            <PanelResizeHandle className="w-2 bg-gray-400 hover:bg-gray-600 cursor-col-resize"/>
-            <Panel className="flex justify-center align-center">
-                <BackgroundImage gameTime={gameTime}>
-                    <GameWindow/>
-                </BackgroundImage>
-            </Panel>
-        </PanelGroup>
+            <PanelGroup autoSaveId="game-panel-layout" direction="horizontal">
+                <Panel defaultSize={20} collapsible={true} minSize={20}>
+                    <DiscordTownPanel/>
+                </Panel>
+                <PanelResizeHandle className="w-2 bg-gray-400 hover:bg-gray-600 cursor-col-resize"/>
+                <Panel className="flex justify-center align-center">
+                    <BackgroundImage gameTime={gameTime}>
+                        <GameWindow/>
+                    </BackgroundImage>
+                </Panel>
+            </PanelGroup>
+        </>
     );
 }
 

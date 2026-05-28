@@ -70,7 +70,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
                 GameTime.Night => AudioEvent.TimeToNight,
                 _ => AudioEvent.Stop
             };
-            await gameBroadcastService.BroadcastPlayAudio(gameId, audioEvent);
+            await TryBroadcastPlayAudio(gameId, audioEvent);
             return (true, $"Time set to {gameTime}");
         }
         catch (Exception ex)
@@ -212,7 +212,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         if (updateOccurred)
         {
             await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
-            await gameBroadcastService.BroadcastPlayAudio(gameId, isDead ? AudioEvent.PlayerDead : AudioEvent.PlayerRevive);
+            await TryBroadcastPlayAudio(gameId, isDead ? AudioEvent.PlayerDead : AudioEvent.PlayerRevive);
         }
 
         string updateOccurredString = updateOccurred ? Now : Already;
@@ -403,7 +403,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         gamePerspectiveService.CommitDraftRoles(gameId);
 
         await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
-        await gameBroadcastService.BroadcastPlayAudio(gameId, AudioEvent.RoleAssigned);
+        await TryBroadcastPlayAudio(gameId, AudioEvent.RoleAssigned);
         return Result.Ok($"Draft roles committed for game {gameId}");
     }
 
@@ -460,5 +460,17 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         }
 
         return updateCount;
+    }
+
+    private async Task TryBroadcastPlayAudio(string gameId, AudioEvent audio)
+    {
+        try
+        {
+            await gameBroadcastService.BroadcastPlayAudio(gameId, audio);
+        }
+        catch
+        {
+            // Non-critical side effect: don't fail a committed state mutation.
+        }
     }
 }

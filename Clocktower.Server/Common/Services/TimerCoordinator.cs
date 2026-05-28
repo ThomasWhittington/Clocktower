@@ -51,7 +51,7 @@ public class TimerCoordinator(ILogger<TimerCoordinator> logger, IGameBroadcastSe
         _timers[gameId] = new TimerInstance { State = state, Cts = cts };
 
         await gameBroadcastService.BroadcastTimerUpdate(gameId, state);
-        await gameBroadcastService.BroadcastPlayAudio(gameId, AudioEvent.Stop);
+        await TryBroadcastAudioAsync(gameId, AudioEvent.Stop);
 
         _ = FinishLaterAsync(gameId, end, cts.Token);
 
@@ -77,7 +77,7 @@ public class TimerCoordinator(ILogger<TimerCoordinator> logger, IGameBroadcastSe
         _timers[gameId] = new TimerInstance { State = state, Cts = new CancellationTokenSource() };
 
         await gameBroadcastService.BroadcastTimerUpdate(gameId, state);
-        await gameBroadcastService.BroadcastPlayAudio(gameId, AudioEvent.Stop);
+        await TryBroadcastAudioAsync(gameId, AudioEvent.Stop);
         return state;
     }
 
@@ -99,7 +99,7 @@ public class TimerCoordinator(ILogger<TimerCoordinator> logger, IGameBroadcastSe
                 if (inst.State.Status != TimerStatus.Running || inst.State.EndUtc != endUtc)
                     return;
 
-                await gameBroadcastService.BroadcastPlayAudio(gameId, AudioEvent.Timer10Seconds);
+                await TryBroadcastAudioAsync(gameId, AudioEvent.Timer10Seconds);
 
                 await Task.Delay(TimeSpan.FromSeconds(10), ct);
             }
@@ -122,7 +122,7 @@ public class TimerCoordinator(ILogger<TimerCoordinator> logger, IGameBroadcastSe
 
             inst2.State = finished;
             await gameBroadcastService.BroadcastTimerUpdate(gameId, finished);
-            await gameBroadcastService.BroadcastPlayAudio(gameId, AudioEvent.TimerUp);
+            await TryBroadcastAudioAsync(gameId, AudioEvent.TimerUp);
         }
         catch (Exception ex)
         {
@@ -139,6 +139,18 @@ public class TimerCoordinator(ILogger<TimerCoordinator> logger, IGameBroadcastSe
         finally
         {
             cts.Dispose();
+        }
+    }
+
+    private async Task TryBroadcastAudioAsync(string gameId, AudioEvent audioEvent)
+    {
+        try
+        {
+            await gameBroadcastService.BroadcastPlayAudio(gameId, audioEvent);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Failed to broadcast audio {AudioEvent} for game {GameId}", audioEvent, gameId);
         }
     }
 }
