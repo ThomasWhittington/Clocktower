@@ -79,6 +79,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         _sessions[gameId] = updatedSession;
 
         await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, updatedSession);
+        await TryBroadcastPlayAudio(gameId, AudioEvent.Stop);
         await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
     }
 
@@ -117,6 +118,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         _sessions[gameId] = session;
 
         await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, session);
+        await TryBroadcastPlayAudio(gameId, AudioEvent.Nomination);
         return true;
     }
 
@@ -136,6 +138,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         _sessions[gameId] = session;
 
         await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, session);
+        await TryBroadcastPlayAudio(gameId, AudioEvent.NominationsOpen);
     }
 
     private static int GetRequiredMajority(IEnumerable<GameUser> players)
@@ -151,11 +154,29 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         var user = gamePerspective.Users.FirstOrDefault(o => o.Id == playerId);
         if (user is null) return false;
 
+        var userNowMarked = !user.IsMarked;
         var updated = gamePerspectiveService.UpdatePublicUser(gameId, playerId, new PublicGameUserUpdate
         {
-            IsMarked = !user.IsMarked
+            IsMarked = userNowMarked
         });
-        if (updated) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+
+        if (!updated) return updated;
+
+        if (userNowMarked)
+        {
+            var otherUsers = gamePerspective.Users.Where(o => o.Id != playerId && o.IsMarked).ToList();
+            foreach (var otherUser in otherUsers)
+            {
+                gamePerspectiveService.UpdatePublicUser(gameId, otherUser.Id, new PublicGameUserUpdate
+                {
+                    IsMarked = false
+                });
+            }
+
+            await TryBroadcastPlayAudio(gameId, AudioEvent.PlayerMarked);
+        }
+
+        await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         return updated;
     }
 
@@ -210,6 +231,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         _sessions[gameId] = newSession;
 
         await gameBroadcastService.BroadcastNominationSessionUpdate(gameId, newSession);
+        await TryBroadcastPlayAudio(session.GameId, AudioEvent.Countdown);
     }
 
     public NominationSession? GetSession(string gameId)
@@ -250,6 +272,7 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
         if (user is null) return;
         gamePerspectiveService.UpdatePublicUser(session.GameId, user.Id, new PublicGameUserUpdate { VoteLocked = true });
         await gameBroadcastService.BroadcastDiscordTownUpdate(session.GameId);
+        await TryBroadcastPlayAudio(session.GameId, user.HandUp ? AudioEvent.HandPassUp : AudioEvent.HandPassDown);
     }
 
     private async Task EndVote(NominationSession session)
@@ -281,5 +304,17 @@ public class VotingService(IGamePerspectiveService gamePerspectiveService, IGame
             [voteHistory],
             (_, existingHistory) => [..existingHistory, voteHistory]
         );
+    }
+
+    private async Task TryBroadcastPlayAudio(string gameId, AudioEvent audio)
+    {
+        try
+        {
+            await gameBroadcastService.BroadcastPlayAudio(gameId, audio);
+        }
+        catch
+        {
+            // Keep vote/session state pipeline resilient to non-critical audio failures.
+        }
     }
 }

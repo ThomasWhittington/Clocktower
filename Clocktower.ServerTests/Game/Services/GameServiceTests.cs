@@ -271,6 +271,7 @@ public class GameServiceTests
         _mockGamePerspectiveService.Setup(o => o.GameExists(gameId)).Returns(true);
         _mockGamePerspectiveService.Setup(o => o.SetTime(gameId, gameTime));
         _mockGameBroadcastService.Setup(o => o.BroadcastTimeUpdate(gameId, gameTime)).Returns(Task.CompletedTask);
+        _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio(gameId, It.IsAny<AudioEvent>())).Returns(Task.CompletedTask);
 
         var result = await _sut.SetTime(gameId, gameTime);
 
@@ -278,6 +279,14 @@ public class GameServiceTests
         result.success.Should().BeTrue();
         _mockGamePerspectiveService.Verify(o => o.SetTime(gameId, gameTime), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastTimeUpdate(gameId, gameTime), Times.Once);
+        var expectedSound = gameTime switch
+        {
+            GameTime.Day => AudioEvent.TimeToDay,
+            GameTime.Evening => AudioEvent.TimeToEvening,
+            GameTime.Night => AudioEvent.TimeToNight,
+            _ => AudioEvent.Stop
+        };
+        _mockGameBroadcastService.Verify(o => o.BroadcastPlayAudio(gameId, expectedSound), Times.Once);
     }
 
     [TestMethod]
@@ -637,6 +646,7 @@ public class GameServiceTests
         _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guildMock.Object : null);
         _mockGamePerspectiveService.Setup(o => o.UpdatePublicUser(GameId, UserId, It.IsAny<PublicGameUserUpdate>())).Returns(updateOccurred);
         _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+        _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio(GameId, It.IsAny<AudioEvent>())).Returns(Task.CompletedTask);
     }
 
     #region SetPlayerHasVoteToken
@@ -753,6 +763,7 @@ public class GameServiceTests
         result.ShouldSucceedWith($"{DisplayName} is now {expectedDeadStatus}");
         _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new PublicGameUserUpdate { IsDead = isDead }), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastPlayAudio(GameId, AudioEvent.PlayerRevive), Times.Once);
     }
 
     [TestMethod]
@@ -767,6 +778,7 @@ public class GameServiceTests
         result.ShouldSucceedWith($"{DisplayName} is now {expectedDeadStatus}");
         _mockGamePerspectiveService.Verify(o => o.UpdatePublicUser(GameId, UserId, new PublicGameUserUpdate { IsDead = isDead, HasVoteToken = true }), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastPlayAudio(GameId, AudioEvent.PlayerDead), Times.Once);
     }
 
 
@@ -868,6 +880,7 @@ public class GameServiceTests
         _mockGamePerspectiveService.Setup(o => o.GameExists(GameId)).Returns(gameExists);
         _mockGamePerspectiveService.Setup(o => o.CommitDraftRoles(GameId));
         _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+        _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio(GameId, AudioEvent.RoleAssigned)).Returns(Task.CompletedTask);
     }
 
     [TestMethod]
@@ -891,6 +904,7 @@ public class GameServiceTests
 
         _mockGamePerspectiveService.Verify(o => o.CommitDraftRoles(GameId), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastPlayAudio(GameId, AudioEvent.RoleAssigned), Times.Once);
     }
 
     #endregion

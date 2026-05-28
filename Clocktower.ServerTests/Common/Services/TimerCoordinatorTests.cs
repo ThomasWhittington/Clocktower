@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 using Clocktower.Server.Common.Services;
+using Clocktower.Server.Data.Types.Enum;
 using Clocktower.Server.Socket.Services;
 using Microsoft.Extensions.Logging;
 
@@ -39,6 +40,7 @@ public class TimerCoordinatorTests
     [TestMethod]
     public async Task Get_ReturnsExistingTimer_WithRefreshedServerNowUtc()
     {
+        _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio("game-1", It.IsAny<AudioEvent>())).Returns(Task.CompletedTask);
         _mockGameBroadcastService
             .Setup(n => n.BroadcastTimerUpdate(It.IsAny<string>(), It.IsAny<TimerState>()))
             .Returns(Task.CompletedTask);
@@ -63,6 +65,7 @@ public class TimerCoordinatorTests
     {
         var updates = new ConcurrentQueue<TimerState>();
 
+        _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio("game-1", It.IsAny<AudioEvent>())).Returns(Task.CompletedTask);
         _mockGameBroadcastService
             .Setup(n => n.BroadcastTimerUpdate("game-1", It.IsAny<TimerState>()))
             .Callback<string, TimerState>((_, state) => updates.Enqueue(state))
@@ -100,6 +103,8 @@ public class TimerCoordinatorTests
         var runningTcs = new TaskCompletionSource<TimerState>(TaskCreationOptions.RunContinuationsAsynchronously);
         var finishedTcs = new TaskCompletionSource<TimerState>(TaskCreationOptions.RunContinuationsAsynchronously);
 
+        _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio("game-1", It.IsAny<AudioEvent>())).Returns(Task.CompletedTask);
+
         _mockGameBroadcastService
             .Setup(n => n.BroadcastTimerUpdate("game-1", It.IsAny<TimerState>()))
             .Callback<string, TimerState>((_, state) =>
@@ -135,6 +140,8 @@ public class TimerCoordinatorTests
         _mockGameBroadcastService.Verify(
             n => n.BroadcastTimerUpdate("game-1", It.Is<TimerState>(s => s.Status == TimerStatus.Finished)),
             Times.Once);
+
+        _mockGameBroadcastService.Verify(n => n.BroadcastPlayAudio("game-1", AudioEvent.Stop), Times.Once);
     }
 
     [TestMethod]
@@ -142,6 +149,7 @@ public class TimerCoordinatorTests
     {
         var updates = new ConcurrentQueue<TimerState>();
 
+        _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio("game-1", It.IsAny<AudioEvent>())).Returns(Task.CompletedTask);
         _mockGameBroadcastService
             .Setup(n => n.BroadcastTimerUpdate("game-1", It.IsAny<TimerState>()))
             .Callback<string, TimerState>((_, state) => updates.Enqueue(state))
@@ -173,6 +181,7 @@ public class TimerCoordinatorTests
         var finishedTcs = new TaskCompletionSource<TimerState>(TaskCreationOptions.RunContinuationsAsynchronously);
         var runningTcs = new TaskCompletionSource<TimerState>(TaskCreationOptions.RunContinuationsAsynchronously);
 
+        _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio("game-1", It.IsAny<AudioEvent>())).Returns(Task.CompletedTask);
         _mockGameBroadcastService
             .Setup(n => n.BroadcastTimerUpdate("game-1", It.IsAny<TimerState>()))
             .Callback<string, TimerState>((_, state) =>
@@ -200,6 +209,7 @@ public class TimerCoordinatorTests
     {
         var updates = new ConcurrentQueue<TimerState>();
 
+        _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio("game-1", It.IsAny<AudioEvent>())).Returns(Task.CompletedTask);
         _mockGameBroadcastService
             .Setup(n => n.BroadcastTimerUpdate("game-1", It.IsAny<TimerState>()))
             .Callback<string, TimerState>((_, state) => updates.Enqueue(state))
@@ -225,6 +235,7 @@ public class TimerCoordinatorTests
     {
         var finishedTcs = new TaskCompletionSource<TimerState>(TaskCreationOptions.RunContinuationsAsynchronously);
 
+        _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio("game-1", It.IsAny<AudioEvent>())).Returns(Task.CompletedTask);
         _mockGameBroadcastService
             .Setup(n => n.BroadcastTimerUpdate("game-1", It.IsAny<TimerState>()))
             .Callback<string, TimerState>((_, state) =>
@@ -258,6 +269,7 @@ public class TimerCoordinatorTests
     {
         var updates = new ConcurrentQueue<TimerState>();
 
+        _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio("game-1", It.IsAny<AudioEvent>())).Returns(Task.CompletedTask);
         _mockGameBroadcastService
             .Setup(n => n.BroadcastTimerUpdate("game-1", It.IsAny<TimerState>()))
             .Callback<string, TimerState>((_, state) => updates.Enqueue(state))

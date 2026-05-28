@@ -5,6 +5,7 @@ interface AppState {
     loggedIn: boolean,
     guildId: string,
     gameId: string | null,
+    volume: number;
     joinedGameId: string | null,
     currentUser?: User,
     paperNotes: Record<string, string>;
@@ -16,6 +17,7 @@ interface AppState {
     setJwt: (value: string | undefined) => void;
     setPaperNote: (gameId: string, content: string) => void;
     getPaperNote: (gameId: string) => string;
+    setVolume: (value: number) => void;
     clearSession: () => void;
     reset: () => void;
 }
@@ -83,6 +85,23 @@ const getStoredPaperNotes = (): Record<string, string> => {
 const setStoredPaperNotes = (notes: Record<string, string>) => {
     localStorage.setItem('paperNotes', JSON.stringify(notes));
 };
+
+const setStoredVolume = (volume: number) => {
+    const clampedVolume = Math.max(0, Math.min(1, volume));
+    localStorage.setItem('volume', JSON.stringify(clampedVolume));
+};
+const getVolume = (): number => {
+    const stored = localStorage.getItem('volume');
+    if (!stored) return 0.5;
+    try {
+        const parsed = JSON.parse(stored);
+        const numeric = typeof parsed === 'number' ? parsed : 0.5;
+        return Number.isFinite(numeric) ? Math.max(0, Math.min(1, numeric)) : 0.5;
+    } catch {
+        localStorage.removeItem('volume');
+        return 0.5;
+    }
+}
 const getStoredUser = (): User | undefined => {
     const stored = localStorage.getItem('currentUser');
     return stored ? JSON.parse(stored) : undefined;
@@ -99,6 +118,7 @@ const clearStoredSession = () => {
 const getInitialState = () => ({
     guildId: '',
     gameId: '',
+    volume: .5,
     currentUser: undefined,
     jwt: undefined,
     paperNotes: {}
@@ -113,6 +133,7 @@ export const useAppStore = create<AppState>(
         currentUser: getStoredUser(),
         loggedIn: getLoggedIn(),
         paperNotes: getStoredPaperNotes(),
+        volume: getVolume(),
         setGuildId: (id) => {
             setStoredGuildId(id);
             set(() => ({guildId: id}));
@@ -137,9 +158,13 @@ export const useAppStore = create<AppState>(
             const notes = {...get().paperNotes, [gameId]: content};
             setStoredPaperNotes(notes);
             set({paperNotes: notes});
-        },
-        getPaperNote: (gameId) => {
+        }, getPaperNote: (gameId) => {
             return get().paperNotes[gameId] || '';
+        },
+        setVolume: (volume: number) => {
+            const clampedVolume = Math.max(0, Math.min(1, volume));
+            setStoredVolume(clampedVolume);
+            set(() => ({volume: clampedVolume}));
         },
         clearSession: () => {
             clearStoredSession();

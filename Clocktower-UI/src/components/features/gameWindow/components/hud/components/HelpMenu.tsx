@@ -2,6 +2,7 @@
 import {useDropdown} from "@/hooks";
 import {useCurrentUserIsStoryteller} from "@/components/features/discordTownPanel/hooks";
 import {HelpIcon} from "@/components/ui/icons";
+import AudioOptions from "@/components/features/gameWindow/components/hud/components/AudioOptions.tsx";
 
 interface HelpMenuProps {
     onRoleListClick: () => void;
@@ -53,6 +54,7 @@ export const HelpMenu = ({onRoleListClick, onNightOrderClick, onVoteHistoryClick
                         <span>Paper</span>
                         <span>[P]</span>
                     </button>
+                    <AudioOptions/>
                     {isStoryteller &&
                         <button type="button" className="text-discord-warning" onClick={() => {
                             onForceUpdateClick();

@@ -63,6 +63,14 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
 
             gamePerspectiveService.SetTime(gameId, gameTime);
             await gameBroadcastService.BroadcastTimeUpdate(gameId, gameTime);
+            var audioEvent = gameTime switch
+            {
+                GameTime.Day => AudioEvent.TimeToDay,
+                GameTime.Evening => AudioEvent.TimeToEvening,
+                GameTime.Night => AudioEvent.TimeToNight,
+                _ => AudioEvent.Stop
+            };
+            await TryBroadcastPlayAudio(gameId, audioEvent);
             return (true, $"Time set to {gameTime}");
         }
         catch (Exception ex)
@@ -117,7 +125,6 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         var gameUser = user.AsGameUser(gamePerspective);
         gameUser.UserType = UserType.Player;
         gameUser.SeatingPosition = gamePerspectiveService.GetNextAvailableSeatingPosition(gameId);
-
         gamePerspectiveService.AddUserToGame(gameId, gameUser);
 
         await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
@@ -202,7 +209,12 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
             HasVoteToken = isDead ? true : null
         });
 
-        if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+        if (updateOccurred)
+        {
+            await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+            await TryBroadcastPlayAudio(gameId, isDead ? AudioEvent.PlayerDead : AudioEvent.PlayerRevive);
+        }
+
         string updateOccurredString = updateOccurred ? Now : Already;
         string expectedTokenStatus = isDead ? "dead" : "alive";
         return Result.Ok($"{user.DisplayName} is {updateOccurredString} {expectedTokenStatus}");
@@ -391,6 +403,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         gamePerspectiveService.CommitDraftRoles(gameId);
 
         await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+        await TryBroadcastPlayAudio(gameId, AudioEvent.RoleAssigned);
         return Result.Ok($"Draft roles committed for game {gameId}");
     }
 
@@ -447,5 +460,17 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         }
 
         return updateCount;
+    }
+
+    private async Task TryBroadcastPlayAudio(string gameId, AudioEvent audio)
+    {
+        try
+        {
+            await gameBroadcastService.BroadcastPlayAudio(gameId, audio);
+        }
+        catch
+        {
+            // Non-critical side effect: don't fail a committed state mutation.
+        }
     }
 }

@@ -243,11 +243,6 @@ public class DiscordTownService(
         return null;
     }
 
-    public async Task PingUser(string userId)
-    {
-        await gameBroadcastService.PingUser(userId, "Ping!");
-    }
-
     public async Task<(InviteUserOutcome outcome, string message)> InviteUser(string gameId, string userId, bool sendInvite)
     {
         try

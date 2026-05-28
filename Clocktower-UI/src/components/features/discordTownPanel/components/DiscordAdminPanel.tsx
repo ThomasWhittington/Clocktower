@@ -34,7 +34,7 @@ function DiscordAdminPanel() {
 
                 {timerActionsCanRun &&
                     <>
-                        <input type="number" min={1} value={timerSeconds / 60} onChange={(e) => setTimerSeconds(Number(e.target.value) * 60)} placeholder="Minutes" className="input-primary w-24"/>
+                        <input type="number" min={1} step="1" value={timerSeconds} onChange={(e) => setTimerSeconds(Number(e.target.value))} placeholder="Seconds" className="input-primary w-24"/>
                         <input type="text" value={timerLabel} onChange={(e) => setTimerLabel(e.target.value)} placeholder="Label (optional)" className="input-primary w-32 placeholder:select-none"/>
                         <button className="btn-primary" aria-label="Start or edit timer" disabled={!canSubmitTimer} onClick={() => startOrEditTimer(timerSeconds, timerLabel.trim() || undefined)}>
                             ⌛

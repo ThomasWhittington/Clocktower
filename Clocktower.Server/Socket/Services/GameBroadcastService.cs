@@ -32,10 +32,10 @@ public class GameBroadcastService(
     public Task BroadcastNominationSessionUpdate(string gameId, NominationSession? nominationSession)
         => notificationService.SendNominationSessionUpdateToGroup(gameId, nominationSession);
 
-    public Task PingUser(string userId, string message) => notificationService.PingUser(userId, message);
-
     public Task BroadcastTalkRequestsUpdate(string gameId, IEnumerable<TalkRequest>? talkRequests)
         => notificationService.SendTalkRequestsUpdateToGroup(gameId, talkRequests);
+
+    public Task BroadcastPlayAudio(string gameId, AudioEvent audio) => notificationService.PlayAudio(gameId, audio);
 
     private IEnumerable<UserNotification> BuildNotifications(string gameId, string guildId, List<GamePerspective> perspectives)
     {
