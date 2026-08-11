@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Clocktower.Server.Common.Api.Filters;
+using Clocktower.Server.Common.Services;
 
 namespace Clocktower.Server;
 
@@ -20,6 +21,15 @@ public static class Endpoints
         endpoints.MapDiscordAuthEndpoints();
         endpoints.MapDiscordTownEndpoints();
         endpoints.MapTimerEndpoints();
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.MapGet("/api/dev/token/{userId}", (string userId, IJwtWriter jwtWriter) =>
+            {
+                var jwt = jwtWriter.GetJwtToken(id: userId, name: userId, isStoryTeller: true, testBypass: true);
+                return Results.Ok(new { token = jwt });
+            });
+        }
     }
 
     extension(IEndpointRouteBuilder app)
@@ -68,7 +78,7 @@ public static class Endpoints
             endpoints.MapPublicGroup()
                 .MapEndpointsFromNamespace("Clocktower.Server.Discord.GameAction.Endpoints");
         }
-        
+
         private void MapDiscordAuthEndpoints()
         {
             var endpoints = app.MapGroup("/discord/auth")
@@ -86,7 +96,7 @@ public static class Endpoints
             endpoints.MapPublicGroup()
                 .MapEndpointsFromNamespace("Clocktower.Server.Discord.Town.Endpoints");
         }
-        
+
         private void MapTimerEndpoints()
         {
             var endpoints = app.MapGroup("/timer")
