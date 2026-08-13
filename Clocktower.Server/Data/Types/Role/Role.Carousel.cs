@@ -17,6 +17,8 @@ public partial record Role
     private static Role CarouselTraveller(string name, string description)
         => Traveller(name, description, Edition.Carousel);
 
+    #region Minions
+
     public static Role Marionette => CarouselMinion("Marionette", "You think you are a good character, but you are not. The Demon knows who you are. [You neighbour the demon]")
         .WithGlobalReminders("Is The Marionette")
         .FirstNight(5, "Mark a good player neighbouring the demon with the \"Is The Marionette\" reminder. Inform the demon of the Marionette.")
@@ -73,4 +75,58 @@ public partial record Role
     public static Role Harpy => CarouselMinion("Harpy", "Each night, choose 2 players: tomorrow, the 1st player is mad that the 2nd is evil, or one or both might die.")
         .EachNight(28, 16, "Ask the Harpy to select 2 players. Mark 1st 'Mad' and 2nd '2nd'. Put Harpy to sleep. Wake 1st player: show 'This Character Selected You', show Harpy token, point to 2nd player.")
         .WithReminders("Mad", "2nd");
+
+    #endregion
+
+    #region Demons
+
+    public static Role LordOfTyphon => CarouselDemon("Lord Of Typhon", "Each night*, choose a player: they die. [Evil characters are in a line. You are in the middle. +1 Minion. -? to +? Outsiders.]")
+        .OtherNight(24, "The Lord Of Typhon picks a player. That player dies.")
+        .WithReminders("Dead")
+        .AffectsSetup();
+
+    public static Role Lleech => CarouselDemon("Lleech", "Each night*, choose a player: they die. You start by choosing a player: they are poisoned. You die if & only if they are dead.")
+        .FirstNight(1, "The Lleech picks a player to be their host.")
+        .OtherNight(24, "The Lleech picks a player. That player dies.")
+        .WithReminders("Host & Poisoned", "Dead");
+
+    public static Role Ojo => CarouselDemon("Ojo", "Each night*, choose a character, they die. If they are not in play, the Storyteller chooses who dies.")
+        .OtherNight(24, "The Ojo picks a character. If that character is in play, they die. If not, the Storyteller chooses who dies.")
+        .WithReminders("Dead");
+
+    public static Role Leviathan => CarouselDemon("Leviathan", "If more than 1 good player is executed, evil wins. All players know you are in play. After day 5, evil wins.")
+        .OtherNight(100, "Increment day counter")
+        .WithReminders("Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Good Player Executed");
+
+    public static Role Yaggababble => CarouselDemon("Yaggababble", "You start knowing a secret phrase. For each timr you said it publicly today, a player might die.")
+        .FirstNight(1, "Wake the Yaggababble and show them their secret phrase. Put them to sleep.")
+        .OtherNight(24, "Do not wake. Choose and mark players to die based on how many times the Yaggababble said their secret phrase today.")
+        .WithReminders("Dead");
+
+    public static Role Legion => CarouselDemon("Legion", "Each night*, a player might die. Executions fail if only evil voted. You register as a Minion too. [Most players are Legion].")
+        .OtherNight(24, "The Storyteller may kill 1 player.")
+        .WithReminders("Dead", "About To Die")
+        .AffectsSetup();
+
+    public static Role Riot => CarouselDemon("Riot", "On day 3, Minions become Riot & nominees die but nominate an alive player immediately. This must happen.")
+        .OtherNight(100, "Increment day counter")
+        .WithReminders("Day 1", "Day 2", "Day 3");
+
+    public static Role Kazali => CarouselDemon("Kazali", "Each night*, choose a player: they die. [You choose which players are which Minions. -? to +? Outsiders")
+        .FirstNight(1, "Allow the Kazali to pick which players are which Minions. Inform the new Minions of the change.")
+        .OtherNight(24, "The Kazali picks a player. That player dies.")
+        .WithReminders("Dead")
+        .AffectsSetup();
+
+    public static Role AlHadikhia => CarouselDemon("Al-Hadikhia", "Each night*, you may choose 3 players (all players learn who): each silently chooses to live or die, but if all live, all die.")
+        .OtherNight(24, "Wake the Al-Hadikhia to choose 3 players; announce the group to be silent and name each chosen player, waking them individually to ask if they live—if all 3 choose life, all die, otherwise only those who chose death die.")
+        .WithReminders("1", "2", "3");
+
+    public static Role LilMonsta => CarouselDemon("Lil' Monsta", "Each night, Minions choose who babysits Lil' Monsta & \"is the Demon\". Each night *, a player might die. [+1 Minion, no player is \"Lil' Monsta\"]")
+        .FirstNight(24, "Wake all Minions together. They select at a player to babysit Lil' Monsta.")
+        .OtherNight(24, "Wake all Minions together. They select a player to babysit Lil' Monsta. A player might die.")
+        .WithReminders("Dead", "Is The Demon")
+        .AffectsSetup();
+
+    #endregion
 }
