@@ -17,6 +17,45 @@ public partial record Role
     private static Role CarouselTraveller(string name, string description)
         => Traveller(name, description, Edition.Carousel);
 
+    #region Townsfolk
+
+    public static Role Magician => CarouselTownsfolk("Magician", "The Demon thinks you are a Minion. Minions think yuo are a Demon.");
+    public static Role Shugenja => CarouselTownsfolk("Shugenja", "You start knowing if your closest evil player is clockwise or anti-clockwise. If equidistant, this info is arbitrary.");
+
+    public static Role Princess => CarouselTownsfolk("Princess", "On your 1st day, if you nominated & executed a player, the Demon doesn't kill tonight.")
+        .WithReminders("Doesn't Kill");
+
+    public static Role Preacher => CarouselTownsfolk("Preacher", "Each night, choose a player: a Minion, if chosen, learns this. All chosen Minions have no ability.")
+        .EachNight(70, 13, "Ask the Preacher to choose a player. If that player is a Minion, wake them and tell them they have been Preached and mark them as No Ability")
+        .WithReminders("No Ability");
+
+    public static Role PoppyGrower => CarouselTownsfolk("Poppy Grower", "Minions & Demons do not know each other. If you die, they learn who each other are that night.")
+        .EachNight(2, 30, "If the Poppy Grower has died, wake the Evil team and inform them of who their teammates are.")
+        .WithReminders("Evil Wakes");
+
+    public static Role Nightwatchman => CarouselTownsfolk("Nightwatchman", "Once per game, at night, choose a player: they learn you are the Nightwatchman.")
+        .EachNight(45, 58, "If the Nightwatchman still has their ability, ask if they wish to use it. If they pick a player, tell that player who the Nightwatchman is. Mark as No Ability")
+        .WithReminders("No Ability");
+
+    public static Role Noble => CarouselTownsfolk("Noble", "You start knowing 3 players, 1 and only 1 of which is evil.")
+        .FirstNight(48, "Show the Noble 3 players, 1 and only 1 of which is evil.")
+        .WithReminders("Know");
+
+    public static Role Pixie => CarouselTownsfolk("Pixie", "You start knowing 1 in-play Townsfolk. If you were mad that you were this character, you gain their ability when they die.")
+        .FirstNight(50, "Show the Pixie 1 in-play Townsfolk character.")
+        .WithReminders("Has Ability");
+
+    public static Role Steward => CarouselTownsfolk("Steward", "You start knowing 1 good player.")
+        .FirstNight(55, "Show the Steward 1 good player (not their character).")
+        .WithReminders("Know");
+
+    public static Role VillageIdiot => CarouselTownsfolk("Village Idiot", "Each night, choose a player: you learn their alignment. [+0 to +2 Village Idiots. 1 of the extras is drunk].")
+        .EachNight(72, 70, "For each Village Idiot, wake in turn. They pick a player and get a good or evil. The drunk one gets arbitrary info.")
+        .WithReminders("Drunk")
+        .AffectsSetup();
+
+    #endregion
+
     #region Outsiders
 
     public static Role Damsel => CarouselOutsider("Damsel", "All Minions know a Damsel is in play. If a Minion publicly guesses you (once), your team loses.")
