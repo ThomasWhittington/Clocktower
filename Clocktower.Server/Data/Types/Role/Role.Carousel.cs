@@ -17,6 +17,43 @@ public partial record Role
     private static Role CarouselTraveller(string name, string description)
         => Traveller(name, description, Edition.Carousel);
 
+    #region Outsiders
+
+    public static Role Damsel => CarouselOutsider("Damsel", "All Minions know a Damsel is in play. If a Minion publicly guesses you (once), your team loses.")
+        .FirstNight(5, "Inform the Minions that a Damsel is in play.")
+        .WithReminders("Guess Used");
+
+    public static Role Golem => CarouselOutsider("Golem", "You may only nominate once per game. When you do, if the nominee is not the Demon, they die")
+        .WithReminders("May Not Nominate");
+
+    public static Role Hatter => CarouselOutsider("Hatter", "If you died today or tonight, the Minion & Demon players may choose new Minion & Demon characters to be.")
+        .OtherNight(28, "If the Hatter died today or tonight, allow the Minions and Demons to change their characters if they wish.")
+        .WithReminders("Tea Party Tonight");
+
+    public static Role Heretic => CarouselOutsider("Heretic", "Whoever wins, loses & whoever loses, wins, even if you are dead.");
+
+    public static Role Hermit => CarouselOutsider("Hermit", "You have all Outsider abilities. [-0 or -1 Outsiders]")
+        .WithReminders("1", "2", "3")
+        .AffectsSetup();
+
+    public static Role Ogre => CarouselOutsider("Ogre", "On your first night, choose a player (not yourself): you become their alignment (you don't know which) even if drunk or poisoned.")
+        .FirstNight(29, "The Ogre chooses a player. The Ogre becomes the alignment of the selected player.")
+        .WithReminders("Friend");
+
+    public static Role PlagueDoctor => CarouselOutsider("Plague Doctor", "When you die, the Storyteller gains a Minion ability.")
+        .WithReminders("Storyteller Ability");
+
+    public static Role Politician => CarouselOutsider("Politician", "If you were the player most responsible for you team losing, you change alignment & win, even if dead.");
+
+    public static Role PuzzleMaster => CarouselOutsider("Puzzle Master", "1 player is drunk, even if you die. If you guess (once) who it is, learn the Demon player, but guess wrong & get false info.")
+        .WithReminders("Drunk", "Guess Used");
+
+    public static Role Snitch => CarouselOutsider("Snitch", "Each Minion gets 3 bluffs.");
+
+    public static Role Zealot => CarouselOutsider("Zealot", "If there are more 5 or more players alive, you must vote for every nomination.");
+
+    #endregion
+
     #region Minions
 
     public static Role Marionette => CarouselMinion("Marionette", "You think you are a good character, but you are not. The Demon knows who you are. [You neighbour the demon]")
