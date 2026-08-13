@@ -60,7 +60,7 @@ public class ScriptProvider(IFileSystem fileSystem) : IScriptProvider
 
             var metaName = metaElement.GetProperty("name").GetString() ?? "";
             var metaAuthor = metaElement.GetProperty("author").GetString() ?? "";
-            var characters = scriptArray.Skip(1).Select(e => e.GetString() ?? "").ToList();
+            var characters = scriptArray.Skip(1).Select(e => e.GetString() ?? "").OrderBy(o => o).ToList();
             var scriptImport = new ScriptImport(metaName, metaAuthor, characters);
 
             return ProcessScriptImport(scriptImport);
