@@ -76,13 +76,19 @@ public class ScriptProvider(IFileSystem fileSystem) : IScriptProvider
         var allRoles = Role.AllRoles.ToList();
 
         var scriptRoles = new List<Role>();
+        var failedCharacters = new List<string>();
+
         foreach (var characterId in scriptImport.Characters)
         {
             var thisRole = allRoles.FirstOrDefault(o => o.Id == characterId);
             if (thisRole == null)
-                return Result.Fail<Script>(ErrorKind.Invalid, InvalidScriptCode, $"Character with ID '{characterId}' not found in role list");
-            scriptRoles.Add(thisRole);
+                failedCharacters.Add(characterId);
+            else
+                scriptRoles.Add(thisRole);
         }
+
+        if (failedCharacters.Count != 0)
+            return Result.Fail<Script>(ErrorKind.Invalid, InvalidScriptCode, $"Characters with IDs '{string.Join(", ", failedCharacters)}' not found in role list");
 
         var script = new Script(scriptImport.Name, scriptImport.Author, scriptRoles);
         return Result.Ok(script);
