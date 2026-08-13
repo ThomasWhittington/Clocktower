@@ -136,7 +136,7 @@ export type ClocktowerServerDataTypesEnumGameTime = 'Unknown' | 'Day' | 'Evening
 
 export type ClocktowerServerDataTypesEnumRoleType = 'Unknown' | 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
 
-export type ClocktowerServerDataTypesEnumScriptSelect = 'Unknown' | 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Custom';
+export type ClocktowerServerDataTypesEnumScriptSelect = 'Unknown' | 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Custom' | 'AllCarousel';
 
 export type ClocktowerServerDataTypesEnumUserType = 'Unknown' | 'Player' | 'StoryTeller' | 'Spectator';
 
@@ -396,6 +396,22 @@ export type HealthApiResponses = {
 };
 
 export type HealthApiResponse = HealthApiResponses[keyof HealthApiResponses];
+
+export type GetApiDevTokenByUserIdData = {
+    body?: never;
+    path: {
+        userId: string;
+    };
+    query?: never;
+    url: '/api/dev/token/{userId}';
+};
+
+export type GetApiDevTokenByUserIdResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type CheckGuildApiData = {
     body?: never;
@@ -884,31 +900,6 @@ export type MoveUserToChannelApiResponses = {
 };
 
 export type MoveUserToChannelApiResponse = MoveUserToChannelApiResponses[keyof MoveUserToChannelApiResponses];
-
-export type PingUserApiData = {
-    body?: never;
-    path: {
-        userId: string;
-    };
-    query?: never;
-    url: '/api/discord/town/ping/{userId}';
-};
-
-export type PingUserApiErrors = {
-    /**
-     * Bad Request
-     */
-    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
-};
-
-export type PingUserApiError = PingUserApiErrors[keyof PingUserApiErrors];
-
-export type PingUserApiResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
 
 export type SetUserTypeApiData = {
     body?: never;

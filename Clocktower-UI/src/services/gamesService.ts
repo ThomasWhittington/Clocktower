@@ -416,6 +416,8 @@ const scriptSelectToString = (scriptSelect: ScriptSelect): ClocktowerServerDataT
             return "SectsAndViolets";
         case ScriptSelect.BadMoonRising:
             return "BadMoonRising";
+        case ScriptSelect.AllCarousel:
+            return "AllCarousel";
         case ScriptSelect.Custom:
             return "Custom";
         default:

@@ -37,6 +37,8 @@ import type {
     ForceUpdateApiData,
     ForceUpdateApiErrors,
     ForceUpdateApiResponses,
+    GetApiDevTokenByUserIdData,
+    GetApiDevTokenByUserIdResponses,
     GetAuthDataApiData,
     GetAuthDataApiErrors,
     GetAuthDataApiResponses,
@@ -81,9 +83,6 @@ import type {
     MoveUserToChannelApiData,
     MoveUserToChannelApiErrors,
     MoveUserToChannelApiResponses,
-    PingUserApiData,
-    PingUserApiErrors,
-    PingUserApiResponses,
     RandomiseSeatingPositionsApiData,
     RandomiseSeatingPositionsApiErrors,
     RandomiseSeatingPositionsApiResponses,
@@ -214,6 +213,19 @@ export const healthApi = <ThrowOnError extends boolean = false>(options?: Option
             }
         ],
         url: '/api/admin/health',
+        ...options
+    });
+};
+
+export const getApiDevTokenByUserId = <ThrowOnError extends boolean = false>(options: Options<GetApiDevTokenByUserIdData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetApiDevTokenByUserIdResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/dev/token/{userId}',
         ...options
     });
 };
@@ -560,24 +572,6 @@ export const moveUserToChannelApi = <ThrowOnError extends boolean = false>(optio
             }
         ],
         url: '/api/discord/town/{guildId}/{userId}/{channelId}',
-        ...options
-    });
-};
-
-/**
- * Pings user
- *
- * Sends a ping to the user if online
- */
-export const pingUserApi = <ThrowOnError extends boolean = false>(options: Options<PingUserApiData, ThrowOnError>) => {
-    return (options.client ?? client).post<PingUserApiResponses, PingUserApiErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/discord/town/ping/{userId}',
         ...options
     });
 };

@@ -1,5 +1,8 @@
 ﻿import {ScriptSelect} from "@/types";
-import {useFileUpload, useSetScript} from "@/hooks";
+import {
+    useFileUpload,
+    useSetScript
+} from "@/hooks";
 
 export const ScriptSelector = () => {
     const setScript = useSetScript();
@@ -16,6 +19,9 @@ export const ScriptSelector = () => {
             </button>
             <button onClick={() => setScript(ScriptSelect.BadMoonRising)} className="btn-outline">
                 Bad Moon Rising
+            </button>
+            <button onClick={() => setScript(ScriptSelect.AllCarousel)} className="btn-outline">
+                All Carousel
             </button>
             <button onClick={triggerFileInput} className="btn-outline">
                 Custom
