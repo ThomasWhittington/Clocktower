@@ -1,5 +1,4 @@
 ﻿import {Reminder} from "@/types";
-import reminderBase from "#/tokenParts/base/reminderBase.png";
 import {TokenRoleIcon} from "@/components/tokens/TokenRoleIcon.tsx";
 
 interface ReminderTokenProps {
@@ -12,6 +11,7 @@ interface ReminderTokenProps {
 }
 
 export const ReminderToken = ({reminder, angleToCenter, size, className, onClick, disableXOverlay}: ReminderTokenProps) => {
+    const reminderBase = `${import.meta.env.BASE_URL}tokenParts/base/reminderBase.png`;
     return (
         <span
             key={reminder.id}

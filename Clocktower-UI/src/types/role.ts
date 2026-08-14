@@ -1,5 +1,8 @@
 ﻿import type {ClocktowerServerDataTypesRoleRole} from "@/api";
-import {Edition, RoleType} from "@/types";
+import {
+    Edition,
+    RoleType
+} from "@/types";
 
 export type RoleDto = {
     id?: string;
@@ -12,6 +15,7 @@ export type RoleDto = {
     otherNight?: number;
     otherNightReminder?: string;
     setup?: boolean;
+    setupDescription?: string;
     reminders?: string[];
     remindersGlobal?: string[];
 };
@@ -19,6 +23,7 @@ export type RoleDto = {
 export class Role {
     readonly id: string;
     readonly name: string;
+    readonly fullDescription: string;
     readonly description: string;
     readonly type: RoleType;
     readonly edition: Edition;
@@ -27,6 +32,7 @@ export class Role {
     readonly otherNight: number;
     readonly otherNightReminder: string;
     readonly setup: boolean;
+    readonly setupDescription?: string;
     readonly reminders: string[];
     readonly remindersGlobal: string[];
 
@@ -45,8 +51,10 @@ export class Role {
         this.otherNight = data.otherNight ?? 0;
         this.otherNightReminder = data.otherNightReminder ?? '';
         this.setup = data.setup ?? false;
+        this.setupDescription = data.setupDescription ?? '';
         this.reminders = data.reminders ?? [];
         this.remindersGlobal = data.remindersGlobal ?? [];
+        this.fullDescription = this.description + " " + this.setupDescription;
     }
 }
 
@@ -62,6 +70,7 @@ export function mapToRole(roleDto: ClocktowerServerDataTypesRoleRole): Role {
         otherNight: roleDto.otherNight,
         otherNightReminder: roleDto.otherNightReminder ?? undefined,
         setup: roleDto.setup ?? false,
+        setupDescription: roleDto.setupDescription ?? undefined,
         reminders: roleDto.reminders ?? undefined,
         remindersGlobal: roleDto.remindersGlobal ?? undefined
     });

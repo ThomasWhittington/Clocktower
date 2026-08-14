@@ -45,7 +45,7 @@ public partial record Role
         .OtherNight(52, "If the Ravenkeeper died tonight: The Ravenkeeper chooses a player. Show them that players Character.");
 
     public static Role Slayer => TroubleBrewingTownsfolk("Slayer", "Once per game, during the day, publicly choose a player: if they are the Demon, they die.")
-        .WithReminders("No Ability");
+        .WithReminders(NoAbilityText);
 
     public static Role Soldier => TroubleBrewingTownsfolk("Soldier", "You are safe from the Demon.");
 
@@ -54,7 +54,7 @@ public partial record Role
         .WithReminders("Died Today");
 
     public static Role Virgin => TroubleBrewingTownsfolk("Virgin", "The 1st time you are nominated, if the nominator is a Townsfolk, they are EXECUTED immediately.")
-        .WithReminders("No Ability");
+        .WithReminders(NoAbilityText);
 
     public static Role Washerwoman => TroubleBrewingTownsfolk("Washerwoman", "On your first night, you learn that 1 of 2 players is a particular Townsfolk.")
         .FirstNight(34, "Show the Washerwoman a Townsfolk character and 2 players. One of the players is the Townsfolk.")
@@ -66,14 +66,14 @@ public partial record Role
 
     public static Role Drunk => TroubleBrewingOutsider("Drunk", "You do not know you are the Drunk. You think you are a Townsfolk, but you are not.")
         .WithGlobalReminders("Is the Drunk")
-        .AffectsSetup();
+        .AffectsSetup("Player sees a townsfolk role, not the Drunk");
 
     public static Role Recluse => TroubleBrewingOutsider("Recluse", "You might register as evil & as a Minion or Demon, even if dead.");
 
     public static Role Saint => TroubleBrewingOutsider("Saint", "If you die by execution, your team loses.");
 
-    public static Role Baron => TroubleBrewingMinion("Baron", "There are extra Outsiders in play. [+2 Outsiders]")
-        .AffectsSetup();
+    public static Role Baron => TroubleBrewingMinion("Baron", "There are extra Outsiders in play.")
+        .AffectsSetup("+2 Outsiders");
 
     public static Role Poisoner => TroubleBrewingMinion("Poisoner", "Each night, choose a player: they are poisoned tonight and tomorrow day.")
         .EachNight(17, 7, "The previously poisoned player is no longer poisoned. The Poisoner selects a player. Mark that player as 'Poisoned'.")
@@ -88,7 +88,7 @@ public partial record Role
 
     public static Role Imp => TroubleBrewingDemon("Imp", "Each night*, choose a player: they die. If you kill yourself this way, a Minion becomes the Imp.")
         .OtherNight(24, "The Imp picks a player. That player dies. If the Imp chose themselves: Replace the character of 1 alive minion with the Imp token.")
-        .WithReminders("Dead");
+        .WithReminders(DeadText);
 
     public static Role Scapegoat => TroubleBrewingTraveller("Scapegoat", "If a player of your alignment is executed, you might be executed instead.");
     public static Role Gunslinger => TroubleBrewingTraveller("Gunslinger", "Each day, after the 1st vote has been tallied, you may choose a player that voted: they die.");

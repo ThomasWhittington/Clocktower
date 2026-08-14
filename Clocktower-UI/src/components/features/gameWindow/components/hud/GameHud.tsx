@@ -58,6 +58,7 @@ export function GameHud({
                     onRolePlannerClick={() => script && togglePanel('rolePlanner')}
                     showDraftRoles={isDraftMode}
                     onDraftToggle={() => setIsDraftMode(prev => !prev)}
+                    hasScript={!!script}
                 />
             )}
             <CenterHud circleDiameter={circleDiameter}/>

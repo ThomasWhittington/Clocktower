@@ -1,10 +1,9 @@
-﻿import leaf1 from '#/tokenParts/leaves/leaf-top1.png';
-import leaf2 from '#/tokenParts/leaves/leaf-top2.png';
-import leaf3 from '#/tokenParts/leaves/leaf-top3.png';
-import leaf4 from '#/tokenParts/leaves/leaf-top4.png';
-import leaf5 from '#/tokenParts/leaves/leaf-top5.png';
-
-export const TopLeaf = ({leafCount}: { leafCount: number }) => {
+﻿export const TopLeaf = ({leafCount}: { leafCount: number }) => {
+    const leaf1 = `${import.meta.env.BASE_URL}tokenParts/leaves/leaf-top1.png`;
+    const leaf2 = `${import.meta.env.BASE_URL}tokenParts/leaves/leaf-top2.png`;
+    const leaf3 = `${import.meta.env.BASE_URL}tokenParts/leaves/leaf-top3.png`;
+    const leaf4 = `${import.meta.env.BASE_URL}tokenParts/leaves/leaf-top4.png`;
+    const leaf5 = `${import.meta.env.BASE_URL}tokenParts/leaves/leaf-top5.png`;
     leafCount = Math.min(leafCount, 5);
     const leafMap: Record<number, string> = {
         1: leaf1,

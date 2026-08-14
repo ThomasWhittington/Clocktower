@@ -60,7 +60,7 @@ public class ScriptProvider(IFileSystem fileSystem) : IScriptProvider
 
             var metaName = metaElement.GetProperty("name").GetString() ?? "";
             var metaAuthor = metaElement.GetProperty("author").GetString() ?? "";
-            var characters = scriptArray.Skip(1).Select(e => e.GetString() ?? "").ToList();
+            var characters = scriptArray.Skip(1).Select(e => e.GetString() ?? "").OrderBy(o => o).ToList();
             var scriptImport = new ScriptImport(metaName, metaAuthor, characters);
 
             return ProcessScriptImport(scriptImport);
@@ -76,13 +76,19 @@ public class ScriptProvider(IFileSystem fileSystem) : IScriptProvider
         var allRoles = Role.AllRoles.ToList();
 
         var scriptRoles = new List<Role>();
+        var failedCharacters = new List<string>();
+
         foreach (var characterId in scriptImport.Characters)
         {
             var thisRole = allRoles.FirstOrDefault(o => o.Id == characterId);
             if (thisRole == null)
-                return Result.Fail<Script>(ErrorKind.Invalid, InvalidScriptCode, $"Character with ID '{characterId}' not found in role list");
-            scriptRoles.Add(thisRole);
+                failedCharacters.Add(characterId);
+            else
+                scriptRoles.Add(thisRole);
         }
+
+        if (failedCharacters.Count != 0)
+            return Result.Fail<Script>(ErrorKind.Invalid, InvalidScriptCode, $"Characters with IDs '{string.Join(", ", failedCharacters)}' not found in role list");
 
         var script = new Script(scriptImport.Name, scriptImport.Author, scriptRoles);
         return Result.Ok(script);

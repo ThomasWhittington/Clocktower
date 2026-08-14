@@ -20,6 +20,7 @@ function Home() {
                             guilds={guilds}
                             loading={loading}
                             error={error}
+                            selectedGuildId={guildId}
                             onGuildClick={(guild) => setGuildId(guild.id)}
                         />
                         {guildId &&

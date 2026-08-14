@@ -8,6 +8,7 @@ public partial record Role(string Name, string Description, RoleType Type, Editi
     public int OtherNight { get; init; } = 0;
     public string OtherNightReminder { get; init; } = "";
     public bool Setup { get; init; } = false;
+    public string SetupDescription { get; init; } = "";
     public IReadOnlyList<string> Reminders { get; init; } = [];
     public IReadOnlyList<string> RemindersGlobal { get; init; } = [];
 }

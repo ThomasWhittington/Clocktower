@@ -68,7 +68,7 @@ public static class Endpoints
             endpoints.MapPublicGroup()
                 .MapEndpointsFromNamespace("Clocktower.Server.Discord.GameAction.Endpoints");
         }
-        
+
         private void MapDiscordAuthEndpoints()
         {
             var endpoints = app.MapGroup("/discord/auth")
@@ -86,7 +86,7 @@ public static class Endpoints
             endpoints.MapPublicGroup()
                 .MapEndpointsFromNamespace("Clocktower.Server.Discord.Town.Endpoints");
         }
-        
+
         private void MapTimerEndpoints()
         {
             var endpoints = app.MapGroup("/timer")

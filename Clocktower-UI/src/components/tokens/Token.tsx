@@ -1,5 +1,4 @@
-﻿import aliveTokenBase from '#/tokenParts/base/aliveToken.png';
-import {
+﻿import {
     LeftLeaf,
     OrangeLeaf,
     RightLeaf,
@@ -21,6 +20,7 @@ interface TokenProps {
 
 
 export const Token = memo(({role, size = 40, isDead, onClick, customName, className}: TokenProps) => {
+    const aliveTokenBase = `${import.meta.env.BASE_URL}tokenParts/base/aliveToken.png`;
     const reminderLeaves = (role?.reminders || []).length + (role?.remindersGlobal || []).length;
 
     return (
