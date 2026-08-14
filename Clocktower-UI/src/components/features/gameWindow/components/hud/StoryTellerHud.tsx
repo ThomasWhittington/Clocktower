@@ -27,6 +27,7 @@ interface StoryTellerHudProps {
     onRolePlannerClick: () => void;
     showDraftRoles: boolean;
     onDraftToggle: () => void;
+    hasScript: boolean;
 }
 
 export const StoryTellerHud = (
@@ -38,7 +39,8 @@ export const StoryTellerHud = (
         rolePlannerIsOpen,
         onRolePlannerClick,
         showDraftRoles,
-        onDraftToggle
+        onDraftToggle,
+        hasScript
     }: StoryTellerHudProps) => {
     const setTime = useTimeOfDay();
 
@@ -51,36 +53,27 @@ export const StoryTellerHud = (
         sendToTownSquare,
         isLoading: isDiscordLoading
     } = useDiscordActions();
-    return (
-        <div className="controls-storyteller">
-            <div>
-                <IconButton
-                    icon={<AddUserIcon/>}
-                    isActive={usersIsOpen}
-                    onClick={onUsersClick}
-                    tooltip="User Manager"
-                />
-                <IconButton
-                    icon={<ScriptIcon/>}
-                    isActive={scriptIsOpen}
-                    onClick={onScriptClick}
-                    tooltip="Script Manager"
-                />
-                <IconButton
-                    icon={<BookIcon/>}
-                    isActive={rolePlannerIsOpen}
-                    onClick={onRolePlannerClick}
-                    tooltip="Role Planner"
-                />
-                <IconButton
-                    icon={<DraftIcon/>}
-                    isActive={showDraftRoles}
-                    isActiveVariant="danger"
-                    onClick={onDraftToggle}
-                    tooltip="Toggle Draft Mode"
-                />
-            </div>
 
+    const scriptControls = hasScript && (
+        <>
+            <IconButton
+                icon={<BookIcon/>}
+                isActive={rolePlannerIsOpen}
+                onClick={onRolePlannerClick}
+                tooltip="Role Planner"
+            />
+            <IconButton
+                icon={<DraftIcon/>}
+                isActive={showDraftRoles}
+                isActiveVariant="danger"
+                onClick={onDraftToggle}
+                tooltip="Toggle Draft Mode"
+            />
+        </>
+    );
+
+    const gameManagementControls = hasScript && (
+        <>
             <div>
                 <IconButton
                     icon={<TownsquareIcon/>}
@@ -121,6 +114,28 @@ export const StoryTellerHud = (
                             onClick={toggleNominations}
                 />
             </div>
+        </>
+    );
+
+    return (
+        <div className="controls-storyteller">
+            <div>
+                <IconButton
+                    icon={<AddUserIcon/>}
+                    isActive={usersIsOpen}
+                    onClick={onUsersClick}
+                    tooltip="User Manager"
+                />
+                <IconButton
+                    icon={<ScriptIcon/>}
+                    isActive={scriptIsOpen}
+                    onClick={onScriptClick}
+                    tooltip="Script Manager"
+                />
+                {scriptControls}
+            </div>
+
+            {gameManagementControls}
         </div>
     );
 }
