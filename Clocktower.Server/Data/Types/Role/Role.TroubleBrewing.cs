@@ -45,7 +45,7 @@ public partial record Role
         .OtherNight(52, "If the Ravenkeeper died tonight: The Ravenkeeper chooses a player. Show them that players Character.");
 
     public static Role Slayer => TroubleBrewingTownsfolk("Slayer", "Once per game, during the day, publicly choose a player: if they are the Demon, they die.")
-        .WithReminders("No Ability");
+        .WithReminders(NoAbilityText);
 
     public static Role Soldier => TroubleBrewingTownsfolk("Soldier", "You are safe from the Demon.");
 
@@ -54,7 +54,7 @@ public partial record Role
         .WithReminders("Died Today");
 
     public static Role Virgin => TroubleBrewingTownsfolk("Virgin", "The 1st time you are nominated, if the nominator is a Townsfolk, they are EXECUTED immediately.")
-        .WithReminders("No Ability");
+        .WithReminders(NoAbilityText);
 
     public static Role Washerwoman => TroubleBrewingTownsfolk("Washerwoman", "On your first night, you learn that 1 of 2 players is a particular Townsfolk.")
         .FirstNight(34, "Show the Washerwoman a Townsfolk character and 2 players. One of the players is the Townsfolk.")

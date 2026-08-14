@@ -4,6 +4,7 @@ namespace Clocktower.Server.Data.Types.Role;
 
 public partial record Role
 {
+    public const string NoAbilityText = "No Ability";
     private static readonly Lazy<IReadOnlyList<Role>> AllRolesLazy = new(DiscoverAllRoles);
 
     public static IReadOnlyList<Role> AllRoles => AllRolesLazy.Value;
