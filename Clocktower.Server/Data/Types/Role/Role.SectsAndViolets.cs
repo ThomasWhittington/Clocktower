@@ -46,14 +46,14 @@ public partial record Role
 
     public static Role Seamstress => SectsAndVioletsTownsfolk("Seamstress", "Once per game, at night, choose 2 players (not yourself): you learn if they are the same alignment.")
         .EachNight(43, 60, "Ask the seamstress if they would like to use their ability. If yes, they choose two players and learn if they are the same alignment.")
-        .WithReminders("No Ability");
+        .WithReminders(NoAbilityText);
 
     public static Role Philosopher => SectsAndVioletsTownsfolk("Philosopher", "Once per game, at night, choose a good character: gain that ability. If this character is in play, they become drunk.")
         .EachNight(2, 2, "Ask the Philosopher if they would like to use their ability. If yes, they pick a good character and gain that ability (they are still the philosopher). If the selected role is already in play, the existing player becomes drunk.")
         .WithReminders("Is the Philosopher", "Drunk");
 
     public static Role Artist => SectsAndVioletsTownsfolk("Artist", "Once per game, during the day, privately ask the Storyteller any yes/no question.")
-        .WithReminders("No Ability");
+        .WithReminders(NoAbilityText);
 
     public static Role Juggler => SectsAndVioletsTownsfolk("Juggler", "On your 1st day, publicly guess up to 5 players' characters. That night, you learn how many you got correct.")
         .OtherNight(61, "If today was the Juggler's first day: Give them the number of correct guesses they made.")
@@ -120,7 +120,7 @@ public partial record Role
 
     public static Role BoneCollector => SectsAndVioletsTraveller("Bone Collector", "Once per game, at night*, choose a dead player, they regain their ability until dusk.")
         .OtherNight(1, "Ask the Bone Collector if they wish to use their ability. If yes: They choose a dead player, 'Has Ability' reminder token. (They may now wake this night if their ability is in the order)")
-        .WithReminders("No Ability", "Has Ability");
+        .WithReminders(NoAbilityText, "Has Ability");
 
     public static Role Deviant => SectsAndVioletsTraveller("Deviant", "If you were funny today, you cannot die by exile.");
 }

@@ -19,7 +19,43 @@ public partial record Role
 
     #region Townsfolk
 
-    public static Role Magician => CarouselTownsfolk("Magician", "The Demon thinks you are a Minion. Minions think yuo are a Demon.");
+    public static Role CultLeader => CarouselTownsfolk("Cult Leader", "Each night, you become the alignment of an alive neighbor. If all good players choose to join your cult, your team wins.")
+        .EachNight(90, 90, "The Cult Leader becomes the alignment of one of their neighbors. Inform the Cult Leader of their alignment");
+
+    public static Role Engineer => CarouselTownsfolk("Engineer", "Once per game, at night, choose which Minions or which Demon is in play.")
+        .EachNight(25, 25, "If the Engineer wishes to use their ability, ask them to choose which Minions or which Demon is in play. Mark as No Ability. Inform the affected players of their role changes.")
+        .WithReminders(NoAbilityText);
+
+    public static Role Farmer => CarouselTownsfolk("Farmer", "When you die at night, an alive good player becomes a Farmer.")
+        .OtherNight(48, "If a Farmer died this night, another alive good player becomes a Farmer. Inform the new Farmer, not the old.");
+
+    public static Role Fisherman => CarouselTownsfolk("Fisherman", "Once per game, during the day, visit the Storyteller for some advice to help your team win.")
+        .WithReminders(NoAbilityText);
+
+    public static Role General => CarouselTownsfolk("General", "Each night, you learn which alignment  the Storyteller believes is winning: Good, Evil or neither.")
+        .EachNight(62, 65, "The General learns which alignment the Storyteller believes is winning: Good, Evil or neither.");
+
+    public static Role HighPriestess => CarouselTownsfolk("High Priestess", "Each night, learn which player the Storyteller believes you should talk to most.")
+        .EachNight(63, 60, "The High Priestess learns which player the Storyteller believes they should talk to most.");
+
+    public static Role Huntsman => CarouselTownsfolk("Huntsman", "Once per game, at night, choose a living player: the Damsel, if chosen, becomes a not-in-play Townsfolk.")
+        .EachNight(66, 55, "If the Huntsman still has their ability, ask if they wish to use it. If they pick the Damsel, the Damsel becomes a not-in-play Townsfolk. Mark the Huntsman as No Ability.")
+        .WithReminders(NoAbilityText)
+        .AffectsSetup("+ the Damsel");
+
+    public static Role King => CarouselTownsfolk("King", "Each night, if the dead equal or outnumber the living, you learn 1 alive character. The Demon knows you are the King.")
+        .FirstNight(64, "Wake the Demon and show them the King player. Then, if the dead equal or outnumber the living, wake the King and show them 1 alive character.")
+        .OtherNight(67, "If the dead equal or outnumber the living, wake the King and show them 1 alive character.");
+
+    public static Role Knight => CarouselTownsfolk("Knight", "You start knowing 2 players that are not the Demon.")
+        .FirstNight(58, "Show the Knight 2 players that are not the Demon.")
+        .WithReminders("Know");
+
+    public static Role Lycanthrope => CarouselTownsfolk("Lycanthrope", "Each night*, choose an alive player. If good, they die & the Demon doesn't kill tonight. One good player registers as evil.")
+        .OtherNight(30, "The Lycanthrope chooses an alive player. If that player is good, they die and the Demon does not kill tonight.")
+        .WithReminders("Dead", "Registers Evil");
+
+    public static Role Magician => CarouselTownsfolk("Magician", "The Demon thinks you are a Minion. Minions think you are a Demon.");
     public static Role Shugenja => CarouselTownsfolk("Shugenja", "You start knowing if your closest evil player is clockwise or anti-clockwise. If equidistant, this info is arbitrary.");
 
     public static Role Princess => CarouselTownsfolk("Princess", "On your 1st day, if you nominated & executed a player, the Demon doesn't kill tonight.")
@@ -27,7 +63,7 @@ public partial record Role
 
     public static Role Preacher => CarouselTownsfolk("Preacher", "Each night, choose a player: a Minion, if chosen, learns this. All chosen Minions have no ability.")
         .EachNight(70, 13, "Ask the Preacher to choose a player. If that player is a Minion, wake them and tell them they have been Preached and mark them as No Ability")
-        .WithReminders("No Ability");
+        .WithReminders(NoAbilityText);
 
     public static Role PoppyGrower => CarouselTownsfolk("Poppy Grower", "Minions & Demons do not know each other. If you die, they learn who each other are that night.")
         .EachNight(2, 30, "If the Poppy Grower has died, wake the Evil team and inform them of who their teammates are.")
@@ -35,7 +71,7 @@ public partial record Role
 
     public static Role Nightwatchman => CarouselTownsfolk("Nightwatchman", "Once per game, at night, choose a player: they learn you are the Nightwatchman.")
         .EachNight(45, 58, "If the Nightwatchman still has their ability, ask if they wish to use it. If they pick a player, tell that player who the Nightwatchman is. Mark as No Ability")
-        .WithReminders("No Ability");
+        .WithReminders(NoAbilityText);
 
     public static Role Noble => CarouselTownsfolk("Noble", "You start knowing 3 players, 1 and only 1 of which is evil.")
         .FirstNight(48, "Show the Noble 3 players, 1 and only 1 of which is evil.")
@@ -122,7 +158,7 @@ public partial record Role
     public static Role Mezepheles => CarouselMinion("Mezepheles", "You start knowing a secret word / phrase. The 1st good player to say this word becomes evil that night.")
         .FirstNight(19, "Pick a secret word / phrase and tell the Mezepheles what it is.")
         .OtherNight(12, "If a good player said the secret word / phrase today: Wake that player. Tell them they are now evil. (Optionally, wake the Mezepheles to tell them who turned evil)")
-        .WithReminders("Turns Evil", "No Ability");
+        .WithReminders("Turns Evil", NoAbilityText);
 
     public static Role OrganGrinder => CarouselMinion("Organ Grinder", "All players keep their eyes closed when voting and the vote tally is secret. Each night, choose if you are drunk until dusk.")
         .EachNight(24, 10, "Ask the Organ Grinder if they wish to be Drunk or Sober the following day.")

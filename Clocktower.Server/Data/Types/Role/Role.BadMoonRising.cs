@@ -49,11 +49,11 @@ public partial record Role
     public static Role Courtier => BadMoonRisingTownsfolk("Courtier", "Once per game, at night, choose a character: they are drunk for 3 nights & 3 days.")
         .FirstNight(19, "Ask if they would like to use their ability. If yes, they select a character: If that character is in play, that player is drunk.")
         .OtherNight(8, "Reduce the remaining number of days the marked player is drunk. If the Courtier has not yet used their ability: Ask if they would like to use their ability. If yes, they select a character: If that character is in play, that player is drunk.")
-        .WithReminders("Drunk 3", "Drunk 2", "Drunk 1", "No Ability");
+        .WithReminders("Drunk 3", "Drunk 2", "Drunk 1", NoAbilityText);
 
     public static Role Professor => BadMoonRisingTownsfolk("Professor", "Once per game, at night*, choose a dead player: if they are a Townsfolk, they are resurrected.")
         .OtherNight(43, "If the Professor has not yet used their ability: Ask if they would like to use their ability. If yes, they select a dead player: If that player is a townsfolk, that player is resurrected.")
-        .WithReminders("Alive", "No Ability");
+        .WithReminders("Alive", NoAbilityText);
 
     public static Role Minstrel => BadMoonRisingTownsfolk("Minstrel", "When a minion dies by execution, all other players (except Travellers) are drunk until dusk tomorrow.")
         .WithReminders("Everyone is Drunk");
@@ -64,7 +64,7 @@ public partial record Role
     public static Role Pacifist => BadMoonRisingTownsfolk("Pacifist", "Executed good players might not die.");
 
     public static Role Fool => BadMoonRisingTownsfolk("Fool", "The first time you die, you don't.")
-        .WithReminders("No Ability");
+        .WithReminders(NoAbilityText);
 
     public static Role Tinker => BadMoonRisingOutsider("Tinker", "You might die at any time.")
         .OtherNight(49, "The Tinker might die.")
@@ -95,7 +95,7 @@ public partial record Role
 
     public static Role Assassin => BadMoonRisingMinion("Assassin", "Once per game, at night*, choose a player: they die, even if for some reason they could not.")
         .OtherNight(36, "If the Assassin has not yet used their ability: The Assassin is asked if they want to use their ability, if yes, they select a player. That player dies.")
-        .WithReminders("Dead", "No Ability");
+        .WithReminders("Dead", NoAbilityText);
 
     public static Role Mastermind => BadMoonRisingMinion("Mastermind", "If the demon dies by execution (ending the game), play for 1 more day. If a player is then executed, their team loses.");
 
@@ -119,7 +119,7 @@ public partial record Role
     public static Role Matron => BadMoonRisingTraveller("Matron", "Each day, you may choose up to 3 sets of 2 players to swap seats. Players may not leave their seats to talk in private.");
 
     public static Role Judge => BadMoonRisingTraveller("Judge", "Once per game, if another player nominated, you may choose to force the current execution to pass or fail.")
-        .WithReminders("No Ability");
+        .WithReminders(NoAbilityText);
 
     public static Role Apprentice => BadMoonRisingTraveller("Apprentice", "On your 1st night, you gain a Townsfolk ability (if good), or a Minion ability (if evil).")
         .FirstNight(1, "Assign and show the Apprentice a Townsfolk or Minion role (where appropriate). From now on they wake at night if their ability would.")
