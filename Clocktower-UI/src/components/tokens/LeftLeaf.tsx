@@ -1,7 +1,7 @@
-﻿import leftLeaf from '#/tokenParts/leaves/leaf-left.png';
+﻿export const LeftLeaf = () => {
+    const leftLeaf = `${import.meta.env.BASE_URL}tokenParts/leaves/leaf-left.png`;
 
-export const LeftLeaf = () => {
     return (
         <span className="leaf" style={{backgroundImage: `url(${leftLeaf})`}}/>
-    )
+    );
 };
