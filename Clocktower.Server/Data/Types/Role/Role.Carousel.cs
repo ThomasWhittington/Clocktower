@@ -19,6 +19,46 @@ public partial record Role
 
     #region Townsfolk
 
+    public static Role Acrobat => CarouselTownsfolk("Acrobat", "Each night*, choose a player: if they are or become drunk or poisoned tonight, you die.")
+        .OtherNight(45, "The Acrobat chooses a player. If that player is or becomes drunk or poisoned tonight, the Acrobat dies.")
+        .WithReminders("Chosen", DeadText);
+
+    public static Role Alchemist => CarouselTownsfolk("Alchemist", "You have a Minion ability. When using this, the Storyteller may prompt you to choose differently.")
+        .FirstNight(31, "Show the Alchemist a Minion character token. They gain this ability.")
+        .WithGlobalReminders("Is The Alchemist");
+
+    public static Role Alsaahir => CarouselTownsfolk("Alsaahir", "Each day, if you publicly guess which players are Minion(s) and which are Demon(s), good wins.");
+
+    public static Role Amnesiac => CarouselTownsfolk("Amnesiac", "You do not know what your ability is. Each day, privately guess what it is: you learn how accurate you are.")
+        .FirstNight(75, "Decide the Amnesiac's entire ability. If the Amnesiac's ability causes them to wake tonight: Wake the Amnesiac and run their ability.")
+        .OtherNight(80, "If the Amnesiac's ability causes them to wake tonight: Wake the Amnesiac and run their ability.")
+        .WithReminders("?");
+
+    public static Role Atheist => CarouselTownsfolk("Atheist", "The Storyteller can break the game rules, and if executed, good wins, even if you are dead.")
+        .AffectsSetup("No evil characters");
+
+    public static Role Balloonist => CarouselTownsfolk("Balloonist", "Each night, you learn a player of a different character type than last night")
+        .EachNight(51, 61, "The Balloonist learns a player of a different character type than last night.")
+        .WithReminders("Know")
+        .AffectsSetup("+0 or +1 Outsider");
+
+    public static Role Banshee => CarouselTownsfolk("Banshee", "If the Demon kills you, all players learn this. From now on, you may nominate twice per day and vote twice per nomination.")
+        .OtherNight(50, "If the Banshee died tonight, announce to all players that the Banshee has died.")
+        .WithReminders("Has Ability");
+
+    public static Role BountyHunter => CarouselTownsfolk("Bounty Hunter", "You start knowing 1 evil player. If the player you know dies, you learn another evil player tonight.")
+        .FirstNight(33, "Show the Bounty Hunter 1 evil player.")
+        .OtherNight(73, "If the evil player the Bounty Hunter knew has died, wake the Bounty Hunter and show them another evil player.")
+        .WithReminders("Know")
+        .AffectsSetup("1 Townsfolk is evil");
+
+    public static Role Cannibal => CarouselTownsfolk("Cannibal", "You have the ability of the recently killed executee. If they are evil, you are poisoned until a good player dies by execution.")
+        .WithReminders("Poisoned", "Lunch");
+
+    public static Role Choirboy => CarouselTownsfolk("Choirboy", "If the Demon kills the King, you learn which player is the Demon.")
+        .OtherNight(52, "If the King was killed by the Demon tonight, wake the Choirboy and show them the Demon player.")
+        .AffectsSetup("+ the King");
+
     public static Role CultLeader => CarouselTownsfolk("Cult Leader", "Each night, you become the alignment of an alive neighbor. If all good players choose to join your cult, your team wins.")
         .EachNight(90, 90, "The Cult Leader becomes the alignment of one of their neighbors. Inform the Cult Leader of their alignment");
 
@@ -53,7 +93,7 @@ public partial record Role
 
     public static Role Lycanthrope => CarouselTownsfolk("Lycanthrope", "Each night*, choose an alive player. If good, they die & the Demon doesn't kill tonight. One good player registers as evil.")
         .OtherNight(30, "The Lycanthrope chooses an alive player. If that player is good, they die and the Demon does not kill tonight.")
-        .WithReminders("Dead", "Registers Evil");
+        .WithReminders(DeadText, "Registers Evil");
 
     public static Role Magician => CarouselTownsfolk("Magician", "The Demon thinks you are a Minion. Minions think you are a Demon.");
     public static Role Shugenja => CarouselTownsfolk("Shugenja", "You start knowing if your closest evil player is clockwise or anti-clockwise. If equidistant, this info is arbitrary.");
@@ -194,17 +234,17 @@ public partial record Role
 
     public static Role LordOfTyphon => CarouselDemon("Lord Of Typhon", "Each night*, choose a player: they die.")
         .OtherNight(24, "The Lord Of Typhon picks a player. That player dies.")
-        .WithReminders("Dead")
+        .WithReminders(DeadText)
         .AffectsSetup("Evil characters are in a line. You are in the middle. +1 Minion. -? to +? Outsiders.");
 
     public static Role Lleech => CarouselDemon("Lleech", "Each night*, choose a player: they die. You start by choosing a player: they are poisoned. You die if & only if they are dead.")
         .FirstNight(1, "The Lleech picks a player to be their host.")
         .OtherNight(24, "The Lleech picks a player. That player dies.")
-        .WithReminders("Host & Poisoned", "Dead");
+        .WithReminders("Host & Poisoned", DeadText);
 
     public static Role Ojo => CarouselDemon("Ojo", "Each night*, choose a character, they die. If they are not in play, the Storyteller chooses who dies.")
         .OtherNight(24, "The Ojo picks a character. If that character is in play, they die. If not, the Storyteller chooses who dies.")
-        .WithReminders("Dead");
+        .WithReminders(DeadText);
 
     public static Role Leviathan => CarouselDemon("Leviathan", "If more than 1 good player is executed, evil wins. All players know you are in play. After day 5, evil wins.")
         .OtherNight(100, "Increment day counter")
@@ -213,11 +253,11 @@ public partial record Role
     public static Role Yaggababble => CarouselDemon("Yaggababble", "You start knowing a secret phrase. For each timr you said it publicly today, a player might die.")
         .FirstNight(1, "Wake the Yaggababble and show them their secret phrase. Put them to sleep.")
         .OtherNight(24, "Do not wake. Choose and mark players to die based on how many times the Yaggababble said their secret phrase today.")
-        .WithReminders("Dead");
+        .WithReminders(DeadText);
 
     public static Role Legion => CarouselDemon("Legion", "Each night*, a player might die. Executions fail if only evil voted. You register as a Minion too.")
         .OtherNight(24, "The Storyteller may kill 1 player.")
-        .WithReminders("Dead", "About To Die")
+        .WithReminders(DeadText, "About To Die")
         .AffectsSetup("Most players are Legion");
 
     public static Role Riot => CarouselDemon("Riot", "On day 3, Minions become Riot & nominees die but nominate an alive player immediately. This must happen.")
@@ -227,7 +267,7 @@ public partial record Role
     public static Role Kazali => CarouselDemon("Kazali", "Each night*, choose a player: they die. You choose which players are which Minions.")
         .FirstNight(1, "Allow the Kazali to pick which players are which Minions. Inform the new Minions of the change.")
         .OtherNight(24, "The Kazali picks a player. That player dies.")
-        .WithReminders("Dead")
+        .WithReminders(DeadText)
         .AffectsSetup("-? to +? Outsiders");
 
     public static Role AlHadikhia => CarouselDemon("Al-Hadikhia", "Each night*, you may choose 3 players (all players learn who): each silently chooses to live or die, but if all live, all die.")
@@ -237,7 +277,7 @@ public partial record Role
     public static Role LilMonsta => CarouselDemon("Lil' Monsta", "Each night, Minions choose who babysits Lil' Monsta & \"is the Demon\". Each night *, a player might die.")
         .FirstNight(24, "Wake all Minions together. They select at a player to babysit Lil' Monsta.")
         .OtherNight(24, "Wake all Minions together. They select a player to babysit Lil' Monsta. A player might die.")
-        .WithReminders("Dead", "Is The Demon")
+        .WithReminders(DeadText, "Is The Demon")
         .AffectsSetup("+1 Minion, no player is \"Lil' Monsta\"");
 
     #endregion

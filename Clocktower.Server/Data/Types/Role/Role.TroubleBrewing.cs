@@ -88,7 +88,7 @@ public partial record Role
 
     public static Role Imp => TroubleBrewingDemon("Imp", "Each night*, choose a player: they die. If you kill yourself this way, a Minion becomes the Imp.")
         .OtherNight(24, "The Imp picks a player. That player dies. If the Imp chose themselves: Replace the character of 1 alive minion with the Imp token.")
-        .WithReminders("Dead");
+        .WithReminders(DeadText);
 
     public static Role Scapegoat => TroubleBrewingTraveller("Scapegoat", "If a player of your alignment is executed, you might be executed instead.");
     public static Role Gunslinger => TroubleBrewingTraveller("Gunslinger", "Each day, after the 1st vote has been tallied, you may choose a player that voted: they die.");

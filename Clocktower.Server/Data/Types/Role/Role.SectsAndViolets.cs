@@ -92,21 +92,21 @@ public partial record Role
 
     public static Role FangGu => SectsAndVioletsDemon("Fang Gu", "Each night*, choose a player, they die. The 1st outsider this kills becomes an evil Fang Gu and you die instead.")
         .OtherNight(29, "The Fang Gu chooses a player. If this player is not an outsider: they die. If this player is an outsider, the Fang Gu dies then wake them and inform them that they are now an evil Fang Gu.")
-        .WithReminders("Dead", "Once")
+        .WithReminders(DeadText, "Once")
         .AffectsSetup("+1 Outsider");
 
     public static Role Vigormortis => SectsAndVioletsDemon("Vigormortis", "Each night*, choose a player: they die. Minions you kill keep their ability and poison 1 Townsfolk neighbour.")
         .OtherNight(32, "The Vigormortis chooses a player: they die. If this player is a minion: they keep their ability and one of their Townsfolk neighbours is poisoned")
-        .WithReminders("Dead", "Has Ability", "Poisoned")
+        .WithReminders(DeadText, "Has Ability", "Poisoned")
         .AffectsSetup("-1 Outsider");
 
     public static Role NoDashii => SectsAndVioletsDemon("No Dashii", "Each night*, choose a player: they die. Your 2 Townsfolk neighbours are poisoned.")
         .OtherNight(30, "The No Dashii chooses a player: they die. Their 2 Townsfolk neighbours are poisoned.")
-        .WithReminders("Dead", "Poisoned");
+        .WithReminders(DeadText, "Poisoned");
 
     public static Role Vortox => SectsAndVioletsDemon("Vortox", "Each night*, choose a player: they die. Townsfolk abilities yield objectively false information. Each day, if no-one is executed, evil wins. (Executing dead players counts as an execution).")
         .OtherNight(31, "The Vortox chooses a player: they die.")
-        .WithReminders("Dead");
+        .WithReminders(DeadText);
 
     public static Role Barista => SectsAndVioletsTraveller("Barista", "Each night, until dusk, 1) a player becomes sober, healthy and gets true info, or 2) their ability works twice. The selected player learns which.")
         .EachNight(1, 1, "Choose a player, wake them and tell them which Barista power is affecting them. Treat them accordingly (sober/healthy/true info or activate their ability twice).")
@@ -114,7 +114,7 @@ public partial record Role
 
     public static Role Harlot => SectsAndVioletsTraveller("Harlot", "Each night*, choose a living player: if they agree, you learn their character, but you both might die.")
         .OtherNight(1, "The Harlot chooses a player. Wake the chosen player, Inform them that the Harlot selected them. Ask if they wish to share their character, If yes: wake the Harlot and show them the chosen player's character token. Then, you may decide that both players die.")
-        .WithReminders("Dead");
+        .WithReminders(DeadText);
 
     public static Role Butcher => SectsAndVioletsTraveller("Butcher", "Each day, after the first execution, you may nominate again.");
 
