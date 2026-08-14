@@ -19,13 +19,15 @@ export const TokenGroup = ({name, roles, tokenSize, onClick, currentRoleId}: Tok
                     <h3>{name}</h3>
                     <div>
                         {roles.map((role) => (
-                            <Token
-                                role={role}
-                                size={tokenSize}
-                                key={role.id}
-                                onClick={() => onClick?.(role)}
-                                className={role.id === currentRoleId ? 'current-role' : undefined}
-                            />
+                            <div key={role.id} className="token-wrapper">
+                                <Token
+                                    role={role}
+                                    size={tokenSize}
+                                    onClick={() => onClick?.(role)}
+                                    className={role.id === currentRoleId ? 'current-role' : undefined}
+                                />
+                                <span className="role-ability">{role.fullDescription}</span>
+                            </div>
                         ))}
                     </div>
                 </div>
