@@ -32,7 +32,7 @@ export class Role {
     readonly otherNight: number;
     readonly otherNightReminder: string;
     readonly setup: boolean;
-    setupDescription?: string;
+    readonly setupDescription?: string;
     readonly reminders: string[];
     readonly remindersGlobal: string[];
 

@@ -72,7 +72,7 @@ public partial record Role
     public static Role Fisherman => CarouselTownsfolk("Fisherman", "Once per game, during the day, visit the Storyteller for some advice to help your team win.")
         .WithReminders(NoAbilityText);
 
-    public static Role General => CarouselTownsfolk("General", "Each night, you learn which alignment  the Storyteller believes is winning: Good, Evil or neither.")
+    public static Role General => CarouselTownsfolk("General", "Each night, you learn which alignment the Storyteller believes is winning: Good, Evil or neither.")
         .EachNight(62, 65, "The General learns which alignment the Storyteller believes is winning: Good, Evil or neither.");
 
     public static Role HighPriestess => CarouselTownsfolk("High Priestess", "Each night, learn which player the Storyteller believes you should talk to most.")
@@ -158,14 +158,14 @@ public partial record Role
     public static Role PlagueDoctor => CarouselOutsider("Plague Doctor", "When you die, the Storyteller gains a Minion ability.")
         .WithReminders("Storyteller Ability");
 
-    public static Role Politician => CarouselOutsider("Politician", "If you were the player most responsible for you team losing, you change alignment & win, even if dead.");
+    public static Role Politician => CarouselOutsider("Politician", "If you were the player most responsible for your team losing, you change alignment & win, even if dead.");
 
     public static Role PuzzleMaster => CarouselOutsider("Puzzle Master", "1 player is drunk, even if you die. If you guess (once) who it is, learn the Demon player, but guess wrong & get false info.")
         .WithReminders("Drunk", "Guess Used");
 
     public static Role Snitch => CarouselOutsider("Snitch", "Each Minion gets 3 bluffs.");
 
-    public static Role Zealot => CarouselOutsider("Zealot", "If there are more 5 or more players alive, you must vote for every nomination.");
+    public static Role Zealot => CarouselOutsider("Zealot", "If there are 5 or more players alive, you must vote for every nomination.");
 
     #endregion
 
@@ -179,19 +179,19 @@ public partial record Role
     public static Role Boffin => CarouselMinion("Boffin", "The Demon (even if drunk or poisoned) has a not-in-play good character's ability. You both know which.")
         .FirstNight(18, "The demon gains the ability of a not-in-play good character. Show both the Demon and the Boffin which");
 
-    public static Role Psychopath => CarouselMinion("Psychopath", "Each day, before nominations, you may publicly choose a player: they die. If executed, you only die if you loose roshambo.");
+    public static Role Psychopath => CarouselMinion("Psychopath", "Each day, before nominations, you may publicly choose a player: they die. If executed, you only die if you lose roshambo.");
     public static Role Boomdandy => CarouselMinion("Boomdandy", "If you are executed, all but 3 players die. After a 10 to 1 countdown, the player with the most players pointing at them, dies.");
 
     public static Role Wraith => CarouselMinion("Wraith", "You may choose to open your eyes at night. You wake when other evil players do.")
         .EachNight(21, 20, "Wake the wraith whenever evil players wake.");
 
-    public static Role Vizier => CarouselMinion("Vizier", "All players know you are the Vizier. You cannot die during the day. If good voted, you may choose the execute immediately.")
+    public static Role Vizier => CarouselMinion("Vizier", "All players know you are the Vizier. You cannot die during the day. If good voted, you may choose to execute immediately.")
         .FirstNight(90, "Inform the whole town who the Vizier is.");
 
     public static Role Goblin => CarouselMinion("Goblin", "If you public claim to be the Goblin when nominated & are executed that day, your team wins.")
         .WithReminders("Claimed");
 
-    public static Role Wizard => CarouselMinion("Wizard", "Once per game, choose to make a wish. If granted, it might have a price & leave a clue as to it's nature.")
+    public static Role Wizard => CarouselMinion("Wizard", "Once per game, choose to make a wish. If granted, it might have a price & leave a clue as to its nature.")
         .EachNight(75, 80, "If the wizard can still make a wish, ask if they wish to do so. Accept or decline the wish.")
         .WithReminders("?");
 
@@ -250,7 +250,7 @@ public partial record Role
         .OtherNight(100, "Increment day counter")
         .WithReminders("Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Good Player Executed");
 
-    public static Role Yaggababble => CarouselDemon("Yaggababble", "You start knowing a secret phrase. For each timr you said it publicly today, a player might die.")
+    public static Role Yaggababble => CarouselDemon("Yaggababble", "You start knowing a secret phrase. For each time you said it publicly today, a player might die.")
         .FirstNight(1, "Wake the Yaggababble and show them their secret phrase. Put them to sleep.")
         .OtherNight(24, "Do not wake. Choose and mark players to die based on how many times the Yaggababble said their secret phrase today.")
         .WithReminders(DeadText);

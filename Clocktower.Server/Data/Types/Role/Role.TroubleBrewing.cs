@@ -66,7 +66,7 @@ public partial record Role
 
     public static Role Drunk => TroubleBrewingOutsider("Drunk", "You do not know you are the Drunk. You think you are a Townsfolk, but you are not.")
         .WithGlobalReminders("Is the Drunk")
-        .AffectsSetup("[Player sees a townsfolk role, not the Drunk]");
+        .AffectsSetup("Player sees a townsfolk role, not the Drunk");
 
     public static Role Recluse => TroubleBrewingOutsider("Recluse", "You might register as evil & as a Minion or Demon, even if dead.");
 
