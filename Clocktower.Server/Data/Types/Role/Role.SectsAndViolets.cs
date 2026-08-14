@@ -90,15 +90,15 @@ public partial record Role
         .FirstNight(23, "Wake the evil twin and inform them of the good twin and the good twin's role. Wake the good twin, inform them that they are the good twin and inform them who the evil twin is.")
         .WithReminders("Twin");
 
-    public static Role FangGu => SectsAndVioletsDemon("Fang Gu", "Each night*, choose a player, they die. The 1st outsider this kills becomes an evil Fang Gu and you die instead. [+1 Outsider]")
+    public static Role FangGu => SectsAndVioletsDemon("Fang Gu", "Each night*, choose a player, they die. The 1st outsider this kills becomes an evil Fang Gu and you die instead.")
         .OtherNight(29, "The Fang Gu chooses a player. If this player is not an outsider: they die. If this player is an outsider, the Fang Gu dies then wake them and inform them that they are now an evil Fang Gu.")
         .WithReminders("Dead", "Once")
-        .AffectsSetup();
+        .AffectsSetup("+1 Outsider");
 
-    public static Role Vigormortis => SectsAndVioletsDemon("Vigormortis", "Each night*, choose a player: they die. Minions you kill keep their ability and poison 1 Townsfolk neighbour. [-1 Outsider]")
+    public static Role Vigormortis => SectsAndVioletsDemon("Vigormortis", "Each night*, choose a player: they die. Minions you kill keep their ability and poison 1 Townsfolk neighbour.")
         .OtherNight(32, "The Vigormortis chooses a player: they die. If this player is a minion: they keep their ability and one of their Townsfolk neighbours is poisoned")
         .WithReminders("Dead", "Has Ability", "Poisoned")
-        .AffectsSetup();
+        .AffectsSetup("-1 Outsider");
 
     public static Role NoDashii => SectsAndVioletsDemon("No Dashii", "Each night*, choose a player: they die. Your 2 Townsfolk neighbours are poisoned.")
         .OtherNight(30, "The No Dashii chooses a player: they die. Their 2 Townsfolk neighbours are poisoned.")

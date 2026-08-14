@@ -49,10 +49,10 @@ public partial record Role
         .FirstNight(55, "Show the Steward 1 good player (not their character).")
         .WithReminders("Know");
 
-    public static Role VillageIdiot => CarouselTownsfolk("Village Idiot", "Each night, choose a player: you learn their alignment. [+0 to +2 Village Idiots. 1 of the extras is drunk].")
+    public static Role VillageIdiot => CarouselTownsfolk("Village Idiot", "Each night, choose a player: you learn their alignment.")
         .EachNight(72, 70, "For each Village Idiot, wake in turn. They pick a player and get a good or evil. The drunk one gets arbitrary info.")
         .WithReminders("Drunk")
-        .AffectsSetup();
+        .AffectsSetup("+0 to +2 Village Idiots. 1 of the extras is drunk");
 
     #endregion
 
@@ -71,9 +71,9 @@ public partial record Role
 
     public static Role Heretic => CarouselOutsider("Heretic", "Whoever wins, loses & whoever loses, wins, even if you are dead.");
 
-    public static Role Hermit => CarouselOutsider("Hermit", "You have all Outsider abilities. [-0 or -1 Outsiders]")
+    public static Role Hermit => CarouselOutsider("Hermit", "You have all Outsider abilities.")
         .WithReminders("1", "2", "3")
-        .AffectsSetup();
+        .AffectsSetup("-0 or -1 Outsiders");
 
     public static Role Ogre => CarouselOutsider("Ogre", "On your first night, choose a player (not yourself): you become their alignment (you don't know which) even if drunk or poisoned.")
         .FirstNight(29, "The Ogre chooses a player. The Ogre becomes the alignment of the selected player.")
@@ -95,10 +95,10 @@ public partial record Role
 
     #region Minions
 
-    public static Role Marionette => CarouselMinion("Marionette", "You think you are a good character, but you are not. The Demon knows who you are. [You neighbour the demon]")
+    public static Role Marionette => CarouselMinion("Marionette", "You think you are a good character, but you are not. The Demon knows who you are.")
         .WithGlobalReminders("Is The Marionette")
         .FirstNight(5, "Mark a good player neighbouring the demon with the \"Is The Marionette\" reminder. Inform the demon of the Marionette.")
-        .AffectsSetup();
+        .AffectsSetup("You neighbour the demon");
 
     public static Role Boffin => CarouselMinion("Boffin", "The Demon (even if drunk or poisoned) has a not-in-play good character's ability. You both know which.")
         .FirstNight(18, "The demon gains the ability of a not-in-play good character. Show both the Demon and the Boffin which");
@@ -137,16 +137,16 @@ public partial record Role
         .FirstNight(15, "Show the Widow the Grimoire. Ask the Widow to pick a player. That player is poisoned for the remainder of the game (does not end on Widow death).")
         .WithReminders("Poisoned", "Known");
 
-    public static Role Xaan => CarouselMinion("Xaan", "On night X, all Townsfolk are poisoned until dusk. [X Outsiders]")
+    public static Role Xaan => CarouselMinion("Xaan", "On night X, all Townsfolk are poisoned until dusk.")
         .FirstNight(14, "Show the Xaan the number X (1, 2, or 3) based on setup.")
         .WithReminders("Night 1", "Night 2", "Night 3", "X")
-        .AffectsSetup();
+        .AffectsSetup("X Outsiders");
 
-    public static Role Summoner => CarouselMinion("Summoner", "You get 3 bluffs. On the 3rd night, choose a player: they become an evil Demon of your choice. [No Demon]")
+    public static Role Summoner => CarouselMinion("Summoner", "You get 3 bluffs. On the 3rd night, choose a player: they become an evil Demon of your choice.")
         .FirstNight(80, "Show the Summoner 3 unassigned good character tokens as bluffs.")
         .OtherNight(22, "If this is Night 3: Ask the Summoner to point to a player and a Demon character on the character sheet. That player becomes that Demon and turns Evil.")
         .WithReminders("Night 1", "Night 2", "Night 3")
-        .AffectsSetup();
+        .AffectsSetup("No Demon");
 
     public static Role Harpy => CarouselMinion("Harpy", "Each night, choose 2 players: tomorrow, the 1st player is mad that the 2nd is evil, or one or both might die.")
         .EachNight(28, 16, "Ask the Harpy to select 2 players. Mark 1st 'Mad' and 2nd '2nd'. Put Harpy to sleep. Wake 1st player: show 'This Character Selected You', show Harpy token, point to 2nd player.")
@@ -156,10 +156,10 @@ public partial record Role
 
     #region Demons
 
-    public static Role LordOfTyphon => CarouselDemon("Lord Of Typhon", "Each night*, choose a player: they die. [Evil characters are in a line. You are in the middle. +1 Minion. -? to +? Outsiders.]")
+    public static Role LordOfTyphon => CarouselDemon("Lord Of Typhon", "Each night*, choose a player: they die.")
         .OtherNight(24, "The Lord Of Typhon picks a player. That player dies.")
         .WithReminders("Dead")
-        .AffectsSetup();
+        .AffectsSetup("Evil characters are in a line. You are in the middle. +1 Minion. -? to +? Outsiders.");
 
     public static Role Lleech => CarouselDemon("Lleech", "Each night*, choose a player: they die. You start by choosing a player: they are poisoned. You die if & only if they are dead.")
         .FirstNight(1, "The Lleech picks a player to be their host.")
@@ -179,30 +179,30 @@ public partial record Role
         .OtherNight(24, "Do not wake. Choose and mark players to die based on how many times the Yaggababble said their secret phrase today.")
         .WithReminders("Dead");
 
-    public static Role Legion => CarouselDemon("Legion", "Each night*, a player might die. Executions fail if only evil voted. You register as a Minion too. [Most players are Legion].")
+    public static Role Legion => CarouselDemon("Legion", "Each night*, a player might die. Executions fail if only evil voted. You register as a Minion too.")
         .OtherNight(24, "The Storyteller may kill 1 player.")
         .WithReminders("Dead", "About To Die")
-        .AffectsSetup();
+        .AffectsSetup("Most players are Legion");
 
     public static Role Riot => CarouselDemon("Riot", "On day 3, Minions become Riot & nominees die but nominate an alive player immediately. This must happen.")
         .OtherNight(100, "Increment day counter")
         .WithReminders("Day 1", "Day 2", "Day 3");
 
-    public static Role Kazali => CarouselDemon("Kazali", "Each night*, choose a player: they die. [You choose which players are which Minions. -? to +? Outsiders")
+    public static Role Kazali => CarouselDemon("Kazali", "Each night*, choose a player: they die. You choose which players are which Minions.")
         .FirstNight(1, "Allow the Kazali to pick which players are which Minions. Inform the new Minions of the change.")
         .OtherNight(24, "The Kazali picks a player. That player dies.")
         .WithReminders("Dead")
-        .AffectsSetup();
+        .AffectsSetup("-? to +? Outsiders");
 
     public static Role AlHadikhia => CarouselDemon("Al-Hadikhia", "Each night*, you may choose 3 players (all players learn who): each silently chooses to live or die, but if all live, all die.")
         .OtherNight(24, "Wake the Al-Hadikhia to choose 3 players; announce the group to be silent and name each chosen player, waking them individually to ask if they live—if all 3 choose life, all die, otherwise only those who chose death die.")
         .WithReminders("1", "2", "3");
 
-    public static Role LilMonsta => CarouselDemon("Lil' Monsta", "Each night, Minions choose who babysits Lil' Monsta & \"is the Demon\". Each night *, a player might die. [+1 Minion, no player is \"Lil' Monsta\"]")
+    public static Role LilMonsta => CarouselDemon("Lil' Monsta", "Each night, Minions choose who babysits Lil' Monsta & \"is the Demon\". Each night *, a player might die.")
         .FirstNight(24, "Wake all Minions together. They select at a player to babysit Lil' Monsta.")
         .OtherNight(24, "Wake all Minions together. They select a player to babysit Lil' Monsta. A player might die.")
         .WithReminders("Dead", "Is The Demon")
-        .AffectsSetup();
+        .AffectsSetup("+1 Minion, no player is \"Lil' Monsta\"");
 
     #endregion
 }

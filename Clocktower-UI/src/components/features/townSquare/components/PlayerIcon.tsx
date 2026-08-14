@@ -79,11 +79,11 @@ export function PlayerIcon({x, y, size, player, onNameClick, avatarOverlay, glow
             }
 
             <AnimatePresence>
-                {role?.description && showTooltip && (
+                {role?.fullDescription && showTooltip && (
                     <motion.div className={`role-description-tooltip ${isTopHalf ? 'top-half' : 'bottom-half'}`} {...animations.fade}>
                         <div className="role-description-content">
                             <strong>{role.name}</strong>
-                            <p>{role.description}</p>
+                            <p>{role.fullDescription}</p>
                         </div>
                     </motion.div>
                 )}

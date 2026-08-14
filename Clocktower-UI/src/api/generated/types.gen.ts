@@ -136,7 +136,7 @@ export type ClocktowerServerDataTypesEnumGameTime = 'Unknown' | 'Day' | 'Evening
 
 export type ClocktowerServerDataTypesEnumRoleType = 'Unknown' | 'Townsfolk' | 'Outsider' | 'Minion' | 'Demon' | 'Traveller';
 
-export type ClocktowerServerDataTypesEnumScriptSelect = 'Unknown' | 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'Custom' | 'AllCarousel';
+export type ClocktowerServerDataTypesEnumScriptSelect = 'Unknown' | 'TroubleBrewing' | 'SectsAndViolets' | 'BadMoonRising' | 'AllCarousel' | 'Custom';
 
 export type ClocktowerServerDataTypesEnumUserType = 'Unknown' | 'Player' | 'StoryTeller' | 'Spectator';
 
@@ -164,6 +164,7 @@ export type ClocktowerServerDataTypesRoleRole = {
     otherNight?: number;
     otherNightReminder?: string | null;
     setup?: boolean;
+    setupDescription?: string | null;
     reminders?: Array<string> | null;
     remindersGlobal?: Array<string> | null;
 };
@@ -326,6 +327,7 @@ export type ClocktowerServerDataTypesRoleRoleWritable = {
     otherNight?: number;
     otherNightReminder?: string | null;
     setup?: boolean;
+    setupDescription?: string | null;
     reminders?: Array<string> | null;
     remindersGlobal?: Array<string> | null;
 };

@@ -49,11 +49,12 @@ public static class RoleExtensions
             };
         }
 
-        public Role AffectsSetup()
+        public Role AffectsSetup(string setupDescription)
         {
             return role with
             {
-                Setup = true
+                Setup = true,
+                SetupDescription = $"[{setupDescription}]"
             };
         }
     }

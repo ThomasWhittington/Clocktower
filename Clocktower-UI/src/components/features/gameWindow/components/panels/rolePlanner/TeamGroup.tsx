@@ -27,7 +27,7 @@ export const TeamGroup = ({name, roles, tokenSize, onClick, selectedRoleIds}: To
                                 onClick={() => onClick?.(role)}
                                 className={isSelected ? 'selected-role' : 'unselected-role'}
                             />
-                            <span className="role-ability">{role.description}</span>
+                            <span className="role-ability">{role.fullDescription}</span>
                         </div>
                     );
                 })}

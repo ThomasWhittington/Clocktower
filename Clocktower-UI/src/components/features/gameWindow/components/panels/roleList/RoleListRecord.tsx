@@ -25,7 +25,7 @@ export const RoleListRecord = ({role, players}: RoleListRecordProps) => {
                         )}
                     </span>
                     <span className="role-name">{role?.name}</span>
-                    <span className="role-ability">{role?.description}</span>
+                    <span className="role-ability">{role?.fullDescription}</span>
                 </div>
             </li>
         )

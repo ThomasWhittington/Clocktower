@@ -82,11 +82,11 @@ public partial record Role
         .OtherNight(20, "Allow the Lunatic to do the actions of the Demon. Place their 'attack' markers. If the Lunatic selected players: Wake the Demon. Show them who the lunatic selected. Remove any Lunatic 'chosen' markers.")
         .WithReminders("Chosen");
 
-    public static Role Godfather => BadMoonRisingMinion("Godfather", "You start knowing which Outsiders are in play. If 1 died today, choose a player tonight: they die. [-1 or +1 Outsider]")
+    public static Role Godfather => BadMoonRisingMinion("Godfather", "You start knowing which Outsiders are in play. If 1 died today, choose a player tonight: they die.")
         .FirstNight(21, "Show the Godfather the tokens of all Outsiders in play.")
         .OtherNight(37, "If an Outsider died today: The Godfather selects a player. That player dies.")
         .WithReminders("Died Today", "Dead")
-        .AffectsSetup();
+        .AffectsSetup("-1 or +1 Outsider");
 
     public static Role DevilsAdvocate => BadMoonRisingMinion("Devil's Advocate", "Each night, choose a living player (different to last night): if executed tomorrow, they don't die.")
         .FirstNight(22, "The Devil's Advocate selects a living player. That player survives execution tomorrow.")

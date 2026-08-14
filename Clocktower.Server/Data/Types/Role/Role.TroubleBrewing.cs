@@ -66,14 +66,14 @@ public partial record Role
 
     public static Role Drunk => TroubleBrewingOutsider("Drunk", "You do not know you are the Drunk. You think you are a Townsfolk, but you are not.")
         .WithGlobalReminders("Is the Drunk")
-        .AffectsSetup();
+        .AffectsSetup("[Player sees a townsfolk role, not the Drunk]");
 
     public static Role Recluse => TroubleBrewingOutsider("Recluse", "You might register as evil & as a Minion or Demon, even if dead.");
 
     public static Role Saint => TroubleBrewingOutsider("Saint", "If you die by execution, your team loses.");
 
-    public static Role Baron => TroubleBrewingMinion("Baron", "There are extra Outsiders in play. [+2 Outsiders]")
-        .AffectsSetup();
+    public static Role Baron => TroubleBrewingMinion("Baron", "There are extra Outsiders in play.")
+        .AffectsSetup("+2 Outsiders");
 
     public static Role Poisoner => TroubleBrewingMinion("Poisoner", "Each night, choose a player: they are poisoned tonight and tomorrow day.")
         .EachNight(17, 7, "The previously poisoned player is no longer poisoned. The Poisoner selects a player. Mark that player as 'Poisoned'.")
