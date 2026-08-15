@@ -306,6 +306,28 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         return Result.Ok($"{targetUser.DisplayName} {updateOccurredString} has the role: {roleString}");
     }
 
+    public async Task<Result<string>> UpdateDraftBluff(string gameId, string targetUserId, int slot, string? roleId)
+    {
+        if (slot is < 1 or > 3)
+            return Result.Fail<string>(ErrorKind.Invalid, "slot.out_of_range", "Slot must be between 1 and 3 inclusive");
+        var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
+        if (gamePerspective is null) return Result.Fail<string>(Errors.GameNotFound(gameId));
+        var guild = bot.GetGuild(gamePerspective.GuildId);
+        if (guild is null) return Result.Fail<string>(Errors.InvalidGuildId());
+        var targetUser = guild.GetUser(targetUserId);
+        if (targetUser is null) return Result.Fail<string>(Errors.UserNotFound(targetUserId));
+        var role = Role.AllRoles.FirstOrDefault(o => o.Id == roleId);
+        if (roleId is not null && role is null) return Result.Fail<string>(ErrorKind.NotFound, "role.not_found", $"Role '{roleId}' was not found");
+
+        var updateOccurred = gamePerspectiveService.UpdateDraftBluff(gameId, targetUserId, slot, role);
+
+        if (updateOccurred) await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
+
+        string updateOccurredString = updateOccurred ? Now : Already;
+        string roleString = role == null ? "NONE" : role.Name;
+        return Result.Ok($"{targetUser.DisplayName} {updateOccurredString} has the draft bluff: {roleString} in slot: {slot}");
+    }
+
     public async Task<Result<string>> SetDraftRole(string gameId, string targetUserId, string? roleId)
     {
         var gamePerspective = gamePerspectiveService.GetFirstPerspective(gameId);
@@ -326,6 +348,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         return Result.Ok($"{targetUser.DisplayName} {updateOccurredString} has the draft role: {roleString}");
     }
 
+
     public async Task<Result<string>> SetDraftRoles(string gameId, Dictionary<string, string> playerRoles)
     {
         var validationResult = ValidateAndBuildDraftRoleUpdates(gameId, playerRoles);
@@ -338,6 +361,7 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
 
         return Result.Ok($"{updateCount}/{updateQueue.Count} draft roles set for players");
     }
+
 
     public async Task<Result<string>> SetReminder(string gameId, string userId, string targetUserId, string reminderId)
     {
@@ -395,12 +419,12 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         return Result.Ok($"{targetUser.DisplayName} {updateOccurredString}");
     }
 
-    public async Task<Result<string>> CommitDraftRoles(string gameId)
+    public async Task<Result<string>> CommitDraft(string gameId)
     {
         var gameExists = gamePerspectiveService.GameExists(gameId);
         if (!gameExists) return Result.Fail<string>(Errors.GameNotFound(gameId));
 
-        gamePerspectiveService.CommitDraftRoles(gameId);
+        gamePerspectiveService.CommitDrafts(gameId);
 
         await gameBroadcastService.BroadcastDiscordTownUpdate(gameId);
         await TryBroadcastPlayAudio(gameId, AudioEvent.RoleAssigned);

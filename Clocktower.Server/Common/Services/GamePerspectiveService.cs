@@ -94,10 +94,11 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
 
             var updatedUser = user with
             {
-                Role = update.RemoveRole ? null : update.Role ?? user.Role
+                Role = update.RemoveRole ? null : update.Role ?? user.Role,
+                Bluffs = update.Bluffs
             };
 
-            return state with { Users = state.Users.Select(u => u.Id == userId ? updatedUser : u).ToList() };
+            return state with { Users = [.. state.Users.Select(u => u.Id == userId ? updatedUser : u)] };
         });
 
         return updated;
@@ -249,12 +250,39 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         return updated;
     }
 
-    public void CommitDraftRoles(string gameId)
+    public bool UpdateDraftBluff(string gameId, string userId, int slot, Role? bluffRole)
+    {
+        if (slot is < 1 or > 3) return false;
+        bool updated = false;
+
+        store.TryUpdate(gameId, IGamePerspectiveStore.OmniscientKey, state =>
+        {
+            var user = state.Users.FirstOrDefault(u => u.Id == userId);
+            if (user is null) return state;
+
+            var draftBluffs = (user.DraftBluffs ?? []).Take(3).ToList();
+            while (draftBluffs.Count < 3) draftBluffs.Add(null);
+
+            var index = slot - 1;
+            if (draftBluffs[index]?.Id == bluffRole?.Id) return state;
+
+            draftBluffs[index] = bluffRole;
+            updated = true;
+
+            var updatedUser = user with { DraftBluffs = draftBluffs };
+
+            return state with { Users = [.. state.Users.Select(u => u.Id == userId ? updatedUser : u)] };
+        });
+
+        return updated;
+    }
+
+    public void CommitDrafts(string gameId)
     {
         var omniscient = store.Get(gameId, IGamePerspectiveStore.OmniscientKey);
         if (omniscient is null) return;
 
-        var usersWithDrafts = omniscient.Users.Where(u => u.DraftRole != null).ToList();
+        var usersWithDrafts = omniscient.Users.Where(u => u.DraftRole != null || (u.DraftBluffs ?? []).Any()).ToList();
 
         foreach (var user in usersWithDrafts)
         {
@@ -267,13 +295,13 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
             var userIsCurrentlyTraveller = omniscient.Users.FirstOrDefault(o => o.Id == user.Id)?.Role?.Type == RoleType.Traveller;
             if (userIsCurrentlyTraveller) SetRoleOnAllPerspectives(gameId, user.Id, null);
 
-            UpdatePrivateUser(gameId, user.Id, new PrivateGameUserUpdate { Role = user.DraftRole });
+            UpdatePrivateUser(gameId, user.Id, new PrivateGameUserUpdate { Role = user.DraftRole, Bluffs = user.DraftBluffs });
         }
 
         store.TryUpdate(gameId, IGamePerspectiveStore.OmniscientKey, state =>
             state with
             {
-                Users = state.Users.Select(u => u with { DraftRole = null }).ToList()
+                Users = [.. state.Users.Select(u => u with { DraftRole = null, DraftBluffs = null })]
             }
         );
     }
@@ -349,7 +377,26 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         (update.VoteLocked != null && user.VoteLocked != update.VoteLocked);
 
     private static bool UserHasPrivateChanges(GameUser user, PrivateGameUserUpdate update) =>
-        (update.RemoveRole && user.Role != null) || (update.Role != null && user.Role != update.Role);
+        (update.RemoveRole && user.Role != null) ||
+        (update.Role != null && user.Role?.Id != update.Role.Id) ||
+        (update.Bluffs != null && !SameRoleSlots(user.Bluffs, update.Bluffs));
+
+    private static bool SameRoleSlots(IReadOnlyList<Role?>? current, IReadOnlyList<Role?>? next)
+    {
+        var currentSlots = NormalizeRoleSlots(current);
+        var nextSlots = NormalizeRoleSlots(next);
+
+        return currentSlots
+            .Zip(nextSlots)
+            .All(pair => pair.First?.Id == pair.Second?.Id);
+    }
+
+    private static List<Role?> NormalizeRoleSlots(IReadOnlyList<Role?>? roles)
+    {
+        var slots = roles?.Take(3).ToList() ?? [];
+        while (slots.Count < 3) slots.Add(null);
+        return slots;
+    }
 
     private void HandleUserTypeTransition(string gameId, string userId, UserType newUserType)
     {
@@ -406,7 +453,7 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
         return template with
         {
             UserId = IGamePerspectiveStore.OmniscientKey,
-            Users = template.Users.ToList()
+            Users = [.. template.Users]
         };
     }
 
@@ -449,5 +496,5 @@ public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspect
             VoteLocked = user.VoteLocked
         };
 
-    private static GameUser ToPersonalUser(GameUser user) => user with { DraftRole = null };
+    private static GameUser ToPersonalUser(GameUser user) => user with { DraftRole = null, DraftBluffs = null };
 }

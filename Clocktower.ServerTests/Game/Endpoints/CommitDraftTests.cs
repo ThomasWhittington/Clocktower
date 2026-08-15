@@ -5,7 +5,7 @@ using Clocktower.Server.Game.Services;
 namespace Clocktower.ServerTests.Game.Endpoints;
 
 [TestClass]
-public class CommitDraftRolesTests
+public class CommitDraftTests
 {
     private Mock<IGameService> _mockGameService = null!;
 
@@ -20,14 +20,14 @@ public class CommitDraftRolesTests
     {
         var builder = EndpointFactory.CreateBuilder();
 
-        CommitDraftRoles.Map(builder);
+        CommitDraft.Map(builder);
 
-        builder.GetEndpoint("/{gameId}/commit-draft-roles")
+        builder.GetEndpoint("/{gameId}/commit-draft")
             .ShouldHaveMethod(HttpMethod.Post)
             .ShouldHaveStorytellerAuthorization()
-            .ShouldHaveOperationId("commitDraftRolesApi")
-            .ShouldHaveSummary("Commits draft roles")
-            .ShouldHaveDescription("Commits the draft roles for all users in a game, moving them to the role fields.")
+            .ShouldHaveOperationId("commitDraftApi")
+            .ShouldHaveSummary("Commit draft")
+            .ShouldHaveDescription("Commits the draft for all users in a game, moving them to the live fields.")
             .ShouldHaveValidation();
     }
 
@@ -37,11 +37,11 @@ public class CommitDraftRolesTests
         var request = new GameIdRequest(CommonMethods.GetRandomString());
         var error = Result.Fail<string>(ErrorKind.Invalid, "error code", "error message");
 
-        _mockGameService.Setup(o => o.CommitDraftRoles(request.GameId)).ReturnsAsync(error);
+        _mockGameService.Setup(o => o.CommitDraft(request.GameId)).ReturnsAsync(error);
 
-        var result = await CommitDraftRoles.Handle(request, _mockGameService.Object);
+        var result = await CommitDraft.Handle(request, _mockGameService.Object);
 
-        _mockGameService.Verify(o => o.CommitDraftRoles(request.GameId), Times.Once);
+        _mockGameService.Verify(o => o.CommitDraft(request.GameId), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
@@ -53,11 +53,11 @@ public class CommitDraftRolesTests
         var request = new GameIdRequest(CommonMethods.GetRandomString());
         var error = Result.Fail<string>(ErrorKind.NotFound, "error code", "error message");
 
-        _mockGameService.Setup(o => o.CommitDraftRoles(request.GameId)).ReturnsAsync(error);
+        _mockGameService.Setup(o => o.CommitDraft(request.GameId)).ReturnsAsync(error);
 
-        var result = await CommitDraftRoles.Handle(request, _mockGameService.Object);
+        var result = await CommitDraft.Handle(request, _mockGameService.Object);
 
-        _mockGameService.Verify(o => o.CommitDraftRoles(request.GameId), Times.Once);
+        _mockGameService.Verify(o => o.CommitDraft(request.GameId), Times.Once);
 
         var response = result.Result.Should().BeOfType<NotFound<ErrorResponse>>().Subject;
         response.Value.ShouldBeError(error);
@@ -69,11 +69,11 @@ public class CommitDraftRolesTests
         var request = new GameIdRequest(CommonMethods.GetRandomString());
         var success = Result.Ok("success");
 
-        _mockGameService.Setup(o => o.CommitDraftRoles(request.GameId)).ReturnsAsync(success);
+        _mockGameService.Setup(o => o.CommitDraft(request.GameId)).ReturnsAsync(success);
 
-        var result = await CommitDraftRoles.Handle(request, _mockGameService.Object);
+        var result = await CommitDraft.Handle(request, _mockGameService.Object);
 
-        _mockGameService.Verify(o => o.CommitDraftRoles(request.GameId), Times.Once);
+        _mockGameService.Verify(o => o.CommitDraft(request.GameId), Times.Once);
 
         var response = result.Result.Should().BeOfType<Ok<string>>().Subject;
         response.Value.Should().BeEquivalentTo(success.Value);

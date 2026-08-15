@@ -19,7 +19,8 @@ public interface IGameService
     Task<Result<string>> SetPerspectiveRole(string gameId, string userId, string targetUserId, string? roleId);
     Task<Result<string>> SetRole(string gameId, string targetUserId, string? roleId);
     Task<Result<string>> SetDraftRole(string gameId, string targetUserId, string? roleId);
-    Task<Result<string>> CommitDraftRoles(string gameId);
+    Task<Result<string>> CommitDraft(string gameId);
+    Task<Result<string>> UpdateDraftBluff(string gameId, string targetUserId, int slot, string? roleId);
     Task<Result<string>> SetDraftRoles(string gameId, Dictionary<string, string> playerRoles);
     Task<Result<string>> SetReminder(string gameId, string userId, string targetUserId, string reminderId);
     Task<Result<string>> RemoveReminder(string gameId, string userId, string targetUserId, string reminderId);

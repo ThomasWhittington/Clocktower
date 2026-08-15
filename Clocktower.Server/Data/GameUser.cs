@@ -12,6 +12,8 @@ public record GameUser(string Id) : IGameUser
     [UsedImplicitly] public bool VoteLocked { get; set; }
     [UsedImplicitly] public Role? Role { get; set; }
     [UsedImplicitly] public Role? DraftRole { get; set; }
+    public IReadOnlyList<Role?>? Bluffs { get; init; }
+    public IReadOnlyList<Role?>? DraftBluffs { get; init; }
     [UsedImplicitly] public IEnumerable<ReminderToken> ReminderTokens { get; set; } = [];
 }
 
@@ -27,5 +29,7 @@ public interface IGameUser : IIdentifiable
     [UsedImplicitly] bool VoteLocked { get; set; }
     [UsedImplicitly] Role? Role { get; set; }
     [UsedImplicitly] Role? DraftRole { get; set; }
+    [UsedImplicitly] IReadOnlyList<Role?>? Bluffs { get; init; }
+    [UsedImplicitly] IReadOnlyList<Role?>? DraftBluffs { get; init; }
     [UsedImplicitly] IEnumerable<ReminderToken> ReminderTokens { get; set; }
 }

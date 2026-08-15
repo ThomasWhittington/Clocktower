@@ -873,36 +873,36 @@ public class GameServiceTests
 
     #endregion
 
-    #region CommitDraftRoles
+    #region CommitDrafts
 
-    private void Setup_CommitDraftRoles(bool gameExists = true)
+    private void Setup_CommitDrafts(bool gameExists = true)
     {
         _mockGamePerspectiveService.Setup(o => o.GameExists(GameId)).Returns(gameExists);
-        _mockGamePerspectiveService.Setup(o => o.CommitDraftRoles(GameId));
+        _mockGamePerspectiveService.Setup(o => o.CommitDrafts(GameId));
         _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
         _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio(GameId, AudioEvent.RoleAssigned)).Returns(Task.CompletedTask);
     }
 
     [TestMethod]
-    public async Task CommitDraftRoles_ReturnsError_WhenGameNotFound()
+    public async Task CommitDrafts_ReturnsError_WhenGameNotFound()
     {
-        Setup_CommitDraftRoles(gameExists: false);
+        Setup_CommitDrafts(gameExists: false);
 
-        var result = await _sut.CommitDraftRoles(GameId);
+        var result = await _sut.CommitDraft(GameId);
 
         result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
     }
 
     [TestMethod]
-    public async Task CommitDraftRoles_ReturnsOk()
+    public async Task CommitDrafts_ReturnsOk()
     {
-        Setup_CommitDraftRoles();
+        Setup_CommitDrafts();
 
-        var result = await _sut.CommitDraftRoles(GameId);
+        var result = await _sut.CommitDraft(GameId);
 
         result.ShouldSucceedWith<string>($"Draft roles committed for game {GameId}");
 
-        _mockGamePerspectiveService.Verify(o => o.CommitDraftRoles(GameId), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.CommitDrafts(GameId), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastPlayAudio(GameId, AudioEvent.RoleAssigned), Times.Once);
     }

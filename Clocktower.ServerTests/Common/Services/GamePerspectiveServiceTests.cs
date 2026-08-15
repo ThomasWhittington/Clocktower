@@ -1179,10 +1179,10 @@ public class GamePerspectiveServiceTests
 
     #endregion
 
-    #region CommitDraftRoles
+    #region CommitDrafts
 
     [TestMethod]
-    public void CommitDraftRoles_UpdatesRoles()
+    public void CommitDrafts_UpdatesRoles()
     {
         var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
         var spectator = new GameUser("spectator") { UserType = UserType.Spectator };
@@ -1198,7 +1198,7 @@ public class GamePerspectiveServiceTests
         _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp);
         _sut.UpdateDraftRole(GameId1, UserId3, Role.FortuneTeller);
 
-        _sut.CommitDraftRoles(GameId1);
+        _sut.CommitDrafts(GameId1);
 
         foreach (var userId in new[] { "storyteller", "spectator", UserId1, UserId2, UserId3 })
         {
@@ -1241,7 +1241,7 @@ public class GamePerspectiveServiceTests
     }
 
     [TestMethod]
-    public void CommitDraftRoles_ChangesNothing_WhenNoOmniscient()
+    public void CommitDrafts_ChangesNothing_WhenNoOmniscient()
     {
         var player1 = new GameUser(UserId1) { UserType = UserType.Player };
         var player2 = new GameUser(UserId2) { UserType = UserType.Player };
@@ -1254,7 +1254,7 @@ public class GamePerspectiveServiceTests
         _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp);
         _sut.UpdateDraftRole(GameId1, UserId3, Role.FortuneTeller);
 
-        _sut.CommitDraftRoles(GameId1);
+        _sut.CommitDrafts(GameId1);
 
         foreach (var userId in new[] { UserId1, UserId2, UserId3 })
         {
@@ -1276,7 +1276,7 @@ public class GamePerspectiveServiceTests
     }
 
     [TestMethod]
-    public void CommitDraftRoles_UpdatesCorrect_WithTravellersBeingSet()
+    public void CommitDrafts_UpdatesCorrect_WithTravellersBeingSet()
     {
         var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
         var player1 = new GameUser(UserId1) { UserType = UserType.Player };
@@ -1290,7 +1290,7 @@ public class GamePerspectiveServiceTests
         _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp);
         _sut.UpdateDraftRole(GameId1, UserId3, Role.Gunslinger);
 
-        _sut.CommitDraftRoles(GameId1);
+        _sut.CommitDrafts(GameId1);
 
         foreach (var userId in new[] { "storyteller", UserId1, UserId2, UserId3 })
         {
@@ -1326,7 +1326,7 @@ public class GamePerspectiveServiceTests
     }
 
     [TestMethod]
-    public void CommitDraftRoles_UpdatesCorrect_WithExistingTravellers()
+    public void CommitDrafts_UpdatesCorrect_WithExistingTravellers()
     {
         var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
         var player1 = new GameUser(UserId1) { UserType = UserType.Player };
@@ -1341,7 +1341,7 @@ public class GamePerspectiveServiceTests
         _sut.UpdateDraftRole(GameId1, UserId2, Role.Imp);
         _sut.UpdateDraftRole(GameId1, UserId3, Role.FortuneTeller);
 
-        _sut.CommitDraftRoles(GameId1);
+        _sut.CommitDrafts(GameId1);
 
         foreach (var userId in new[] { "storyteller", UserId1, UserId2, UserId3 })
         {
