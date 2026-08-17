@@ -26,9 +26,8 @@ export class User {
     readonly voteLocked: boolean;
     readonly role: Role | undefined;
     readonly draftRole: Role | undefined;
-    readonly bluffs: [Role | undefined, Role | undefined, Role | undefined];
-    readonly draftBluffs: [Role | undefined, Role | undefined, Role | undefined];
-
+    readonly bluffs: (Role | undefined)[] | undefined;
+    readonly draftBluffs: (Role | undefined)[] | undefined;
     readonly reminderTokens: Reminder[];
 
     constructor(data: Partial<User>) {
@@ -46,8 +45,8 @@ export class User {
         this.voteLocked = data.voteLocked ?? false;
         this.role = data.role instanceof Role ? data.role : (data.role ? mapToRole(data.role as any) : undefined);
         this.draftRole = data.draftRole instanceof Role ? data.draftRole : (data.draftRole ? mapToRole(data.draftRole as any) : undefined);
-        this.bluffs = data.bluffs ?? [undefined, undefined, undefined];
-        this.draftBluffs = data.draftBluffs ?? [undefined, undefined, undefined];
+        this.bluffs = data.bluffs;
+        this.draftBluffs = data.draftBluffs;
         this.reminderTokens = data.reminderTokens ?? [];
     }
 }
@@ -72,12 +71,12 @@ export function mapToUser(userDto: ClocktowerServerDataDtoUserDto): User {
             userDto.bluffs[0] ? mapToRole(userDto.bluffs[0]) : undefined,
             userDto.bluffs[1] ? mapToRole(userDto.bluffs[1]) : undefined,
             userDto.bluffs[2] ? mapToRole(userDto.bluffs[2]) : undefined
-        ] : [undefined, undefined, undefined],
+        ] : undefined,
         draftBluffs: userDto.draftBluffs ? [
             userDto.draftBluffs[0] ? mapToRole(userDto.draftBluffs[0]) : undefined,
             userDto.draftBluffs[1] ? mapToRole(userDto.draftBluffs[1]) : undefined,
             userDto.draftBluffs[2] ? mapToRole(userDto.draftBluffs[2]) : undefined
-        ] : [undefined, undefined, undefined],
+        ] : undefined,
         reminderTokens: userDto.reminderTokens ? userDto.reminderTokens.map(token => mapToReminderToken(token)) : [],
     });
 }

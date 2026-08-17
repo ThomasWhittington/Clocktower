@@ -4,6 +4,7 @@ import {
     User
 } from "@/types";
 import {
+    BluffsHud,
     BottomHud,
     CenterHud,
     RightHud,
@@ -45,7 +46,7 @@ export function GameHud({
             void forceUpdate(discordTown.gameId);
         }
     };
-
+    const currentGameUser = discordTown?.gameUsers.find(o => o.id === "285398267854848000");
     return (
         <>
             {isStoryteller && (
@@ -74,6 +75,7 @@ export function GameHud({
                 onCancelNomination={onCancelNomination}
             />
             <BottomHud scriptName={script?.name} storyTellers={discordTown?.storyTellers ?? []}/>
+            <BluffsHud user={currentGameUser}/>
         </>
     );
 }

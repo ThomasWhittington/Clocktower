@@ -2,7 +2,7 @@
 
 public class GamePerspectiveService(IGamePerspectiveStore store) : IGamePerspectiveService
 {
-    public IEnumerable<GamePerspective> GetAll() => store.GetAll();
+    public IEnumerable<GamePerspective> GetAll() => store.GetAll().DistinctBy(o => o.Id);
 
     public bool GameExists(string gameId) => store.GetAllPerspectivesForGame(gameId).Any();
 

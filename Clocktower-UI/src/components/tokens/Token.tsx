@@ -11,7 +11,7 @@ import {memo} from "react";
 
 interface TokenProps {
     role?: Role;
-    size?: number;
+    size?: number | string;
     isDead?: boolean;
     onClick?: () => void;
     customName?: string;

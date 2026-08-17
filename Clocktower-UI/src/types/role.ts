@@ -23,7 +23,11 @@ export type RoleDto = {
 export class Role {
     readonly id: string;
     readonly name: string;
-    readonly fullDescription: string;
+
+    get fullDescription(): string {
+        return this.description + " " + this.setupDescription;
+    }
+
     readonly description: string;
     readonly type: RoleType;
     readonly edition: Edition;
@@ -54,7 +58,6 @@ export class Role {
         this.setupDescription = data.setupDescription ?? '';
         this.reminders = data.reminders ?? [];
         this.remindersGlobal = data.remindersGlobal ?? [];
-        this.fullDescription = this.description + " " + this.setupDescription;
     }
 }
 
