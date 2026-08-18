@@ -4,7 +4,7 @@
 public class SetDraftBluff : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{gameId}/{userId}/set-draft-bluff/{slot}/{roleId}", Handle)
+        .MapPost("/{gameId}/{userId}/set-draft-bluff/{slot}/{roleId?}", Handle)
         .SetOpenApiOperationId<SetDraftBluff>()
         .WithSummaryAndDescription("Sets a draft bluff for a player in a game")
         .WithRequestValidation<Request>();
@@ -18,7 +18,7 @@ public class SetDraftBluff : IEndpoint
     }
 
     [UsedImplicitly]
-    public record Request(string GameId, string UserId, int Slot, string RoleId);
+    public record Request(string GameId, string UserId, int Slot, string? RoleId);
 
     [UsedImplicitly]
     public class RequestValidator : AbstractValidator<Request>
@@ -28,7 +28,6 @@ public class SetDraftBluff : IEndpoint
             RuleFor(x => x.GameId).MustBeValidGameId();
             RuleFor(x => x.UserId).MustBeValidSnowflake(nameof(Request.UserId));
             RuleFor(x => x.Slot).InclusiveBetween(1, 3);
-            RuleFor(x => x.RoleId).NotEmpty();
         }
     }
 }

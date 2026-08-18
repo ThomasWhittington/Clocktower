@@ -15,7 +15,7 @@ import {
     useAction,
 } from "@/hooks";
 
-export function useTownSquareActions() {
+export function useTownSquareActions(onSetBluffs?: (player: User) => void) {
     const [activeMenuPlayerId, setActiveMenuPlayerId] = useState<string | null>(null);
     const [swappingPlayer, setSwappingPlayer] = useState<User | null>(null);
     const [nominatingPlayer, setNominatingPlayer] = useState<User | null>(null);
@@ -30,6 +30,12 @@ export function useTownSquareActions() {
         e?.stopPropagation();
         setActiveMenuPlayerId((prev) => (prev === playerId ? null : playerId));
     }, []);
+
+
+    const setBluffs = useCallback((player: User) => {
+        onSetBluffs?.(player);
+        setActiveMenuPlayerId(null);
+    }, [onSetBluffs]);
 
     const initiateSwap = useCallback((player: User) => {
         setNominatingPlayer(null);
@@ -113,6 +119,7 @@ export function useTownSquareActions() {
         swappingPlayer,
         toggleMenu,
         closeMenu,
+        setBluffs,
         initiateSwap,
         confirmSwap,
         cancelSwap,
@@ -129,6 +136,7 @@ export function useTownSquareActions() {
         swappingPlayer,
         toggleMenu,
         closeMenu,
+        setBluffs,
         initiateSwap,
         confirmSwap,
         cancelSwap,

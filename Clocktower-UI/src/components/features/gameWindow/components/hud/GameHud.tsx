@@ -13,6 +13,7 @@ import {
 } from "@/components/features/gameWindow/components";
 import {useDiscordTown} from "@/components/features/discordTownPanel/hooks";
 import {adminService} from "@/services";
+import {useAppStore} from "@/store";
 
 interface GameHudProps {
     script: Script | undefined;
@@ -40,13 +41,14 @@ export function GameHud({
                             onCancelNomination
                         }: Readonly<GameHudProps>) {
     const {discordTown} = useDiscordTown();
+    const {currentUser} = useAppStore();
     const {forceUpdate} = adminService;
     const forceUpdateGame = () => {
         if (discordTown?.gameId) {
             void forceUpdate(discordTown.gameId);
         }
     };
-    const currentGameUser = discordTown?.gameUsers.find(o => o.id === "285398267854848000");
+    const currentGameUser = discordTown?.gameUsers.find(o => o.id === currentUser?.id);
     return (
         <>
             {isStoryteller && (

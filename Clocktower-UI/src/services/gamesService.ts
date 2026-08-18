@@ -17,6 +17,7 @@ import {
     randomiseSeatingPositionsApi,
     removeReminderApi,
     removeUserFromGameApi,
+    setDraftBluffApi,
     setDraftRoleApi,
     setDraftRolesApi,
     setPerspectiveRoleApi,
@@ -307,6 +308,28 @@ async function setDraftRole(gameId: string, targetUserId: string, roleId: string
     return data;
 }
 
+async function setDraftBluff(gameId: string, targetUserId: string, slot: number, roleId: string | undefined) {
+    const {
+        data,
+        error
+    } = await setDraftBluffApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: targetUserId,
+            slot: slot,
+            roleId: roleId ?? ''
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set draft bluff for user:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
+
 async function commitDraft(gameId: string) {
     const {
         data,
@@ -449,6 +472,7 @@ export const gamesService = {
     setRole,
     setDraftRole,
     setDraftRoles,
+    setDraftBluff,
     setPerspectiveRole,
     commitDraft,
     setReminder,

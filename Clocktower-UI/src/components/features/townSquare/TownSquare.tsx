@@ -55,6 +55,7 @@ export default function TownSquare({
         swappingPlayer,
         toggleMenu,
         closeMenu,
+        setBluffs,
         initiateSwap,
         confirmSwap,
         cancelSwap,
@@ -99,6 +100,7 @@ export default function TownSquare({
         }
     }, [gameId]);
     const actionContext = useMemo<PlayerActionContext>(() => ({
+        setBluffs,
         initiateSwap,
         toggleMarkPlayer: handleToggleMarkPlayer,
         initiateNomination,

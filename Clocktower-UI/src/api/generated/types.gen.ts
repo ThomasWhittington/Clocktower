@@ -1211,7 +1211,7 @@ export type SetDraftBluffApiData = {
         gameId: string;
         userId: string;
         slot: number;
-        roleId: string;
+        roleId?: string;
     };
     query?: never;
     url: '/api/games/{gameId}/{userId}/set-draft-bluff/{slot}/{roleId}';

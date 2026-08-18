@@ -354,6 +354,10 @@
                 @apply opacity-80;
             }
 
+            .in-play-role {
+                @apply outline-3 outline-offset-2 outline-yellow-400/80;
+            }
+
             .role-ability {
                 @apply hidden fixed z-10 bg-gray-900 text-white p-3 rounded-lg shadow-lg max-w-xs text-sm text-left top-auto left-1/2 translate-x-[-50%] bottom-5 mt-0 pointer-events-none;
             }
@@ -362,6 +366,22 @@
             .token-wrapper:focus-within .role-ability {
                 @apply block;
             }
+        }
+
+        .bluff-slots {
+            @apply flex justify-center items-center gap-4 select-none;
+        }
+
+        .bluff-slot {
+            @apply cursor-pointer rounded-full transition-all duration-200;
+
+            &.slot-pending-target {
+                @apply outline-3 outline-offset-4 outline-yellow-400/80 animate-pulse;
+            }
+        }
+
+        .bluff-pending-hint {
+            @apply text-center text-sm text-yellow-300/90 select-none;
         }
 
         .setup-warning {
