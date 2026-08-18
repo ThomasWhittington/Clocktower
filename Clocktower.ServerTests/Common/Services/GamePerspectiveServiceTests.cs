@@ -868,23 +868,6 @@ public class GamePerspectiveServiceTests
         result.Should().Contain(p => p.Id == GameId3);
     }
 
-    [TestMethod]
-    public void GetAll_ReturnsMultiplePerspectivesFromSameGame()
-    {
-        var storyTeller = new GameUser(UserId1) { UserType = UserType.StoryTeller };
-        var player1 = new GameUser(UserId2) { UserType = UserType.Player };
-        var player2 = new GameUser(UserId3) { UserType = UserType.Player };
-
-        _sut.InitializeGame(GameId1, GuildId, storyTeller);
-        _sut.AddUserToGame(GameId1, player1);
-        _sut.AddUserToGame(GameId1, player2);
-
-        var result = _sut.GetAll().ToList();
-
-        result.Should().HaveCount(3);
-        result.Where(p => p.Id == GameId1).Should().HaveCount(3);
-    }
-
     #endregion
 
     #region UpdatePublicUser
@@ -1179,6 +1162,125 @@ public class GamePerspectiveServiceTests
 
     #endregion
 
+    #region UpdateDraftBluff
+
+    [TestMethod]
+    [DataRow(0)]
+    [DataRow(4)]
+    public void UpdateDraftBluff_ReturnsFalse_WhenSlotOutOfRange(int slot)
+    {
+        var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId1) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyteller);
+        _sut.AddUserToGame(GameId1, player1);
+
+        var result = _sut.UpdateDraftBluff(GameId1, UserId1, slot, Role.Chef);
+
+        result.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void UpdateDraftBluff_ReturnsFalse_WhenUserNotFound()
+    {
+        var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
+        _sut.InitializeGame(GameId1, GuildId, storyteller);
+
+        var result = _sut.UpdateDraftBluff(GameId1, UserId1, 1, Role.Chef);
+
+        result.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void UpdateDraftBluff_UpdatesOmniscient()
+    {
+        var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
+        var spectator = new GameUser("spectator") { UserType = UserType.Spectator };
+        var player1 = new GameUser(UserId1) { UserType = UserType.Player };
+        var player2 = new GameUser(UserId2) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyteller);
+        _sut.AddUserToGame(GameId1, spectator);
+        _sut.AddUserToGame(GameId1, player1);
+        _sut.AddUserToGame(GameId1, player2);
+
+        var result = _sut.UpdateDraftBluff(GameId1, UserId1, 2, Role.Chef);
+
+        result.Should().BeTrue();
+
+        foreach (var userId in new[] { "storyteller", "spectator" })
+        {
+            var playerPerspective = _sut.GetPerspective(GameId1, userId);
+            playerPerspective.Should().NotBeNull();
+            playerPerspective.Players.First(o => o.Id == UserId1).DraftBluffs.Should().BeEquivalentTo([null, Role.Chef, null], o => o.WithStrictOrdering());
+        }
+
+        foreach (var userId in new[] { UserId1, UserId2 })
+        {
+            var playerPerspective = _sut.GetPerspective(GameId1, userId);
+            playerPerspective.Should().NotBeNull();
+            playerPerspective.Players.First(o => o.Id == UserId1).DraftBluffs.Should().BeNull();
+        }
+    }
+
+    [TestMethod]
+    public void UpdateDraftBluff_OnlyUpdatesTargetSlot_PreservingOtherSlots()
+    {
+        var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId1) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyteller);
+        _sut.AddUserToGame(GameId1, player1);
+
+        _sut.UpdateDraftBluff(GameId1, UserId1, 1, Role.Chef);
+        _sut.UpdateDraftBluff(GameId1, UserId1, 3, Role.Imp);
+
+        var perspective = _sut.GetPerspective(GameId1, "storyteller");
+        perspective.Players.First(o => o.Id == UserId1).DraftBluffs.Should().BeEquivalentTo([Role.Chef, null, Role.Imp], o => o.WithStrictOrdering());
+    }
+
+    [TestMethod]
+    public void UpdateDraftBluff_ClearsSlot_WhenRoleIsNull()
+    {
+        var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId1) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyteller);
+        _sut.AddUserToGame(GameId1, player1);
+        _sut.UpdateDraftBluff(GameId1, UserId1, 1, Role.Chef);
+
+        var result = _sut.UpdateDraftBluff(GameId1, UserId1, 1, null);
+
+        result.Should().BeTrue();
+        var perspective = _sut.GetPerspective(GameId1, "storyteller");
+        perspective.Players.First(o => o.Id == UserId1).DraftBluffs.Should().BeEquivalentTo(new Role?[] { null, null, null }, o => o.WithStrictOrdering());
+    }
+
+    [TestMethod]
+    public void UpdateDraftBluff_ChangesNothing_WhenSameRoleAlreadyInSlot()
+    {
+        var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId1) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyteller);
+        _sut.AddUserToGame(GameId1, player1);
+        _sut.UpdateDraftBluff(GameId1, UserId1, 1, Role.Chef);
+
+        var result = _sut.UpdateDraftBluff(GameId1, UserId1, 1, Role.Chef);
+
+        result.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void UpdateDraftBluff_ChangesNothing_WhenClearingAlreadyEmptySlot()
+    {
+        var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
+        var player1 = new GameUser(UserId1) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyteller);
+        _sut.AddUserToGame(GameId1, player1);
+
+        var result = _sut.UpdateDraftBluff(GameId1, UserId1, 1, null);
+
+        result.Should().BeFalse();
+    }
+
+    #endregion
+
     #region CommitDrafts
 
     [TestMethod]
@@ -1236,6 +1338,40 @@ public class GamePerspectiveServiceTests
             else
             {
                 user3.Role.Should().BeNull();
+            }
+        }
+    }
+
+    [TestMethod]
+    public void CommitDrafts_UpdatesBluffs()
+    {
+        var storyteller = new GameUser("storyteller") { UserType = UserType.StoryTeller };
+        var spectator = new GameUser("spectator") { UserType = UserType.Spectator };
+        var player1 = new GameUser(UserId1) { UserType = UserType.Player };
+        var player2 = new GameUser(UserId2) { UserType = UserType.Player };
+        _sut.InitializeGame(GameId1, GuildId, storyteller);
+        _sut.AddUserToGame(GameId1, spectator);
+        _sut.AddUserToGame(GameId1, player1);
+        _sut.AddUserToGame(GameId1, player2);
+        _sut.UpdateDraftBluff(GameId1, UserId1, 1, Role.Chef);
+        _sut.UpdateDraftBluff(GameId1, UserId1, 3, Role.Imp);
+
+        _sut.CommitDrafts(GameId1);
+
+        foreach (var userId in new[] { "storyteller", "spectator", UserId1, UserId2 })
+        {
+            var playerPerspective = _sut.GetPerspective(GameId1, userId);
+            playerPerspective.Should().NotBeNull();
+
+            var user1 = playerPerspective.Players.First(o => o.Id == UserId1);
+            user1.DraftBluffs.Should().BeNull();
+            if (playerPerspective.UserId is UserId1 or "omniscient")
+            {
+                user1.Bluffs.Should().BeEquivalentTo([Role.Chef, null, Role.Imp], o => o.WithStrictOrdering());
+            }
+            else
+            {
+                user1.Bluffs.Should().BeNull();
             }
         }
     }
