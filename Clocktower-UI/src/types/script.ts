@@ -6,11 +6,15 @@ export class Script {
     readonly name: string;
     readonly author: string;
     readonly roles: Role[];
-
+    readonly permanentReminders: {
+        roleId: string;
+        reminderText: string;
+    }[];
     constructor(data: Partial<Script>) {
         this.name = data.name ?? '';
         this.author = data.author ?? '';
         this.roles = (data.roles ?? []).map(role => new Role(role));
+        this.permanentReminders = data.permanentReminders ?? [];
     }
 
     get townsfolk(): Role[] {

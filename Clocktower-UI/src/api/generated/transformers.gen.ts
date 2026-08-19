@@ -253,6 +253,11 @@ const clocktowerServerDataScriptSchemaResponseTransformer = (data: any) => {
             return clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(item);
         });
     }
+    if (data.permanentReminders) {
+        data.permanentReminders = data.permanentReminders.map((item: any) => {
+            return clocktowerServerDataPermanentReminderSchemaResponseTransformer(item);
+        });
+    }
     return data;
 };
 

@@ -114,6 +114,11 @@ export type ClocktowerServerDataMiniGuild = {
     name?: string | null;
 };
 
+export type ClocktowerServerDataPermanentReminder = {
+    roleId?: string | null;
+    reminderText?: string | null;
+};
+
 export type ClocktowerServerDataRoleDistribution = {
     townsfolk?: number;
     outsiders?: number;
@@ -125,6 +130,7 @@ export type ClocktowerServerDataScript = {
     name?: string | null;
     author?: string | null;
     roles?: Array<ClocktowerServerDataTypesRoleRole> | null;
+    permanentReminders?: Array<ClocktowerServerDataPermanentReminder> | null;
 };
 
 export type ClocktowerServerDataTownUser = {
@@ -311,6 +317,7 @@ export type ClocktowerServerDataScriptWritable = {
     name?: string | null;
     author?: string | null;
     roles?: Array<ClocktowerServerDataTypesRoleRoleWritable> | null;
+    permanentReminders?: Array<ClocktowerServerDataPermanentReminder> | null;
 };
 
 export type ClocktowerServerDataTypesJoinDataWritable = {

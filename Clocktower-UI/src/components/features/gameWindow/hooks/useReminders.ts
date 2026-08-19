@@ -21,6 +21,14 @@ export const useReminders = (player?: User) => {
         const reminders: Reminder[] = [];
         const seenIds = new Set<string>();
 
+        script.permanentReminders.forEach(({roleId, reminderText}) => {
+            const id = roleId + "-" + reminderText;
+            if (!seenIds.has(id)) {
+                seenIds.add(id);
+                reminders.push({id, roleId, reminderText});
+            }
+        });
+
         const globalReminderRoles = script?.roles.filter(o => o.remindersGlobal.length > 0);
         for (const role of globalReminderRoles) {
             role.remindersGlobal.forEach((reminder: string) => {
