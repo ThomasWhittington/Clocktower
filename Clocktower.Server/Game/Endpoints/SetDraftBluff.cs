@@ -5,6 +5,7 @@ public class SetDraftBluff : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
         .MapPost("/{gameId}/{userId}/set-draft-bluff/{slot}/{roleId?}", Handle)
+        .RequireStorytellerForGame()
         .SetOpenApiOperationId<SetDraftBluff>()
         .WithSummaryAndDescription("Sets a draft bluff for a player in a game")
         .WithRequestValidation<Request>();
