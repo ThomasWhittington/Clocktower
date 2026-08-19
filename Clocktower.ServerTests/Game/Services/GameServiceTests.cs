@@ -873,36 +873,36 @@ public class GameServiceTests
 
     #endregion
 
-    #region CommitDraftRoles
+    #region CommitDrafts
 
-    private void Setup_CommitDraftRoles(bool gameExists = true)
+    private void Setup_CommitDrafts(bool gameExists = true)
     {
         _mockGamePerspectiveService.Setup(o => o.GameExists(GameId)).Returns(gameExists);
-        _mockGamePerspectiveService.Setup(o => o.CommitDraftRoles(GameId));
+        _mockGamePerspectiveService.Setup(o => o.CommitDrafts(GameId));
         _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
         _mockGameBroadcastService.Setup(o => o.BroadcastPlayAudio(GameId, AudioEvent.RoleAssigned)).Returns(Task.CompletedTask);
     }
 
     [TestMethod]
-    public async Task CommitDraftRoles_ReturnsError_WhenGameNotFound()
+    public async Task CommitDrafts_ReturnsError_WhenGameNotFound()
     {
-        Setup_CommitDraftRoles(gameExists: false);
+        Setup_CommitDrafts(gameExists: false);
 
-        var result = await _sut.CommitDraftRoles(GameId);
+        var result = await _sut.CommitDraft(GameId);
 
         result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
     }
 
     [TestMethod]
-    public async Task CommitDraftRoles_ReturnsOk()
+    public async Task CommitDrafts_ReturnsOk()
     {
-        Setup_CommitDraftRoles();
+        Setup_CommitDrafts();
 
-        var result = await _sut.CommitDraftRoles(GameId);
+        var result = await _sut.CommitDraft(GameId);
 
         result.ShouldSucceedWith<string>($"Draft roles committed for game {GameId}");
 
-        _mockGamePerspectiveService.Verify(o => o.CommitDraftRoles(GameId), Times.Once);
+        _mockGamePerspectiveService.Verify(o => o.CommitDrafts(GameId), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastPlayAudio(GameId, AudioEvent.RoleAssigned), Times.Once);
     }
@@ -1135,6 +1135,125 @@ public class GameServiceTests
 
         result.ShouldSucceedWith<string>("display name already has the draft role: Gunslinger");
         _mockGamePerspectiveService.Verify(o => o.UpdateDraftRole(GameId, UserId, Role.Gunslinger), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+    }
+
+    #endregion
+
+    #region UpdateDraftBluff
+
+    private void Setup_UpdateDraftBluff(bool hasGame = true, bool hasGuild = true, bool hasTargetUser = true, bool updated = true)
+    {
+        var guild = StrictMockFactory.Create<IDiscordGuild>();
+        var targetUser = StrictMockFactory.Create<IDiscordGuildUser>();
+        targetUser.Setup(o => o.DisplayName).Returns(DisplayName);
+        var perspective = new GamePerspective(GameId, UserId, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow);
+
+        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? perspective : null);
+
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guild.Object : null);
+
+        guild.Setup(o => o.GetUser(UserId)).Returns(hasTargetUser ? targetUser.Object : null);
+        _mockGamePerspectiveService.Setup(o => o.UpdateDraftBluff(GameId, UserId, It.IsAny<int>(), It.IsAny<Role>())).Returns(updated);
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+    }
+
+    [TestMethod]
+    [DataRow(0)]
+    [DataRow(4)]
+    public async Task UpdateDraftBluff_ReturnsError_WhenSlotOutOfRange(int slot)
+    {
+        var result = await _sut.UpdateDraftBluff(GameId, UserId, slot, Role.Gunslinger.Id);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "slot.out_of_range");
+        _mockGamePerspectiveService.Verify(o => o.UpdateDraftBluff(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Role>()), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task UpdateDraftBluff_ReturnsError_WhenGameNotFound()
+    {
+        Setup_UpdateDraftBluff(hasGame: false);
+
+        var result = await _sut.UpdateDraftBluff(GameId, UserId, 1, Role.Gunslinger.Id);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task UpdateDraftBluff_ReturnsError_WhenGuildNotFound()
+    {
+        Setup_UpdateDraftBluff(hasGuild: false);
+
+        var result = await _sut.UpdateDraftBluff(GameId, UserId, 1, Role.Gunslinger.Id);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
+    }
+
+    [TestMethod]
+    public async Task UpdateDraftBluff_ReturnsError_WhenTargetUserNotFound()
+    {
+        Setup_UpdateDraftBluff(hasTargetUser: false);
+
+        var result = await _sut.UpdateDraftBluff(GameId, UserId, 1, Role.Gunslinger.Id);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task UpdateDraftBluff_ReturnsError_WhenRoleNotFound()
+    {
+        Setup_UpdateDraftBluff();
+
+        var result = await _sut.UpdateDraftBluff(GameId, UserId, 1, "invalid");
+
+        result.ShouldFailWith(ErrorKind.NotFound, "role.not_found");
+    }
+
+    [TestMethod]
+    public async Task UpdateDraftBluff_ReturnsOk_RoleNotNull()
+    {
+        Setup_UpdateDraftBluff();
+
+        var result = await _sut.UpdateDraftBluff(GameId, UserId, 2, Role.Gunslinger.Id);
+
+        result.ShouldSucceedWith<string>("display name now has the draft bluff: Gunslinger in slot: 2");
+        _mockGamePerspectiveService.Verify(o => o.UpdateDraftBluff(GameId, UserId, 2, Role.Gunslinger), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task UpdateDraftBluff_ReturnsOk_RoleNull()
+    {
+        Setup_UpdateDraftBluff();
+
+        var result = await _sut.UpdateDraftBluff(GameId, UserId, 3, null);
+
+        result.ShouldSucceedWith<string>("display name now has the draft bluff: NONE in slot: 3");
+        _mockGamePerspectiveService.Verify(o => o.UpdateDraftBluff(GameId, UserId, 3, null), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task UpdateDraftBluff_ReturnsOk_RoleNull_NoChange()
+    {
+        Setup_UpdateDraftBluff(updated: false);
+
+        var result = await _sut.UpdateDraftBluff(GameId, UserId, 1, null);
+
+        result.ShouldSucceedWith<string>("display name already has the draft bluff: NONE in slot: 1");
+        _mockGamePerspectiveService.Verify(o => o.UpdateDraftBluff(GameId, UserId, 1, null), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task UpdateDraftBluff_ReturnsOk_RoleNotNull_NoChange()
+    {
+        Setup_UpdateDraftBluff(updated: false);
+
+        var result = await _sut.UpdateDraftBluff(GameId, UserId, 1, Role.Gunslinger.Id);
+
+        result.ShouldSucceedWith<string>("display name already has the draft bluff: Gunslinger in slot: 1");
+        _mockGamePerspectiveService.Verify(o => o.UpdateDraftBluff(GameId, UserId, 1, Role.Gunslinger), Times.Once);
         _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
     }
 

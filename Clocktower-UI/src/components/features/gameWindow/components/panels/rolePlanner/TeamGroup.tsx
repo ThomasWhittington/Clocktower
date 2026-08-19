@@ -7,9 +7,10 @@ interface TokenGroupProps {
     tokenSize: number,
     onClick?: (role: Role) => void;
     selectedRoleIds?: Set<string>;
+    inPlayRoleIds?: Set<string>;
 }
 
-export const TeamGroup = ({name, roles, tokenSize, onClick, selectedRoleIds}: TokenGroupProps) => {
+export const TeamGroup = ({name, roles, tokenSize, onClick, selectedRoleIds, inPlayRoleIds}: TokenGroupProps) => {
     if (!roles || roles.length === 0) return null;
     const className = `role-group ${name.toLowerCase()}`;
     return (
@@ -18,6 +19,7 @@ export const TeamGroup = ({name, roles, tokenSize, onClick, selectedRoleIds}: To
             <div>
                 {roles.map((role) => {
                     const isSelected = selectedRoleIds?.has(role.id) ?? false;
+                    const isInPlay = inPlayRoleIds?.has(role.id) ?? false;
                     return (
                         <div key={role.id} className="token-wrapper">
                             <Token
@@ -25,7 +27,7 @@ export const TeamGroup = ({name, roles, tokenSize, onClick, selectedRoleIds}: To
                                 size={tokenSize}
                                 key={role.id}
                                 onClick={() => onClick?.(role)}
-                                className={isSelected ? 'selected-role' : 'unselected-role'}
+                                className={`${isSelected ? 'selected-role' : 'unselected-role'}${isInPlay ? ' in-play-role' : ''}`}
                             />
                             <span className="role-ability">{role.fullDescription}</span>
                         </div>

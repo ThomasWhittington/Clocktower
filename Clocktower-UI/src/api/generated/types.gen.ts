@@ -62,6 +62,8 @@ export type ClocktowerServerDataDtoUserDto = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRole;
     draftRole?: ClocktowerServerDataTypesRoleRole;
+    bluffs?: Array<ClocktowerServerDataTypesRoleRole> | null;
+    draftBluffs?: Array<ClocktowerServerDataTypesRoleRole> | null;
     reminderTokens?: Array<ClocktowerServerDataTypesReminderToken> | null;
 };
 
@@ -91,6 +93,8 @@ export type ClocktowerServerDataGameUser = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRole;
     draftRole?: ClocktowerServerDataTypesRoleRole;
+    bluffs?: Array<ClocktowerServerDataTypesRoleRole> | null;
+    draftBluffs?: Array<ClocktowerServerDataTypesRoleRole> | null;
     reminderTokens?: Array<ClocktowerServerDataTypesReminderToken> | null;
 };
 
@@ -264,6 +268,8 @@ export type ClocktowerServerDataDtoUserDtoWritable = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
     draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
+    bluffs?: Array<ClocktowerServerDataTypesRoleRoleWritable> | null;
+    draftBluffs?: Array<ClocktowerServerDataTypesRoleRoleWritable> | null;
     reminderTokens?: Array<ClocktowerServerDataTypesReminderTokenWritable> | null;
 };
 
@@ -290,6 +296,8 @@ export type ClocktowerServerDataGameUserWritable = {
     voteLocked?: boolean;
     role?: ClocktowerServerDataTypesRoleRoleWritable;
     draftRole?: ClocktowerServerDataTypesRoleRoleWritable;
+    bluffs?: Array<ClocktowerServerDataTypesRoleRoleWritable> | null;
+    draftBluffs?: Array<ClocktowerServerDataTypesRoleRoleWritable> | null;
     reminderTokens?: Array<ClocktowerServerDataTypesReminderTokenWritable> | null;
 };
 
@@ -398,22 +406,6 @@ export type HealthApiResponses = {
 };
 
 export type HealthApiResponse = HealthApiResponses[keyof HealthApiResponses];
-
-export type GetApiDevTokenByUserIdData = {
-    body?: never;
-    path: {
-        userId: string;
-    };
-    query?: never;
-    url: '/api/dev/token/{userId}';
-};
-
-export type GetApiDevTokenByUserIdResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
 
 export type CheckGuildApiData = {
     body?: never;
@@ -968,16 +960,16 @@ export type AddUserToGameApiResponses = {
 
 export type AddUserToGameApiResponse = AddUserToGameApiResponses[keyof AddUserToGameApiResponses];
 
-export type CommitDraftRolesApiData = {
+export type CommitDraftApiData = {
     body?: never;
     path: {
         gameId: string;
     };
     query?: never;
-    url: '/api/games/{gameId}/commit-draft-roles';
+    url: '/api/games/{gameId}/commit-draft';
 };
 
-export type CommitDraftRolesApiErrors = {
+export type CommitDraftApiErrors = {
     /**
      * Bad Request
      */
@@ -988,16 +980,16 @@ export type CommitDraftRolesApiErrors = {
     404: ClocktowerServerCommonTypesErrorResponse;
 };
 
-export type CommitDraftRolesApiError = CommitDraftRolesApiErrors[keyof CommitDraftRolesApiErrors];
+export type CommitDraftApiError = CommitDraftApiErrors[keyof CommitDraftApiErrors];
 
-export type CommitDraftRolesApiResponses = {
+export type CommitDraftApiResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type CommitDraftRolesApiResponse = CommitDraftRolesApiResponses[keyof CommitDraftRolesApiResponses];
+export type CommitDraftApiResponse = CommitDraftApiResponses[keyof CommitDraftApiResponses];
 
 export type DeleteGameApiData = {
     body?: never;
@@ -1212,6 +1204,40 @@ export type RemoveUserFromGameApiResponses = {
 };
 
 export type RemoveUserFromGameApiResponse = RemoveUserFromGameApiResponses[keyof RemoveUserFromGameApiResponses];
+
+export type SetDraftBluffApiData = {
+    body?: never;
+    path: {
+        gameId: string;
+        userId: string;
+        slot: number;
+        roleId?: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/{userId}/set-draft-bluff/{slot}/{roleId}';
+};
+
+export type SetDraftBluffApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetDraftBluffApiError = SetDraftBluffApiErrors[keyof SetDraftBluffApiErrors];
+
+export type SetDraftBluffApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetDraftBluffApiResponse = SetDraftBluffApiResponses[keyof SetDraftBluffApiResponses];
 
 export type SetDraftRoleApiData = {
     body?: never;

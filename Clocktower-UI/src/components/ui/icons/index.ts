@@ -35,5 +35,6 @@ export {default as PlusIcon} from "@/icons/plus.svg?react";
 export {default as MinusIcon} from "@/icons/minus.svg?react";
 export {default as AudioMuted} from "@/icons/audioMuted.svg?react";
 export {default as AudioUnMuted} from "@/icons/audioUnmuted.svg?react";
+export {default as Demon} from "@/icons/demon.svg?react";
 
 export * from './HandIcon'

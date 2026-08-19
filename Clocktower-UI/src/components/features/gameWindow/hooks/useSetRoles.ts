@@ -27,7 +27,7 @@ export function useSetRoles(currentUserId: string, isStoryTeller: boolean, isDra
     const commitDraftRoles = useCallback(async () => {
         if (!gameId) return;
         await runAction(async () => {
-            return await gamesService.commitDraftRoles(gameId);
+            return await gamesService.commitDraft(gameId);
         });
     }, [gameId, runAction]);
 

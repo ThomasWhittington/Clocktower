@@ -1,14 +1,14 @@
 ﻿namespace Clocktower.Server.Game.Endpoints;
 
 [UsedImplicitly]
-public class CommitDraftRoles : IEndpoint
+public class CommitDraft : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{gameId}/commit-draft-roles", Handle)
+        .MapPost("/{gameId}/commit-draft", Handle)
         .RequireStorytellerForGame()
-        .SetOpenApiOperationId<CommitDraftRoles>()
-        .WithSummary("Commits draft roles")
-        .WithDescription("Commits the draft roles for all users in a game, moving them to the role fields.")
+        .SetOpenApiOperationId<CommitDraft>()
+        .WithSummary("Commit draft")
+        .WithDescription("Commits the draft for all users in a game, moving them to the live fields.")
         .WithRequestValidation<GameIdRequest>();
 
 
@@ -16,7 +16,7 @@ public class CommitDraftRoles : IEndpoint
         [AsParameters] GameIdRequest request,
         [FromServices] IGameService gameService)
     {
-        var result = await gameService.CommitDraftRoles(request.GameId);
+        var result = await gameService.CommitDraft(request.GameId);
         return result.ToHttpResult();
     }
 }

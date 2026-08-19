@@ -47,6 +47,12 @@ export default function GameWindow() {
         }
     }, [script]);
 
+    useEffect(() => {
+        if (!isDraftMode && isPanelOpen('bluffPlanner')) {
+            closePanel();
+        }
+    }, [isDraftMode]);
+
     const {assignToDraft} = useAssignToDraft({
         selectedRoles: selectedDraftRoles,
         discordTown,
@@ -62,7 +68,10 @@ export default function GameWindow() {
     });
 
     const {removeReminder} = useReminders(thisUser);
-    const townSquareActions = useTownSquareActions();
+    const townSquareActions = useTownSquareActions((player) => {
+        setIsDraftMode(true);
+        openPanel('bluffPlanner', {player});
+    });
 
     const handleTokenClick = (player: User) => {
         const canOpenToken = script && (isStoryteller || player.role?.type !== RoleType.Traveller);
@@ -86,6 +95,7 @@ export default function GameWindow() {
 
     const tokenData = getPanelData('token');
     const reminderData = getPanelData('reminder');
+    const bluffPlannerData = getPanelData('bluffPlanner');
     return (
         <div className="game-window-controls">
             <TownSquare
@@ -103,6 +113,7 @@ export default function GameWindow() {
                 closePanel={closePanel}
                 tokenData={tokenData}
                 reminderData={reminderData}
+                bluffPlannerData={bluffPlannerData}
                 isDraftMode={isDraftMode}
                 setIsDraftMode={setIsDraftMode}
                 setRole={setRole}

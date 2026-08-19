@@ -126,6 +126,16 @@ const clocktowerServerDataDtoUserDtoSchemaResponseTransformer = (data: any) => {
     if (data.draftRole) {
         data.draftRole = clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(data.draftRole);
     }
+    if (data.bluffs) {
+        data.bluffs = data.bluffs.map((item: any) => {
+            return clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(item);
+        });
+    }
+    if (data.draftBluffs) {
+        data.draftBluffs = data.draftBluffs.map((item: any) => {
+            return clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(item);
+        });
+    }
     if (data.reminderTokens) {
         data.reminderTokens = data.reminderTokens.map((item: any) => {
             return clocktowerServerDataTypesReminderTokenSchemaResponseTransformer(item);
@@ -165,6 +175,16 @@ const clocktowerServerDataGameUserSchemaResponseTransformer = (data: any) => {
     }
     if (data.draftRole) {
         data.draftRole = clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(data.draftRole);
+    }
+    if (data.bluffs) {
+        data.bluffs = data.bluffs.map((item: any) => {
+            return clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(item);
+        });
+    }
+    if (data.draftBluffs) {
+        data.draftBluffs = data.draftBluffs.map((item: any) => {
+            return clocktowerServerDataTypesRoleRoleSchemaResponseTransformer(item);
+        });
     }
     if (data.reminderTokens) {
         data.reminderTokens = data.reminderTokens.map((item: any) => {

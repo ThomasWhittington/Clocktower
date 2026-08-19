@@ -22,9 +22,9 @@ import type {
     CheckGuildApiData,
     CheckGuildApiErrors,
     CheckGuildApiResponses,
-    CommitDraftRolesApiData,
-    CommitDraftRolesApiErrors,
-    CommitDraftRolesApiResponses,
+    CommitDraftApiData,
+    CommitDraftApiErrors,
+    CommitDraftApiResponses,
     CreateTownApiData,
     CreateTownApiErrors,
     CreateTownApiResponses,
@@ -37,8 +37,6 @@ import type {
     ForceUpdateApiData,
     ForceUpdateApiErrors,
     ForceUpdateApiResponses,
-    GetApiDevTokenByUserIdData,
-    GetApiDevTokenByUserIdResponses,
     GetAuthDataApiData,
     GetAuthDataApiErrors,
     GetAuthDataApiResponses,
@@ -101,6 +99,9 @@ import type {
     SendToTownSquareApiData,
     SendToTownSquareApiErrors,
     SendToTownSquareApiResponses,
+    SetDraftBluffApiData,
+    SetDraftBluffApiErrors,
+    SetDraftBluffApiResponses,
     SetDraftRoleApiData,
     SetDraftRoleApiErrors,
     SetDraftRoleApiResponses,
@@ -213,19 +214,6 @@ export const healthApi = <ThrowOnError extends boolean = false>(options?: Option
             }
         ],
         url: '/api/admin/health',
-        ...options
-    });
-};
-
-export const getApiDevTokenByUserId = <ThrowOnError extends boolean = false>(options: Options<GetApiDevTokenByUserIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiDevTokenByUserIdResponses, unknown, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/dev/token/{userId}',
         ...options
     });
 };
@@ -613,19 +601,19 @@ export const addUserToGameApi = <ThrowOnError extends boolean = false>(options: 
 };
 
 /**
- * Commits draft roles
+ * Commit draft
  *
- * Commits the draft roles for all users in a game, moving them to the role fields.
+ * Commits the draft for all users in a game, moving them to the live fields.
  */
-export const commitDraftRolesApi = <ThrowOnError extends boolean = false>(options: Options<CommitDraftRolesApiData, ThrowOnError>) => {
-    return (options.client ?? client).post<CommitDraftRolesApiResponses, CommitDraftRolesApiErrors, ThrowOnError>({
+export const commitDraftApi = <ThrowOnError extends boolean = false>(options: Options<CommitDraftApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<CommitDraftApiResponses, CommitDraftApiErrors, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
                 type: 'http'
             }
         ],
-        url: '/api/games/{gameId}/commit-draft-roles',
+        url: '/api/games/{gameId}/commit-draft',
         ...options
     });
 };
@@ -770,6 +758,24 @@ export const removeUserFromGameApi = <ThrowOnError extends boolean = false>(opti
             }
         ],
         url: '/api/games/{gameId}/remove-user/{userId}',
+        ...options
+    });
+};
+
+/**
+ * Sets a draft bluff for a player in a game
+ *
+ * Sets a draft bluff for a player in a game
+ */
+export const setDraftBluffApi = <ThrowOnError extends boolean = false>(options: Options<SetDraftBluffApiData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetDraftBluffApiResponses, SetDraftBluffApiErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/games/{gameId}/{userId}/set-draft-bluff/{slot}/{roleId}',
         ...options
     });
 };

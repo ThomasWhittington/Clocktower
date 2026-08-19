@@ -1,4 +1,5 @@
 ﻿import {
+    BluffPlannerPanel,
     NightOrderPanel,
     PaperPanel,
     ReminderPanel,
@@ -32,10 +33,11 @@ interface GamePanelsProps {
     setIsDraftMode: (callback: (prev: boolean) => boolean) => void,
     selectedRoles: Role[],
     setSelectedRoles: Dispatch<SetStateAction<Role[]>>,
-    reminderData?: { player: User } | null
+    reminderData?: { player: User } | null,
+    bluffPlannerData?: { player: User } | null
 }
 
-export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, setRole, setIsDraftMode, setSelectedRoles, selectedRoles, reminderData}: Readonly<GamePanelsProps>) {
+export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, setRole, setIsDraftMode, setSelectedRoles, selectedRoles, reminderData, bluffPlannerData}: Readonly<GamePanelsProps>) {
     return (
         <>
             <UserManagerPanel isOpen={isPanelOpen('user')} onClose={closePanel}/>
@@ -60,6 +62,13 @@ export function GamePanels({isPanelOpen, closePanel, tokenData, isDraftMode, set
                     player={tokenData.player}
                     isDraftMode={isDraftMode}
                     setRole={setRole}
+                />
+            )}
+            {bluffPlannerData?.player && (
+                <BluffPlannerPanel
+                    isOpen={isPanelOpen('bluffPlanner')}
+                    onClose={closePanel}
+                    player={bluffPlannerData.player}
                 />
             )}
         </>

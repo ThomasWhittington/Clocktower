@@ -19,7 +19,7 @@
         }
 
         .help-menu {
-            @apply absolute right-0 mr-2 py-2 w-40 bg-discord rounded-lg shadow-lg z-50 select-none;
+            @apply absolute right-0 mr-2 py-2 w-40 bg-black/50 rounded-lg shadow-lg z-50 select-none;
 
             > h2 {
                 @apply text-lg font-bold text-center w-full;
@@ -46,6 +46,80 @@
     .controls-bottom {
         @apply absolute bottom-8 right-8 pointer-events-none flex flex-col gap-2 items-end;
     }
+
+
+    .bluffs {
+        --bluff-token-size: 9vmin;
+        --bluff-gap: 1vmin;
+        --bluff-padding: 1vmin;
+
+        @apply absolute left-0 bottom-0 z-50 pointer-events-auto select-none flex flex-col items-center;
+
+        .bluffs-button svg {
+            width: 3.4vmin;
+            height: 3.4vmin;
+            transform: scale(1.6);
+            transform-origin: center;
+        }
+
+        .bluffs-menu {
+            @apply absolute left-0 bottom-full mb-2 bg-black/50 rounded-lg shadow-lg z-50 select-none;
+            @apply border border-white/10 overflow-hidden;
+            width: calc((var(--bluff-token-size) * 3) + (var(--bluff-gap) * 2) + (var(--bluff-padding) * 2));
+            padding: var(--bluff-padding);
+
+            > h2 {
+                @apply text-white font-bold text-center w-full;
+                font-size: 1.5vmin;
+                margin-bottom: 0.75vmin;
+            }
+
+            ul {
+                @apply flex items-center justify-center list-none p-0 m-0;
+                gap: var(--bluff-gap);
+            }
+
+            .bluffs-menu {
+                @apply absolute left-0 bottom-full mb-2 bg-black/50 rounded-lg shadow-lg z-50 select-none;
+                @apply border border-white/10 overflow-visible;
+                width: calc((var(--bluff-token-size) * 3) + (var(--bluff-gap) * 2) + (var(--bluff-padding) * 2));
+                padding: var(--bluff-padding);
+
+                > h2 {
+                    @apply text-white font-bold text-center w-full;
+                    font-size: 1.5vmin;
+                    margin-bottom: 0.75vmin;
+                }
+
+                ul {
+                    @apply flex items-center justify-center list-none p-0 m-0;
+                    gap: var(--bluff-gap);
+                }
+
+                li {
+                    @apply inline-flex items-center justify-center overflow-visible;
+                    width: var(--bluff-token-size);
+                    height: var(--bluff-token-size);
+                    flex: 0 0 var(--bluff-token-size);
+                }
+
+                .role-ability {
+                    @apply hidden absolute z-1000 bg-black/50 text-white p-3 rounded-lg shadow-lg max-w-xs text-sm text-left pointer-events-none;
+                    left: 50%;
+                    bottom: calc(100% + 0.75vmin);
+                    transform: translateX(-50%);
+                    width: max-content;
+                    max-width: 32vmin;
+                }
+
+                li:hover .role-ability,
+                li:focus-within .role-ability {
+                    @apply block;
+                }
+            }
+        }
+    }
+
 
     .script-label {
         @apply bg-black/50 backdrop-blur-sm p-3 rounded-lg pointer-events-auto select-none text-sm;
@@ -226,7 +300,7 @@
         }
 
         .tooltip {
-            @apply absolute top-full mb-2 px-2 py-1 bg-discord text-white text-xs rounded whitespace-nowrap pointer-events-none;
+            @apply absolute bottom-4 mb-2 px-2 py-1 bg-discord text-white text-xs rounded whitespace-nowrap pointer-events-none;
         }
     }
 }

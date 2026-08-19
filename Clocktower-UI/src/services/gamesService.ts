@@ -11,12 +11,13 @@ import {
     addUserToGameApi,
     type ClocktowerServerDataTypesEnumGameTime,
     type ClocktowerServerDataTypesEnumScriptSelect,
-    commitDraftRolesApi,
+    commitDraftApi,
     getAvailableGameUsersApi,
     getGamesApi,
     randomiseSeatingPositionsApi,
     removeReminderApi,
     removeUserFromGameApi,
+    setDraftBluffApi,
     setDraftRoleApi,
     setDraftRolesApi,
     setPerspectiveRoleApi,
@@ -307,11 +308,33 @@ async function setDraftRole(gameId: string, targetUserId: string, roleId: string
     return data;
 }
 
-async function commitDraftRoles(gameId: string) {
+async function setDraftBluff(gameId: string, targetUserId: string, slot: number, roleId: string | undefined) {
     const {
         data,
         error
-    } = await commitDraftRolesApi({
+    } = await setDraftBluffApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: targetUserId,
+            slot: slot,
+            roleId: roleId ?? ''
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set draft bluff for user:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
+
+async function commitDraft(gameId: string) {
+    const {
+        data,
+        error
+    } = await commitDraftApi({
         client: apiClient,
         path: {
             gameId: gameId
@@ -319,7 +342,7 @@ async function commitDraftRoles(gameId: string) {
     });
 
     if (error) {
-        console.error('Failed to commit draft roles:', error);
+        console.error('Failed to commit draft:', error);
         throw new Error(getMessage(error));
     }
 
@@ -406,6 +429,7 @@ async function removeReminder(gameId: string, userId: string, targetUserId: stri
 
     return data;
 }
+
 const scriptSelectToString = (scriptSelect: ScriptSelect): ClocktowerServerDataTypesEnumScriptSelect => {
     switch (scriptSelect) {
         case ScriptSelect.Unknown:
@@ -448,8 +472,9 @@ export const gamesService = {
     setRole,
     setDraftRole,
     setDraftRoles,
+    setDraftBluff,
     setPerspectiveRole,
-    commitDraftRoles,
+    commitDraft,
     setReminder,
     removeReminder
 }

@@ -21,7 +21,8 @@ public interface IGamePerspectiveService
     void SetTime(string gameId, GameTime gameTime);
     void SetScript(string gameId, Script script);
     bool UpdateDraftRole(string gameId, string userId, Role? draftRole);
-    void CommitDraftRoles(string gameId);
+    bool UpdateDraftBluff(string gameId, string userId, int slot, Role? bluffRole);
+    void CommitDrafts(string gameId);
     void ResetNominationSession(string gameId);
     bool AddReminderForUserOnPerspective(string gameId, string userId, string targetUserId, ReminderToken reminder);
     bool RemoveReminderForUserOnPerspective(string gameId, string userId, string targetUserId, ReminderToken reminder);

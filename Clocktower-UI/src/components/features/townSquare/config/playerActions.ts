@@ -15,6 +15,7 @@ export interface PlayerActionState {
 }
 
 export interface PlayerActionContext {
+    setBluffs: (player: User) => void;
     initiateSwap: (player: User) => void;
     toggleMarkPlayer: (player: User) => void;
     initiateNomination: (player: User) => void;
@@ -23,6 +24,15 @@ export interface PlayerActionContext {
 
 export const playerActions: PlayerAction[] = [
         {
+            id: "set-bluffs",
+            label: "Set Bluffs",
+            icon: "❓",
+            isVisible: (_, state) => state.currentUserIsStoryTeller,
+            execute: (player, {setBluffs}) => {
+                setBluffs(player);
+            },
+        },
+    {
             id: "swap-seats",
             label: "Swap Seats",
             icon: "🔄",
