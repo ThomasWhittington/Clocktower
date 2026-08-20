@@ -17,6 +17,7 @@ import {
     randomiseSeatingPositionsApi,
     removeReminderApi,
     removeUserFromGameApi,
+    setCustomReminderApi,
     setDraftBluffApi,
     setDraftRoleApi,
     setDraftRolesApi,
@@ -408,6 +409,30 @@ async function setReminder(gameId: string, userId: string, targetUserId: string,
     return data;
 }
 
+async function setCustomReminder(gameId: string, userId: string, targetUserId: string, reminderText: string) {
+    const {
+        data,
+        error
+    } = await setCustomReminderApi({
+        client: apiClient,
+        path: {
+            gameId: gameId,
+            userId: userId,
+            targetUserId: targetUserId
+        },
+        body: {
+            reminderText: reminderText
+        }
+    });
+
+    if (error) {
+        console.error('Failed to set custom reminder for user:', error);
+        throw new Error(getMessage(error));
+    }
+
+    return data;
+}
+
 async function removeReminder(gameId: string, userId: string, targetUserId: string, reminderId: string) {
     const {
         data,
@@ -476,5 +501,6 @@ export const gamesService = {
     setPerspectiveRole,
     commitDraft,
     setReminder,
+    setCustomReminder,
     removeReminder
 }

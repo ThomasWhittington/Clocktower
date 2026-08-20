@@ -114,6 +114,11 @@ export type ClocktowerServerDataMiniGuild = {
     name?: string | null;
 };
 
+export type ClocktowerServerDataPermanentReminder = {
+    roleId?: string | null;
+    reminderText?: string | null;
+};
+
 export type ClocktowerServerDataRoleDistribution = {
     townsfolk?: number;
     outsiders?: number;
@@ -125,6 +130,7 @@ export type ClocktowerServerDataScript = {
     name?: string | null;
     author?: string | null;
     roles?: Array<ClocktowerServerDataTypesRoleRole> | null;
+    permanentReminders?: Array<ClocktowerServerDataPermanentReminder> | null;
 };
 
 export type ClocktowerServerDataTownUser = {
@@ -204,6 +210,10 @@ export type ClocktowerServerDiscordEndpointsSendMessageRequest = {
 export type ClocktowerServerDiscordTownEndpointsGetTownStatusResponse = {
     exists?: boolean;
     message?: string | null;
+};
+
+export type ClocktowerServerGameEndpointsSetCustomReminderBody = {
+    reminderText?: string | null;
 };
 
 export type ClocktowerServerGameEndpointsSetDraftRolesBody = {
@@ -311,6 +321,7 @@ export type ClocktowerServerDataScriptWritable = {
     name?: string | null;
     author?: string | null;
     roles?: Array<ClocktowerServerDataTypesRoleRoleWritable> | null;
+    permanentReminders?: Array<ClocktowerServerDataPermanentReminder> | null;
 };
 
 export type ClocktowerServerDataTypesJoinDataWritable = {
@@ -1204,6 +1215,39 @@ export type RemoveUserFromGameApiResponses = {
 };
 
 export type RemoveUserFromGameApiResponse = RemoveUserFromGameApiResponses[keyof RemoveUserFromGameApiResponses];
+
+export type SetCustomReminderApiData = {
+    body: ClocktowerServerGameEndpointsSetCustomReminderBody;
+    path: {
+        gameId: string;
+        userId: string;
+        targetUserId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/set-custom-reminder/{userId}/{targetUserId}';
+};
+
+export type SetCustomReminderApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetCustomReminderApiError = SetCustomReminderApiErrors[keyof SetCustomReminderApiErrors];
+
+export type SetCustomReminderApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetCustomReminderApiResponse = SetCustomReminderApiResponses[keyof SetCustomReminderApiResponses];
 
 export type SetDraftBluffApiData = {
     body?: never;

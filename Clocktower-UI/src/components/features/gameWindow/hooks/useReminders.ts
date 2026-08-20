@@ -21,6 +21,14 @@ export const useReminders = (player?: User) => {
         const reminders: Reminder[] = [];
         const seenIds = new Set<string>();
 
+        script.permanentReminders.forEach(({roleId, reminderText}) => {
+            const id = roleId + "-" + reminderText;
+            if (!seenIds.has(id)) {
+                seenIds.add(id);
+                reminders.push({id, roleId, reminderText});
+            }
+        });
+
         const globalReminderRoles = script?.roles.filter(o => o.remindersGlobal.length > 0);
         for (const role of globalReminderRoles) {
             role.remindersGlobal.forEach((reminder: string) => {
@@ -58,10 +66,17 @@ export const useReminders = (player?: User) => {
             return await gamesService.removeReminder(gameId, currentUser.id, targetUserId, reminderId);
         });
     }, [gameId, runAction, currentUser?.id]);
+    const addCustomReminder = useCallback(async (targetUserId: string, reminderText: string) => {
+        if (!gameId || !currentUser?.id) return;
+        await runAction(async () => {
+            return await gamesService.setCustomReminder(gameId, currentUser.id, targetUserId, reminderText);
+        });
+    }, [gameId, runAction, currentUser?.id]);
 
     return {
         availableReminders: availableReminders(),
         setReminder,
-        removeReminder
+        removeReminder,
+        addCustomReminder
     };
 }

@@ -504,6 +504,23 @@
         }
     }
 
+    .custom-reminder-slot {
+        @apply relative shrink-0;
+    }
+
+    .custom-reminder-form {
+        @apply absolute top-1/2 left-1/2 flex items-center gap-2 p-2 rounded-lg bg-gray-900/95 border border-gray-600 shadow-2xl whitespace-nowrap z-10;
+        transform: translate(-50%, -50%);
+
+        .input-field {
+            @apply w-64 p-2 text-base;
+        }
+
+        .btn-close {
+            @apply text-lg shrink-0;
+        }
+    }
+
     .reminder-panel {
         @apply flex flex-wrap justify-center items-center content-center gap-4 p-4 w-full;
 
