@@ -10,8 +10,19 @@ import {
 import {useServerHub} from "@/hooks";
 import {BackgroundImage} from "@/components/ui";
 import AudioPlayer from "@/components/audio/AudioPlayer.tsx";
+import {useAppStore} from "@/store";
+import {useEffect} from "react";
 
 function Game() {
+    useEffect(() => {
+        const urlParams = new URLSearchParams(globalThis.location.search);
+        const gameId = urlParams.get('gameId');
+        if (gameId) {
+            useAppStore.getState().setGameId(gameId);
+            globalThis.location.href = '/game';
+        }
+    }, []);
+
     const {gameTime, audioEvent} = useServerHub();
 
     return (
