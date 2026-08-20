@@ -66,10 +66,17 @@ export const useReminders = (player?: User) => {
             return await gamesService.removeReminder(gameId, currentUser.id, targetUserId, reminderId);
         });
     }, [gameId, runAction, currentUser?.id]);
+    const addCustomReminder = useCallback(async (targetUserId: string, reminderText: string) => {
+        if (!gameId || !currentUser?.id) return;
+        await runAction(async () => {
+            return await gamesService.setCustomReminder(gameId, currentUser.id, targetUserId, reminderText);
+        });
+    }, [gameId, runAction, currentUser?.id]);
 
     return {
         availableReminders: availableReminders(),
         setReminder,
-        removeReminder
+        removeReminder,
+        addCustomReminder
     };
 }

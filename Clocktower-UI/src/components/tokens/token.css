@@ -34,7 +34,15 @@
         }
 
         .reminder-text {
-            @apply mt-[50%] font-bold text-black mx-2 leading-tight select-none;
+            @apply mt-[50%] font-bold text-black mx-2 leading-tight select-none overflow-hidden break-words;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        &.no-icon .reminder-text {
+            @apply mt-0 w-[85%];
+            -webkit-line-clamp: 4;
         }
     }
 }

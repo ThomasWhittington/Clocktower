@@ -23,5 +23,6 @@ public interface IGameService
     Task<Result<string>> UpdateDraftBluff(string gameId, string targetUserId, int slot, string? roleId);
     Task<Result<string>> SetDraftRoles(string gameId, Dictionary<string, string> playerRoles);
     Task<Result<string>> SetReminder(string gameId, string userId, string targetUserId, string reminderId);
+    Task<Result<string>> SetCustomReminder(string gameId, string userId, string targetUserId, string reminderText);
     Task<Result<string>> RemoveReminder(string gameId, string userId, string targetUserId, string reminderId);
 }

@@ -212,6 +212,10 @@ export type ClocktowerServerDiscordTownEndpointsGetTownStatusResponse = {
     message?: string | null;
 };
 
+export type ClocktowerServerGameEndpointsSetCustomReminderBody = {
+    reminderText?: string | null;
+};
+
 export type ClocktowerServerGameEndpointsSetDraftRolesBody = {
     playerRoles?: {
         [key: string]: string;
@@ -1211,6 +1215,39 @@ export type RemoveUserFromGameApiResponses = {
 };
 
 export type RemoveUserFromGameApiResponse = RemoveUserFromGameApiResponses[keyof RemoveUserFromGameApiResponses];
+
+export type SetCustomReminderApiData = {
+    body: ClocktowerServerGameEndpointsSetCustomReminderBody;
+    path: {
+        gameId: string;
+        userId: string;
+        targetUserId: string;
+    };
+    query?: never;
+    url: '/api/games/{gameId}/set-custom-reminder/{userId}/{targetUserId}';
+};
+
+export type SetCustomReminderApiErrors = {
+    /**
+     * Bad Request
+     */
+    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ClocktowerServerCommonTypesErrorResponse;
+};
+
+export type SetCustomReminderApiError = SetCustomReminderApiErrors[keyof SetCustomReminderApiErrors];
+
+export type SetCustomReminderApiResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SetCustomReminderApiResponse = SetCustomReminderApiResponses[keyof SetCustomReminderApiResponses];
 
 export type SetDraftBluffApiData = {
     body?: never;
