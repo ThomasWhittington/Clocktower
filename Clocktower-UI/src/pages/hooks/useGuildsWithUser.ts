@@ -29,7 +29,7 @@ export const useGuildsWithUser = (enabled: boolean = true) => {
         try {
             setLoading(true);
             setError(null);
-            const data = await discordService.getGuildsWithUser(currentUser.id);
+            const data = await discordService.getGuildsWithUser();
 
             if (!cancelledRef?.current) {
                 setGuilds(data);

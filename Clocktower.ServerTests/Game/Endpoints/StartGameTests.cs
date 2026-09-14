@@ -1,4 +1,4 @@
-﻿using Clocktower.Server.Data;
+using Clocktower.Server.Data;
 using Clocktower.Server.Discord.Town.Services;
 using Clocktower.Server.Game.Endpoints;
 using Clocktower.Server.Game.Services;
@@ -15,7 +15,6 @@ public class StartGameTests
     private const string ResponseMessage = "Response";
 
     private static StartGame.Request GetRandomRequest() => new(
-        CommonMethods.GetRandomSnowflakeStringId(),
         CommonMethods.GetRandomSnowflakeStringId()
     );
 
@@ -42,22 +41,25 @@ public class StartGameTests
         StartGame.Map(builder);
 
 
-        builder.GetEndpoint("/start/{guildId}/{userId}")
+        builder.GetEndpoint("/start/{guildId}")
             .ShouldHaveMethod(HttpMethod.Post)
             .ShouldHaveOperationId("startGameApi")
             .ShouldHaveSummaryAndDescription("Starts new game perspective for id")
-            .ShouldHaveValidation();
+            .ShouldHaveValidation()
+            .ShouldRequireAuthenticatedUser();
     }
 
     [TestMethod]
     public async Task Handle_ReturnsBadRequest_WhenServiceStartNewGameReturnsFalse()
     {
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
+        var user = CommonMethods.CreateClaimsPrincipal(userId);
         var request = GetRandomRequest();
         MockResponse(false, null, true);
 
-        var result = await StartGame.Handle(request, _mockGameService.Object, _mockDiscordTownService.Object, _mockLogger.Object);
+        var result = await StartGame.Handle(user, request, _mockGameService.Object, _mockDiscordTownService.Object, _mockLogger.Object);
 
-        _mockGameService.Verify(o => o.StartNewGame(request.GuildId, request.UserId), Times.Once);
+        _mockGameService.Verify(o => o.StartNewGame(request.GuildId, userId), Times.Once);
 
         var response = result.Result.Should().BeOfType<BadRequest<string>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
@@ -67,13 +69,15 @@ public class StartGameTests
     [TestMethod]
     public async Task Handle_ReturnsCreated_WhenServiceStartNewGameReturnsTrue()
     {
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
+        var user = CommonMethods.CreateClaimsPrincipal(userId);
         var request = GetRandomRequest();
         var gamePerspective = CommonMethods.GetGamePerspective();
         MockResponse(true, gamePerspective, true);
 
-        var result = await StartGame.Handle(request, _mockGameService.Object, _mockDiscordTownService.Object, _mockLogger.Object);
+        var result = await StartGame.Handle(user, request, _mockGameService.Object, _mockDiscordTownService.Object, _mockLogger.Object);
 
-        _mockGameService.Verify(o => o.StartNewGame(request.GuildId, request.UserId), Times.Once);
+        _mockGameService.Verify(o => o.StartNewGame(request.GuildId, userId), Times.Once);
         var response = result.Result.Should().BeOfType<Created<GamePerspective>>().Subject;
         response.StatusCode.Should().Be((int)HttpStatusCode.Created);
         response.Location.Should().Be($"/games/{gamePerspective.Id}");
@@ -83,12 +87,14 @@ public class StartGameTests
     [TestMethod]
     public async Task Handle_LogsWarning_WhenTownNotFound()
     {
+        var userId = CommonMethods.GetRandomSnowflakeStringId();
+        var user = CommonMethods.CreateClaimsPrincipal(userId);
         var request = GetRandomRequest();
         var gamePerspective = CommonMethods.GetGamePerspective();
         MockResponse(true, gamePerspective, false);
 
-        var result = await StartGame.Handle(request, _mockGameService.Object, _mockDiscordTownService.Object, _mockLogger.Object);
-        _mockGameService.Verify(o => o.StartNewGame(request.GuildId, request.UserId), Times.Once);
+        var result = await StartGame.Handle(user, request, _mockGameService.Object, _mockDiscordTownService.Object, _mockLogger.Object);
+        _mockGameService.Verify(o => o.StartNewGame(request.GuildId, userId), Times.Once);
 
         _mockLogger.Verify(
             x => x.Log(

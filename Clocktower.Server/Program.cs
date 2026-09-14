@@ -17,6 +17,7 @@ global using Clocktower.Server.Data.Extensions;
 global using Clocktower.Server.Common.Types;
 global using Clocktower.Server.Common.UpdateModels;
 global using Clocktower.Server.Data.Dto;
+global using System.Security.Claims;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -96,9 +97,6 @@ internal abstract class Program
                         policy.RequireClaim("is_storyteller", "true");
                         policy.AddRequirements(new StoryTellerForGameRequirement());
                     }
-                )
-                .AddPolicy("SelfForRoute", policy =>
-                    policy.AddRequirements(new SelfForRouteRequirement())
                 );
             var app = builder.Build();
             app.Configure();

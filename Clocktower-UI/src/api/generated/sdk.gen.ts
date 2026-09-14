@@ -99,15 +99,15 @@ export const checkGuildApi = <ThrowOnError extends boolean = false>(options: Opt
  *
  * Gets all guilds the bot is in that the player is also an administrator
  */
-export const getGuildsWithUserApi = <ThrowOnError extends boolean = false>(options: Options<GetGuildsWithUserApiData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetGuildsWithUserApiResponses, GetGuildsWithUserApiErrors, ThrowOnError>({
+export const getGuildsWithUserApi = <ThrowOnError extends boolean = false>(options?: Options<GetGuildsWithUserApiData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetGuildsWithUserApiResponses, GetGuildsWithUserApiErrors, ThrowOnError>({
         security: [
             {
                 scheme: 'bearer',
                 type: 'http'
             }
         ],
-        url: '/api/discord/{userId}/guilds',
+        url: '/api/discord/guilds',
         ...options
     });
 };
@@ -417,7 +417,7 @@ export const moveUserToChannelApi = <ThrowOnError extends boolean = false>(optio
                 type: 'http'
             }
         ],
-        url: '/api/discord/town/{guildId}/{userId}/{channelId}',
+        url: '/api/discord/town/{guildId}/{channelId}',
         ...options
     });
 };
@@ -579,7 +579,7 @@ export const removeReminderApi = <ThrowOnError extends boolean = false>(options:
                 type: 'http'
             }
         ],
-        url: '/api/games/{gameId}/remove-reminder/{userId}/{targetUserId}/{reminderId}',
+        url: '/api/games/{gameId}/remove-reminder/{targetUserId}/{reminderId}',
         ...options
     });
 };
@@ -615,7 +615,7 @@ export const setCustomReminderApi = <ThrowOnError extends boolean = false>(optio
                 type: 'http'
             }
         ],
-        url: '/api/games/{gameId}/set-custom-reminder/{userId}/{targetUserId}',
+        url: '/api/games/{gameId}/set-custom-reminder/{targetUserId}',
         ...options,
         headers: {
             'Content-Type': 'application/json',
@@ -695,7 +695,7 @@ export const setPerspectiveRoleApi = <ThrowOnError extends boolean = false>(opti
                 type: 'http'
             }
         ],
-        url: '/api/games/{gameId}/set-perspective-role/{userId}/{targetUserId}/{roleId}',
+        url: '/api/games/{gameId}/set-perspective-role/{targetUserId}/{roleId}',
         ...options
     });
 };
@@ -749,7 +749,7 @@ export const setReminderApi = <ThrowOnError extends boolean = false>(options: Op
                 type: 'http'
             }
         ],
-        url: '/api/games/{gameId}/set-reminder/{userId}/{targetUserId}/{reminderId}',
+        url: '/api/games/{gameId}/set-reminder/{targetUserId}/{reminderId}',
         ...options
     });
 };
@@ -821,7 +821,7 @@ export const startGameApi = <ThrowOnError extends boolean = false>(options: Opti
                 type: 'http'
             }
         ],
-        url: '/api/games/start/{guildId}/{userId}',
+        url: '/api/games/start/{guildId}',
         ...options
     });
 };

@@ -11,15 +11,3 @@ public class GuildIdRequestValidator : AbstractValidator<GuildIdRequest>
         RuleFor(x => x.GuildId).MustBeValidSnowflake(nameof(GuildIdRequest.GuildId));
     }
 }
-
-[UsedImplicitly]
-public record UserIdRequest(string UserId);
-
-[UsedImplicitly]
-public class UserIdRequestValidator : AbstractValidator<UserIdRequest>
-{
-    public UserIdRequestValidator()
-    {
-        RuleFor(x => x.UserId).MustBeValidSnowflake(nameof(UserIdRequest.UserId));
-    }
-}

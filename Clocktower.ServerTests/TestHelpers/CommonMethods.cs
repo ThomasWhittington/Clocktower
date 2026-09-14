@@ -1,4 +1,5 @@
 ﻿global using Clocktower.Server.Common.Types;
+using System.Security.Claims;
 using Clocktower.Server.Common;
 using Clocktower.Server.Data;
 using Microsoft.Extensions.Options;
@@ -11,6 +12,7 @@ public static class CommonMethods
     public static string GetRandomSnowflakeStringId() => new Random((int)DateTime.Now.Ticks).NextInt64().ToString();
     public static GameUser GetRandomGameUser(string? id = null) => new(id ?? GetRandomSnowflakeStringId());
     public static TownUser GetRandomTownUser(string? id = null, string? name = null) => new(id ?? GetRandomSnowflakeStringId(), name ?? GetRandomString(), GetRandomString());
+    public static ClaimsPrincipal CreateClaimsPrincipal(string userId) => new(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, userId)]));
 
 
     public static Secrets SetUpMockSecrets(

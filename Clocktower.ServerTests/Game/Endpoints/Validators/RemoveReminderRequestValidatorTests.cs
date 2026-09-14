@@ -4,22 +4,21 @@ using FluentValidation.TestHelper;
 namespace Clocktower.ServerTests.Game.Endpoints.Validators;
 
 [TestClass]
-public class SetPerspectiveRoleRequestValidatorTests
+public class RemoveReminderRequestValidatorTests
 {
-    private SetPerspectiveRole.RequestValidator _validator = null!;
+    private RemoveReminder.RequestValidator _validator = null!;
     private const string ValidSnowflake = "123456789012345678";
-    private const string RoleId = "role-id";
 
     [TestInitialize]
     public void Setup()
     {
-        _validator = new SetPerspectiveRole.RequestValidator();
+        _validator = new RemoveReminder.RequestValidator();
     }
 
     [TestMethod]
     public void Validate_ShouldNotHaveErrors_WhenRequestIsValid()
     {
-        var request = new SetPerspectiveRole.Request("gameId", ValidSnowflake, RoleId);
+        var request = new RemoveReminder.Request("gameId", ValidSnowflake, "role-reminder");
 
         var result = _validator.TestValidate(request);
 
@@ -33,34 +32,12 @@ public class SetPerspectiveRoleRequestValidatorTests
     [DataRow("")]
     public void Validate_ShouldHaveError_WhenGameIdIsTooShort(string invalidGameId)
     {
-        var request = new SetPerspectiveRole.Request(invalidGameId, ValidSnowflake, RoleId);
+        var request = new RemoveReminder.Request(invalidGameId, ValidSnowflake, "role-reminder");
 
         var result = _validator.TestValidate(request);
 
         result.ShouldHaveValidationErrorFor(x => x.GameId)
             .WithErrorMessage("GameId cannot be less than 3 characters");
-    }
-
-    [TestMethod]
-    public void Validate_ShouldHaveError_WhenGameIdIsTooLong()
-    {
-        var longGameId = new string('a', 33);
-        var request = new SetPerspectiveRole.Request(longGameId, ValidSnowflake, RoleId);
-
-        var result = _validator.TestValidate(request);
-
-        result.ShouldHaveValidationErrorFor(x => x.GameId)
-            .WithErrorMessage("GameId cannot be longer than 32 characters");
-    }
-
-    [TestMethod]
-    public void Validate_ShouldPass_WhenGameIdHasWhitespaceButTrimsToValidLength()
-    {
-        var request = new SetPerspectiveRole.Request("  abc  ", ValidSnowflake, RoleId);
-
-        var result = _validator.TestValidate(request);
-
-        result.ShouldNotHaveValidationErrorFor(x => x.GameId);
     }
 
     #endregion
@@ -70,7 +47,7 @@ public class SetPerspectiveRoleRequestValidatorTests
     [TestMethod]
     public void Validate_ShouldHaveError_WhenTargetUserIdIsEmpty()
     {
-        var request = new SetPerspectiveRole.Request("valid-game", "", RoleId);
+        var request = new RemoveReminder.Request("valid-game", "", "role-reminder");
 
         var result = _validator.TestValidate(request);
 
@@ -81,12 +58,26 @@ public class SetPerspectiveRoleRequestValidatorTests
     [TestMethod]
     public void Validate_ShouldHaveError_WhenTargetUserIdIsNotSnowflake()
     {
-        var request = new SetPerspectiveRole.Request("valid-game", "invalid-user", RoleId);
+        var request = new RemoveReminder.Request("valid-game", "invalid-user", "role-reminder");
 
         var result = _validator.TestValidate(request);
 
         result.ShouldHaveValidationErrorFor(x => x.TargetUserId)
             .WithErrorMessage("TargetUserId must be a valid Discord snowflake");
+    }
+
+    #endregion
+
+    #region ReminderId Tests
+
+    [TestMethod]
+    public void Validate_ShouldHaveError_WhenReminderIdIsEmpty()
+    {
+        var request = new RemoveReminder.Request("valid-game", ValidSnowflake, "");
+
+        var result = _validator.TestValidate(request);
+
+        result.ShouldHaveValidationErrorFor(x => x.ReminderId);
     }
 
     #endregion

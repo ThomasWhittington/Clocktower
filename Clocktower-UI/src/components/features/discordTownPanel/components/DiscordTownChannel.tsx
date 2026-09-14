@@ -11,19 +11,16 @@ function DiscordTownChannel({channel}: Readonly<{
 }>) {
 
     const guildId = useAppStore((state) => state.guildId);
-    const currentUser = useAppStore((state) => state.currentUser);
     const {isInVoiceChannel} = useUserPresenceStatus();
 
     const moveUserHere = async () => {
         if (!(ValidationUtils.isValidDiscordId(guildId) &&
-            ValidationUtils.isValidDiscordId(channel.channel.id) &&
-            currentUser != undefined &&
-            ValidationUtils.isValidDiscordId(currentUser.id))
+            ValidationUtils.isValidDiscordId(channel.channel.id))
         ) {
             return;
         }
 
-        await discordService.moveUserToChannel(guildId, currentUser.id, channel.channel.id)
+        await discordService.moveUserToChannel(guildId, channel.channel.id)
             .catch((err) => console.error(err));
 
     }

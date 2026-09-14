@@ -69,6 +69,12 @@ public static class EndpointAssertions
             return endpoint;
         }
 
+        public RouteEndpoint ShouldRequireAuthenticatedUser()
+        {
+            endpoint.GetMetadata<AuthorizeAttribute>().Policy.Should().BeNull();
+            return endpoint;
+        }
+
         public RouteEndpoint ShouldHaveValidation()
         {
             var producesMetadata = endpoint.Metadata.GetOrderedMetadata<IProducesResponseTypeMetadata>()

@@ -15,7 +15,7 @@ export const useReminders = (player?: User) => {
     const {script} = useServerHub();
     const {discordTown} = useDiscordTown();
     const {runAction} = useAction();
-    const {gameId, currentUser} = useAppStore();
+    const {gameId} = useAppStore();
     const availableReminders = (): Reminder[] => {
         if (!script) return [];
         const reminders: Reminder[] = [];
@@ -55,23 +55,23 @@ export const useReminders = (player?: User) => {
         );
     };
     const setReminder = useCallback(async (targetUserId: string, reminderId: string) => {
-        if (!gameId || !currentUser?.id) return;
+        if (!gameId) return;
         await runAction(async () => {
-            return await gamesService.setReminder(gameId, currentUser.id, targetUserId, reminderId);
+            return await gamesService.setReminder(gameId, targetUserId, reminderId);
         });
-    }, [gameId, runAction, currentUser?.id]);
+    }, [gameId, runAction]);
     const removeReminder = useCallback(async (targetUserId: string, reminderId: string) => {
-        if (!gameId || !currentUser?.id) return;
+        if (!gameId) return;
         await runAction(async () => {
-            return await gamesService.removeReminder(gameId, currentUser.id, targetUserId, reminderId);
+            return await gamesService.removeReminder(gameId, targetUserId, reminderId);
         });
-    }, [gameId, runAction, currentUser?.id]);
+    }, [gameId, runAction]);
     const addCustomReminder = useCallback(async (targetUserId: string, reminderText: string) => {
-        if (!gameId || !currentUser?.id) return;
+        if (!gameId) return;
         await runAction(async () => {
-            return await gamesService.setCustomReminder(gameId, currentUser.id, targetUserId, reminderText);
+            return await gamesService.setCustomReminder(gameId, targetUserId, reminderText);
         });
-    }, [gameId, runAction, currentUser?.id]);
+    }, [gameId, runAction]);
 
     return {
         availableReminders: availableReminders(),

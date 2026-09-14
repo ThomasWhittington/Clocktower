@@ -92,7 +92,6 @@ public static class ConfigureServices
             builder.Services.AddScoped<IRolesService, RolesService>();
             builder.Services.AddScoped<IGameAuthorizationService, GameAuthorizationService>();
             builder.Services.AddScoped<IAuthorizationHandler, StoryTellerForGameHandler>();
-            builder.Services.AddScoped<IAuthorizationHandler, SelfForRouteHandler>();
             builder.Services.AddScoped<ITimerService, TimerService>();
 
             builder.Services.AddHostedService(provider => provider.GetRequiredService<IDiscordBot>());

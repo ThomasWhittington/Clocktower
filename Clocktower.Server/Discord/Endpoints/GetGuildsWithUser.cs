@@ -1,4 +1,4 @@
-﻿using Clocktower.Server.Discord.Services;
+using Clocktower.Server.Discord.Services;
 
 namespace Clocktower.Server.Discord.Endpoints;
 
@@ -6,17 +6,15 @@ namespace Clocktower.Server.Discord.Endpoints;
 public class GetGuildsWithUser : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapGet("/{userId}/guilds", Handle)
+        .MapGet("/guilds", Handle)
         .SetOpenApiOperationId<GetGuildsWithUser>()
         .WithSummary("Gets guilds that contain user")
         .WithDescription("Gets all guilds the bot is in that the player is also an administrator")
-        .WithRequestValidation<UserIdRequest>()
-        .RequireOwnUserId();
+        .RequireAuthorization();
 
-    internal static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] UserIdRequest request, [FromServices] IDiscordService discordService)
+    internal static Results<Ok<Response>, BadRequest<string>> Handle(ClaimsPrincipal user, [FromServices] IDiscordService discordService)
     {
-
-        var (success, guilds, message) = discordService.GetGuildsWithUser(request.UserId);
+        var (success, guilds, message) = discordService.GetGuildsWithUser(user.GetUserId()!);
         return success ? TypedResults.Ok(new Response(guilds)) : TypedResults.BadRequest(message);
     }
 
