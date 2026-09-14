@@ -47,7 +47,7 @@ function GameManager() {
         }
         clearError();
         setIsLoading(true);
-        gamesService.startGame(guildId, currentUser.id).then(data => {
+        gamesService.startGame(guildId).then(data => {
             if (data?.id) {
                 setGameId(data.id);
                 joinGameGroup(data.id);

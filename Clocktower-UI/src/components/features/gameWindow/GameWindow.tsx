@@ -39,7 +39,7 @@ export default function GameWindow() {
     const [circleDiameter, setCircleDiameter] = useState(0);
     const {togglePanel, isPanelOpen, closePanel, openPanel, getPanelData} = useActivePanel();
     const isStoryteller = useCurrentUserIsStoryteller();
-    const {setRole, commitDraftRoles} = useSetRoles(currentUser?.id ?? "", isStoryteller, isDraftMode);
+    const {setRole, commitDraftRoles} = useSetRoles(isStoryteller, isDraftMode);
 
     useEffect(() => {
         if (script && isPanelOpen('script')) {

@@ -1,4 +1,4 @@
-﻿using Clocktower.Server.Game.Endpoints;
+using Clocktower.Server.Game.Endpoints;
 using FluentValidation.TestHelper;
 
 namespace Clocktower.ServerTests.Game.Endpoints.Validators;
@@ -18,7 +18,7 @@ public class StartGameRequestValidatorTests
     [TestMethod]
     public void Validate_ShouldNotHaveErrors_WhenRequestIsValid()
     {
-        var request = new StartGame.Request(ValidSnowflake, ValidSnowflake);
+        var request = new StartGame.Request(ValidSnowflake);
 
         var result = _validator.TestValidate(request);
 
@@ -32,7 +32,7 @@ public class StartGameRequestValidatorTests
     [DataRow(null)]
     public void Validate_ShouldHaveError_WhenGuildIdIsEmpty(string? guildId)
     {
-        var request = new StartGame.Request(guildId!, ValidSnowflake);
+        var request = new StartGame.Request(guildId!);
 
         var result = _validator.TestValidate(request);
 
@@ -45,38 +45,12 @@ public class StartGameRequestValidatorTests
     [DataRow("123")]
     public void Validate_ShouldHaveError_WhenGuildIdIsNotSnowflake(string invalidSnowflake)
     {
-        var request = new StartGame.Request(invalidSnowflake, ValidSnowflake);
+        var request = new StartGame.Request(invalidSnowflake);
 
         var result = _validator.TestValidate(request);
 
         result.ShouldHaveValidationErrorFor(x => x.GuildId)
             .WithErrorMessage("GuildId must be a valid Discord snowflake");
-    }
-
-    #endregion
-
-    #region UserId Tests
-
-    [TestMethod]
-    public void Validate_ShouldHaveError_WhenUserIdIsEmpty()
-    {
-        var request = new StartGame.Request("123456789012345678", "");
-
-        var result = _validator.TestValidate(request);
-
-        result.ShouldHaveValidationErrorFor(x => x.UserId)
-            .WithErrorMessage("UserId cannot be empty");
-    }
-
-    [TestMethod]
-    public void Validate_ShouldHaveError_WhenUserIdIsNotSnowflake()
-    {
-        var request = new StartGame.Request("123456789012345678", "invalid-user");
-
-        var result = _validator.TestValidate(request);
-
-        result.ShouldHaveValidationErrorFor(x => x.UserId)
-            .WithErrorMessage("UserId must be a valid Discord snowflake");
     }
 
     #endregion

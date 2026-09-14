@@ -447,18 +447,16 @@ export type CheckGuildApiResponse = CheckGuildApiResponses[keyof CheckGuildApiRe
 
 export type GetGuildsWithUserApiData = {
     body?: never;
-    path: {
-        userId: string;
-    };
+    path?: never;
     query?: never;
-    url: '/api/discord/{userId}/guilds';
+    url: '/api/discord/guilds';
 };
 
 export type GetGuildsWithUserApiErrors = {
     /**
      * Bad Request
      */
-    400: MicrosoftAspNetCoreHttpHttpValidationProblemDetails;
+    400: string;
 };
 
 export type GetGuildsWithUserApiError = GetGuildsWithUserApiErrors[keyof GetGuildsWithUserApiErrors];
@@ -881,11 +879,10 @@ export type MoveUserToChannelApiData = {
     body?: never;
     path: {
         guildId: string;
-        userId: string;
         channelId: string;
     };
     query?: never;
-    url: '/api/discord/town/{guildId}/{userId}/{channelId}';
+    url: '/api/discord/town/{guildId}/{channelId}';
 };
 
 export type MoveUserToChannelApiErrors = {
@@ -1129,12 +1126,11 @@ export type RemoveReminderApiData = {
     body?: never;
     path: {
         gameId: string;
-        userId: string;
         targetUserId: string;
         reminderId: string;
     };
     query?: never;
-    url: '/api/games/{gameId}/remove-reminder/{userId}/{targetUserId}/{reminderId}';
+    url: '/api/games/{gameId}/remove-reminder/{targetUserId}/{reminderId}';
 };
 
 export type RemoveReminderApiErrors = {
@@ -1195,11 +1191,10 @@ export type SetCustomReminderApiData = {
     body: ClocktowerServerGameEndpointsSetCustomReminderBody;
     path: {
         gameId: string;
-        userId: string;
         targetUserId: string;
     };
     query?: never;
-    url: '/api/games/{gameId}/set-custom-reminder/{userId}/{targetUserId}';
+    url: '/api/games/{gameId}/set-custom-reminder/{targetUserId}';
 };
 
 export type SetCustomReminderApiErrors = {
@@ -1326,12 +1321,11 @@ export type SetPerspectiveRoleApiData = {
     body?: never;
     path: {
         gameId: string;
-        userId: string;
         targetUserId: string;
         roleId?: string;
     };
     query?: never;
-    url: '/api/games/{gameId}/set-perspective-role/{userId}/{targetUserId}/{roleId}';
+    url: '/api/games/{gameId}/set-perspective-role/{targetUserId}/{roleId}';
 };
 
 export type SetPerspectiveRoleApiErrors = {
@@ -1426,12 +1420,11 @@ export type SetReminderApiData = {
     body?: never;
     path: {
         gameId: string;
-        userId: string;
         targetUserId: string;
         reminderId: string;
     };
     query?: never;
-    url: '/api/games/{gameId}/set-reminder/{userId}/{targetUserId}/{reminderId}';
+    url: '/api/games/{gameId}/set-reminder/{targetUserId}/{reminderId}';
 };
 
 export type SetReminderApiErrors = {
@@ -1556,10 +1549,9 @@ export type StartGameApiData = {
     body?: never;
     path: {
         guildId: string;
-        userId: string;
     };
     query?: never;
-    url: '/api/games/start/{guildId}/{userId}';
+    url: '/api/games/start/{guildId}';
 };
 
 export type StartGameApiErrors = {

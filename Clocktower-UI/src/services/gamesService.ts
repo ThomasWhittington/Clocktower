@@ -46,15 +46,14 @@ async function getGames(): Promise<GamePerspective[]> {
     return data?.map(mapToGamePerspective) ?? [];
 }
 
-async function startGame(guildId: string, userId: string): Promise<GamePerspective | null> {
+async function startGame(guildId: string): Promise<GamePerspective | null> {
     const {
         data,
         error
     } = await startGameApi({
         client: apiClient,
         path: {
-            guildId: guildId,
-            userId: userId
+            guildId: guildId
         }
     });
     if (error) {
@@ -245,7 +244,7 @@ async function setScript(gameId: string, scriptSelect: ScriptSelect, json?: stri
     }
 }
 
-async function setPerspectiveRole(gameId: string, userId: string, targetUserId: string, roleId: string | undefined) {
+async function setPerspectiveRole(gameId: string, targetUserId: string, roleId: string | undefined) {
     const {
         data,
         error
@@ -253,7 +252,6 @@ async function setPerspectiveRole(gameId: string, userId: string, targetUserId: 
         client: apiClient,
         path: {
             gameId: gameId,
-            userId: userId,
             targetUserId: targetUserId,
             roleId: roleId ?? ''
         }
@@ -387,7 +385,7 @@ async function setDraftRoles(gameId: string, playerRoles: Record<string, string>
     return data;
 }
 
-async function setReminder(gameId: string, userId: string, targetUserId: string, reminderId: string) {
+async function setReminder(gameId: string, targetUserId: string, reminderId: string) {
     const {
         data,
         error
@@ -395,7 +393,6 @@ async function setReminder(gameId: string, userId: string, targetUserId: string,
         client: apiClient,
         path: {
             gameId: gameId,
-            userId: userId,
             targetUserId: targetUserId,
             reminderId: reminderId
         }
@@ -409,7 +406,7 @@ async function setReminder(gameId: string, userId: string, targetUserId: string,
     return data;
 }
 
-async function setCustomReminder(gameId: string, userId: string, targetUserId: string, reminderText: string) {
+async function setCustomReminder(gameId: string, targetUserId: string, reminderText: string) {
     const {
         data,
         error
@@ -417,7 +414,6 @@ async function setCustomReminder(gameId: string, userId: string, targetUserId: s
         client: apiClient,
         path: {
             gameId: gameId,
-            userId: userId,
             targetUserId: targetUserId
         },
         body: {
@@ -433,7 +429,7 @@ async function setCustomReminder(gameId: string, userId: string, targetUserId: s
     return data;
 }
 
-async function removeReminder(gameId: string, userId: string, targetUserId: string, reminderId: string) {
+async function removeReminder(gameId: string, targetUserId: string, reminderId: string) {
     const {
         data,
         error
@@ -441,7 +437,6 @@ async function removeReminder(gameId: string, userId: string, targetUserId: stri
         client: apiClient,
         path: {
             gameId: gameId,
-            userId: userId,
             targetUserId: targetUserId,
             reminderId: reminderId
         }

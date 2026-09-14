@@ -31,10 +31,5 @@ public static class RouteHandlerBuilderExtensions
         {
             return builder.RequireAuthorization("StoryTellerForGame");
         }
-
-        public RouteHandlerBuilder RequireOwnUserId()
-        {
-            return builder.RequireAuthorization("SelfForRoute");
-        }
     }
 }

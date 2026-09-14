@@ -2,7 +2,7 @@
 import {mapToMiniGuild, type MiniGuild, UserType} from "@/types";
 import {apiClient} from "@/api/api-client.ts";
 
-async function moveUserToChannel(guildId: string, userId: string, channelId: string): Promise<string> {
+async function moveUserToChannel(guildId: string, channelId: string): Promise<string> {
     const {
         data,
         error
@@ -10,7 +10,6 @@ async function moveUserToChannel(guildId: string, userId: string, channelId: str
         client: apiClient,
         path: {
             guildId: guildId,
-            userId: userId,
             channelId: channelId
         }
     });
@@ -32,15 +31,12 @@ async function getAuthData(key: string) {
     });
 }
 
-async function getGuildsWithUser(userId: string): Promise<MiniGuild[]> {
+async function getGuildsWithUser(): Promise<MiniGuild[]> {
     const {
         data,
         error
     } = await getGuildsWithUserApi({
-        client: apiClient,
-        path: {
-            userId: userId
-        }
+        client: apiClient
     });
 
     if (error) {

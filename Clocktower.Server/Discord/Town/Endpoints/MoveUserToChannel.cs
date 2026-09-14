@@ -1,4 +1,4 @@
-﻿using Clocktower.Server.Discord.Town.Services;
+using Clocktower.Server.Discord.Town.Services;
 
 namespace Clocktower.Server.Discord.Town.Endpoints;
 
@@ -6,21 +6,21 @@ namespace Clocktower.Server.Discord.Town.Endpoints;
 public class MoveUserToChannel : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app) => app
-        .MapPost("/{guildId}/{userId}/{channelId}", Handle)
+        .MapPost("/{guildId}/{channelId}", Handle)
         .SetOpenApiOperationId<MoveUserToChannel>()
         .WithSummaryAndDescription("Moves the user to the specified channel")
         .WithRequestValidation<Request>()
-        .RequireOwnUserId();
+        .RequireAuthorization();
 
-    internal static async Task<Results<Ok<string>, BadRequest<string>>> Handle([AsParameters] Request request, IDiscordTownService discordTownService)
+    internal static async Task<Results<Ok<string>, BadRequest<string>>> Handle(ClaimsPrincipal user, [AsParameters] Request request, IDiscordTownService discordTownService)
     {
-        var (success, message) = await discordTownService.MoveUser(request.GuildId, request.UserId, request.ChannelId);
+        var (success, message) = await discordTownService.MoveUser(request.GuildId, user.GetUserId()!, request.ChannelId);
         return success ? TypedResults.Ok(message) : TypedResults.BadRequest(message);
     }
 
 
     [UsedImplicitly]
-    public record Request(string GuildId, string UserId, string ChannelId);
+    public record Request(string GuildId, string ChannelId);
 
     [UsedImplicitly]
     public class RequestValidator : AbstractValidator<Request>
@@ -28,7 +28,6 @@ public class MoveUserToChannel : IEndpoint
         public RequestValidator()
         {
             RuleFor(x => x.GuildId).MustBeValidSnowflake(nameof(Request.GuildId));
-            RuleFor(x => x.UserId).MustBeValidSnowflake(nameof(Request.UserId));
             RuleFor(x => x.ChannelId).MustBeValidSnowflake(nameof(Request.ChannelId));
         }
     }

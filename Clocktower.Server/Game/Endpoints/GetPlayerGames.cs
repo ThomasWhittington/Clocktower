@@ -7,7 +7,7 @@ public class GetPlayerGames : IEndpoint
         .MapGet("/player/{userId}", Handle)
         .SetOpenApiOperationId<GetPlayerGames>()
         .WithSummaryAndDescription("Gets games the player is in")
-        .RequireOwnUserId();
+        .RequireAuthorization();
 
     internal static Ok<IEnumerable<MiniGamePerspective>> Handle(string userId, [FromServices] IGameService gameService)
     {

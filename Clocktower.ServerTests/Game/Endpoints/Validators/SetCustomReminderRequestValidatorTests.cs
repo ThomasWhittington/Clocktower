@@ -7,7 +7,6 @@ namespace Clocktower.ServerTests.Game.Endpoints.Validators;
 public class SetCustomReminderRequestValidatorTests
 {
     private SetCustomReminder.RequestValidator _validator = null!;
-    private const string ValidSnowflake = "123456789012345678";
     private const string ValidSnowflake2 = "876543210987654321";
 
     [TestInitialize]
@@ -19,7 +18,7 @@ public class SetCustomReminderRequestValidatorTests
     [TestMethod]
     public void Validate_ShouldNotHaveErrors_WhenRequestIsValid()
     {
-        var request = new SetCustomReminder.Request("gameId", ValidSnowflake, ValidSnowflake2, new SetCustomReminder.Body("Poisoned by the Imp"));
+        var request = new SetCustomReminder.Request("gameId", ValidSnowflake2, new SetCustomReminder.Body("Poisoned by the Imp"));
 
         var result = _validator.TestValidate(request);
 
@@ -33,7 +32,7 @@ public class SetCustomReminderRequestValidatorTests
     [DataRow("")]
     public void Validate_ShouldHaveError_WhenGameIdIsTooShort(string invalidGameId)
     {
-        var request = new SetCustomReminder.Request(invalidGameId, ValidSnowflake, ValidSnowflake2, new SetCustomReminder.Body("text"));
+        var request = new SetCustomReminder.Request(invalidGameId, ValidSnowflake2, new SetCustomReminder.Body("text"));
 
         var result = _validator.TestValidate(request);
 
@@ -43,34 +42,12 @@ public class SetCustomReminderRequestValidatorTests
 
     #endregion
 
-    #region UserId / TargetUserId Tests
-
-    [TestMethod]
-    public void Validate_ShouldHaveError_WhenUserIdIsEmpty()
-    {
-        var request = new SetCustomReminder.Request("valid-game", "", ValidSnowflake2, new SetCustomReminder.Body("text"));
-
-        var result = _validator.TestValidate(request);
-
-        result.ShouldHaveValidationErrorFor(x => x.UserId)
-            .WithErrorMessage("UserId cannot be empty");
-    }
-
-    [TestMethod]
-    public void Validate_ShouldHaveError_WhenUserIdIsNotSnowflake()
-    {
-        var request = new SetCustomReminder.Request("valid-game", "invalid-user", ValidSnowflake2, new SetCustomReminder.Body("text"));
-
-        var result = _validator.TestValidate(request);
-
-        result.ShouldHaveValidationErrorFor(x => x.UserId)
-            .WithErrorMessage("UserId must be a valid Discord snowflake");
-    }
+    #region TargetUserId Tests
 
     [TestMethod]
     public void Validate_ShouldHaveError_WhenTargetUserIdIsEmpty()
     {
-        var request = new SetCustomReminder.Request("valid-game", ValidSnowflake, "", new SetCustomReminder.Body("text"));
+        var request = new SetCustomReminder.Request("valid-game", "", new SetCustomReminder.Body("text"));
 
         var result = _validator.TestValidate(request);
 
@@ -81,7 +58,7 @@ public class SetCustomReminderRequestValidatorTests
     [TestMethod]
     public void Validate_ShouldHaveError_WhenTargetUserIdIsNotSnowflake()
     {
-        var request = new SetCustomReminder.Request("valid-game", ValidSnowflake, "invalid-user", new SetCustomReminder.Body("text"));
+        var request = new SetCustomReminder.Request("valid-game", "invalid-user", new SetCustomReminder.Body("text"));
 
         var result = _validator.TestValidate(request);
 
@@ -96,7 +73,7 @@ public class SetCustomReminderRequestValidatorTests
     [TestMethod]
     public void Validate_ShouldHaveError_WhenReminderTextIsEmpty()
     {
-        var request = new SetCustomReminder.Request("valid-game", ValidSnowflake, ValidSnowflake2, new SetCustomReminder.Body(""));
+        var request = new SetCustomReminder.Request("valid-game", ValidSnowflake2, new SetCustomReminder.Body(""));
 
         var result = _validator.TestValidate(request);
 
@@ -107,7 +84,7 @@ public class SetCustomReminderRequestValidatorTests
     public void Validate_ShouldHaveError_WhenReminderTextIsTooLong()
     {
         var longText = new string('a', 41);
-        var request = new SetCustomReminder.Request("valid-game", ValidSnowflake, ValidSnowflake2, new SetCustomReminder.Body(longText));
+        var request = new SetCustomReminder.Request("valid-game", ValidSnowflake2, new SetCustomReminder.Body(longText));
 
         var result = _validator.TestValidate(request);
 
@@ -119,7 +96,7 @@ public class SetCustomReminderRequestValidatorTests
     public void Validate_ShouldNotHaveError_WhenReminderTextIsMaxLength()
     {
         var maxLengthText = new string('a', 40);
-        var request = new SetCustomReminder.Request("valid-game", ValidSnowflake, ValidSnowflake2, new SetCustomReminder.Body(maxLengthText));
+        var request = new SetCustomReminder.Request("valid-game", ValidSnowflake2, new SetCustomReminder.Body(maxLengthText));
 
         var result = _validator.TestValidate(request);
 

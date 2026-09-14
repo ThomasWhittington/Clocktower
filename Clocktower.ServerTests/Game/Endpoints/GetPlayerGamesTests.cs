@@ -30,7 +30,8 @@ public class GetPlayerGamesTests
         builder.GetEndpoint("/player/{userId}")
             .ShouldHaveMethod(HttpMethod.Get)
             .ShouldHaveOperationId("getPlayerGamesApi")
-            .ShouldHaveSummaryAndDescription("Gets games the player is in");
+            .ShouldHaveSummaryAndDescription("Gets games the player is in")
+            .ShouldRequireAuthenticatedUser();
     }
 
     [TestMethod]

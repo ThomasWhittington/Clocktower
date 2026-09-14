@@ -1,7 +1,6 @@
-﻿using Clocktower.Server.Data;
+using Clocktower.Server.Data;
 using Clocktower.Server.Discord.Endpoints;
 using Clocktower.Server.Discord.Services;
-using Clocktower.Server.Discord.Town.Endpoints.Validation;
 
 namespace Clocktower.ServerTests.Discord.Endpoints;
 
@@ -25,19 +24,19 @@ public class GetGuildsWithUserTests
 
         GetGuildsWithUser.Map(builder);
 
-        builder.GetEndpoint("/{userId}/guilds")
+        builder.GetEndpoint("/guilds")
             .ShouldHaveMethod(HttpMethod.Get)
             .ShouldHaveOperationId("getGuildsWithUserApi")
             .ShouldHaveSummary("Gets guilds that contain user")
             .ShouldHaveDescription("Gets all guilds the bot is in that the player is also an administrator")
-            .ShouldHaveValidation();
+            .ShouldRequireAuthenticatedUser();
     }
 
     [TestMethod]
     public void Handle_ReturnsBadRequest_WhenServiceGetGuildsWithUserReturnsFalse()
     {
         var userId = CommonMethods.GetRandomSnowflakeStringId();
-        var request = new UserIdRequest(userId);
+        var user = CommonMethods.CreateClaimsPrincipal(userId);
 
         var guilds = new List<MiniGuild>
         {
@@ -47,7 +46,7 @@ public class GetGuildsWithUserTests
 
         _mockDiscordService.Setup(o => o.GetGuildsWithUser(userId)).Returns((false, guilds, ResponseMessage));
 
-        var result = GetGuildsWithUser.Handle(request, _mockDiscordService.Object);
+        var result = GetGuildsWithUser.Handle(user, _mockDiscordService.Object);
 
         _mockDiscordService.Verify(o => o.GetGuildsWithUser(userId), Times.Once);
 
@@ -60,7 +59,7 @@ public class GetGuildsWithUserTests
     public void Handle_ReturnsOk_WhenServiceGetGuildsWithUserReturnsTrue()
     {
         var userId = CommonMethods.GetRandomSnowflakeStringId();
-        var request = new UserIdRequest(userId);
+        var user = CommonMethods.CreateClaimsPrincipal(userId);
 
         var guilds = new List<MiniGuild>
         {
@@ -70,7 +69,7 @@ public class GetGuildsWithUserTests
 
         _mockDiscordService.Setup(o => o.GetGuildsWithUser(userId)).Returns((true, guilds, ResponseMessage));
 
-        var result = GetGuildsWithUser.Handle(request, _mockDiscordService.Object);
+        var result = GetGuildsWithUser.Handle(user, _mockDiscordService.Object);
 
         _mockDiscordService.Verify(o => o.GetGuildsWithUser(userId), Times.Once);
 
