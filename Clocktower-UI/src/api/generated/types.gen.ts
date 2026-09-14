@@ -1002,31 +1002,6 @@ export type CommitDraftApiResponses = {
 
 export type CommitDraftApiResponse = CommitDraftApiResponses[keyof CommitDraftApiResponses];
 
-export type DeleteGameApiData = {
-    body?: never;
-    path: {
-        gameId: string;
-    };
-    query?: never;
-    url: '/api/games/{gameId}/delete';
-};
-
-export type DeleteGameApiErrors = {
-    /**
-     * Not Found
-     */
-    404: string;
-};
-
-export type DeleteGameApiError = DeleteGameApiErrors[keyof DeleteGameApiErrors];
-
-export type DeleteGameApiResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
 export type GetAvailableGameUsersApiData = {
     body?: never;
     path: {

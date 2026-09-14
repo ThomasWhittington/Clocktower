@@ -7,7 +7,8 @@ public class SetPerspectiveRole : IEndpoint
         .MapPost("/{gameId}/set-perspective-role/{userId}/{targetUserId}/{roleId?}", Handle)
         .SetOpenApiOperationId<SetPerspectiveRole>()
         .WithSummaryAndDescription("Sets the role for the target user on the users perspective of the game")
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .RequireOwnUserId();
 
 
     internal static async Task<Results<Ok<string>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle(

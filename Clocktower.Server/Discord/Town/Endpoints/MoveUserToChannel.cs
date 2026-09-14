@@ -9,7 +9,8 @@ public class MoveUserToChannel : IEndpoint
         .MapPost("/{guildId}/{userId}/{channelId}", Handle)
         .SetOpenApiOperationId<MoveUserToChannel>()
         .WithSummaryAndDescription("Moves the user to the specified channel")
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .RequireOwnUserId();
 
     internal static async Task<Results<Ok<string>, BadRequest<string>>> Handle([AsParameters] Request request, IDiscordTownService discordTownService)
     {

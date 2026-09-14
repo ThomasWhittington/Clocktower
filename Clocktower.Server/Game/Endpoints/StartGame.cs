@@ -9,7 +9,8 @@ public class StartGame : IEndpoint
         .MapPost("/start/{guildId}/{userId}", Handle)
         .SetOpenApiOperationId<StartGame>()
         .WithSummaryAndDescription("Starts new game perspective for id")
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .RequireOwnUserId();
 
     internal static async Task<Results<Created<GamePerspective>, BadRequest<string>>> Handle([AsParameters] Request request, [FromServices] IGameService gameService, [FromServices] IDiscordTownService discordTownService, [FromServices] ILogger<StartGame> logger)
     {

@@ -7,7 +7,8 @@ public class SetReminder : IEndpoint
         .MapPost("/{gameId}/set-reminder/{userId}/{targetUserId}/{reminderId}", Handle)
         .SetOpenApiOperationId<SetReminder>()
         .WithSummaryAndDescription("Set a reminder for a player in a game")
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .RequireOwnUserId();
 
     internal static async Task<Results<Ok<string>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle(
         [AsParameters] Request request,

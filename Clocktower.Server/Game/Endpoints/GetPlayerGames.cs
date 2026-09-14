@@ -6,7 +6,8 @@ public class GetPlayerGames : IEndpoint
     public static void Map(IEndpointRouteBuilder app) => app
         .MapGet("/player/{userId}", Handle)
         .SetOpenApiOperationId<GetPlayerGames>()
-        .WithSummaryAndDescription("Gets games the player is in");
+        .WithSummaryAndDescription("Gets games the player is in")
+        .RequireOwnUserId();
 
     internal static Ok<IEnumerable<MiniGamePerspective>> Handle(string userId, [FromServices] IGameService gameService)
     {

@@ -7,7 +7,8 @@ public class RemoveReminder : IEndpoint
         .MapPost("/{gameId}/remove-reminder/{userId}/{targetUserId}/{reminderId}", Handle)
         .SetOpenApiOperationId<RemoveReminder>()
         .WithSummaryAndDescription("Removes a reminder for a player in a game")
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .RequireOwnUserId();
 
     internal static async Task<Results<Ok<string>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle(
         [AsParameters] Request request,

@@ -3,7 +3,6 @@
 public interface IGameService
 {
     (bool success, GamePerspective? gamePerspective, string message) StartNewGame(string guildId, string userId);
-    (bool success, string message) DeleteGame(string gameId);
     (bool success, IEnumerable<GamePerspective> perspectives, string message) GetGamePerspectives(string gameId);
     IEnumerable<GamePerspective> GetGames();
     IEnumerable<MiniGamePerspective> GetPlayerGames(string userId);

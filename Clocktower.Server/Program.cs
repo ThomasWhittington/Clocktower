@@ -96,6 +96,9 @@ internal abstract class Program
                         policy.RequireClaim("is_storyteller", "true");
                         policy.AddRequirements(new StoryTellerForGameRequirement());
                     }
+                )
+                .AddPolicy("SelfForRoute", policy =>
+                    policy.AddRequirements(new SelfForRouteRequirement())
                 );
             var app = builder.Build();
             app.Configure();
