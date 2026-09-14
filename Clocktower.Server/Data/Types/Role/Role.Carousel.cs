@@ -96,7 +96,9 @@ public partial record Role
         .WithReminders(DeadText, "Registers Evil");
 
     public static Role Magician => CarouselTownsfolk("Magician", "The Demon thinks you are a Minion. Minions think you are a Demon.");
-    public static Role Shugenja => CarouselTownsfolk("Shugenja", "You start knowing if your closest evil player is clockwise or anti-clockwise. If equidistant, this info is arbitrary.");
+
+    public static Role Shugenja => CarouselTownsfolk("Shugenja", "You start knowing if your closest evil player is clockwise or anti-clockwise. If equidistant, this info is arbitrary.")
+        .FirstNight(49, "Wake the Shugenja and show them the direction (clockwise or anti-clockwise) of their closest evil player.");
 
     public static Role Princess => CarouselTownsfolk("Princess", "On your 1st day, if you nominated & executed a player, the Demon doesn't kill tonight.")
         .WithReminders("Doesn't Kill");
