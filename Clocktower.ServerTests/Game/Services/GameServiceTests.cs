@@ -130,36 +130,6 @@ public class GameServiceTests
 
     #endregion
 
-    #region DeleteGame
-
-    [TestMethod]
-    public void DeleteGame_ReturnsExpected_WhenStoreReturnsTrue()
-    {
-        var gameId = CommonMethods.GetRandomString();
-
-        _mockGamePerspectiveService.Setup(o => o.RemoveGame(gameId)).Returns(true);
-
-        var result = _sut.DeleteGame(gameId);
-
-        result.success.Should().BeTrue();
-        result.message.Should().Be($"Game deleted successfully");
-    }
-
-    [TestMethod]
-    public void DeleteGame_ReturnsExpected_WhenStoreReturnsFalse()
-    {
-        var gameId = CommonMethods.GetRandomString();
-
-        _mockGamePerspectiveService.Setup(o => o.RemoveGame(gameId)).Returns(false);
-
-        var result = _sut.DeleteGame(gameId);
-
-        result.success.Should().BeFalse();
-        result.message.Should().Be($"Game ID '{gameId}' failed to be deleted");
-    }
-
-    #endregion
-
     #region StartNewGame
 
     [TestMethod]
@@ -912,7 +882,8 @@ public class GameServiceTests
 
     #region SetPerspectiveRole
 
-    private void Setup_SetPerspectiveRole(bool hasGame = true, bool hasGuild = true, bool hasUser = true, bool hasTargetUser = true, bool updated = true)
+    private void Setup_SetPerspectiveRole(bool hasGame = true, bool hasGuild = true, bool hasUser = true, bool hasTargetUser = true,
+        bool hasCallerInPerspective = true, UserType callerUserType = UserType.Player, bool updated = true)
     {
         var guild = StrictMockFactory.Create<IDiscordGuild>();
 
@@ -921,7 +892,9 @@ public class GameServiceTests
         var user = StrictMockFactory.Create<IDiscordGuildUser>();
         user.Setup(o => o.DisplayName).Returns(DisplayName2);
 
-        var perspective = new GamePerspective(GameId, UserId, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow);
+        var gameUsers = hasCallerInPerspective ? new List<GameUser> { new(UserId2) { UserType = callerUserType } } : [];
+
+        var perspective = new GamePerspective(GameId, UserId, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow) with { Users = gameUsers };
 
         _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? perspective : null);
 
@@ -929,7 +902,9 @@ public class GameServiceTests
 
         guild.Setup(o => o.GetUser(UserId)).Returns(hasTargetUser ? targetUser.Object : null);
         guild.Setup(o => o.GetUser(UserId2)).Returns(hasUser ? user.Object : null);
-        _mockGamePerspectiveService.Setup(o => o.SetRoleOnPerspective(GameId, UserId2, UserId, It.IsAny<Role>())).Returns(updated);
+
+        var expectedPerspectiveUserId = callerUserType == UserType.StoryTeller ? IGamePerspectiveStore.OmniscientKey : UserId2;
+        _mockGamePerspectiveService.Setup(o => o.SetRoleOnPerspective(GameId, expectedPerspectiveUserId, UserId, It.IsAny<Role>())).Returns(updated);
         _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
     }
 
@@ -974,6 +949,16 @@ public class GameServiceTests
     }
 
     [TestMethod]
+    public async Task SetPerspectiveRole_ReturnsError_WhenCallerNotInPerspective()
+    {
+        Setup_SetPerspectiveRole(hasCallerInPerspective: false);
+
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger.Id);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
     public async Task SetPerspectiveRole_ReturnsError_WhenRoleNotFound()
     {
         Setup_SetPerspectiveRole();
@@ -981,6 +966,17 @@ public class GameServiceTests
         var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, "invalid");
 
         result.ShouldFailWith(ErrorKind.NotFound, "role.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetPerspectiveRole_WritesToOmniscientPerspective_WhenCallerIsStoryTeller()
+    {
+        Setup_SetPerspectiveRole(callerUserType: UserType.StoryTeller);
+
+        var result = await _sut.SetPerspectiveRole(GameId, UserId2, UserId, Role.Gunslinger.Id);
+
+        result.ShouldSucceedWith<string>("display name now has the perspective role: Gunslinger");
+        _mockGamePerspectiveService.Verify(o => o.SetRoleOnPerspective(GameId, IGamePerspectiveStore.OmniscientKey, UserId, Role.Gunslinger), Times.Once);
     }
 
     [TestMethod]
@@ -1372,6 +1368,258 @@ public class GameServiceTests
 
         result.ShouldSucceedWith<string>("display name2 Reminders updated");
         _mockGamePerspectiveService.Verify(o => o.AddReminderForUserOnPerspective(GameId, IGamePerspectiveStore.OmniscientKey, UserId2, new ReminderToken("", ReminderText)), Times.Once);
+    }
+
+    #endregion
+
+    #region SetReminder
+
+    private const string ReminderRoleId = "empath";
+    private const string ReminderTokenText = "Poisoned";
+    private static readonly string ReminderId = $"{ReminderRoleId}-{ReminderTokenText}";
+
+    private void Setup_SetReminder(bool hasGame = true, bool hasGuild = true, bool hasUser = true, bool hasTargetUser = true,
+        bool hasCallerInPerspective = true, UserType callerUserType = UserType.Player, bool updated = true)
+    {
+        var guild = StrictMockFactory.Create<IDiscordGuild>();
+
+        var user = StrictMockFactory.Create<IDiscordGuildUser>();
+        user.Setup(o => o.DisplayName).Returns(DisplayName);
+        var targetUser = StrictMockFactory.Create<IDiscordGuildUser>();
+        targetUser.Setup(o => o.DisplayName).Returns(DisplayName2);
+
+        var gameUsers = hasCallerInPerspective ? new List<GameUser> { new(UserId) { UserType = callerUserType } } : [];
+
+        var perspective = new GamePerspective(GameId, UserId, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow) with { Users = gameUsers };
+
+        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? perspective : null);
+
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guild.Object : null);
+
+        guild.Setup(o => o.GetUser(UserId)).Returns(hasUser ? user.Object : null);
+        guild.Setup(o => o.GetUser(UserId2)).Returns(hasTargetUser ? targetUser.Object : null);
+
+        var expectedPerspectiveUserId = callerUserType == UserType.StoryTeller ? IGamePerspectiveStore.OmniscientKey : UserId;
+        _mockGamePerspectiveService.Setup(o => o.AddReminderForUserOnPerspective(GameId, expectedPerspectiveUserId, UserId2, new ReminderToken(ReminderRoleId, ReminderTokenText))).Returns(updated);
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+    }
+
+    [TestMethod]
+    public async Task SetReminder_ReturnsError_WhenGameNotFound()
+    {
+        Setup_SetReminder(hasGame: false);
+
+        var result = await _sut.SetReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetReminder_ReturnsError_WhenGuildNotFound()
+    {
+        Setup_SetReminder(hasGuild: false);
+
+        var result = await _sut.SetReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
+    }
+
+    [TestMethod]
+    public async Task SetReminder_ReturnsError_WhenUserNotFound()
+    {
+        Setup_SetReminder(hasUser: false);
+
+        var result = await _sut.SetReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetReminder_ReturnsError_WhenTargetUserNotFound()
+    {
+        Setup_SetReminder(hasTargetUser: false);
+
+        var result = await _sut.SetReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetReminder_ReturnsError_WhenCallerNotInPerspective()
+    {
+        Setup_SetReminder(hasCallerInPerspective: false);
+
+        var result = await _sut.SetReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task SetReminder_ReturnsError_WhenReminderIdIsInvalid()
+    {
+        Setup_SetReminder();
+
+        var result = await _sut.SetReminder(GameId, UserId, UserId2, "invalid");
+
+        result.ShouldFailWith(ErrorKind.Invalid, "reminder.invalid");
+    }
+
+    [TestMethod]
+    public async Task SetReminder_ReturnsOk_WhenUpdated()
+    {
+        Setup_SetReminder();
+
+        var result = await _sut.SetReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldSucceedWith<string>("display name2 Reminders updated");
+        _mockGamePerspectiveService.Verify(o => o.AddReminderForUserOnPerspective(GameId, UserId, UserId2, new ReminderToken(ReminderRoleId, ReminderTokenText)), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task SetReminder_ReturnsOk_WhenNoChangeMade()
+    {
+        Setup_SetReminder(updated: false);
+
+        var result = await _sut.SetReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldSucceedWith<string>("display name2 No reminder change made");
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task SetReminder_WritesToOmniscientPerspective_WhenCallerIsStoryTeller()
+    {
+        Setup_SetReminder(callerUserType: UserType.StoryTeller);
+
+        var result = await _sut.SetReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldSucceedWith<string>("display name2 Reminders updated");
+        _mockGamePerspectiveService.Verify(o => o.AddReminderForUserOnPerspective(GameId, IGamePerspectiveStore.OmniscientKey, UserId2, new ReminderToken(ReminderRoleId, ReminderTokenText)), Times.Once);
+    }
+
+    #endregion
+
+    #region RemoveReminder
+
+    private void Setup_RemoveReminder(bool hasGame = true, bool hasGuild = true, bool hasUser = true, bool hasTargetUser = true,
+        bool hasCallerInPerspective = true, UserType callerUserType = UserType.Player, bool updated = true)
+    {
+        var guild = StrictMockFactory.Create<IDiscordGuild>();
+
+        var user = StrictMockFactory.Create<IDiscordGuildUser>();
+        user.Setup(o => o.DisplayName).Returns(DisplayName);
+        var targetUser = StrictMockFactory.Create<IDiscordGuildUser>();
+        targetUser.Setup(o => o.DisplayName).Returns(DisplayName2);
+
+        var gameUsers = hasCallerInPerspective ? new List<GameUser> { new(UserId) { UserType = callerUserType } } : [];
+
+        var perspective = new GamePerspective(GameId, UserId, GuildId, CommonMethods.GetRandomGameUser(), DateTime.UtcNow) with { Users = gameUsers };
+
+        _mockGamePerspectiveService.Setup(o => o.GetFirstPerspective(GameId)).Returns(hasGame ? perspective : null);
+
+        _mockBot.Setup(o => o.GetGuild(GuildId)).Returns(hasGuild ? guild.Object : null);
+
+        guild.Setup(o => o.GetUser(UserId)).Returns(hasUser ? user.Object : null);
+        guild.Setup(o => o.GetUser(UserId2)).Returns(hasTargetUser ? targetUser.Object : null);
+
+        var expectedPerspectiveUserId = callerUserType == UserType.StoryTeller ? IGamePerspectiveStore.OmniscientKey : UserId;
+        _mockGamePerspectiveService.Setup(o => o.RemoveReminderForUserOnPerspective(GameId, expectedPerspectiveUserId, UserId2, new ReminderToken(ReminderRoleId, ReminderTokenText))).Returns(updated);
+        _mockGameBroadcastService.Setup(o => o.BroadcastDiscordTownUpdate(GameId)).Returns(Task.CompletedTask);
+    }
+
+    [TestMethod]
+    public async Task RemoveReminder_ReturnsError_WhenGameNotFound()
+    {
+        Setup_RemoveReminder(hasGame: false);
+
+        var result = await _sut.RemoveReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "game.not_found");
+    }
+
+    [TestMethod]
+    public async Task RemoveReminder_ReturnsError_WhenGuildNotFound()
+    {
+        Setup_RemoveReminder(hasGuild: false);
+
+        var result = await _sut.RemoveReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldFailWith(ErrorKind.Invalid, "guild.invalid_id");
+    }
+
+    [TestMethod]
+    public async Task RemoveReminder_ReturnsError_WhenUserNotFound()
+    {
+        Setup_RemoveReminder(hasUser: false);
+
+        var result = await _sut.RemoveReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task RemoveReminder_ReturnsError_WhenTargetUserNotFound()
+    {
+        Setup_RemoveReminder(hasTargetUser: false);
+
+        var result = await _sut.RemoveReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task RemoveReminder_ReturnsError_WhenCallerNotInPerspective()
+    {
+        Setup_RemoveReminder(hasCallerInPerspective: false);
+
+        var result = await _sut.RemoveReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldFailWith(ErrorKind.NotFound, "user.not_found");
+    }
+
+    [TestMethod]
+    public async Task RemoveReminder_ReturnsError_WhenReminderIdIsInvalid()
+    {
+        Setup_RemoveReminder();
+
+        var result = await _sut.RemoveReminder(GameId, UserId, UserId2, "invalid");
+
+        result.ShouldFailWith(ErrorKind.Invalid, "reminder.invalid");
+    }
+
+    [TestMethod]
+    public async Task RemoveReminder_ReturnsOk_WhenUpdated()
+    {
+        Setup_RemoveReminder();
+
+        var result = await _sut.RemoveReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldSucceedWith<string>("display name2 Reminders updated");
+        _mockGamePerspectiveService.Verify(o => o.RemoveReminderForUserOnPerspective(GameId, UserId, UserId2, new ReminderToken(ReminderRoleId, ReminderTokenText)), Times.Once);
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task RemoveReminder_ReturnsOk_WhenNoChangeMade()
+    {
+        Setup_RemoveReminder(updated: false);
+
+        var result = await _sut.RemoveReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldSucceedWith<string>("display name2 No reminder change made");
+        _mockGameBroadcastService.Verify(o => o.BroadcastDiscordTownUpdate(GameId), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task RemoveReminder_WritesToOmniscientPerspective_WhenCallerIsStoryTeller()
+    {
+        Setup_RemoveReminder(callerUserType: UserType.StoryTeller);
+
+        var result = await _sut.RemoveReminder(GameId, UserId, UserId2, ReminderId);
+
+        result.ShouldSucceedWith<string>("display name2 Reminders updated");
+        _mockGamePerspectiveService.Verify(o => o.RemoveReminderForUserOnPerspective(GameId, IGamePerspectiveStore.OmniscientKey, UserId2, new ReminderToken(ReminderRoleId, ReminderTokenText)), Times.Once);
     }
 
     #endregion

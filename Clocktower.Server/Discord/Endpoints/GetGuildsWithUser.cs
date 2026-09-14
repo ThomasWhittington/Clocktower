@@ -10,7 +10,8 @@ public class GetGuildsWithUser : IEndpoint
         .SetOpenApiOperationId<GetGuildsWithUser>()
         .WithSummary("Gets guilds that contain user")
         .WithDescription("Gets all guilds the bot is in that the player is also an administrator")
-        .WithRequestValidation<UserIdRequest>();
+        .WithRequestValidation<UserIdRequest>()
+        .RequireOwnUserId();
 
     internal static Results<Ok<Response>, BadRequest<string>> Handle([AsParameters] UserIdRequest request, [FromServices] IDiscordService discordService)
     {

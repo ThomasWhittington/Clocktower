@@ -7,7 +7,8 @@ public class SetCustomReminder : IEndpoint
         .MapPost("/{gameId}/set-custom-reminder/{userId}/{targetUserId}", Handle)
         .SetOpenApiOperationId<SetCustomReminder>()
         .WithSummaryAndDescription("Sets a custom, free-text reminder for a player in a game, visible only to the user who set it")
-        .WithRequestValidation<Request>();
+        .WithRequestValidation<Request>()
+        .RequireOwnUserId();
 
     internal static async Task<Results<Ok<string>, NotFound<ErrorResponse>, BadRequest<ErrorResponse>>> Handle(
         [AsParameters] Request request,

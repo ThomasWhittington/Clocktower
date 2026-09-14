@@ -27,15 +27,6 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
     }
 
 
-    public (bool success, string message) DeleteGame(string gameId)
-    {
-        bool deleteSuccessful = gamePerspectiveService.RemoveGame(gameId);
-
-        return deleteSuccessful
-            ? (true, "Game deleted successfully")
-            : (false, $"Game ID '{gameId}' failed to be deleted");
-    }
-
     public (bool success, GamePerspective? gamePerspective, string message) StartNewGame(string guildId, string userId)
     {
         var gameId = idGenerator.GenerateId();
@@ -250,6 +241,11 @@ public class GameService(IDiscordBot bot, IGamePerspectiveService gamePerspectiv
         if (user is null) return Result.Fail<string>(Errors.UserNotFound(userId));
         var targetUser = guild.GetUser(targetUserId);
         if (targetUser is null) return Result.Fail<string>(Errors.UserNotFound(targetUserId));
+        var gameUser = gamePerspective.Users.FirstOrDefault(o => o.Id == userId);
+        if (gameUser is null) return Result.Fail<string>(Errors.UserNotFound(userId));
+
+        if (gameUser.UserType == UserType.StoryTeller) userId = IGamePerspectiveStore.OmniscientKey;
+
         var role = Role.AllRoles.FirstOrDefault(o => o.Id == roleId);
         if (roleId is not null && role is null) return Result.Fail<string>(ErrorKind.NotFound, "role.not_found", $"Role '{roleId}' was not found");
 
